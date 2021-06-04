@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Available files</title>
+</head>
+
+<body>
+    <table>
+        <tr>
+            <th>Name</th>
+            <th>Format</th>
+            <th>Licence</th>
+            <th>Author</th>
+            <th>Source</th>
+            <th>Tags</th>
+            <th>Link</th>
+        </tr>
+        {% for file in file_list %}
+        <tr>
+            <td>{file.name}</td>
+            <td>{file.format}</td>
+            <td>{file.license}</td>
+            <td>{file.author}</td>
+            <td>{file.source}</td>
+            <td>{', '.join(file.tags)}</td>
+            <td><a href="{% url 'raw' file.id}"></a></td>
+        </tr>
+        {% endfor %}
+    </table>>
+</body>
+
+</html>
