@@ -167,3 +167,7 @@ Thumbs.db
 *.xhtml
 
 # End of https://www.toptal.com/developers/gitignore/api/python,web
+
+
+#locally uploaded files
+src/files/**
