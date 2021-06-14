@@ -23,7 +23,7 @@
         <select name="tags" id="tags">
             <option value="all">All</option>
             {% for tag in tag_list %}
-                <option value={{tag.name|urlencode}}>{{tag.name}}</option>
+            <option value={{tag.name|urlencode}}>{{tag.name}}</option>
             {% endfor %}
         </select>
         <input type="submit" value="Filter">
@@ -31,21 +31,30 @@
     <table>
         <tr>
             <th>Name</th>
+            <th>Description</th>
             <th>Format</th>
             <th>Licence</th>
             <th>Author</th>
             <th>Source</th>
             <th>Tags</th>
+            <th>Public</th>
             <th>Content</th>
         </tr>
         {% for file in file_list %}
         <tr>
-            <td>{{file.name}}</td>
+            <td>{{file.file.name}}</td>
+            <td>{{file.description}}</td>
             <td>{{file.format}}</td>
-            <td>test</td>
+            <td>{{file.license}}</td>
             <td>{{file.author}}</td>
             <td>{{file.source}}</td>
             <td> {{file.displayTags}}</td>
+            <td> {% if file.public %}
+                Public
+                {% else %}
+                Private
+                {% endif %}
+            </td>
             <td><a href="{% url 'raw' file.id%}">Raw</a></td>
         </tr>
         {% endfor %}
