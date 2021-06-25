@@ -1,7 +1,6 @@
 from django.http.request import HttpRequest
 from django.shortcuts import get_object_or_404, redirect, render
 from django.http import HttpResponse
-from django.db.models import Q
 from django.utils.http import urlunquote
 
 from .models import File, FileUploadForm, Tag
@@ -49,7 +48,7 @@ def accepted(request):
 
 
 def file_data(request, file_id):
-    return render(request, 'FileManager/uploadForm.html')
+    return render(request, 'FileManager/fileOverview.html')
 
 # displays a form to upload a new file
 
