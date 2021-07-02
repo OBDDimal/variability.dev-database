@@ -10,19 +10,24 @@ class containerManager(threading.Thread):
     def __init__(self):
         threading.Thread.__init__(self)
         self.running = False
+        self.queued_containers = []
 
     def run(self):
+        '''
+        Starts the process that actively monitors the running containers
+        '''
         self.running = True
         while self.running:
             # stop the thread if there are no more processes to queue
-            if len(queued_containers) == 0:
+            if len(self.queued_containers) == 0:
                 self.running = False
                 return
-            container = queued_containers[0]
+            container = self.queued_containers[0]
             # get process to the container
-            process = DockerProcess.objects.get(pk=container.name)
+            container_id = int(container.name.split('-')[1])
+            process = DockerProcess.objects.get(pk=container_id)
             if start_process(container, process):
-                queued_containers = queued_containers[1:]
+                self.queued_containers = self.queued_containers[1:]
             else:
                 # wait a second then check again
                 time.sleep(1)
@@ -36,11 +41,18 @@ client = docker.from_env()
 MAX_RAM = 32
 MAX_CPU = 16
 
-queued_containers = []
 containerManagerThread = containerManager()
 
 
 def create_container(ram, cpu, name):
+    '''
+    Creates a new Docker Container with the specified
+
+    Args:
+        ram: The maximum amount of memory allowed for the container
+        cpu: The amount of CPU cores for this container
+        name: The name of the container
+    '''
     return client.containers.create(
         'ubuntu',
         command='echo Hello World',
@@ -50,16 +62,29 @@ def create_container(ram, cpu, name):
         name=name
     )
 
-def get_ram_and_cpu(resource):
-    resources = resource.split('-')
+
+def get_ram_and_cpu(process):
+    '''
+    Splits the Database representation of a processes resources into ram and cpu
+
+    Returns:
+        Ram: The memory that the process wants to request
+        Cpu: The amount of cpu cores the process wants to request
+    '''
+    resources = process.resources.split('-')
     return int(resources[0]), int(resources[1])
 
 
 def start_or_queue_process(process):
-    ram, cpu = get_ram_and_cpu(process.resources)
-    container = create_container(ram, cpu, process.id)
+    '''
+    Creates a new docker container based on the database process
+
+    If there are enough resources available to start the container, it
+    '''
+    ram, cpu = get_ram_and_cpu(process)
+    container = create_container(ram, cpu, f'p-{process.id}')
     if not start_process(container, process):
-        queued_containers.append((container, process))
+        containerManagerThread.queued_containers.append((container, process))
 
 
 def start_process(new_container, process):
@@ -78,7 +103,8 @@ def start_process(new_container, process):
     used_cpu_cores = 0
     # get all active containers and add up their requirements
     for container in client.containers.list():
-        process = DockerProcess.objects.get(pk=container.name)
+        container_id = int(container.name.split('-')[1])
+        process = DockerProcess.objects.get(pk=container_id)
         process_ram, process_cpu = get_ram_and_cpu(process)
         used_ram += process_ram,
         used_cpu_cores += process_cpu

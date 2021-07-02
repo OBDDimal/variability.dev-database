@@ -2,12 +2,30 @@ from .models import File
 from . import github_manager as gm
 
 def get_all_files(admin_access):
+    '''
+    Returns all files in the database
+
+    Args:
+        admin_access: True if the method should also return private files
+
+    Returns:
+        A list of all files in the database that meet the access criteria
+    '''
     file_list = File.objects.all()
     if not admin_access:
         file_list = file_list.filter(public=True)
     return file_list
 
 def get_accepted_files(admin_access):
+    '''
+    Returns all database files, that were merged into the main branch of the repository
+
+    Args:
+        admin_access: True if the method should also return private files
+
+    Returns:
+        A list of all files in the database that are also in the main branch of the repository
+    '''
     github_file_list = gm.get_files_from_repo(admin_access)
     file_ids = [file.name.split('-')[0] for file in github_file_list]
 

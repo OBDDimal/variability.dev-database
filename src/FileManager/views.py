@@ -13,6 +13,12 @@ from . import github_manager as gm
 
 
 def index(request):
+    '''
+        Displays an overview over all available files in the database.
+        If the user is logged in as an admin, private files are displayed, else only public files.
+
+        Filters the displayed list if tag is selected and included in the request
+    '''
     # Admins can see all files
     admin_access = request.user.is_superuser
     file_list = fm.get_all_files(admin_access)
@@ -29,6 +35,11 @@ def index(request):
 
 
 def accepted(request):
+    '''
+        Displays all files that are accepted in the repository
+
+        Filters the displayed list if tag is selected and included in the request
+    '''
     # Admins can see all files
     admin_access = request.user.is_superuser
     file_list = fm.get_accepted_files(admin_access)
@@ -44,16 +55,21 @@ def accepted(request):
         'tag_list': Tag.objects.all()})
 
 
-# displays details about a specific file
-
-
 def file_data(request, file_id):
-    return render(request, 'FileManager/fileOverview.html')
+    '''
+    Displays details about a file analysis
 
-# displays a form to upload a new file
+    Currently WIP
+    '''
+    return render(request, 'FileManager/fileOverview.html')
 
 
 def upload_file(request):
+    '''
+    Displays a form that lets the user upload a new file to the database
+
+    If the request method is POST, the form is validated and a new file is posted in github as well as stored in the database
+    '''
     if request.method == 'POST':
         form = FileUploadForm(request.POST, request.FILES)
         if(form.is_valid()):
@@ -72,6 +88,12 @@ def upload_file(request):
 
 
 def file_raw(request, file_id):
+    '''
+    Displays the raw content of a file
+    
+    Args:
+        file_id: The database id of the file
+    '''
     fileObj = get_object_or_404(File, pk=file_id)
     # make sure only appropriate users can see the file
     # if not (request.user.is_superuser or fileObj.uploader is None or fileObj.uploader == request.user):
