@@ -38,6 +38,7 @@
             <th>Source</th>
             <th>Tags</th>
             <th>Public</th>
+            <th>Hash</th>
             <th>Content</th>
         </tr>
         {% for file in file_list %}
@@ -55,6 +56,7 @@
                 Private
                 {% endif %}
             </td>
+            <td>{{file.hash}}</td>
             <td><a href="{% url 'raw' file.id%}">Raw</a></td>
         </tr>
         {% endfor %}

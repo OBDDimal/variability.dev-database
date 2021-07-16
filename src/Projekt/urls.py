@@ -22,5 +22,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('files/', include('FileManager.urls')),
     path('analysis/', include('dockerManager.urls')),
+    path('api/', include('FileManager.api_urls')),
     path('', views.index, name='index'),
 ]

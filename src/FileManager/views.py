@@ -28,7 +28,7 @@ def index(request):
         selected_tag = urlunquote(request.GET.get('tags'))
         if(not selected_tag == 'all'):
             file_list = file_list.filter(tags__name=selected_tag)
-
+            
     return render(request, 'FileManager/index.html', {
         'file_list': file_list,
         'tag_list': Tag.objects.all()})
@@ -76,6 +76,7 @@ def upload_file(request):
             # preprocess the uploaded file
             file_name = request.FILES.get('file').name
             uploaded_file = form.save(commit=False)
+            uploaded_file.hash = fm.get_file_hash(uploaded_file)
             uploaded_file.save()
             gm.post_file_in_pull_request(
                 file=uploaded_file, file_name=file_name)
@@ -90,7 +91,7 @@ def upload_file(request):
 def file_raw(request, file_id):
     '''
     Displays the raw content of a file
-    
+
     Args:
         file_id: The database id of the file
     '''
@@ -98,8 +99,5 @@ def file_raw(request, file_id):
     # make sure only appropriate users can see the file
     # if not (request.user.is_superuser or fileObj.uploader is None or fileObj.uploader == request.user):
     #    return HttpResponse('No permissions to view this file')
-    file = fileObj.file
-    file.open(mode='r')
-    lines = file.readlines()
-    file.close()
+    lines = fm.get_file_lines(fileObj)
     return HttpResponse('<br>'.join(lines))
