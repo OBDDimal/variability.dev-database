@@ -6,7 +6,7 @@ from django.forms import ModelForm
 RESOURCE_OPTIONS = {
     ('4-1', '4 GB RAM, 1 CPU core'),
     ('32-1', '32 GB RAM, 1 CPU core'),
-    ('32-16', '32 GB RAM, 16 CPU core'),
+    ('32-16', '32 GB RAM, 16 CPU cores'),
 }
 
 # Create your models here.

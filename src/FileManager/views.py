@@ -6,6 +6,7 @@ from django.utils.http import urlunquote
 from .models import File, FileUploadForm, Tag
 from . import file_manager as fm
 from . import github_manager as gm
+from io import BytesIO
 
 # general view that lists all available files
 
@@ -28,7 +29,7 @@ def index(request):
         selected_tag = urlunquote(request.GET.get('tags'))
         if(not selected_tag == 'all'):
             file_list = file_list.filter(tags__name=selected_tag)
-            
+
     return render(request, 'FileManager/index.html', {
         'file_list': file_list,
         'tag_list': Tag.objects.all()})
@@ -74,12 +75,16 @@ def upload_file(request):
         form = FileUploadForm(request.POST, request.FILES)
         if(form.is_valid()):
             # preprocess the uploaded file
-            file_name = request.FILES.get('file').name
-            uploaded_file = form.save(commit=False)
-            uploaded_file.hash = fm.get_file_hash(uploaded_file)
-            uploaded_file.save()
+            file_content = form.files['file'].file.read().decode('utf-8')
+            file_name = form.files['file'].name
+
+            file_obj = form.save(commit=False)
+            file_obj.content = file_content
+            file_obj.name = file_name
+            file_obj.hash = fm.get_string_hash(file_obj.content)
+            file_obj.save()
             gm.post_file_in_pull_request(
-                file=uploaded_file, file_name=file_name)
+                file=file_obj, file_name=file_name)
             return redirect('/files/')
     else:
         form = FileUploadForm()
@@ -99,5 +104,5 @@ def file_raw(request, file_id):
     # make sure only appropriate users can see the file
     # if not (request.user.is_superuser or fileObj.uploader is None or fileObj.uploader == request.user):
     #    return HttpResponse('No permissions to view this file')
-    lines = fm.get_file_lines(fileObj)
-    return HttpResponse('<br>'.join(lines))
+    lines = fileObj.content.replace('\n','<br>')
+    return HttpResponse(lines)
