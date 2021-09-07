@@ -1,4 +1,3 @@
-from django.http.request import HttpRequest
 from django.shortcuts import get_object_or_404, redirect, render
 from django.http import HttpResponse
 from django.utils.http import urlunquote
@@ -6,12 +5,8 @@ from django.utils.http import urlunquote
 from .models import File, FileUploadForm, Tag
 from . import file_manager as fm
 from . import github_manager as gm
-from io import BytesIO
 
 # general view that lists all available files
-
-# displays all files that are currently
-
 
 def index(request):
     '''
@@ -56,7 +51,7 @@ def accepted(request):
         'tag_list': Tag.objects.all()})
 
 
-def file_data(request, file_id):
+def file_data(request, file_hash):
     '''
     Displays details about a file analysis
 
@@ -93,16 +88,16 @@ def upload_file(request):
 # displays the content of a file as raw text
 
 
-def file_raw(request, file_id):
+def file_raw(request, file_hash):
     '''
     Displays the raw content of a file
 
     Args:
         file_id: The database id of the file
     '''
-    fileObj = get_object_or_404(File, pk=file_id)
+    fileObj = get_object_or_404(File, hash=file_hash)
     # make sure only appropriate users can see the file
     # if not (request.user.is_superuser or fileObj.uploader is None or fileObj.uploader == request.user):
     #    return HttpResponse('No permissions to view this file')
-    lines = fileObj.content.replace('\n','<br>')
+    lines = fileObj.content.replace('\n', '<br>')
     return HttpResponse(lines)

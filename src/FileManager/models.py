@@ -46,13 +46,22 @@ class File(models.Model):
         return self.name
 
     def displayTags(self):
+        '''
+        Used to get a displayable string out of all available tags
+        '''
         return ', '.join(map(str, self.tags.all()))
 
     def get_sortable_fields():
-        return ['name', 'format', 'description', 'author', 'source', 'license', 'hash']
+        '''
+        A list of all fields that can be used to sort the results
+        '''
+        return ['name', 'format', 'description', 'author', 'source', 'hash']
 
     def get_filter_categories():
-        return ['format','description','author', 'source', 'license', 'hash']
+        ''' 
+        A list of all fields that can be used to filter the results
+        '''
+        return ['name', 'format','description','author', 'source', 'license', 'hash']
 
 
 
@@ -64,6 +73,9 @@ class FileUploadForm(ModelForm):
                   'source', 'license', 'tags', 'public']
 
 class Token(models.Model):
+    '''
+    Class that represents authentication tokens
+    '''
     value = models.CharField(max_length=64)
     persistent = models.BooleanField()
     last_request = models.TimeField()

@@ -170,3 +170,6 @@ Thumbs.db
 
 #locally uploaded files
 src/files/**
+_reports/**
+_log/**
+ddueruem/files/**

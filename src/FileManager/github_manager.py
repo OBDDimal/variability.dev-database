@@ -6,12 +6,11 @@ from .models import File
 import os
 import re
 
-#repo_name = 'h3ssto/ddueruem-web'
-repo_name = 'Sean-Duft/github-api-tests'
+repo_name = 'h3ssto/ddueruem-web'
 g = Github(login_or_token=os.getenv('GITHUB_TOKEN'))
 
 
-def get_files_from_repo(full_access=False):
+def get_files_from_repo(full_access=False, repo_name=repo_name):
     '''
     Returns all files that are present in the main branch of the repository.
 
@@ -40,8 +39,8 @@ def get_files_from_repo(full_access=False):
     return public_files
 
 
-def post_file_in_pull_request(file, file_name, branch_name='main'):
-    '''
+def post_file_in_pull_request(file, file_name, branch_name='main', repo_name=repo_name):
+    ''' 
     Takes the given file and posts commits it in a new branch to the repository,
     and creates a pull request with this new branch.
 
@@ -56,13 +55,14 @@ def post_file_in_pull_request(file, file_name, branch_name='main'):
     path = 'files/' + access + '/' + str(file.id) + '-' + file_name
     filtered_file_name = re.sub(r'\W+', '', file_name)
 
-    create_branch(branch_name=filtered_file_name)
+    create_branch(branch_name=filtered_file_name, repo_name=repo_name)
     create_or_update_file(path, file_name, file.content,
-                          branch_name=filtered_file_name)
-    create_new_pull_request(branch_name, filtered_file_name)
+                          branch_name=filtered_file_name, repository_name=repo_name)
+    create_new_pull_request(
+        branch_name, filtered_file_name, repo_name=repo_name)
 
 
-def create_branch(branch_name, base='main'):
+def create_branch(branch_name, base='main', repo_name=repo_name):
     '''
     Creates a new branch in the github repo
 
@@ -109,7 +109,7 @@ def create_or_update_file(path, file_name, file_content, branch_name, repository
                          file_content, branch=branch_name)
 
 
-def create_new_pull_request(base, head):
+def create_new_pull_request(base, head, repo_name=repo_name):
     '''
     Creates a new pull request in the repository
 
@@ -122,7 +122,8 @@ def create_new_pull_request(base, head):
     # get sha of head branch
     if head not in [branch.name for branch in repo.get_branches()]:
         return
-    pull_requests = list(filter(lambda p: p.head.ref == head, repo.get_pulls()))
+    pull_requests = list(
+        filter(lambda p: p.head.ref == head, repo.get_pulls()))
     if(len(pull_requests) == 0):
         # create a pull request
         body = f'Added a new file'

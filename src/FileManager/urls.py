@@ -10,7 +10,7 @@ urlpatterns = [
     #upload form for new files
     path('upload/', views.upload_file),
     #view details for a specific file
-    path('<int:file_id>/', views.file_data),
+    path('<str:file_hash>/', views.file_data),
     #display raw content of uploaded files
-    path('<int:file_id>/raw/', views.file_raw, name='raw'),
+    path('<str:file_hash>/raw/', views.file_raw, name='raw'),
 ]

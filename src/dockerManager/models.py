@@ -9,14 +9,31 @@ RESOURCE_OPTIONS = {
     ('32-16', '32 GB RAM, 16 CPU cores'),
 }
 
-# Create your models here.
+LIBRARIES = (
+    ('buddy', 'BuDDy'),
+    ('cudd', 'CUDD')
+)
+
 class DockerProcess(models.Model):
+    # the file object thats analzyed
     file = models.ForeignKey('FileManager.File', on_delete=CASCADE)
+    # maximal available server resources in the form 'RAM-CPU'
     resources = models.CharField(
         max_length=20, choices=RESOURCE_OPTIONS, default=('4-1'))
     feedback_email = models.CharField(max_length=50)
+    # library used to anazlyze the file
+    library = models.CharField(max_length=10, choices=LIBRARIES)
+
+
+class Analysis(models.Model):
+    # the report file
+    report = models.CharField(max_length=200000)
+    # ordering file
+    order = models.CharField(max_length=200000)
+    process = models.OneToOneField(DockerProcess, on_delete=models.CASCADE)
+
 
 class ProcessCreationForm(ModelForm):
     class Meta:
         model = DockerProcess
-        fields = ['file', 'resources', 'feedback_email']
+        fields = ['file', 'resources', 'feedback_email', 'library']

@@ -57,7 +57,7 @@
                 {% endif %}
             </td>
             <td>{{file.hash}}</td>
-            <td><a href="{% url 'raw' file.id%}">Raw</a></td>
+            <td><a href="{% url 'raw' file.hash%}">Raw</a></td>
         </tr>
         {% endfor %}
     </table>
