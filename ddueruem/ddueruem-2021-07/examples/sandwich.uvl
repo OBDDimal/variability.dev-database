@@ -1,0 +1,30 @@
+namespace Sandwich
+
+features
+	Sandwich	
+		mandatory
+			Bread	
+				alternative
+					Full Grain 
+					Flatbread
+					Toast
+
+		optional
+			Cheese	
+				optional
+					Gouda	
+						alternative
+							Sprinkled
+							Slice
+					Cheddar
+					Cream Cheese 
+			Meat	
+				or
+					Salami 
+					Ham
+					Chicken Breast
+			Vegetables	
+				optional
+					Cucumber 
+					Tomatoes
+					Lettuce

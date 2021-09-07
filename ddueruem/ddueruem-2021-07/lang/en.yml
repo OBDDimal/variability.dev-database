@@ -1,0 +1,46 @@
+en:
+  # error
+  error_create_directory_failed: Failed to create directory
+
+  # warning
+
+  # info
+  ## filesystem
+  info_create_directory: Created directory at
+  info_use_directory: Using directory at
+
+  ## logging
+  info_set_volatile_loglevel: "Setting volatile log level to:"
+  info_set_persistent_loglevel: "Setting persistent log level to:"
+
+  # cli
+  cli_desc: A wrapper for BuDDy and CUDD.
+  cli_file: the DIMACS/UVL file to read.
+
+  cli--force-parser: ignore file ending and parse with selected parser.
+
+  cli--silent: disable all output.
+  cli--no-log: disable log file creation.
+  cli--no-cache: disable cache creation.
+
+  cli--lib: select the BDD library to use. (buddy)
+  cli--parser: select the parser to use. (auto)
+
+  cli--preorder: select the heuristic for preordering. (off)
+  cli--dynorder: enable dynamic reordering w/ the selected heuristic. (off) [help]
+  
+  cli--ignore-cached-order: ignore cached variable orders.
+  cli--ignore-cached-artifacts: ignore cached BDDs.
+
+  cli--log-level: Specify the level of logging
+
+  cli--cache-dir: Specify the directory to store caches to
+  cli--log-dir: Specify the directory to store logifles to
+  cli--report-dir: Specify the directory to store report files to
+
+  # setup cli
+
+  cli_setup_desc: Download and build supported libraries
+  
+  cli_setup--install: download and install the chosen libraries.
+  cli_setup--clean: ignores existing downloads, sources, and shared libraries.

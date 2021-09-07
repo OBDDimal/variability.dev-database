@@ -1,0 +1,47 @@
+c 1 Flatbread
+c 2 Vegetables
+c 3 Cheddar
+c 4 Cheese
+c 5 Cucumber 
+c 6 Salami 
+c 7 Full Grain 
+c 8 Bread
+c 9 Meat
+c 10 Sandwich
+c 11 Lettuce
+c 12 Toast
+c 13 Ham
+c 14 Slice
+c 15 Gouda
+c 16 Tomatoes
+c 17 Chicken Breast
+c 18 Sprinkled
+c 19 Cream Cheese 
+p cnf 19 27
+10 0
+2 -5 0
+2 -16 0
+2 -11 0
+4 -15 0
+4 -3 0
+4 -19 0
+8 -7 0
+8 -1 0
+8 -12 0
+7 1 12 -8 0
+-7 -1 0
+-7 -12 0
+-1 -12 0
+9 -6 0
+9 -13 0
+9 -17 0
+6 13 17 -9 0
+10 -8 0
+10 -4 0
+10 -9 0
+10 -2 0
+8 -10 0
+15 -18 0
+15 -14 0
+18 14 -15 0
+-18 -14 0
