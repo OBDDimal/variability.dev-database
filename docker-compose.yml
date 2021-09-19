@@ -1,0 +1,7 @@
+version: "3.9"
+services:
+  ddueruem:
+    image: ddueruem
+    volumes:
+      - ./_log:/ddueruem/_log
+      - ./_reports:/ddueruem/_reports
