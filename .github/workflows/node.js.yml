@@ -10,7 +10,7 @@ on:
     branches: [ pipelineSetup ]
 
 jobs:
-  build:
+  install:
 
     runs-on: ubuntu-latest
     defaults:
@@ -32,3 +32,37 @@ jobs:
     - run: yarn install --frozen-lockfile
     - run: yarn build --if-present
     - run: yarn test
+    
+  build:
+
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./frontend
+    strategy:
+      matrix:
+        node-version: [12.x, 14.x, 16.x]
+        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
+
+    steps:
+    - uses: actions/checkout@v2
+    - run: yarn install --frozen-lockfile
+    - run: yarn build --if-present
+    
+  test:
+
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./frontend
+    strategy:
+      matrix:
+        node-version: [12.x, 14.x, 16.x]
+        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
+
+    steps:
+    - uses: actions/checkout@v2
+    - run: yarn install --frozen-lockfile
+    - run: yarn build --if-present
+    - run: yarn test
+
