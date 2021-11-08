@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% block dashboard %}
+    <p>
+        Ah I see, the negotiator {{ user.username|default:'mr. nobody' }} has arrived! <br/>
+        Dashboard choices:
+    </p>
+    <ul>
+        <li><a href="{% url 'dashboard' %}">Change password</a></li>
+        <li><a href="{% url 'dashboard' %}">Logout here</a></li>
+    </ul>
+{% endblock %}

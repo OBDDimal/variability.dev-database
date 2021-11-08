@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>DDueruem Web Backend Test</title>
+    <style>
+        label, input {
+            display: block;
+        }
+
+        span.helptext {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+<center>
+    <h1>DDueruem Web Backend</h1>
+    <p>
+        DDueruem is a web service for sharing feature model instances and collaborative benchmarking. <br/>
+        Are you logged in ?
+    </p>
+
+    {% block checklogin %}
+        {% if user.is_authenticated %}
+            <h2>Hello {{ user.username }}!</h2>
+            <p>You are currently logged in the system!</p>
+            {% block dashboard %}{% endblock %}
+        {% else %}
+            {% block loginForm %}
+                <h2>You are not logged in the system!</h2>
+                <p>
+                    Login: <a href="{% url 'home' %}">click here</a> or <br/>
+                    Register: <a href="{% url 'home' %}">click here</a> or <br/>
+                    Reset password: <a href="{% url 'home' %}">click here</a>
+                </p>
+            {% endblock %}
+        {% endif %}
+        {% block content %}{% endblock %}
+    {% endblock %}
+</center>
+</body>
+</html>
