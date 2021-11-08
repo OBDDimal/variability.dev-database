@@ -28,7 +28,7 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'yarn'
-        cache-dependency-path: frontend/package-lock.json
+        cache-dependency-path: frontend/yarn.lock
     - run: yarn install --frozen-lockfile
     - run: yarn build --if-present
     - run: yarn test
