@@ -29,7 +29,15 @@ jobs:
         node-version: ${{ matrix.node-version }}
         cache: 'yarn'
         cache-dependency-path: frontend/yarn.lock
-    - run: yarn install --frozen-lockfile
+        
+    - uses: actions/cache@v2
+      with:
+        path: '**/node_modules'
+        key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
+        
+    - name: Install dependencies
+      if: steps.yarn-cache.outputs.cache-hit != 'true'
+      run: yarn install --frozen-lockfile
     - run: yarn build --if-present
     - run: yarn test
     
@@ -46,7 +54,6 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - run: yarn install --frozen-lockfile
     - run: yarn build --if-present
     
   test:
@@ -62,7 +69,6 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - run: yarn install --frozen-lockfile
     - run: yarn build --if-present
     - run: yarn test
 
