@@ -1,17 +1,9 @@
-from django.shortcuts import render, redirect
-from core.forms import FileUploadForm
+from rest_framework import views, viewsets, permissions
+from core.models import FileUpload
+from core.serializers import FilesSerializer
 
 
-def upload(request):
-    if request.method == 'POST':
-        form = FileUploadForm(request.POST, request.FILES)
-        if form.is_valid():
-            form.save()
-            return render(request, 'uploads/upload.html', {
-                'form': form
-            })
-    else:
-        form = FileUploadForm()
-    return render(request, 'uploads/upload.html', {
-        'form': form
-    })
+class FileUploadSetView(viewsets.ModelViewSet):
+    queryset = FileUpload.objects.all()
+    serializer_class = FilesSerializer
+    permission_classes = [permissions.IsAuthenticated]

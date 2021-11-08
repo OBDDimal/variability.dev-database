@@ -1,10 +1,15 @@
 from django.conf import settings
 from django.conf.urls.static import static
-from django.urls import path
+from django.urls import path, include, re_path
+from rest_framework import routers
+
 from core import views
 
+router = routers.DefaultRouter()
+router.register(r'files', views.FileUploadSetView)
+
 urlpatterns = [
-    path('', views.upload),
+    path('', include(router.urls)),
 ]
 
 if settings.DEBUG:
