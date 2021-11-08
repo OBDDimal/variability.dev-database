@@ -34,7 +34,7 @@ jobs:
     - run: yarn test
     
   build:
-
+    needs: install
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -50,7 +50,7 @@ jobs:
     - run: yarn build --if-present
     
   test:
-
+    needs: build
     runs-on: ubuntu-latest
     defaults:
       run:
