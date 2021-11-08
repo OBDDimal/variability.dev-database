@@ -1,8 +1,25 @@
+#BDD stuff
+#locally uploaded files
+src/files/**
+_reports/**
+_log/**
+ddueruem/files/**
 
-# Created by https://www.toptal.com/developers/gitignore/api/python,web
-# Edit at https://www.toptal.com/developers/gitignore?templates=python,web
+#IntelliJ
+.idea/*
 
-### Python ###
+#Visual Studio Code
+vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+*.code-workspace
+
+# Local History for Visual Studio Code
+.history/
+
+# ---------- ignores for Python ----------
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -19,11 +36,12 @@ dist/
 downloads/
 eggs/
 .eggs/
+lib/
+lib64/
 parts/
 sdist/
 var/
 wheels/
-pip-wheel-metadata/
 share/python-wheels/
 *.egg-info/
 .installed.cfg
@@ -53,7 +71,7 @@ coverage.xml
 *.py,cover
 .hypothesis/
 .pytest_cache/
-pytestdebug.log
+cover/
 
 # Translations
 *.mo
@@ -74,9 +92,9 @@ instance/
 
 # Sphinx documentation
 docs/_build/
-doc/_build/
 
 # PyBuilder
+.pybuilder/
 target/
 
 # Jupyter Notebook
@@ -87,7 +105,9 @@ profile_default/
 ipython_config.py
 
 # pyenv
-.python-version
+#   For a library or package, you might want to ignore these files since the code is
+#   intended to run in multiple environments; otherwise, check them in:
+# .python-version
 
 # pipenv
 #   According to pypa/pipenv#598, it is recommended to include Pipfile.lock in version control.
@@ -95,9 +115,6 @@ ipython_config.py
 #   having no cross-platform support, pipenv may install dependencies that don't work, or not
 #   install all needed dependencies.
 #Pipfile.lock
-
-# poetry
-#poetry.lock
 
 # PEP 582; used by e.g. github.com/David-OConnor/pyflow
 __pypackages__/
@@ -110,15 +127,13 @@ celerybeat.pid
 *.sage.py
 
 # Environments
-# .env
-.env/
-.venv/
+.env
+.venv
 env/
 venv/
 ENV/
 env.bak/
 venv.bak/
-pythonenv*
 
 # Spyder project settings
 .spyderproject
@@ -141,35 +156,5 @@ dmypy.json
 # pytype static type analyzer
 .pytype/
 
-# operating system-related files
-# file properties cache/storage on macOS
-*.DS_Store
-# thumbnail cache on Windows
-Thumbs.db
-
-# profiling data
-.prof
-
-
-### Web ###
-*.asp
-*.cer
-*.csr
-*.css
-*.htm
-*.js
-*.jsp
-*.php
-*.rss
-*.wasm
-*.wat
-*.xhtml
-
-# End of https://www.toptal.com/developers/gitignore/api/python,web
-
-
-#locally uploaded files
-src/files/**
-_reports/**
-_log/**
-ddueruem/files/**
+# Cython debug symbols
+cython_debug/
