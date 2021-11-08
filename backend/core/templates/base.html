@@ -21,24 +21,20 @@
         DDueruem is a web service for sharing feature model instances and collaborative benchmarking. <br/>
         Are you logged in ?
     </p>
-
-    {% block checklogin %}
-        {% if user.is_authenticated %}
-            <h2>Hello {{ user.username }}!</h2>
-            <p>You are currently logged in the system!</p>
-            {% block dashboard %}{% endblock %}
-        {% else %}
-            {% block loginForm %}
-                <h2>You are not logged in the system!</h2>
-                <p>
-                    Login: <a href="{% url 'home' %}">click here</a> or <br/>
-                    Register: <a href="{% url 'home' %}">click here</a> or <br/>
-                    Reset password: <a href="{% url 'home' %}">click here</a>
-                </p>
-            {% endblock %}
-        {% endif %}
-        {% block content %}{% endblock %}
-    {% endblock %}
+    {% if user.is_authenticated %}
+        <h2>Hello {{ user.username }}!</h2>
+        <p>You are currently logged in the system!</p>
+        {% block dashboard %}{% endblock %}
+    {% else %}
+        <h2>You are not logged in the system!</h2>
+        <p>
+            Login: <a href="{% url 'login' %}">click here</a> or <br/>
+            Register: <a href="{% url 'home' %}">click here</a> or <br/>
+            Reset password: <a href="{% url 'password_reset' %}">click here</a>
+        </p>
+        {% block loginForm %}{% endblock %}
+    {% endif %}
+    {% block content %}{% endblock %}
 </center>
 </body>
 </html>

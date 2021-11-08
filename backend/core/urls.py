@@ -4,5 +4,5 @@ from .views import home, dashboard
 urlpatterns = [
     url("accounts/", include("django.contrib.auth.urls")),
     url("dashboard/", dashboard, name="dashboard"),
-    url("", home, name="home")
+    url("home/", home, name="home"),
 ]
