@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Button, Form, FormControl, FormControlProps } from "react-bootstrap";
+import { Button, Form } from "react-bootstrap";
 
 export default class upload extends Component {
   state = {
@@ -13,6 +13,26 @@ export default class upload extends Component {
     }
   };
 
+  onSubmit = () => {
+    if (this.state.file) {
+      const data = new FormData();
+      data.append("file", this.state.file);
+
+      fetch("http://localhost:8000/core/files/", {
+        mode: "no-cors",
+        method: "POST",
+        body: data,
+      })
+        .then((response) => response.json())
+        .then((result) => {
+          console.log("Success:", result);
+        })
+        .catch((error) => {
+          console.log("Error:", error);
+        });
+    }
+  };
+
   render() {
     return (
       <div>
@@ -20,7 +40,13 @@ export default class upload extends Component {
           <Form.Label>File Upload</Form.Label>
           <Form.Control type='file' onChange={this.onFileChange} />
         </Form.Group>
-        <Button type='button'>Upload!</Button>
+        <Button
+          type='button'
+          disabled={this.state.file === undefined ? true : undefined}
+          onClick={this.onSubmit}
+        >
+          Upload!
+        </Button>
       </div>
     );
   }

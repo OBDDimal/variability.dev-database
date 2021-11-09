@@ -9,18 +9,23 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import SiteNavbar from "./components/SiteNavbar";
 import Upload from "./routes/Upload";
+import { Container, Row } from "react-bootstrap";
 
 ReactDOM.render(
   <React.StrictMode>
     <SiteNavbar
       url={window.location.href.substr(window.location.href.lastIndexOf("/"))}
     />
-    <BrowserRouter>
-      <Routes>
-        <Route path='/' element={<App />} />
-        <Route path='upload' element={<Upload />} />
-      </Routes>
-    </BrowserRouter>
+    <Container>
+      <Row>
+        <BrowserRouter>
+          <Routes>
+            <Route path='/' element={<App />} />
+            <Route path='upload' element={<Upload />} />
+          </Routes>
+        </BrowserRouter>
+      </Row>
+    </Container>
   </React.StrictMode>,
   document.getElementById("root")
 );
