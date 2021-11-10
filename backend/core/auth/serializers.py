@@ -7,7 +7,7 @@ from django.contrib.auth.models import update_last_login
 from django.core.exceptions import ObjectDoesNotExist
 
 from core.user.serializers import UserSerializer
-from core.user.models import User
+from core.user.models import ExtendedUser
 
 
 # What is ABC ?
@@ -40,12 +40,12 @@ class RegistrationSerializer(UserSerializer):
     email = serializers.EmailField(required=True, write_only=True, max_length=128)
 
     class Meta:
-        model = User
+        model = ExtendedUser
         fields = ['id', 'username', 'email', 'password', 'is_active', 'is_staff']
 
     def create(self, validated_data):
         try:
-            user = User.objects.get(email=validated_data['email'])
+            user = ExtendedUser.objects.get(email=validated_data['email'])
         except ObjectDoesNotExist:
-            user = User.objects.create_user(**validated_data)
+            user = ExtendedUser.objects.create_user(**validated_data)
         return user
