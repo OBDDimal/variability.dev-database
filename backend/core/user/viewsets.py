@@ -1,28 +1,14 @@
 from core.user.serializers import UserSerializer
 from core.user.models import User
 from rest_framework import viewsets
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework import filters
 
 
 class UserViewSet(viewsets.ModelViewSet):
-    # A viewset is a class-based view, able to handle all of the basic HTTP requests
-    http_method_names = ['get']
+    """
+    API endpoint that allows users to be viewed or edited.
+    """
+    queryset = User.objects.all().order_by('-date_joined')
     serializer_class = UserSerializer
-    permission_classes = (IsAuthenticated,)
-    filter_backends = [filters.OrderingFilter]
-    ordering_fields = ['updated']
-    ordering = ['-updated']
-
-    def get_queryset(self):
-        if self.request.user.is_superuser:
-            return User.objects.all()
-
-    def get_object(self):
-        lookup_field_value = self.kwargs[self.lookup_field]
-
-        obj = User.objects.get(lookup_field_value)
-        self.check_object_permissions(self.request, obj)
-
-        return obj
-
+    permission_classes = [AllowAny]

@@ -5,6 +5,7 @@ from django.core.mail import send_mail
 
 
 class UserManager(BaseUserManager):
+    use_in_migrations = True
 
     def create_user(self, email, password=None, **kwargs):
         """
@@ -32,16 +33,14 @@ class UserManager(BaseUserManager):
         kwargs.setdefault('is_superuser', True)
         kwargs.setdefault('is_active', True)
 
-        user = self.create_user(email, password, **kwargs)
-        user.save(using=self._db)
-
-        return user
+        return self.create_user(email, password, **kwargs)
 
 
 class User(AbstractBaseUser, PermissionsMixin):
-    email = models.EmailField(db_index=True, unique=True, null=True, blank=True)
+    email = models.EmailField(db_index=True, unique=True)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
+    date_joined = models.DateTimeField('date joined', auto_now_add=True)
     institute = models.CharField(db_index=True, max_length=255, unique=False)
 
     USERNAME_FIELD = 'email'
@@ -54,8 +53,9 @@ class User(AbstractBaseUser, PermissionsMixin):
         verbose_name_plural = 'users'
 
     def email_user(self, subject, message, from_email=None, **kwargs):
-        # Sends an email to this User.
-
+        """
+        Sends an email to this User.
+        """
         send_mail(subject, message, from_email, [self.email], **kwargs)
 
     def __str__(self):

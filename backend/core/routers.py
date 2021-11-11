@@ -5,12 +5,6 @@ from core.auth.viewsets import LoginViewSet, RegistrationViewSet, RefreshViewSet
 # routes = SimpleRouter()
 router = routers.DefaultRouter()
 
-# DEFAULT
-
-# ADMIN
-router.register(r'admin', UserViewSet, basename='admin')
-
-
 # AUTHENTICATION
 router.register(r'auth/login', LoginViewSet, basename='auth-login')
 router.register(r'auth/register', RegistrationViewSet, basename='auth-register')
