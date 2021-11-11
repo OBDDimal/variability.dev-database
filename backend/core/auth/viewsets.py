@@ -8,6 +8,8 @@ from rest_framework_simplejwt.exceptions import TokenError, InvalidToken
 from core.auth.serializers import LoginSerializer, RegistrationSerializer
 
 
+
+
 class LoginViewSet(ModelViewSet, TokenObtainPairView):
     serializer_class = LoginSerializer
     permission_classes = (AllowAny,)

@@ -1,17 +1,24 @@
-from rest_framework.routers import SimpleRouter
+from rest_framework import routers
 from core.user.viewsets import UserViewSet
 from core.auth.viewsets import LoginViewSet, RegistrationViewSet, RefreshViewSet
 
-routes = SimpleRouter()
+# routes = SimpleRouter()
+router = routers.DefaultRouter()
+
+# DEFAULT
+
+# ADMIN
+router.register(r'admin', UserViewSet, basename='admin')
+
 
 # AUTHENTICATION
-routes.register(r'auth/login', LoginViewSet, basename='auth-login')
-routes.register(r'auth/register', RegistrationViewSet, basename='auth-register')
-routes.register(r'auth/refresh', RefreshViewSet, basename='auth-refresh')
+router.register(r'auth/login', LoginViewSet, basename='auth-login')
+router.register(r'auth/register', RegistrationViewSet, basename='auth-register')
+router.register(r'auth/refresh', RefreshViewSet, basename='auth-refresh')
 
 # USER
-routes.register(r'user', UserViewSet, basename='user')
+router.register(r'user', UserViewSet, basename='user')
 
 urlpatterns = [
-    *routes.urls
+    *router.urls
 ]
