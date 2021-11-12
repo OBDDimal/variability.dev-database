@@ -39,10 +39,13 @@ class AdminUserChangeForm(forms.ModelForm):
     A form for updating users. Includes all attributes of the user, but replaces the password field
     with admin's disabled password hash display field.
     """
-    password = ReadOnlyPasswordHashField()
+    password = ReadOnlyPasswordHashField(help_text=("Raw passwords are not stored, so there is no way to see "
+                                                    "this user's password, but you can change the password "
+                                                    "using <a href=\"../password/\">this form</a>."))
 
     class Meta:
         model = User
+        # define fields which will be edited (not displayed)
         fields = (
             'email', 'password', 'institute', 'bio',
             'is_staff', 'is_active', 'groups', 'user_permissions', 'last_login')
