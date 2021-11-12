@@ -7,36 +7,54 @@ from django.core.mail import send_mail
 class UserManager(BaseUserManager):
     use_in_migrations = True
 
-    def create_user(self, email, password=None, **kwargs):
+    def save_user(self, email, password, **kwargs):
         """
-        Create and return a `User` with an email, password  and institute
+        Saves an user with the given attributes to the database
         """
         if email is None:
-            raise TypeError('Users must have an email.')
+            raise TypeError('Email for user is not set')
+        if password is None:
+            raise TypeError('Password for user is not set')
 
         email = self.normalize_email(email)
         user = self.model(email=email, **kwargs)
+
+        # Call this method for password hashing
         user.set_password(password)
         user.save(using=self._db)
         return user
 
-    def create_superuser(self, email, password=None, **kwargs):
+    def create_user(self, email, password=None, **kwargs):
         """
-        Create and return a `User` with superuser (admin) permissions.
+        Creates an user with the given attributes
         """
-        if password is None:
-            raise TypeError('Superusers must have a password.')
-        if email is None:
-            raise TypeError('Superusers must have an email.')
+        kwargs.setdefault('is_superuser', False)
+        kwargs.setdefault('is_staff', False)
+        return self.save_user(email, password, **kwargs)
 
+    def create_staffuser(self, email, password, **kwargs):
+        """
+        Creates an user with activated staff flag and the given attributes
+        """
+        kwargs.setdefault('is_superuser', False)
         kwargs.setdefault('is_staff', True)
-        kwargs.setdefault('is_superuser', True)
-        kwargs.setdefault('is_active', True)
+        return self.save_user(email, password, **kwargs)
 
-        return self.create_user(email, password, **kwargs)
+    def create_superuser(self, email, password, **kwargs):
+        """
+        Creates an superuser the given attributes
+        """
+        kwargs.setdefault('is_superuser', True)
+        kwargs.setdefault('is_staff', True)
+
+        # I dont know if this is necessary but people keep on doing this in tutorials ...
+        if kwargs.get('is_superuser') is not True:
+            raise ValueError('is_superuser should be True')
+        return self.save_user(email, password, **kwargs)
 
 
 class User(AbstractBaseUser, PermissionsMixin):
+    id = models.BigAutoField(primary_key=True)
     email = models.EmailField(db_index=True, unique=True)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
