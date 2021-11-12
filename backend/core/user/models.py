@@ -1,6 +1,6 @@
 from django.db import models
 
-from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
+from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin, Group
 from django.core.mail import send_mail
 
 
@@ -40,7 +40,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(db_index=True, unique=True)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
-    date_joined = models.DateTimeField('date joined', auto_now_add=True)
+    date_joined = models.DateTimeField('date joined', auto_now_add=True, editable=False)
     institute = models.CharField(db_index=True, max_length=255, unique=False)
     bio = models.TextField(max_length=500, blank=True)
 
