@@ -42,6 +42,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_staff = models.BooleanField(default=False)
     date_joined = models.DateTimeField('date joined', auto_now_add=True)
     institute = models.CharField(db_index=True, max_length=255, unique=False)
+    bio = models.TextField(max_length=500, blank=True)
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
