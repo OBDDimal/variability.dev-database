@@ -7,3 +7,4 @@ class AdminUserCreationFrom(UserFrom):
     class Meta:
         model = User
         fields = "__all__"
+
