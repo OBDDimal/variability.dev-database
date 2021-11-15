@@ -1,8 +1,8 @@
 from django.db import models
+from core.user.models import User
 
 
-# Create your models here.
-class FileUpload(models.Model):
+class File(models.Model):
     LICENSES = [
         ('CC BY - Mention', 'CC BY - Mention'),
         ('CC BY-NC - Mention - Non-commercial', 'CC BY-NC - Mention - Non-commercial')
@@ -12,4 +12,4 @@ class FileUpload(models.Model):
     file = models.FileField(upload_to='files/')
     uploaded_at = models.DateTimeField(auto_now_add=True)
     license = models.CharField(choices=LICENSES, max_length=255, default='CC BY - Mention')
-    # Relation to uploader -> User management needed (One to One field)
+    owner = models.ForeignKey(User, on_delete=models.CASCADE)
