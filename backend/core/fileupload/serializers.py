@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from core.models import FileUpload
+from core.fileupload.models import FileUpload
 
 
 class FilesSerializer(serializers.HyperlinkedModelSerializer):

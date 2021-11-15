@@ -5,13 +5,7 @@ import withReactContent from "sweetalert2-react-content";
 
 const MySwal = withReactContent(Swal);
 
-/*
-enum license {
-  cc_by = "CC BY - Mention",
-  cc_by_nc = "CC BY-NC - Mention - Non-commercial",
-}
-*/
-
+// Can't use enums because of iteration problems
 const license = ["CC BY - Mention", "CC BY-NC - Mention - Non-commercial"];
 
 type UploadState = {
@@ -29,9 +23,7 @@ export default class upload extends Component {
 
   onDescriptionChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const description = e.target as HTMLInputElement;
-    if (description.value !== "") {
-      this.setState({ description: description.value });
-    }
+    this.setState({ description: description.value });
   };
 
   onFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -50,12 +42,12 @@ export default class upload extends Component {
       const data = new FormData();
       const headers = new Headers();
 
-      headers.set("Authorization", "Basic " + btoa("admin:admin"));
+      headers.set("Authorization", "Basic " + btoa("t@b.de:admin"));
       data.append("description", this.state.description);
       data.append("file", this.state.file);
       data.append("license", this.state.license);
 
-      fetch("http://localhost:8000/core/files/", {
+      fetch("http://localhost:8000/files/", {
         headers: headers,
         method: "POST",
         body: data,
