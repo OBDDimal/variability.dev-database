@@ -10,6 +10,8 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import SiteNavbar from "./components/SiteNavbar";
 import Upload from "./routes/Upload";
 import { Container, Row } from "react-bootstrap";
+import {RouteComponentProps}  from "react-router-dom";
+import Login from "./routes/Login";
 
 ReactDOM.render(
   <React.StrictMode>
@@ -22,6 +24,7 @@ ReactDOM.render(
           <Routes>
             <Route path='/' element={<App />} />
             <Route path='upload' element={<Upload />} />
+            <Route path='login' element={<Login />} />
           </Routes>
         </BrowserRouter>
       </Row>
