@@ -3,30 +3,12 @@ import ReactDOM from "react-dom";
 import "./index.css";
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";
-
-import "bootstrap/dist/css/bootstrap.min.css";
-
-import { BrowserRouter, Route, Routes } from "react-router-dom";
-import SiteNavbar from "./components/SiteNavbar";
-import Upload from "./routes/Upload";
-import { Container, Row } from "react-bootstrap";
+import { BrowserRouter } from "react-router-dom";
 
 ReactDOM.render(
-  <React.StrictMode>
-    <SiteNavbar
-      url={window.location.href.substr(window.location.href.lastIndexOf("/"))}
-    />
-    <Container>
-      <Row>
-        <BrowserRouter>
-          <Routes>
-            <Route path='/' element={<App />} />
-            <Route path='upload' element={<Upload />} />
-          </Routes>
-        </BrowserRouter>
-      </Row>
-    </Container>
-  </React.StrictMode>,
+  <BrowserRouter>
+    <App />
+  </BrowserRouter>,
   document.getElementById("root")
 );
 
