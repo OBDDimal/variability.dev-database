@@ -1,10 +1,13 @@
 from django.contrib import admin
-from .forms import AdminUserChangeForm, AdminUserCreationForm
-from .models import User
+from core.user.forms import AdminUserChangeForm, AdminUserCreationForm
+from core.user.models import User
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 
 
 class UserAdmin(BaseUserAdmin):
+    """
+    Class for defining the backend admin panel, its used forms and which data should be displayed.
+    """
     model = User
     form = AdminUserChangeForm
     add_form = AdminUserCreationForm

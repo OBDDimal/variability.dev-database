@@ -3,6 +3,9 @@ from core.user.models import User
 
 
 class File(models.Model):
+    """
+    Data Model for a file in the backend
+    """
     LICENSES = [
         ('CC BY - Mention', 'CC BY - Mention'),
         ('CC BY-NC - Mention - Non-commercial', 'CC BY-NC - Mention - Non-commercial')

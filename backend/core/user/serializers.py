@@ -2,10 +2,12 @@ from core.user.models import User
 from rest_framework import serializers
 
 
-# class UserSerializer(serializers.HyperlinkedModelSerializer):
 class UserSerializer(serializers.ModelSerializer):
+    """
+    A serializer for defining which user attributes should be converted (to JSON)
+    """
+
     class Meta:
         model = User
-        # fields = ['url', 'id', 'email', 'is_active', 'institute', 'date_joined']
         fields = ['id', 'email', 'is_active', 'institute', 'date_joined']
         # read_only_field = ['is_active', 'created', 'updated', 'date_joined']

@@ -9,6 +9,9 @@ from core.auth.serializers import LoginSerializer, RegistrationSerializer
 
 
 class LoginViewSet(ModelViewSet, TokenObtainPairView):
+    """
+    Define the login view set for the backend with needed serializer
+    """
     serializer_class = LoginSerializer
     permission_classes = (AllowAny,)
     http_method_names = ['post']
@@ -25,6 +28,9 @@ class LoginViewSet(ModelViewSet, TokenObtainPairView):
 
 
 class RegistrationViewSet(ModelViewSet, TokenObtainPairView):
+    """
+    Define the registration view set for the backend with needed serializer
+    """
     serializer_class = RegistrationSerializer
     permission_classes = (AllowAny,)
     http_method_names = ['post']
@@ -48,6 +54,9 @@ class RegistrationViewSet(ModelViewSet, TokenObtainPairView):
 
 
 class RefreshViewSet(ViewSet, TokenRefreshView):
+    """
+    Define the token refresh view set for the backend with needed serializer
+    """
     permission_classes = (AllowAny,)
     http_method_names = ['post']
 

@@ -10,8 +10,10 @@ from core.user.serializers import UserSerializer
 from core.user.models import User
 
 
-# What is ABC ?
 class LoginSerializer(TokenObtainPairSerializer):
+    """
+    A serializer for defining which attributes should be converted to JSON after successful login
+    """
 
     def update(self, instance, validated_data):
         pass
@@ -35,7 +37,10 @@ class LoginSerializer(TokenObtainPairSerializer):
 
 
 class RegistrationSerializer(UserSerializer):
-    # password = serializers.CharField(max_length=128, min_length=8, write_only=True, required=True)
+    """
+    A serializer for defining which attributes should be converted to JSON after successful registration
+    """
+
     password = serializers.CharField(max_length=128, write_only=True, required=True)
     email = serializers.EmailField(required=True, write_only=True, max_length=128)
 

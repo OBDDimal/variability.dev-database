@@ -5,8 +5,9 @@ from core.fileupload.views import FileUploadSetView
 from core.user.viewsets import UserViewSet
 from core.auth.viewsets import LoginViewSet, RegistrationViewSet, RefreshViewSet
 
-# routes = SimpleRouter()
 router = routers.DefaultRouter()
+
+# Register new routes for backend here and link it to its view set
 
 # AUTHENTICATION
 router.register(r'auth/login', LoginViewSet, basename='auth-login')

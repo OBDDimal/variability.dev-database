@@ -1,5 +1,4 @@
 from django.db import models
-
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin, Group
 from django.core.mail import send_mail
 
@@ -42,7 +41,7 @@ class UserManager(BaseUserManager):
 
     def create_superuser(self, email, password, **kwargs):
         """
-        Creates an superuser the given attributes
+        Creates a superuser with the given attributes
         """
         kwargs.setdefault('is_superuser', True)
         kwargs.setdefault('is_staff', True)
@@ -73,7 +72,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def email_user(self, subject, message, from_email=None, **kwargs):
         """
-        Sends an email to this User.
+        Sends an email to this user
         """
         send_mail(subject, message, from_email, [self.email], **kwargs)
 
