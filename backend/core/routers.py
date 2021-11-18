@@ -1,3 +1,4 @@
+from django.urls import path, include
 from rest_framework import routers
 
 from core.fileupload.views import FileUploadSetView
@@ -17,5 +18,6 @@ router.register(r'files', FileUploadSetView)
 router.register(r'user', UserViewSet, basename='user')
 
 urlpatterns = [
-    *router.urls
+    *router.urls,
+    path('api-auth/', include('rest_framework.urls')),
 ]
