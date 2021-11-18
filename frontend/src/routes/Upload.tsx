@@ -2,6 +2,8 @@ import React, { Component } from "react";
 import { Button, Form } from "react-bootstrap";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
+import AuthService from "../services/auth.service";
+import api from "../services/api.service";
 
 const MySwal = withReactContent(Swal);
 
@@ -40,19 +42,15 @@ export default class upload extends Component {
   onSubmit = () => {
     if (this.isReady()) {
       const data = new FormData();
-      const headers = new Headers();
 
-      headers.set("Authorization", "Basic " + btoa("t@b.de:admin"));
       data.append("description", this.state.description);
       data.append("file", this.state.file);
       data.append("license", this.state.license);
 
-      fetch("http://localhost:8000/files/", {
-        headers: headers,
-        method: "POST",
-        body: data,
-      })
-        .then((response) => response.json())
+      api
+        .post("http://localhost:8000/files/", data, {
+          headers: { "Content-Type": "multipart/form-data" },
+        })
         .then((result) => {
           MySwal.fire({
             icon: "success",
