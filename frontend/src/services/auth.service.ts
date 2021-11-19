@@ -30,7 +30,7 @@ class AuthService {
   }
 
   register(email: string, password: string) {
-    return axios.post(API_URL + "register", {
+    return axios.post(API_URL + "register/", {
       email,
       password,
     });
