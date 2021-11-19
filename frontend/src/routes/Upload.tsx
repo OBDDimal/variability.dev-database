@@ -2,7 +2,6 @@ import React, { Component } from "react";
 import { Button, Form } from "react-bootstrap";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
-import AuthService from "../services/auth.service";
 import api from "../services/api.service";
 
 const MySwal = withReactContent(Swal);
