@@ -1,4 +1,3 @@
-from django import forms
 from django.contrib.auth.models import update_last_login
 from django.core.exceptions import ObjectDoesNotExist
 from django.template.loader import render_to_string

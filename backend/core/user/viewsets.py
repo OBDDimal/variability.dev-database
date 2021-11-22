@@ -1,5 +1,4 @@
-from datetime import datetime, timedelta
-from time import strptime
+from datetime import timedelta
 from django.core.signing import Signer, BadSignature
 from django.utils import timezone, dateparse
 from rest_framework.response import Response

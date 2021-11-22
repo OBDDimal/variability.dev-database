@@ -1,8 +1,6 @@
 from django.core.signing import Signer
-from django.utils.encoding import force_bytes, force_text
-from django.utils import timezone
+from django.utils.encoding import force_bytes, force_str
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
-from django.utils.encoding import force_str
 
 
 def generate_one_time_link(user):
