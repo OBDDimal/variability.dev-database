@@ -1,134 +1,97 @@
-import { Component } from "react";
-import { Formik, Field, Form, ErrorMessage } from "formik";
-import * as Yup from "yup";
-
+import React, { Component } from "react";
 import AuthService from "../services/auth.service";
+import Swal from "sweetalert2";
+import withReactContent from "sweetalert2-react-content";
+import { Button, Form } from "react-bootstrap";
+
+const MySwal = withReactContent(Swal);
 
 type Props = {};
 
 type State = {
-  email: String;
-  password: String;
+  email?: string;
+  password?: string;
   loading: boolean;
-  message: String;
 };
 
 export default class Login extends Component<Props, State> {
-  constructor(props: any) {
-    super(props);
-    this.handleLogin = this.handleLogin.bind(this);
+  state: State = {
+    email: undefined,
+    password: undefined,
+    loading: false,
+  };
 
-    this.state = {
-      email: "",
-      password: "",
-      loading: false,
-      message: "",
-    };
-  }
+  onEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const email = e.target as HTMLInputElement;
+    this.setState({ email: email.value });
+  };
 
-  validationSchema() {
-    return Yup.object().shape({
-      email: Yup.string().required("This field is required!"),
-      password: Yup.string().required("This field is required!"),
-    });
-  }
+  onPasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const password = e.target as HTMLInputElement;
+    this.setState({ password: password.value });
+  };
 
-  handleLogin(formValue: { email: string; password: string }) {
-    const { email, password } = formValue;
+  isReady = () => {
+    return this.state.email && this.state.password;
+  };
 
-    this.setState({
-      message: "",
-      loading: true,
-    });
+  onSubmit = () => {
+    // Call to this.isReady() does not work, due to typescript checking
+    if (this.state.email && this.state.password) {
+      this.setState({ loading: true });
 
-    AuthService.login(email, password).then(
-      () => {
-        window.location.replace("/");
-      },
-      (error) => {
-        const resMessage =
-          (error.response &&
-            error.response.data &&
-            error.response.data.message) ||
-          error.message ||
-          error.toString();
-
-        this.setState({
-          loading: false,
-          message: resMessage,
-        });
-      }
-    );
-  }
+      AuthService.login(this.state.email, this.state.password).then(
+        () => {
+          MySwal.fire({
+            icon: "success",
+            title: "Login successful",
+            toast: true,
+            position: "top-right",
+            showConfirmButton: false,
+            timer: 1500,
+            timerProgressBar: true,
+          }).then(() => {
+            window.location.replace("/");
+          });
+        },
+        (error) => {
+          this.setState({ loading: false });
+          MySwal.fire({
+            icon: "error",
+            title: "Error!!",
+            text: `Wrong login credentials! ${error.toString()}`,
+          });
+        }
+      );
+    }
+  };
 
   render() {
-    const initialValues = {
-      email: "",
-      password: "",
-    };
-
     return (
-      <div className='col-md-12'>
-        <div className='card card-container'>
-          <img
-            src='//ssl.gstatic.com/accounts/ui/avatar_2x.png'
-            alt='profile-img'
-            className='profile-img-card'
+      <div>
+        <Form.Group className='mb-3'>
+          <Form.Label>Email</Form.Label>
+          <Form.Control
+            type='email'
+            placeholder='Email'
+            onChange={this.onEmailChange}
           />
-
-          <Formik
-            initialValues={initialValues}
-            validationSchema={this.validationSchema}
-            onSubmit={this.handleLogin}
-          >
-            <Form>
-              <div className='form-group'>
-                <label htmlFor='email'>Email</label>
-                <Field name='email' type='text' className='form-control' />
-                <ErrorMessage
-                  name='email'
-                  component='div'
-                  className='alert alert-danger'
-                />
-              </div>
-
-              <div className='form-group'>
-                <label htmlFor='password'>Password</label>
-                <Field
-                  name='password'
-                  type='password'
-                  className='form-control'
-                />
-                <ErrorMessage
-                  name='password'
-                  component='div'
-                  className='alert alert-danger'
-                />
-              </div>
-
-              <div className='form-group'>
-                <button
-                  type='submit'
-                  className='btn btn-primary btn-block'
-                  disabled={this.state.loading}
-                >
-                  {this.state.loading && (
-                    <span className='spinner-border spinner-border-sm'></span>
-                  )}
-                  <span>Login</span>
-                </button>
-              </div>
-
-              {this.state.message && (
-                <div className='form-group'>
-                  <div className='alert alert-danger' role='alert'>
-                    {this.state.message}
-                  </div>
-                </div>
-              )}
-            </Form>
-          </Formik>
-        </div>
+        </Form.Group>
+        <Form.Group className='mb-3'>
+          <Form.Label>Password</Form.Label>
+          <Form.Control type='password' onChange={this.onPasswordChange} />
+        </Form.Group>
+        <Button
+          variant='primary'
+          type='button'
+          disabled={!this.isReady() || this.state.loading ? true : undefined}
+          onClick={this.onSubmit}
+        >
+          {this.state.loading && (
+            <span className='spinner-border spinner-border-sm' />
+          )}
+          Login!
+        </Button>
       </div>
     );
   }

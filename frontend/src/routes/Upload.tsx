@@ -9,17 +9,21 @@ const MySwal = withReactContent(Swal);
 // Can't use enums because of iteration problems
 const license = ["CC BY - Mention", "CC BY-NC - Mention - Non-commercial"];
 
-type UploadState = {
-  description: string;
-  file: string;
+type Props = {};
+
+type State = {
+  description?: string;
+  file?: File;
   license: string;
+  loading: boolean;
 };
 
-export default class upload extends Component {
-  state: UploadState = {
-    description: "",
-    file: "",
+export default class upload extends Component<Props, State> {
+  state: State = {
+    description: undefined,
+    file: undefined,
     license: license[0],
+    loading: false,
   };
 
   onDescriptionChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -35,15 +39,15 @@ export default class upload extends Component {
   };
 
   isReady = () => {
-    return this.state.file !== "" && this.state.description !== "";
+    return this.state.file && this.state.description;
   };
 
   onSubmit = () => {
-    if (this.isReady()) {
+    if (this.state.file && this.state.description) {
       const data = new FormData();
 
-      data.append("description", this.state.description);
-      data.append("file", this.state.file);
+      data.append("description", this.state.description as string);
+      data.append("file", this.state.file as File);
       data.append("license", this.state.license);
 
       api
@@ -56,7 +60,12 @@ export default class upload extends Component {
             title: "Success!!",
             text: JSON.stringify(result),
           }).then(() => {
-            window.location.reload();
+            this.setState({
+              description: undefined,
+              file: undefined,
+              license: license[0],
+              loading: false,
+            });
           });
         })
         .catch((error) => {
@@ -99,9 +108,12 @@ export default class upload extends Component {
         <Button
           variant='primary'
           type='button'
-          disabled={this.isReady() === false ? true : undefined}
+          disabled={!this.isReady() ? true : undefined}
           onClick={this.onSubmit}
         >
+          {this.state.loading && (
+            <span className='spinner-border spinner-border-sm' />
+          )}
           Upload!
         </Button>
       </div>
