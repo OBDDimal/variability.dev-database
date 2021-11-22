@@ -60,7 +60,7 @@ ROOT_URLCONF = 'ddueruemweb.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'core/templates']
+        'DIRS': [BASE_DIR / 'templates']
         ,
         'APP_DIRS': True,
         'OPTIONS': {
@@ -152,4 +152,10 @@ CORS_ALLOWED_ORIGINS = [
 ]
 
 EMAIL_HOST = "localhost"  # define host and port for email backend
+# EMAIL_HOST_USER="backend"
+# EMAIL_HOST_PASSWORD="123"
 EMAIL_PORT = 1025
+# EMAIL_USE_TTLS = True
+# EMAIL_USE_SSL = False
+
+PASSWORD_RESET_TIMEOUT_DAYS = 2

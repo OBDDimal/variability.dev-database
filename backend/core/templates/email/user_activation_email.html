@@ -1,0 +1,13 @@
+{% autoescape off %}
+    <h3>Hello {{ user.get_email }},</h3>
+
+    To activate your account on {{ domain }}, please click on the following link:
+    <br><br>
+    <a href="{{ protocol }}://{{ domain }}{{ token }}">Confirm my email here</a>
+    <br><br>
+    <p>
+
+    </p>
+    If clicking the link above doesn't work, please copy and paste the URL in a new browser
+    window instead.
+{% endautoescape %}

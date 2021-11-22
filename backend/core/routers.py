@@ -2,7 +2,7 @@ from django.urls import path, include
 from rest_framework import routers
 
 from core.fileupload.views import FileUploadSetView
-from core.user.viewsets import UserViewSet
+from core.user.viewsets import UserViewSet, ActivateUserViewSet
 from core.auth.viewsets import LoginViewSet, RegistrationViewSet, RefreshViewSet
 
 router = routers.DefaultRouter()
@@ -12,6 +12,7 @@ router = routers.DefaultRouter()
 # AUTHENTICATION
 router.register(r'auth/login', LoginViewSet, basename='auth-login')
 router.register(r'auth/register', RegistrationViewSet, basename='auth-register')
+router.register(r'auth/register/confirm/(?<token>[\w\d]+)', ActivateUserViewSet, basename='auth-register-confirm')
 router.register(r'auth/refresh', RefreshViewSet, basename='auth-refresh')
 router.register(r'files', FileUploadSetView)
 
