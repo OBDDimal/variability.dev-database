@@ -1,145 +1,118 @@
-import { Component } from "react";
-import { Formik, Field, Form, ErrorMessage } from "formik";
-import * as Yup from "yup";
-
+import React, { Component } from "react";
+import { Button, Form } from "react-bootstrap";
+import Swal from "sweetalert2";
+import withReactContent from "sweetalert2-react-content";
 import AuthService from "../services/auth.service";
+
+const MySwal = withReactContent(Swal);
 
 type Props = {};
 
 type State = {
-  email: string;
-  password: string;
-  successful: boolean;
-  message: string;
+  email?: string;
+  password?: string;
+  passwordConfirmation?: string;
+  loading: boolean;
 };
 
 export default class Register extends Component<Props, State> {
-  constructor(props: Props) {
-    super(props);
-    this.handleRegister = this.handleRegister.bind(this);
+  state: State = {
+    email: undefined,
+    password: undefined,
+    passwordConfirmation: undefined,
+    loading: false,
+  };
 
-    this.state = { email: "", password: "", successful: false, message: "" };
-  }
+  onEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const email = e.target as HTMLInputElement;
+    this.setState({ email: email.value });
+  };
 
-  validationSchema() {
-    return Yup.object().shape({
-      email: Yup.string()
-        .email("This is not a valid email.")
-        .required("This field is required!"),
-      password: Yup.string()
-        .test(
-          "len",
-          "The password must be between 6 and 40 characters.",
-          (val: any) =>
-            val && val.toString().length >= 6 && val.toString().length <= 40
-        )
-        .required("This field is required!"),
-    });
-  }
+  onPasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const password = e.target as HTMLInputElement;
+    this.setState({ password: password.value });
+  };
 
-  handleRegister(formValue: { email: string; password: string }) {
-    const { email, password } = formValue;
+  onPasswordConfirmationChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const passwordConfirmation = e.target as HTMLInputElement;
+    this.setState({ passwordConfirmation: passwordConfirmation.value });
+  };
 
-    this.setState({
-      message: "",
-      successful: false,
-    });
-
-    AuthService.register(email, password).then(
-      (response) => {
-        this.setState({
-          message: response.data.message,
-          successful: true,
-        });
-      },
-      (error) => {
-        const resMessage =
-          (error.response &&
-            error.response.data &&
-            error.response.data.message) ||
-          error.message ||
-          error.toString();
-
-        this.setState({
-          successful: false,
-          message: resMessage,
-        });
-      }
+  isReady = () => {
+    return (
+      this.state.email &&
+      this.state.password &&
+      this.state.passwordConfirmation &&
+      this.state.password === this.state.passwordConfirmation
     );
-  }
+  };
+
+  onSubmit = () => {
+    if (
+      this.state.email &&
+      this.state.password &&
+      this.state.passwordConfirmation &&
+      this.state.password === this.state.passwordConfirmation
+    ) {
+      AuthService.register(this.state.email, this.state.password).then(
+        () => {
+          MySwal.fire({
+            icon: "success",
+            title: "Register successful, please check your mail",
+            toast: true,
+            position: "top-right",
+            showConfirmButton: false,
+            timer: 1500,
+            timerProgressBar: true,
+          }).then(() => {
+            window.location.replace("/");
+          });
+        },
+        (error) => {
+          this.setState({ loading: false });
+          MySwal.fire({
+            icon: "error",
+            title: "Error!!",
+            text: `Something went wrong while registering! ${error.toString()}`,
+          });
+        }
+      );
+    }
+  };
 
   render() {
-    const { successful, message } = this.state;
-
-    const initialValues = {
-      email: "",
-      password: "",
-    };
-
     return (
-      <div className='col-md-12'>
-        <div className='card card-container'>
-          <img
-            src='//ssl.gstatic.com/accounts/ui/avatar_2x.png'
-            alt='profile-img'
-            className='profile-img-card'
+      <div>
+        <Form.Group className='mb-3'>
+          <Form.Label>Email</Form.Label>
+          <Form.Control
+            type='email'
+            placeholder='Email'
+            onChange={this.onEmailChange}
           />
-
-          <Formik
-            initialValues={initialValues}
-            validationSchema={this.validationSchema}
-            onSubmit={this.handleRegister}
-          >
-            <Form>
-              {!successful && (
-                <div>
-                  <div className='form-group'>
-                    <label htmlFor='email'> Email </label>
-                    <Field name='email' type='email' className='form-control' />
-                    <ErrorMessage
-                      name='email'
-                      component='div'
-                      className='alert alert-danger'
-                    />
-                  </div>
-
-                  <div className='form-group'>
-                    <label htmlFor='password'> Password </label>
-                    <Field
-                      name='password'
-                      type='password'
-                      className='form-control'
-                    />
-                    <ErrorMessage
-                      name='password'
-                      component='div'
-                      className='alert alert-danger'
-                    />
-                  </div>
-
-                  <div className='form-group'>
-                    <button type='submit' className='btn btn-primary btn-block'>
-                      Sign Up
-                    </button>
-                  </div>
-                </div>
-              )}
-
-              {message && (
-                <div className='form-group'>
-                  <div
-                    className={
-                      successful ? "alert alert-success" : "alert alert-danger"
-                    }
-                    role='alert'
-                  >
-                    {message}
-                  </div>
-                </div>
-              )}
-            </Form>
-          </Formik>
-        </div>
+        </Form.Group>
+        <Form.Group className='mb-3'>
+          <Form.Label>Password</Form.Label>
+          <Form.Control type='password' onChange={this.onPasswordChange} />
+        </Form.Group>
+        <Form.Group className='mb-3'>
+          <Form.Label>Password Confirmation</Form.Label>
+          <Form.Control
+            type='password'
+            onChange={this.onPasswordConfirmationChange}
+          />
+        </Form.Group>
+        <Button
+          variant='primary'
+          type='button'
+          disabled={!this.isReady() || this.state.loading ? true : undefined}
+          onClick={this.onSubmit}
+        >
+          {this.state.loading && (
+            <span className='spinner-border spinner-border-sm' />
+          )}
+          Register!
+        </Button>
       </div>
     );
   }
