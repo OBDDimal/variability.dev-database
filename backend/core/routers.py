@@ -12,7 +12,7 @@ router = routers.DefaultRouter()
 # AUTHENTICATION
 router.register(r'auth/login', LoginViewSet, basename='auth-login')
 router.register(r'auth/register', RegistrationViewSet, basename='auth-register')
-router.register(r'auth/register/confirm/(?<token>[\w\d]+)', ActivateUserViewSet, basename='auth-register-confirm')
+router.register(r'auth/register/confirm/(?P<token>[\w\d]+)', ActivateUserViewSet, basename='auth-register-confirm')
 router.register(r'auth/refresh', RefreshViewSet, basename='auth-refresh')
 router.register(r'files', FileUploadSetView)
 

@@ -1,17 +1,14 @@
 from django import forms
 from django.contrib.auth.models import update_last_login
 from django.core.exceptions import ObjectDoesNotExist
-from django.core.signing import Signer
 from django.template.loader import render_to_string
-from django.utils.encoding import force_bytes, force_text
-from django.contrib.sites.shortcuts import get_current_site
 from django.utils import timezone
-from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.settings import api_settings
 from core.user.serializers import UserSerializer
 from core.user.models import User
+from .tokens import generate_one_time_link
 
 
 class LoginSerializer(TokenObtainPairSerializer):
@@ -70,16 +67,16 @@ class RegistrationSerializer(UserSerializer):
                 user = User.objects.get(email=validated_data['email'])
             except ObjectDoesNotExist:
                 user = User.objects.create_user(**validated_data)
-                signer = Signer()
+
                 extended_user = {
-                    'email': user,
-                    'timestamp': timezone.now(),
+                    'id': str(user.id),
+                    'email': str(user.email),
+                    'timestamp': str(timezone.now()),
                 }
-                print(extended_user)
                 user.email_user("DDueruem Account Activation", render_to_string('email/user_activation_email.html', {
-                    'user': user,
+                    'user': str(user.email),
                     'protocol': 'http',
-                    'domain': 'localhost:8000/auth/register/',
-                    'token': urlsafe_base64_encode(force_bytes(signer.sign_object(extended_user)))
+                    'domain': 'localhost:8000/auth/register/confirm/',
+                    'token': generate_one_time_link(extended_user)
                 }))
                 return user
