@@ -1,16 +1,18 @@
+from datetime import datetime, timedelta
+from time import strptime
 from django.core.signing import Signer, BadSignature
-from django.utils import timezone
-from django.utils.encoding import force_str
-from django.utils.http import urlsafe_base64_decode
-
+from django.utils import timezone, dateparse
+from rest_framework.response import Response
 from core.user.serializers import UserSerializer
 from core.user.models import User
-from rest_framework import viewsets
+from rest_framework.viewsets import ModelViewSet, GenericViewSet
 from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.mixins import CreateModelMixin
 from ddueruemweb.settings import PASSWORD_RESET_TIMEOUT_DAYS
+from ..auth.tokens import get_attributes_of_one_time_link
 
 
-class UserViewSet(viewsets.ModelViewSet):
+class UserViewSet(ModelViewSet):
     """
     API endpoint that allows users to be viewed or edited
     """
@@ -19,22 +21,27 @@ class UserViewSet(viewsets.ModelViewSet):
     permission_classes = [AllowAny]
 
 
-class ActivateUserViewSet(viewsets.GenericViewSet):
-    serializer_class = UserSerializer
+class ActivateUserViewSet(GenericViewSet, CreateModelMixin):
     permission_classes = [AllowAny]
+    http_method_names = ['get']
 
-    def get(self, request, token):
-        signer = Signer()
+    @staticmethod
+    def get(request, token):
         try:
-            user = signer.unsign_object((force_str(urlsafe_base64_decode(token))))
-            timestamp = user.pop('timestamp')
-            valid = (timezone.now() - timestamp).total_seconds() < PASSWORD_RESET_TIMEOUT_DAYS * 24 * 60 * 60
+            user = get_attributes_of_one_time_link(token)
+            actual_request_timestamp = dateparse.parse_datetime(user.pop('timestamp'))
+            min_possible_request_timestamp = timezone.now() - timedelta(days=PASSWORD_RESET_TIMEOUT_DAYS)
+            valid = min_possible_request_timestamp <= actual_request_timestamp
+            print('actual: ' + str(actual_request_timestamp))
+            print('minimal: ' + str(min_possible_request_timestamp))
+            print(valid)
+            valid = False
             if not valid:
                 raise BadSignature('Token expired!')
             else:
                 user_from_db = User.objects.get(pk=user['email'])
                 user_from_db.is_active = False
                 user_from_db.save()
-                return {'user': user_from_db}
+                return Response({'user': user_from_db})
         except BadSignature:
-            return {'message': 'Token invalid. Did it expire?'}
+            return Response({'message': 'Token invalid. Did it expire?'})
