@@ -34,13 +34,12 @@ class ActivateUserViewSet(GenericViewSet, CreateModelMixin):
             print('actual: ' + str(actual_request_timestamp))
             print('minimal: ' + str(min_possible_request_timestamp))
             print(valid)
-            valid = False
             if not valid:
                 raise BadSignature('Token expired!')
             else:
-                user_from_db = User.objects.get(pk=user['email'])
-                user_from_db.is_active = False
+                user_from_db = User.objects.get(email=user['email'])
+                user_from_db.is_active = True
                 user_from_db.save()
-                return Response({'user': user_from_db})
+                return Response({'user': UserSerializer(user_from_db).data})
         except BadSignature:
             return Response({'message': 'Token invalid. Did it expire?'})
