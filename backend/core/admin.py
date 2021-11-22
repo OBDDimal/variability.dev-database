@@ -12,7 +12,7 @@ class UserAdmin(BaseUserAdmin):
     form = AdminUserChangeForm
     add_form = AdminUserCreationForm
     # Shows attributes in list view
-    list_display = ('email', 'institute', 'is_staff', 'is_superuser', 'last_login', 'date_joined')
+    list_display = ('email', 'institute', 'is_active', 'is_staff', 'is_superuser', 'last_login', 'date_joined')
     list_filter = ('is_superuser',)
     # Define how view should look like after clicking on a email
     fieldsets = [

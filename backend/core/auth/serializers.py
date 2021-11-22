@@ -38,11 +38,10 @@ class LoginSerializer(TokenObtainPairSerializer):
 
 class RegistrationSerializer(UserSerializer):
     """
-    A serializer for defining which attributes should be converted to JSON after successful registration
+    A serializer for defining which attributes should be converted to JSON after successful registration.
+    This serializer extends the user serializer in core/user/serializers.py.
     """
-
-    password = serializers.CharField(max_length=128, write_only=True, required=True)
-    email = serializers.EmailField(required=True, write_only=True, max_length=128)
+    password = serializers.CharField(max_length=128, write_only=True, required=True, style={'input_type': 'password'})
 
     class Meta:
         model = User

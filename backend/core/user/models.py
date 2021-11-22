@@ -27,25 +27,33 @@ class UserManager(BaseUserManager):
         """
         Creates an user with the given attributes
         """
-        kwargs.setdefault('is_superuser', False)
-        kwargs.setdefault('is_staff', False)
+        kwargs.update({
+            'is_superuser': False,
+            'is_staff': False,
+            'is_active': False
+        })
         return self.save_user(email, password, **kwargs)
 
     def create_staffuser(self, email, password, **kwargs):
         """
         Creates an user with activated staff flag and the given attributes
         """
-        kwargs.setdefault('is_superuser', False)
-        kwargs.setdefault('is_staff', True)
+        kwargs.update({
+            'is_superuser': False,
+            'is_staff': True,
+            'is_active': False
+        })
         return self.save_user(email, password, **kwargs)
 
     def create_superuser(self, email, password, **kwargs):
         """
         Creates a superuser with the given attributes
         """
-        kwargs.setdefault('is_superuser', True)
-        kwargs.setdefault('is_staff', True)
-
+        kwargs.update({
+            'is_superuser': True,
+            'is_staff': True,
+            'is_active': True
+        })
         # I dont know if this is necessary but people keep on doing this in tutorials ...
         if kwargs.get('is_superuser') is not True:
             raise ValueError('is_superuser should be True')
@@ -55,7 +63,7 @@ class UserManager(BaseUserManager):
 class User(AbstractBaseUser, PermissionsMixin):
     id = models.BigAutoField(primary_key=True)
     email = models.EmailField(db_index=True, unique=True)
-    is_active = models.BooleanField(default=True)
+    is_active = models.BooleanField(default=False)
     is_staff = models.BooleanField(default=False)
     date_joined = models.DateTimeField('date joined', auto_now_add=True, editable=False)
     institute = models.CharField(db_index=True, max_length=255, unique=False)
