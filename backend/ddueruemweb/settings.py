@@ -35,6 +35,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django_extensions',
 
     'rest_framework',
     'rest_framework_simplejwt',
@@ -158,4 +159,4 @@ EMAIL_PORT = 1025
 # EMAIL_USE_TTLS = True
 # EMAIL_USE_SSL = False
 
-PASSWORD_RESET_TIMEOUT_DAYS = 2
+PASSWORD_RESET_TIMEOUT_DAYS = 2  # also used for user email activation token timeout calc
