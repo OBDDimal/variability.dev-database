@@ -1,15 +1,14 @@
-import "./App.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 
 import { Navigate, Route, Routes } from "react-router-dom";
-import SiteNavbar from "./components/SiteNavbar";
-import Upload from "./routes/Upload";
+import SiteNavbar from "../components/SiteNavbar";
+import Upload from "./Upload";
 import { Container, Row } from "react-bootstrap";
-import Home from "./routes/Home";
-import Login from "./components/login.component";
-import Register from "./components/register.component";
-import Profile from "./components/profile.component";
-import authService from "./services/auth.service";
+import Home from "./Home";
+import Login from "./Login";
+import Register from "./Register";
+import Profile from "../components/profile.component";
+import authService from "../services/auth.service";
 
 interface AuthChildren {
   children: JSX.Element; // Maybe there is a way to define this better and directly in RequireAuth
