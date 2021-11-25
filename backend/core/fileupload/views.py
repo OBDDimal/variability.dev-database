@@ -25,7 +25,7 @@ class FileUploadViewSet(viewsets.ModelViewSet):
             'delete_domain': 'localhost:8000/'
         }))
 
-
+"""
 def download(request, path):
     file_path = os.path.join(settings.MEDIA_ROOT, path)
     if os.path.exists(file_path):
@@ -34,3 +34,4 @@ def download(request, path):
             response['Content-Disposition'] = 'inline; filename=' + os.path.basename(file_path)
             return response
     raise Http404
+"""

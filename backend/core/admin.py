@@ -1,4 +1,7 @@
 from django.contrib import admin
+from django.contrib.admin import ModelAdmin
+
+from core.fileupload.models import File
 from core.user.forms import AdminUserChangeForm, AdminUserCreationForm
 from core.user.models import User
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
@@ -6,7 +9,7 @@ from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 
 class UserAdmin(BaseUserAdmin):
     """
-    Class for defining the backend admin panel, its used forms and which data should be displayed.
+    Class for defining the backend user admin panel, its used forms and which data should be displayed.
     """
     model = User
     form = AdminUserChangeForm
@@ -37,5 +40,24 @@ class UserAdmin(BaseUserAdmin):
     filter_horizontal = ()
 
 
+class FileAdmin(ModelAdmin):
+    """
+    Class for defining the backend file admin panel and which data should be displayed.
+    """
+    model = File
+    # Shows attributes in list view
+    list_display = ('file', 'owner', 'uploaded_at')
+    # list_filter = ('is_superuser',)
+    # Define how view should look like after clicking on a email
+    fieldsets = [
+        (None, {'fields': ['owner']}),
+        ('Information', {'fields': ['description', 'uploaded_at', 'file']}),
+    ]
+    search_fields = ('owner',)
+    ordering = ('owner', 'uploaded_at')
+    filter_horizontal = ()
+
+
 # Register your models here.
 admin.site.register(User, UserAdmin)
+admin.site.register(File, FileAdmin)

@@ -1,10 +1,13 @@
+from django.conf.global_settings import STATIC_ROOT
+from django.conf.urls.static import static
 from django.urls import path, include
 from rest_framework import routers
 
 from core.fileupload import views
-from core.fileupload.views import FileUploadViewSet, GetOneFileViewSet
+from core.fileupload.views import FileUploadViewSet
 from core.user.viewsets import UserViewSet, ActivateUserViewSet
 from core.auth.viewsets import LoginViewSet, RegistrationViewSet, RefreshViewSet
+from ddueruemweb.settings import STATIC_URL, MEDIA_URL, MEDIA_ROOT
 
 router = routers.DefaultRouter()
 
@@ -21,9 +24,12 @@ router.register(r'user', UserViewSet, basename='user')
 
 # FILES
 router.register(r'files', FileUploadViewSet, basename='file-upload')
-router.register(r'files/(?P<path>.+)', views.download, basename='file-download')
+router.register(r'^media/files/(?P<filename>[^/]+)$', FileUploadViewSet, basename='file-view')
+# router.register(r'files/(?P<path>.+)', views.download, basename='file-download')
 
 urlpatterns = [
     *router.urls,
     path('api-auth/', include('rest_framework.urls')),
 ]
+urlpatterns += static(STATIC_URL, document_root=STATIC_ROOT)
+urlpatterns += static(MEDIA_URL, document_root=MEDIA_ROOT)
