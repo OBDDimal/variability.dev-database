@@ -15,7 +15,8 @@ class UserViewSet(ModelViewSet):
     """
     API endpoint that allows users to be viewed or edited
     """
-    queryset = User.objects.all().order_by('-date_joined')
+    queryset = User.objects.filter(is_active=False, date_joined__lte=timezone.now() - timedelta(
+            hours=PASSWORD_RESET_TIMEOUT_DAYS)).order_by('date_joined')
     serializer_class = UserSerializer
     permission_classes = [AllowAny]
 
