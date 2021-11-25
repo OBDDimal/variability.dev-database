@@ -2,15 +2,17 @@ from django_extensions.management.jobs import HourlyJob
 from datetime import timedelta
 from django.utils import timezone
 from ddueruemweb.settings import PASSWORD_RESET_TIMEOUT_DAYS
-
 from core.user.models import User
 
 
 class Job(HourlyJob):
+    """
+    This job runs every hour and removes all inactive users where
+    the activation period has passed.
+    """
     help = "Check user activation period expired"
 
     def execute(self):
-        # executing empty sample job
         print("Starting cleanup user with expired activation period...")
         User.objects.filter(is_active=False, date_joined__lte=timezone.now() - timedelta(
             hours=PASSWORD_RESET_TIMEOUT_DAYS)).order_by('date_joined').delete()
