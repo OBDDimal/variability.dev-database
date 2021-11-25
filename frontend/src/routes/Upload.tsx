@@ -16,6 +16,9 @@ type State = {
   file?: File;
   license: string;
   loading: boolean;
+  legalShare: boolean;
+  userData: boolean;
+  openSource: boolean;
 };
 
 export default class upload extends Component<Props, State> {
@@ -24,6 +27,9 @@ export default class upload extends Component<Props, State> {
     file: undefined,
     license: license[0],
     loading: false,
+    legalShare: false,
+    userData: false,
+    openSource: false,
   };
 
   onDescriptionChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -39,7 +45,13 @@ export default class upload extends Component<Props, State> {
   };
 
   isReady = () => {
-    return this.state.file && this.state.description;
+    return (
+      this.state.file &&
+      this.state.description &&
+      this.state.legalShare &&
+      this.state.userData &&
+      this.state.openSource
+    );
   };
 
   onSubmit = () => {
@@ -72,7 +84,7 @@ export default class upload extends Component<Props, State> {
           MySwal.fire({
             icon: "error",
             title: "Error!!",
-            text: "Please review your form, for non filled fields",
+            text: JSON.stringify(error),
           });
         });
     }
@@ -89,11 +101,11 @@ export default class upload extends Component<Props, State> {
             placeholder='Leave a comment here'
           />
         </Form.Group>
-        <Form.Group controlId='formFile' className='mb-3'>
+        <Form.Group className='mb-3'>
           <Form.Label>File Upload</Form.Label>
           <Form.Control type='file' onChange={this.onFileChange} />
         </Form.Group>
-        <Form.Group>
+        <Form.Group className='mb-3'>
           <Form.Label>License</Form.Label>
           <Form.Select aria-label='Default select example'>
             {license.map((key) => {
@@ -104,6 +116,33 @@ export default class upload extends Component<Props, State> {
               );
             })}
           </Form.Select>
+        </Form.Group>
+        <Form.Group className='mb-3'>
+          <Form.Check
+            type='checkbox'
+            checked={this.state.legalShare}
+            onClick={() =>
+              this.setState({ legalShare: !this.state.legalShare })
+            }
+            id='legal-share'
+            label='I am legally allowed to share this model'
+          />
+          <Form.Check
+            type='checkbox'
+            checked={this.state.userData}
+            onClick={() => this.setState({ userData: !this.state.userData })}
+            id='user-data'
+            label='My email and a date will always be tied to the file upload (even after account deletion)'
+          />
+          <Form.Check
+            type='checkbox'
+            checked={this.state.openSource}
+            onClick={() =>
+              this.setState({ openSource: !this.state.openSource })
+            }
+            id='open-source'
+            label='All information will be open source according to your chosen license'
+          />
         </Form.Group>
         <Button
           variant='primary'
