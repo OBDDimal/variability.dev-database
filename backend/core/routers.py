@@ -24,7 +24,8 @@ router.register(r'user', UserViewSet, basename='user')
 
 # FILES
 router.register(r'files', FileUploadViewSet, basename='file-upload')
-router.register(r'^media/files/(?P<filename>[^/]+)$', FileUploadViewSet, basename='file-view')
+# details file upload https://djangotricks.blogspot.com/2020/03/how-to-upload-a-file-using-django-rest-framework.html
+# router.register(r'^media/files/(?P<filename>[^/]+)$', FileUploadViewSet, basename='file-view')
 # router.register(r'files/(?P<path>.+)', views.download, basename='file-download')
 
 urlpatterns = [
