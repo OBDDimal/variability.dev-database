@@ -77,6 +77,9 @@ export default class upload extends Component<Props, State> {
               file: undefined,
               license: license[0],
               loading: false,
+              legalShare: false,
+              userData: false,
+              openSource: false,
             });
           });
         })
@@ -141,7 +144,7 @@ export default class upload extends Component<Props, State> {
               this.setState({ openSource: !this.state.openSource })
             }
             id='open-source'
-            label='All information will be open source according to your chosen license'
+            label='All information will be published according to your chosen license'
           />
         </Form.Group>
         <Button

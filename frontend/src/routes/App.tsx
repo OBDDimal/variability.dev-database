@@ -7,7 +7,7 @@ import { Container, Row } from "react-bootstrap";
 import Home from "./Home";
 import Login from "./Login";
 import Register from "./Register";
-import Profile from "../components/profile.component";
+import Profile from "./Profile";
 import authService from "../services/auth.service";
 
 interface AuthChildren {

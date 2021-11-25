@@ -6,6 +6,7 @@ from core.fileupload.serializers import FilesSerializer
 class FileUploadSetView(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
+        self.request.user.email_user('subject', 'message')
 
     queryset = File.objects.all()
     serializer_class = FilesSerializer
