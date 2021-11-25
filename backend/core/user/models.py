@@ -54,9 +54,6 @@ class UserManager(BaseUserManager):
             'is_staff': True,
             'is_active': True
         })
-        # I dont know if this is necessary but people keep on doing this in tutorials ...
-        if kwargs.get('is_superuser') is not True:
-            raise ValueError('is_superuser should be True')
         return self.save_user(email, password, **kwargs)
 
 
