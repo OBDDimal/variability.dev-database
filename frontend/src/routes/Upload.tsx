@@ -77,12 +77,9 @@ export default class upload extends Component<Props, State> {
               file: undefined,
               license: license[0],
               loading: false,
-<<<<<<< HEAD
               legalShare: false,
               userData: false,
               openSource: false,
-=======
->>>>>>> 2a0754be95c63edd2162f1e9c6f33cf9e3a8b3d4
             });
           });
         })
