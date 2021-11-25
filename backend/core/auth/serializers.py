@@ -5,9 +5,10 @@ from django.utils import timezone
 from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.settings import api_settings
-from core.user.serializers import UserSerializer
+
 from core.user.models import User
-from .tokens import generate_one_time_link
+from core.user.serializers import UserSerializer
+from .tokens import encode_user_to_token
 
 
 class LoginSerializer(TokenObtainPairSerializer):
@@ -76,6 +77,6 @@ class RegistrationSerializer(UserSerializer):
                     'user': str(user.email),
                     'protocol': 'http',
                     'domain': 'localhost:8000/auth/register/confirm/',
-                    'token': generate_one_time_link(extended_user)
+                    'token': encode_user_to_token(extended_user)
                 }))
                 return user
