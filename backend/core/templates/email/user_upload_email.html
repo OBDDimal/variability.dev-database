@@ -1,0 +1,17 @@
+{% autoescape off %}
+    <h3>Hello {{ user }},</h3>
+
+    To see your uploaded file {{ file_name }}, please click on the following link:
+    <br/>
+    <a href="{{ protocol }}://{{ file_domain }}/{{ file_token }}/">See file</a>
+    <br/><br/>
+    If clicking the link above doesn't work, you can copy the plain link here:
+    <br/>
+    {{ protocol }}://{{ file_domain }}/{{ file_token }}/
+    <br/><br/>
+    Thank you for uploading a file. You may also delete the file with this permanent
+    link:
+    <a href="{{ protocol }}://{{ delete_domain }}/{{ delete_token }}"
+    >{{ protocol }}://{{ delete_domain }}/{{ delete_token }}</a
+    >
+{% endautoescape %}
