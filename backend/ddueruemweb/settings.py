@@ -160,4 +160,4 @@ EMAIL_PORT = 1025
 # EMAIL_USE_TLS = True
 # EMAIL_USE_SSL = False
 
-PASSWORD_RESET_TIMEOUT_DAYS = 2  # also used for user email activation token timeout calc
+PASSWORD_RESET_TIMEOUT_DAYS = 2  # also used for user email activation (token) timeout calc
