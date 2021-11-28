@@ -1,15 +1,11 @@
 from datetime import timedelta
 from django.core import mail
+from django.core.exceptions import ObjectDoesNotExist
 from django.test import TestCase
 from django.utils import timezone
 from core.user.models import User
-
-# ####################### DJANGO-REST TESTS #######################
-"""
-TODO: 
-for example CSRF valdiation and other REST related tests. Maybe integration tests?
-Details, see: https://www.django-rest-framework.org/api-guide/testing/#testing
-"""
+from ddueruemweb.settings import PASSWORD_RESET_TIMEOUT_DAYS
+from core.jobs.hourly.check_user_activation_period_expired import Job as InactiveUserJob
 
 
 # ####################### DJANGO TESTS #######################
@@ -108,3 +104,84 @@ class UserModelTests(TestCase):
         self.assertEqual(mail.outbox[0].to, [expected_receiver_email])
         self.assertEqual(mail.outbox[0].subject, expected_subject)
         self.assertEqual(mail.outbox[0].body, expected_message)
+
+    def test_delete_expired_users(self):
+        expected_email = "newu@s.er"
+        # join date is exactly PASSWORD_RESET_TIMEOUT_DAYS days ago
+        expected_date_joined = timezone.now() - timedelta(days=PASSWORD_RESET_TIMEOUT_DAYS)
+        self.create_user_with_date_joined(expected_email, expected_date_joined)
+        InactiveUserJob().execute()
+        self.assertRaises(ObjectDoesNotExist, User.objects.get, email=expected_email)
+
+        # user activation period expired 30 minutes ago
+        expected_date_joined = timezone.now() - timedelta(minutes=30) - timedelta(days=PASSWORD_RESET_TIMEOUT_DAYS)
+        self.create_user_with_date_joined(expected_email, expected_date_joined)
+        InactiveUserJob().execute()
+        self.assertRaises(ObjectDoesNotExist, User.objects.get, email=expected_email)
+
+        # user activation period expired 7 days ago
+        expected_date_joined = timezone.now() - timedelta(minutes=30) - timedelta(days=PASSWORD_RESET_TIMEOUT_DAYS)
+        self.create_user_with_date_joined(expected_email, expected_date_joined)
+        InactiveUserJob().execute()
+        self.assertRaises(ObjectDoesNotExist, User.objects.get, email=expected_email)
+
+    def test_keep_inactive_user_within_activation_period(self):
+        expected_email = "newu@s.er"
+        # user joined a view seconds ago
+        expected_date_joined = timezone.now() - timedelta(seconds=30)
+        self.create_user_with_date_joined(expected_email, expected_date_joined)
+        InactiveUserJob().execute()
+        user_from_db = User.objects.get(email=expected_email)
+        self.assertFalse(user_from_db.is_active)
+        self.assertEqual(expected_date_joined, user_from_db.date_joined)
+        # reset changes for following tests
+        User.objects.filter(email=expected_email).delete()
+
+        # user joined an hour ago
+        expected_date_joined = timezone.now() - timedelta(hours=1)
+        self.create_user_with_date_joined(expected_email, expected_date_joined)
+        InactiveUserJob().execute()
+        user_from_db = User.objects.get(email=expected_email)
+        self.assertFalse(user_from_db.is_active)
+        self.assertEqual(expected_date_joined, user_from_db.date_joined)
+        # reset changes for following tests
+        User.objects.filter(email=expected_email).delete()
+
+        # user joined a day ago
+        expected_date_joined = timezone.now() - timedelta(days=1)
+        self.create_user_with_date_joined(expected_email, expected_date_joined)
+        InactiveUserJob().execute()
+        user_from_db = User.objects.get(email=expected_email)
+        self.assertFalse(user_from_db.is_active)
+        self.assertEqual(expected_date_joined, user_from_db.date_joined)
+        # reset changes for following tests
+        User.objects.filter(email=expected_email).delete()
+
+        # user has 30 min left to activate the account
+        expected_date_joined = timezone.now() + timedelta(minutes=30) - timedelta(days=PASSWORD_RESET_TIMEOUT_DAYS)
+        self.create_user_with_date_joined(expected_email, expected_date_joined)
+        InactiveUserJob().execute()
+        user_from_db = User.objects.get(email=expected_email)
+        self.assertFalse(user_from_db.is_active)
+        self.assertEqual(expected_date_joined, user_from_db.date_joined)
+        # reset changes for following tests
+        User.objects.filter(email=expected_email).delete()
+
+    def test_keep_active_user(self):
+        expected_email = "newu@s.er"
+        user = User.objects.save_user(email=expected_email, password="12345678!", is_active=True)
+        self.assertTrue(user.is_active)
+        InactiveUserJob().execute()
+        User.objects.get(email=expected_email)
+
+    # ####################### Util methods #######################
+    @staticmethod
+    def create_user_with_date_joined(user_email, date_joined):
+        """
+        Creates user with an given join date and returns the created user
+        """
+        expected_pw = "12345678!"
+        user = User.objects.create_user(email=user_email, password=expected_pw)
+        user.date_joined = date_joined
+        user.save()
+        pass

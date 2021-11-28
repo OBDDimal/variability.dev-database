@@ -14,7 +14,7 @@ class Job(HourlyJob):
 
     def execute(self):
         print("Starting cleanup user with expired activation period...")
-        User.objects.filter(is_active=False, date_joined__lte=timezone.now() - timedelta(
-            hours=PASSWORD_RESET_TIMEOUT_DAYS)).order_by('date_joined').delete()
+        User.objects.filter(is_active=False,
+                            date_joined__lte=timezone.now() - timedelta(days=PASSWORD_RESET_TIMEOUT_DAYS)).delete()
         print("Done.")
         pass

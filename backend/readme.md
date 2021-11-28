@@ -31,3 +31,13 @@ library, [click here](https://django-rest-framework-simplejwt.readthedocs.io/en/
 
 Since performing jobs on hourly/daily/weekly/... basis is not build-in in django, we
 use [django-extension](https://django-extensions.readthedocs.io/en/latest/#) library to achieve this.
+
+**Jobs do not run automatically!** You must either run a job manually specifying the exact time on which the command 
+is to be run, or use crontab:
+```
+@hourly /path/to/my/project/manage.py runjobs hourly
+```
+
+```
+@daily /path/to/my/project/manage.py runjobs daily
+```
