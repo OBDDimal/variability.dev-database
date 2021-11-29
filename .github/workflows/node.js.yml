@@ -5,9 +5,9 @@ name: Node.js CI
 
 on:
   push:
-    branches: [file-upload]
+    branches: [issue-33]
   pull_request:
-    branches: [file-upload]
+    branches: [issue-33]
 
 jobs:
   install:
