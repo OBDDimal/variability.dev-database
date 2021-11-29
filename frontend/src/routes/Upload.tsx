@@ -78,6 +78,13 @@ export default class upload extends Component<Props, State> {
             title: "Success!!",
             text: JSON.stringify(result),
           }).then(() => {
+            document
+              .querySelectorAll("textarea, input[type=file]")
+              .forEach((e: Element) => {
+                console.log(e);
+                const element = e as HTMLInputElement;
+                element.value = "";
+              });
             this.setState({
               description: undefined,
               file: undefined,
@@ -89,8 +96,7 @@ export default class upload extends Component<Props, State> {
             });
           });
         })
-        .catch((error) => error.json())
-        .then((error) => {
+        .catch((error) => {
           MySwal.fire({
             icon: "error",
             title: "Error!!",
@@ -131,7 +137,7 @@ export default class upload extends Component<Props, State> {
           <Form.Check
             type='checkbox'
             checked={this.state.legalShare}
-            onClick={() =>
+            onChange={() =>
               this.setState({ legalShare: !this.state.legalShare })
             }
             id='legal-share'
@@ -140,14 +146,14 @@ export default class upload extends Component<Props, State> {
           <Form.Check
             type='checkbox'
             checked={this.state.userData}
-            onClick={() => this.setState({ userData: !this.state.userData })}
+            onChange={() => this.setState({ userData: !this.state.userData })}
             id='user-data'
             label='My email and a date will always be tied to the file upload (even after account deletion)'
           />
           <Form.Check
             type='checkbox'
             checked={this.state.openSource}
-            onClick={() =>
+            onChange={() =>
               this.setState({ openSource: !this.state.openSource })
             }
             id='open-source'

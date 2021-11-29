@@ -40,9 +40,12 @@ instance.interceptors.response.use(
     if (error.response && error.response.status === 401) {
       try {
         // Use axios not an instance to prevent infinite loops
-        const response = await axios.post("auth/refresh/", {
-          refresh: authService.getRefreshToken(),
-        });
+        const response = await axios.post(
+          "http://localhost:8000/auth/refresh/",
+          {
+            refresh: authService.getRefreshToken(),
+          }
+        );
 
         const accessToken = response.data.access;
         localStorage.setItem("access", JSON.stringify(accessToken));
