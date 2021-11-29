@@ -1,4 +1,6 @@
 from datetime import timedelta
+
+from django.core.exceptions import ObjectDoesNotExist
 from django.core.signing import BadSignature
 from django.utils import timezone, dateparse
 from rest_framework.response import Response
@@ -21,6 +23,10 @@ class UserViewSet(ModelViewSet):
 
 
 class ActivateUserViewSet(GenericViewSet, CreateModelMixin):
+    """
+    This view is called when the user tries to activate the user account, via a link which contains a token.
+    This token will be decoded and the user will be set to active if the token is valid.
+    """
     permission_classes = [AllowAny]
     http_method_names = ['get']
 
@@ -31,9 +37,6 @@ class ActivateUserViewSet(GenericViewSet, CreateModelMixin):
             actual_request_timestamp = dateparse.parse_datetime(user.pop('timestamp'))
             min_possible_request_timestamp = timezone.now() - timedelta(days=PASSWORD_RESET_TIMEOUT_DAYS)
             valid = min_possible_request_timestamp <= actual_request_timestamp
-            print('actual: ' + str(actual_request_timestamp))
-            print('minimal: ' + str(min_possible_request_timestamp))
-            print(valid)
             if not valid:
                 raise BadSignature('Token expired!')
             else:
@@ -43,5 +46,7 @@ class ActivateUserViewSet(GenericViewSet, CreateModelMixin):
                 user_from_db.is_active = True
                 user_from_db.save()
                 return Response({'user': UserSerializer(user_from_db).data})
+        except ObjectDoesNotExist as error:
+            return Response({'message': str(error)})
         except BadSignature as error:
             return Response({'message': str(error)})

@@ -28,7 +28,7 @@ Start local email server
 ### Start jobs
  Run all hourly/daily/weekly/monthly jobs
 ```
-python manage.py runjobs
+python manage.py runjobs hourly
 ```
 Details, see: [django-extensions docu for job scheduling](https://django-extensions.readthedocs.io/en/latest/jobs_scheduling.html#create-a-job)
 
