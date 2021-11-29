@@ -2,23 +2,34 @@ import React, { Component } from "react";
 import { Button, Form } from "react-bootstrap";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
+import api from "../services/api.service";
 
 const MySwal = withReactContent(Swal);
 
 // Can't use enums because of iteration problems
 const license = ["CC BY - Mention", "CC BY-NC - Mention - Non-commercial"];
 
-type UploadState = {
-  description: string;
-  file: string;
+type Props = {};
+
+type State = {
+  description?: string;
+  file?: File;
   license: string;
+  loading: boolean;
+  legalShare: boolean;
+  userData: boolean;
+  openSource: boolean;
 };
 
-export default class upload extends Component {
-  state: UploadState = {
-    description: "",
-    file: "",
+export default class upload extends Component<Props, State> {
+  state: State = {
+    description: undefined,
+    file: undefined,
     license: license[0],
+    loading: false,
+    legalShare: false,
+    userData: false,
+    openSource: false,
   };
 
   onDescriptionChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -34,39 +45,56 @@ export default class upload extends Component {
   };
 
   isReady = () => {
-    return this.state.file !== "" && this.state.description !== "";
+    return (
+      this.state.file &&
+      this.state.description &&
+      this.state.legalShare &&
+      this.state.userData &&
+      this.state.openSource
+    );
   };
 
   onSubmit = () => {
-    if (this.isReady()) {
+    if (
+      this.state.file &&
+      this.state.description &&
+      this.state.legalShare &&
+      this.state.userData &&
+      this.state.openSource
+    ) {
       const data = new FormData();
-      const headers = new Headers();
 
-      headers.set("Authorization", "Basic " + btoa("t@b.de:admin"));
-      data.append("description", this.state.description);
-      data.append("file", this.state.file);
+      data.append("description", this.state.description as string);
+      data.append("file", this.state.file as File);
       data.append("license", this.state.license);
 
-      fetch("http://localhost:8000/files/", {
-        headers: headers,
-        method: "POST",
-        body: data,
-      })
-        .then((response) => response.json())
+      api
+        .post("http://localhost:8000/files/", data, {
+          headers: { "Content-Type": "multipart/form-data" },
+        })
         .then((result) => {
           MySwal.fire({
             icon: "success",
             title: "Success!!",
             text: JSON.stringify(result),
           }).then(() => {
-            window.location.reload();
+            this.setState({
+              description: undefined,
+              file: undefined,
+              license: license[0],
+              loading: false,
+              legalShare: false,
+              userData: false,
+              openSource: false,
+            });
           });
         })
-        .catch((error) => {
+        .catch((error) => error.json())
+        .then((error) => {
           MySwal.fire({
             icon: "error",
             title: "Error!!",
-            text: "Please review your form, for non filled fields",
+            text: JSON.stringify(error),
           });
         });
     }
@@ -83,11 +111,11 @@ export default class upload extends Component {
             placeholder='Leave a comment here'
           />
         </Form.Group>
-        <Form.Group controlId='formFile' className='mb-3'>
+        <Form.Group className='mb-3'>
           <Form.Label>File Upload</Form.Label>
           <Form.Control type='file' onChange={this.onFileChange} />
         </Form.Group>
-        <Form.Group>
+        <Form.Group className='mb-3'>
           <Form.Label>License</Form.Label>
           <Form.Select aria-label='Default select example'>
             {license.map((key) => {
@@ -99,12 +127,42 @@ export default class upload extends Component {
             })}
           </Form.Select>
         </Form.Group>
+        <Form.Group className='mb-3'>
+          <Form.Check
+            type='checkbox'
+            checked={this.state.legalShare}
+            onClick={() =>
+              this.setState({ legalShare: !this.state.legalShare })
+            }
+            id='legal-share'
+            label='I am legally allowed to share this model'
+          />
+          <Form.Check
+            type='checkbox'
+            checked={this.state.userData}
+            onClick={() => this.setState({ userData: !this.state.userData })}
+            id='user-data'
+            label='My email and a date will always be tied to the file upload (even after account deletion)'
+          />
+          <Form.Check
+            type='checkbox'
+            checked={this.state.openSource}
+            onClick={() =>
+              this.setState({ openSource: !this.state.openSource })
+            }
+            id='open-source'
+            label='All information will be published according to your chosen license'
+          />
+        </Form.Group>
         <Button
           variant='primary'
           type='button'
-          disabled={this.isReady() === false ? true : undefined}
+          disabled={!this.isReady() ? true : undefined}
           onClick={this.onSubmit}
         >
+          {this.state.loading && (
+            <span className='spinner-border spinner-border-sm' />
+          )}
           Upload!
         </Button>
       </div>

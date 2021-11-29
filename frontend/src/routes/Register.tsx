@@ -1,8 +1,8 @@
 import React, { Component } from "react";
-import AuthService from "../services/auth.service";
+import { Button, Form } from "react-bootstrap";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
-import { Button, Form } from "react-bootstrap";
+import AuthService from "../services/auth.service";
 
 const MySwal = withReactContent(Swal);
 
@@ -11,13 +11,15 @@ type Props = {};
 type State = {
   email?: string;
   password?: string;
+  passwordConfirmation?: string;
   loading: boolean;
 };
 
-export default class Login extends Component<Props, State> {
+export default class Register extends Component<Props, State> {
   state: State = {
     email: undefined,
     password: undefined,
+    passwordConfirmation: undefined,
     loading: false,
   };
 
@@ -31,20 +33,36 @@ export default class Login extends Component<Props, State> {
     this.setState({ password: password.value });
   };
 
+  onPasswordConfirmationChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const passwordConfirmation = e.target as HTMLInputElement;
+    this.setState({ passwordConfirmation: passwordConfirmation.value });
+  };
+
   isReady = () => {
-    return this.state.email && this.state.password;
+    return (
+      this.state.email &&
+      this.state.password &&
+      this.state.passwordConfirmation &&
+      this.state.password === this.state.passwordConfirmation
+    );
   };
 
   onSubmit = () => {
-    // Call to this.isReady() does not work, due to typescript checking
-    if (this.state.email && this.state.password) {
-      this.setState({ loading: true });
-
-      AuthService.login(this.state.email, this.state.password).then(
+    if (
+      this.state.email &&
+      this.state.password &&
+      this.state.passwordConfirmation &&
+      this.state.password === this.state.passwordConfirmation
+    ) {
+      AuthService.register(
+        this.state.email,
+        this.state.password,
+        this.state.passwordConfirmation
+      ).then(
         () => {
           MySwal.fire({
             icon: "success",
-            title: "Login successful",
+            title: "Register successful, please check your mail",
             toast: true,
             position: "top-right",
             showConfirmButton: false,
@@ -59,7 +77,7 @@ export default class Login extends Component<Props, State> {
           MySwal.fire({
             icon: "error",
             title: "Error!!",
-            text: `Wrong login credentials! ${error.toString()}`,
+            text: `Something went wrong while registering! ${error.toString()}`,
           });
         }
       );
@@ -81,6 +99,13 @@ export default class Login extends Component<Props, State> {
           <Form.Label>Password</Form.Label>
           <Form.Control type='password' onChange={this.onPasswordChange} />
         </Form.Group>
+        <Form.Group className='mb-3'>
+          <Form.Label>Password Confirmation</Form.Label>
+          <Form.Control
+            type='password'
+            onChange={this.onPasswordConfirmationChange}
+          />
+        </Form.Group>
         <Button
           variant='primary'
           type='button'
@@ -90,7 +115,7 @@ export default class Login extends Component<Props, State> {
           {this.state.loading && (
             <span className='spinner-border spinner-border-sm' />
           )}
-          Login!
+          Register!
         </Button>
       </div>
     );
