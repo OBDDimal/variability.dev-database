@@ -29,7 +29,7 @@ class UserModelTests(TestCase):
         self.assertFalse(user.is_active)
         self.assertFalse(user.is_staff)
         self.assertFalse(user.is_superuser)
-        self.assertIn(user.date_joined, [timezone.now() - timedelta(seconds=1), timezone.now()])
+        self.assertTrue(timezone.now() - timedelta(seconds=1) <= user.date_joined <= timezone.now())
         self.assertIsNotNone(user.institute)
         self.assertIsNotNone(user.bio)
 
@@ -57,7 +57,7 @@ class UserModelTests(TestCase):
         self.assertEqual(user.email, expected_email)
         self.assertFalse(user.is_active)
         self.assertFalse(user.is_staff)
-        self.assertIn(user.date_joined, [timezone.now() - timedelta(seconds=1), timezone.now()])
+        self.assertTrue(timezone.now() - timedelta(seconds=1) <= user.date_joined <= timezone.now())
         self.assertIsNotNone(user.institute)
         self.assertIsNotNone(user.bio)
 
@@ -71,7 +71,7 @@ class UserModelTests(TestCase):
         self.assertEqual(user.email, expected_email)
         self.assertFalse(user.is_active)
         self.assertTrue(user.is_staff)
-        self.assertIn(user.date_joined, [timezone.now() - timedelta(seconds=1), timezone.now()])
+        self.assertTrue(timezone.now() - timedelta(seconds=1) <= user.date_joined <= timezone.now())
         self.assertIsNotNone(user.institute)
         self.assertIsNotNone(user.bio)
 
@@ -85,7 +85,7 @@ class UserModelTests(TestCase):
         self.assertEqual(user.email, expected_email)
         self.assertTrue(user.is_active)
         self.assertTrue(user.is_staff)
-        self.assertIn(user.date_joined, [timezone.now() - timedelta(seconds=1), timezone.now()])
+        self.assertTrue(timezone.now() - timedelta(seconds=1) <= user.date_joined <= timezone.now())
         self.assertIsNotNone(user.institute)
         self.assertIsNotNone(user.bio)
 
