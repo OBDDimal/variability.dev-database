@@ -31,10 +31,11 @@ class AuthService {
     window.location.replace("/");
   }
 
-  register(email: string, password: string) {
+  register(email: string, password1: string, password2: string) {
     return axios.post(API_URL + "register/", {
       email,
-      password,
+      password1,
+      password2,
     });
   }
 

@@ -54,7 +54,11 @@ export default class Register extends Component<Props, State> {
       this.state.passwordConfirmation &&
       this.state.password === this.state.passwordConfirmation
     ) {
-      AuthService.register(this.state.email, this.state.password).then(
+      AuthService.register(
+        this.state.email,
+        this.state.password,
+        this.state.passwordConfirmation
+      ).then(
         () => {
           MySwal.fire({
             icon: "success",

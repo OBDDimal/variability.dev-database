@@ -39,7 +39,8 @@ instance.interceptors.response.use(
     // Access key expired
     if (error.response && error.response.status === 401) {
       try {
-        const response = await instance.post("auth/refresh/", {
+        // Use axios not an instance to prevent infinite loops
+        const response = await axios.post("auth/refresh/", {
           refresh: authService.getRefreshToken(),
         });
 

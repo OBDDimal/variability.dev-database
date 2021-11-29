@@ -83,7 +83,8 @@ export default class upload extends Component<Props, State> {
             });
           });
         })
-        .catch((error) => {
+        .catch((error) => error.json())
+        .then((error) => {
           MySwal.fire({
             icon: "error",
             title: "Error!!",
