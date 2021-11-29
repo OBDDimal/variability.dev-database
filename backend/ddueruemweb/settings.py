@@ -35,6 +35,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django_extensions',
 
     'rest_framework',
     'rest_framework_simplejwt',
@@ -60,7 +61,7 @@ ROOT_URLCONF = 'ddueruemweb.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'core/templates']
+        'DIRS': [BASE_DIR / 'templates']
         ,
         'APP_DIRS': True,
         'OPTIONS': {
@@ -151,5 +152,12 @@ CORS_ALLOWED_ORIGINS = [
     'http://localhost:3000',
 ]
 
+# https://docs.djangoproject.com/en/3.2/topics/email/
 EMAIL_HOST = "localhost"  # define host and port for email backend
+# EMAIL_HOST_USER="backend"
+# EMAIL_HOST_PASSWORD="123"
 EMAIL_PORT = 1025
+# EMAIL_USE_TLS = True
+# EMAIL_USE_SSL = False
+
+PASSWORD_RESET_TIMEOUT_DAYS = 2  # also used for user email activation (token) timeout calc

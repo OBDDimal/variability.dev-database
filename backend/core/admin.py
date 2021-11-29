@@ -1,7 +1,11 @@
 from django.contrib import admin
+from django.utils import timezone
+from datetime import timedelta
 from core.user.forms import AdminUserChangeForm, AdminUserCreationForm
 from core.user.models import User
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
+from django.contrib.admin.templatetags.admin_list import _boolean_icon
+from ddueruemweb.settings import PASSWORD_RESET_TIMEOUT_DAYS
 
 
 class UserAdmin(BaseUserAdmin):
@@ -12,7 +16,7 @@ class UserAdmin(BaseUserAdmin):
     form = AdminUserChangeForm
     add_form = AdminUserCreationForm
     # Shows attributes in list view
-    list_display = ('email', 'institute', 'is_staff', 'is_superuser', 'last_login', 'date_joined')
+    list_display = ('email', 'institute', 'is_active_ex', 'is_staff', 'is_superuser', 'last_login', 'date_joined')
     list_filter = ('is_superuser',)
     # Define how view should look like after clicking on a email
     fieldsets = [
@@ -35,6 +39,20 @@ class UserAdmin(BaseUserAdmin):
     search_fields = ('email',)
     ordering = ('email',)
     filter_horizontal = ()
+
+    @staticmethod
+    def is_active_ex(user):
+        """
+        Extended is_active attribute which either is true or returns
+        how much time is left (Hh:Mm:Ss) until the activation period ends.
+        :return:
+        """
+
+        delta = (user.date_joined + timedelta(days=PASSWORD_RESET_TIMEOUT_DAYS)) - timezone.now()
+        total_minute, second = divmod(delta.seconds, 60)
+        hour, minute = divmod(total_minute, 60)
+
+        return _boolean_icon(True) if user.is_active else f"{delta.days}d{hour}h{minute:02}m{second:02}s"
 
 
 # Register your models here.

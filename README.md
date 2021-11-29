@@ -1,5 +1,5 @@
-# djangoProject
-Try and Error Project for Django
+# Ddueruem-web
+Web service for sharing feature model instances and collaborative benchmarking.
 
 ## Before start
 ### Create new requirements
@@ -12,7 +12,7 @@ Assure correct dependencies are installed
 ### Install requirements
 `pip install -r requirements.txt`
 
-### Create new super user
+### Create new superuser
 `python manage.py createsuperuser`
 
 ### Migrations
@@ -23,9 +23,15 @@ python manage.py migrate
 ```
 ### Start Email Server
 Start local email server
-`python -m smtpd -n -c DebuggingServer localhost:587`
+`python -m smtpd -n -c DebuggingServer localhost:1025`
 
+### Start jobs
+ Run all hourly/daily/weekly/monthly jobs
+```
+python manage.py runjobs hourly
+```
+Details, see: [django-extensions docu for job scheduling](https://django-extensions.readthedocs.io/en/latest/jobs_scheduling.html#create-a-job)
 
-
+## Start the backend
 
 
