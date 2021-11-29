@@ -55,7 +55,13 @@ export default class upload extends Component<Props, State> {
   };
 
   onSubmit = () => {
-    if (this.state.file && this.state.description) {
+    if (
+      this.state.file &&
+      this.state.description &&
+      this.state.legalShare &&
+      this.state.userData &&
+      this.state.openSource
+    ) {
       const data = new FormData();
 
       data.append("description", this.state.description as string);
