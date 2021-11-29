@@ -20,18 +20,7 @@ class FileUploadViewSet(viewsets.ModelViewSet):
         self.request.user.email_user('DDueruem File Upload', render_to_string('email/user_upload_email.html', {
             'user': str(self.request.user.email),
             'protocol': 'http',
-            'file_domain': 'localhost:8000/',
-            'file_name': str(serializer.data.get('file')),
-            'delete_domain': 'localhost:8000/'
+            'file_domain': str(serializer.data.get('file')),
+            'file_name': str(serializer.data.get('file')).split('/')[-1],
+            # TODO: For Issue #28 'delete_domain': 'localhost:8000/'
         }))
-
-"""
-def download(request, path):
-    file_path = os.path.join(settings.MEDIA_ROOT, path)
-    if os.path.exists(file_path):
-        with open(file_path, 'rb') as fh:
-            response = HttpResponse(fh.read(), content_type="application/vnd.ms-excel")
-            response['Content-Disposition'] = 'inline; filename=' + os.path.basename(file_path)
-            return response
-    raise Http404
-"""
