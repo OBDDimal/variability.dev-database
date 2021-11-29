@@ -1,6 +1,8 @@
 from django.contrib import admin
 from django.utils import timezone
 from datetime import timedelta
+from django.contrib.admin import ModelAdmin
+from core.fileupload.models import File
 from core.user.forms import AdminUserChangeForm, AdminUserCreationForm
 from core.user.models import User
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
@@ -10,7 +12,7 @@ from ddueruemweb.settings import PASSWORD_RESET_TIMEOUT_DAYS
 
 class UserAdmin(BaseUserAdmin):
     """
-    Class for defining the backend admin panel, its used forms and which data should be displayed.
+    Class for defining the backend user admin panel, its used forms and which data should be displayed.
     """
     model = User
     form = AdminUserChangeForm
@@ -55,5 +57,24 @@ class UserAdmin(BaseUserAdmin):
         return _boolean_icon(True) if user.is_active else f"{delta.days}d{hour}h{minute:02}m{second:02}s"
 
 
+class FileAdmin(ModelAdmin):
+    """
+    Class for defining the backend file admin panel and which data should be displayed.
+    """
+    model = File
+    # Shows attributes in list view
+    list_display = ('file', 'owner', 'uploaded_at')
+    # list_filter = ('is_superuser',)
+    # Define how view should look like after clicking on a email
+    fieldsets = [
+        (None, {'fields': ['owner']}),
+        ('Information', {'fields': ['description', 'uploaded_at', 'file']}),
+    ]
+    search_fields = ('owner',)
+    ordering = ('owner', 'uploaded_at')
+    filter_horizontal = ()
+
+
 # Register your models here.
 admin.site.register(User, UserAdmin)
+admin.site.register(File, FileAdmin)
