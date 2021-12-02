@@ -9,8 +9,11 @@ https://docs.djangoproject.com/en/3.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.2/ref/settings/
 """
-import os
+import os, environ
 from pathlib import Path
+
+env = environ.Env(DEBUG=(bool, False))
+environ.Env.read_env()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -19,10 +22,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-1ui7v_-4226d=v3%_25g+#kounltqcnxw3++c*tvy1h6cfq_=2'
+SECRET_KEY = env('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = env('DEBUG')
 
 ALLOWED_HOSTS = []
 
@@ -81,6 +84,7 @@ WSGI_APPLICATION = 'ddueruemweb.wsgi.application'
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
 DATABASES = {
+    # Should be in the environment as well
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
@@ -153,10 +157,10 @@ CORS_ALLOWED_ORIGINS = [
 ]
 
 # https://docs.djangoproject.com/en/3.2/topics/email/
-EMAIL_HOST = "localhost"  # define host and port for email backend
+EMAIL_HOST = env('EMAIL_HOST')  # define host and port for email backend
 # EMAIL_HOST_USER="backend"
 # EMAIL_HOST_PASSWORD="123"
-EMAIL_PORT = 1025
+EMAIL_PORT = env('EMAIL_PORT')
 # EMAIL_USE_TLS = True
 # EMAIL_USE_SSL = False
 
