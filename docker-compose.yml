@@ -1,0 +1,24 @@
+version: "3"
+
+services:
+  # email server
+
+  # needs to be configured properly
+  db:
+    image: postgres
+
+  backend:
+    build: ./backend
+    ports:
+      - "8000:8000"
+    command: uwsgi --http "0.0.0.0:8000" --module ddueruemweb.wsgi --master --processes 1 --threads 1
+    depends_on:
+      - db
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "8080:80"
+    depends_on:
+      - backend
+    command: nginx -g 'daemon off;'
