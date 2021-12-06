@@ -120,7 +120,11 @@ export default class upload extends Component<Props, State> {
         </Form.Group>
         <Form.Group className='mb-3'>
           <Form.Label>File Upload</Form.Label>
-          <Form.Control type='file' onChange={this.onFileChange}/>
+          <Form.Control
+            data-testid="file-upload"
+            type='file'
+            onChange={this.onFileChange}
+          />
         </Form.Group>
         <Form.Group className='mb-3'>
           <Form.Label>License</Form.Label>
@@ -136,6 +140,7 @@ export default class upload extends Component<Props, State> {
         </Form.Group>
         <Form.Group className='mb-3'>
           <Form.Check
+            data-testid="legal-share"
             type='checkbox'
             checked={this.state.legalShare}
             onChange={() =>
@@ -145,6 +150,7 @@ export default class upload extends Component<Props, State> {
             label='I am legally allowed to share this model'
           />
           <Form.Check
+            data-testid="user-data"
             type='checkbox'
             checked={this.state.userData}
             onChange={() => this.setState({userData: !this.state.userData})}
@@ -152,6 +158,7 @@ export default class upload extends Component<Props, State> {
             label='My email and a date will always be tied to the file upload (even after account deletion)'
           />
           <Form.Check
+            data-testid="open-source"
             type='checkbox'
             checked={this.state.openSource}
             onChange={() =>
