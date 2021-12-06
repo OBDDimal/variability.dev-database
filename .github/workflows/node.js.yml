@@ -5,12 +5,24 @@ name: Node.js CI
 
 on:
   push:
-    branches: [dev]
+    branches: [dev, issue-48]
   pull_request:
-    branches: [dev]
+    branches: [dev, issue-48]
 
 jobs:
+  sonarQubeTrigger:
+    name: SonarQube Trigger
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@master
+    - name: SonarQube Scan
+      uses: kitabisa/sonarqube-action@v1.1.0
+      with:
+        host: ${{ secrets.SONARQUBE_HOST }}
+        login: ${{ secrets.SONARQUBE_TOKEN }}
+
   install:
+    needs: sonarQubeTrigger
     runs-on: ubuntu-latest
     defaults:
       run:
