@@ -1,7 +1,3 @@
-import os
-
-from django.conf import settings
-from django.http import HttpResponse, Http404
 from django.template.loader import render_to_string
 from rest_framework import viewsets, permissions
 
