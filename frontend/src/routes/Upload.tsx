@@ -69,8 +69,8 @@ export default class upload extends Component<Props, State> {
       data.append("license", this.state.license);
 
       api
-        .post("http://localhost:8000/files/", data, {
-          headers: {"Content-Type": "multipart/form-data"},
+        .post(`${process.env.DOMAIN}/files/`, data, {
+          headers: { "Content-Type": "multipart/form-data" },
         })
         .then((result) => {
           MySwal.fire({
