@@ -35,6 +35,9 @@ ALLOWED_HOSTS = []
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
+    'core',
+    'core.user',
+    'core.fileupload',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
@@ -44,9 +47,6 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework_simplejwt',
     'corsheaders',
-    'core',
-    'core.user',
-    'core.fileupload'
 ]
 
 MIDDLEWARE = [
@@ -172,8 +172,8 @@ CORS_ORIGIN_ALLOW_ALL = True
 
 # https://docs.djangoproject.com/en/3.2/topics/email/
 EMAIL_HOST = env('EMAIL_HOST')  # define host and port for email backend
-# EMAIL_HOST_USER="backend"
-# EMAIL_HOST_PASSWORD="123"
+EMAIL_HOST_USER= env('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD= env('EMAIL_HOST_PASSWORD')
 EMAIL_PORT = env('EMAIL_PORT')
 # EMAIL_USE_TLS = True
 # EMAIL_USE_SSL = False

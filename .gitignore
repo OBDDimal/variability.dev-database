@@ -8,9 +8,6 @@ backend/media/
 #_log/**
 #ddueruem/files/**
 
-##Ignores django migrations
-backend/**/migrations/
-
 #IntelliJ
 out/
 

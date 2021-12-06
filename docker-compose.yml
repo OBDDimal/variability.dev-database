@@ -1,14 +1,6 @@
 version: "3"
 
 services:
-  # email server placeholder
-  email_server:
-    build: ./backend
-    ports: 
-      - "1025:1025"
-    command: python -m smtpd -n -c DebuggingServer localhost:1025
-    depends_on:
-      - db
 
   db:
     image: postgres
