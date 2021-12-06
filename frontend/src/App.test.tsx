@@ -3,9 +3,7 @@ import {render, screen} from "@testing-library/react";
 import App from "./App";
 import {BrowserRouter} from "react-router-dom";
 
-//TODO: Either mock or ShallowRender this properly
 jest.mock("./components/SiteNavbar", () => () => <div data-testid="navbar"></div>);
-//jest.mock("./components/SiteNavbar", () => () => 'navbar');
 
 describe("<App />", () => {
 
