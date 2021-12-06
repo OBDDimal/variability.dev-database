@@ -6,6 +6,9 @@ services:
   # needs to be configured properly
   db:
     image: postgres
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: ddueruem
 
   backend:
     build: ./backend

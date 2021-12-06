@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 import os, environ
 from pathlib import Path
 
+
 env = environ.Env(DEBUG=(bool, False))
 environ.Env.read_env()
 
@@ -85,9 +86,17 @@ WSGI_APPLICATION = 'ddueruemweb.wsgi.application'
 
 DATABASES = {
     # Should be in the environment as well
-    'default': {
+    'development': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
+    },
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'ddueruem',
+        'USER': 'ddueruem',
+        'PASSWORD': 'ddueruem',
+        'HOST': 'db',
+        'PORT': 5432,
     }
 }
 
