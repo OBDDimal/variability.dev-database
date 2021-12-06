@@ -1,20 +1,32 @@
 version: "3"
 
 services:
-  # email server
+  # email server placeholder
+  email_server:
+    build: ./backend
+    ports: 
+      - "1025:1025"
+    command: python -m smtpd -n -c DebuggingServer localhost:1025
+    depends_on:
+      - db
 
-  # needs to be configured properly
   db:
     image: postgres
     restart: always
     environment:
+      POSTGRES_USER: ddueruem
       POSTGRES_PASSWORD: ddueruem
+      POSTGRES_DB: ddueruem
+    volumes:
+      - postgresdata:/var/lib/postgresql
 
   backend:
     build: ./backend
     ports:
       - "8000:8000"
-    command: uwsgi --http "0.0.0.0:8000" --module ddueruemweb.wsgi --master --processes 1 --threads 1
+    volumes:
+      - djangomedia:/api/media
+    command: ./entrypoint.sh
     depends_on:
       - db
 
@@ -25,3 +37,7 @@ services:
     depends_on:
       - backend
     command: nginx -g 'daemon off;'
+
+volumes:
+  postgresdata:
+  djangomedia:
