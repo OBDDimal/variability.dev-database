@@ -1,9 +1,11 @@
 import axios from "axios";
 import authService from "./auth.service";
 
+const API_URL = process.env.REACT_APP_DOMAIN;
+
 //axios instance for checking if token is (still) valid.
 const instance = axios.create({
-  baseURL: "http://localhost:8000/",
+  baseURL: API_URL,
   headers: {
     "Content-Type": "application/json",
   },
@@ -40,12 +42,9 @@ instance.interceptors.response.use(
     if (error.response && error.response.status === 401) {
       try {
         // Use axios not an instance to prevent infinite loops
-        const response = await axios.post(
-          "http://localhost:8000/auth/refresh/",
-          {
-            refresh: authService.getRefreshToken(),
-          }
-        );
+        const response = await axios.post(API_URL + "auth/refresh/", {
+          refresh: authService.getRefreshToken(),
+        });
 
         const accessToken = response.data.access;
         localStorage.setItem("access", JSON.stringify(accessToken));
