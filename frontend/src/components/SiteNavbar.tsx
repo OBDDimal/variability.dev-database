@@ -84,6 +84,15 @@ export default class SiteNavbar extends Component<Props, State> {
                 </Nav.Link>
               )}
 
+              {this.state.loggedIn && (
+                <Nav.Link
+                  href='/files'
+                  className={this.props.url === "/files" ? "active" : ""}
+                >
+                  Files
+                </Nav.Link>
+              )}
+
               <NavDropdown title='Dropdown' id='basic-nav-dropdown'>
                 <NavDropdown.Item href='#action/3.1'>Dummy</NavDropdown.Item>
                 <NavDropdown.Item href='#action/3.2'>

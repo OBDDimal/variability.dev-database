@@ -9,6 +9,9 @@ import Login from "./routes/Login";
 import Register from "./routes/Register";
 import Profile from "./routes/Profile";
 import authService from "./services/auth.service";
+import Files from "./routes/Files";
+
+import "./styles/app.css";
 
 interface AuthChildren {
   children: JSX.Element; // Maybe there is a way to define this better and directly in RequireAuth
@@ -37,6 +40,14 @@ function App() {
               element={
                 <RequireAuth>
                   <Upload />
+                </RequireAuth>
+              }
+            />
+            <Route
+              path='/files'
+              element={
+                <RequireAuth>
+                  <Files />
                 </RequireAuth>
               }
             />
