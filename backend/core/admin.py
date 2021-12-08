@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.utils import timezone
 from datetime import timedelta
 from django.contrib.admin import ModelAdmin
-from core.fileupload.models import File
+from core.fileupload.models import File, Tag
 from core.user.forms import AdminUserChangeForm, AdminUserCreationForm
 from core.user.models import User
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
@@ -78,6 +78,24 @@ class FileAdmin(ModelAdmin):
     filter_horizontal = ()
 
 
+class TagAdmin(ModelAdmin):
+    """
+    Class for defining the backend file admin panel and which data should be displayed.
+    """
+    model = Tag
+    list_display = ('id', 'label', 'creator', 'date_created')
+    fieldsets = [
+        (None, {'fields': ['label']}),
+        ('Information', {'fields': ['id', 'creator', 'description']}),
+        ('Important dates', {'fields': ['date_created']})
+    ]
+    readonly_fields = ('id', 'date_created')
+    search_fields = ('creator',)
+    ordering = ('creator', 'date_created')
+    filter_horizontal = ()
+
+
 # Register your models here.
 admin.site.register(User, UserAdmin)
 admin.site.register(File, FileAdmin)
+admin.site.register(Tag, TagAdmin)
