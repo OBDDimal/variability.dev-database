@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from core.fileupload.models import File
+from core.fileupload.models.file import File
 
 
 class FilesSerializer(serializers.HyperlinkedModelSerializer):
@@ -11,4 +11,4 @@ class FilesSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = File
-        fields = ['description', 'file', 'license', 'owner', 'uploaded_at']
+        fields = ['description', 'local_file', 'license', 'owner', 'uploaded_at']

@@ -1,7 +1,7 @@
 from django.template.loader import render_to_string
 from rest_framework import viewsets, permissions
 
-from core.fileupload.models import File
+from core.fileupload.models.file import File
 from core.fileupload.serializers import FilesSerializer
 
 

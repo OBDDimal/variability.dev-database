@@ -5,7 +5,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.test import TestCase, Client
 from django.utils import timezone
 
-from core.fileupload.models import File
+from core.fileupload.models.file import File
 from core.user.models import User
 from ddueruemweb.settings import PASSWORD_RESET_TIMEOUT_DAYS
 from core.jobs.hourly.check_user_activation_period_expired import Job as InactiveUserJob
@@ -208,7 +208,7 @@ class AdminPanelTests(TestCase):
         f.owner = superuser
         f.description = 'A binary test file'
         f.license = File.LICENSES[0]
-        f.file = SimpleUploadedFile("a/pathTo/ulFile.txt", b"File content needs to be in bytes!")
+        f.local_file = SimpleUploadedFile("a/pathTo/ulFile.txt", b"File content needs to be in bytes!")
         f.save()
 
     def test_valid_logins(self):
