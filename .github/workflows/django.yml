@@ -73,10 +73,8 @@ jobs:
 
       - name: Run Migrations
         run: |
-          mv './ddueruemweb/.env.testing' './ddueruemweb/.env'
           python manage.py makemigrations
           python manage.py migrate --run-syncdb
-          python manage.py test
 
   test:
     needs: backend-migrations
@@ -116,10 +114,10 @@ jobs:
       - name: Run Migrations
         if: steps.migration-cache.outputs.cache-hit != 'true'
         run: |
-          mv './ddueruemweb/.env.testing' './ddueruemweb/.env'
           python manage.py makemigrations
           python manage.py migrate --run-syncdb
 
       - name: Run Tests
         run: |
+          mv './ddueruemweb/.env.testing' './ddueruemweb/.env'
           python manage.py test
