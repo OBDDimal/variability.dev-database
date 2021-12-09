@@ -18,28 +18,29 @@ jobs:
       matrix:
         python-version: [3.9]
     steps:
-      - uses: actions/checkout@v2
-      
+      - name: Checkout project
+        uses: actions/checkout@v2
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v2
         with:
           python-version: ${{ matrix.python-version }}
-
-      # caches the python environment
-      - uses: actions/cache@v2
+      - name: save-env
         id: python-cache
+        uses: actions/cache@v2
         with:
           path: ${{ env.pythonLocation }}
           key: ${{ env.pythonLocation }}-pip-${{ hashFiles('requirements.txt') }}
           
       - name: make env
-        run: mv './ddueruemweb/.env.testing' './ddueruemweb/.env'
+        run: |
+          mv './ddueruemweb/.env.testing' './ddueruemweb/.env'
+          cat ./ddueruemweb/.env
           
-      - name: Upload env
+      - name: upload-env
         uses: actions/upload-artifact@v2
         with:
           name: django-env
-          path: ${{env.working-directory}}ddueruemweb/.env
+          path: ${{ env.working-directory }}/ddueruemweb/.env
 
       - name: Install Dependencies
         if: steps.python-cache.outputs.cache-hit != 'true'
@@ -80,7 +81,6 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: django-env
-          #path: './ddueruemweb/.env'
 
       - name: Install Dependencies
         if: steps.python-cache.outputs.cache-hit != 'true'
@@ -126,7 +126,6 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: django-env
-          #path: './ddueruemweb/.env'
 
       - name: Install Dependencies
         #if: steps.python-cache.outputs.cache-hit != 'true'  #todo: fix caching of django-environ
