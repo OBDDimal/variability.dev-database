@@ -28,7 +28,7 @@ jobs:
         id: python-cache
         with:
           path: ${{ env.pythonLocation }}
-          key: ${{ env.pythonLocation }}-${{ hashFiles('requirements.txt') }}
+          key: ${{ env.pythonLocation }}-pip-${{ hashFiles('requirements.txt') }}
 
       - name: Install Dependencies
         if: steps.python-cache.outputs.cache-hit != 'true'
