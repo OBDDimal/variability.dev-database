@@ -7,6 +7,7 @@ on:
     branches: [dev, issue-40-dockerize-everything]
 
 jobs:
+
   install:
     runs-on: ubuntu-latest
     defaults:
@@ -29,6 +30,10 @@ jobs:
         with:
           path: ${{ env.pythonLocation }}
           key: ${{ env.pythonLocation }}-pip-${{ hashFiles('requirements.txt') }}
+          
+      - name: Copy environment
+        run: |
+          mv './ddueruemweb/.env.testing' './ddueruemweb/.env'
 
       - name: Install Dependencies
         if: steps.python-cache.outputs.cache-hit != 'true'
@@ -64,6 +69,10 @@ jobs:
         with:
           path: ./**/migrations/*
           key: migrationskey
+          
+      - name: Copy environment
+        run: |
+          mv './ddueruemweb/.env.testing' './ddueruemweb/.env'
 
       - name: Install Dependencies
         if: steps.python-cache.outputs.cache-hit != 'true'
@@ -104,6 +113,10 @@ jobs:
         with:
           path: ./**/migrations/*
           key: migrationskey
+          
+      - name: Copy environment
+        run: |
+          mv './ddueruemweb/.env.testing' './ddueruemweb/.env'
 
       - name: Install Dependencies
         #if: steps.python-cache.outputs.cache-hit != 'true'  #todo: fix caching of django-environ
@@ -119,5 +132,4 @@ jobs:
 
       - name: Run Tests
         run: |
-          mv './ddueruemweb/.env.testing' './ddueruemweb/.env'
           python manage.py test
