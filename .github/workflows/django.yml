@@ -35,8 +35,8 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-
-  test:
+          
+  backend-migrations:
     needs: install
     runs-on: ubuntu-latest
     defaults:
@@ -58,16 +58,68 @@ jobs:
         with:
           path: ${{ env.pythonLocation }}
           key: ${{ env.pythonLocation }}-${{ hashFiles('requirements.txt') }}
+          
+      - uses: actions/cache@v2
+        id: migration-cache
+        with:
+          path: ./**/migrations/*
+          key: migrationskey
 
       - name: Install Dependencies
-        #if: steps.python-cache.outputs.cache-hit != 'true'
+        if: steps.python-cache.outputs.cache-hit != 'true'
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Run Tests
+      - name: Run Migrations
         run: |
           mv './ddueruemweb/.env.testing' './ddueruemweb/.env'
           python manage.py makemigrations
           python manage.py migrate --run-syncdb
+          python manage.py test
+
+  test:
+    needs: backend-migrations
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./backend
+    strategy:
+      max-parallel: 4
+      matrix:
+        python-version: [3.7, 3.8, 3.9]
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - uses: actions/cache@v2
+        id: python-cache
+        with:
+          path: ${{ env.pythonLocation }}
+          key: ${{ env.pythonLocation }}-${{ hashFiles('requirements.txt') }}
+          
+      - uses: actions/cache@v2
+        id: migration-cache
+        with:
+          path: ./**/migrations/*
+          key: migrationskey
+
+      - name: Install Dependencies
+        #if: steps.python-cache.outputs.cache-hit != 'true'  #todo: fix caching of django-environ
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          
+      - name: Run Migrations
+        if: steps.migration-cache.outputs.cache-hit != 'true'
+        run: |
+          mv './ddueruemweb/.env.testing' './ddueruemweb/.env'
+          python manage.py makemigrations
+          python manage.py migrate --run-syncdb
+
+      - name: Run Tests
+        run: |
           python manage.py test
