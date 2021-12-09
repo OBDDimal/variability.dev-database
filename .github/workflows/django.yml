@@ -33,14 +33,12 @@ jobs:
           key: ${{ env.pythonLocation }}-pip-${{ hashFiles('requirements.txt') }}
           
       - name: make env
-        run: mv ./ddueruemweb/.env.testing ./ddueruemweb/.env
-        working-directory: ./backend
+        run: mv './ddueruemweb/.env.testing' './ddueruemweb/.env'
           
       - name: Upload env
         uses: actions/upload-artifact@v2
         with:
           name: django-env
-          working-directory: ./backend
           path: ddueruemweb/.env
 
       - name: Install Dependencies
