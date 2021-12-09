@@ -1,0 +1,35 @@
+version: "3"
+
+services:
+
+  db:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: ddueruem
+      POSTGRES_PASSWORD: ddueruem
+      POSTGRES_DB: ddueruem
+    volumes:
+      - postgresdata:/var/lib/postgresql
+
+  backend:
+    build: ./backend
+    ports:
+      - "8000:8000"
+    volumes:
+      - djangomedia:/api/media
+    command: ./entrypoint.sh
+    depends_on:
+      - db
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "8080:80"
+    depends_on:
+      - backend
+    command: nginx -g 'daemon off;'
+
+volumes:
+  postgresdata:
+  djangomedia:

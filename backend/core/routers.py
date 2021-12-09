@@ -1,4 +1,3 @@
-from django.conf.global_settings import STATIC_ROOT
 from django.conf.urls.static import static
 from django.urls import path, include
 from rest_framework import routers
@@ -7,7 +6,7 @@ from core.fileupload import views
 from core.fileupload.views import FileUploadViewSet
 from core.user.viewsets import UserViewSet, ActivateUserViewSet
 from core.auth.viewsets import LoginViewSet, RegistrationViewSet, RefreshViewSet
-from ddueruemweb.settings import STATIC_URL, MEDIA_URL, MEDIA_ROOT
+from ddueruemweb.settings import STATIC_ROOT, STATIC_URL, MEDIA_URL, MEDIA_ROOT
 
 router = routers.DefaultRouter()
 
