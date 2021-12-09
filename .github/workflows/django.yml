@@ -67,4 +67,5 @@ jobs:
 
       - name: Run Tests
         run: |
+          mv './ddueruemweb/.env.testing' './ddueruemweb/.env'
           python manage.py test
