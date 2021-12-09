@@ -34,6 +34,12 @@ jobs:
       - name: Copy environment
         run: |
           mv './ddueruemweb/.env.testing' './ddueruemweb/.env'
+          
+      - name: Upload env
+        uses: actions/upload-artifact@v2
+        with:
+          name: django-env
+          path: ./ddueruemweb/.env
 
       - name: Install Dependencies
         if: steps.python-cache.outputs.cache-hit != 'true'
@@ -70,9 +76,10 @@ jobs:
           path: ./**/migrations/*
           key: migrationskey
           
-      - name: Copy environment
-        run: |
-          mv './ddueruemweb/.env.testing' './ddueruemweb/.env'
+      - name: Download env
+        uses: actions/download-artifact@v2
+        with:
+          name: django-env
 
       - name: Install Dependencies
         if: steps.python-cache.outputs.cache-hit != 'true'
@@ -114,9 +121,10 @@ jobs:
           path: ./**/migrations/*
           key: migrationskey
           
-      - name: Copy environment
-        run: |
-          mv './ddueruemweb/.env.testing' './ddueruemweb/.env'
+      - name: Download env
+        uses: actions/download-artifact@v2
+        with:
+          name: django-env
 
       - name: Install Dependencies
         #if: steps.python-cache.outputs.cache-hit != 'true'  #todo: fix caching of django-environ
