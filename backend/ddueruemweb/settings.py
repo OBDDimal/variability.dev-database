@@ -153,7 +153,6 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
 STATIC_URL = '/static/'
-STATIC_ROOT = 'static'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
@@ -167,8 +166,10 @@ AUTH_USER_MODEL = 'core_user.User'
 
 # LOGIN_REDIRECT_URL = "dashboard"  # define URL to which user should be redirected after successful login
 # LOGOUT_REDIRECT_URL = "home"
-CORS_ORIGIN_ALLOW_ALL = True
 
+CORS_ALLOWED_ORIGINS = [
+    'http://localhost:3000',
+]
 
 # https://docs.djangoproject.com/en/3.2/topics/email/
 EMAIL_HOST = env('EMAIL_HOST')  # define host and port for email backend

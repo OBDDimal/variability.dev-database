@@ -1,8 +1,11 @@
 from datetime import timedelta
 from django.core import mail
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.exceptions import ObjectDoesNotExist
-from django.test import TestCase
+from django.test import TestCase, Client
 from django.utils import timezone
+
+from core.fileupload.models import File
 from core.user.models import User
 from ddueruemweb.settings import PASSWORD_RESET_TIMEOUT_DAYS
 from core.jobs.hourly.check_user_activation_period_expired import Job as InactiveUserJob
@@ -185,3 +188,76 @@ class UserModelTests(TestCase):
         user.date_joined = date_joined
         user.save()
         pass
+
+
+class AdminPanelTests(TestCase):
+    """
+    Tests for the admin panel. These tests require a working User and File model.
+    """
+    client = Client()
+
+    def setUp(self):
+        superuser = User.objects.create_superuser(email="ad@m.in", password="12345678!")  # is_active per default
+        User.objects.create_staffuser(email="st@a.ff", password="12345678!")
+        User.objects.create_user(email="du@s.er", password="12345678!")
+        active_user = User.objects.create_user(email="au@s.er", password="12345678!")
+        active_user.is_active = True
+        active_user.save()
+        self.assertIs(len(User.objects.all()), 4)
+        f = File()
+        f.owner = superuser
+        f.description = 'A binary test file'
+        f.license = File.LICENSES[0]
+        f.file = SimpleUploadedFile("a/pathTo/ulFile.txt", b"File content needs to be in bytes!")
+        f.save()
+
+    def test_valid_logins(self):
+        client = self.client
+        # if login was successful, admin panel does a redirect (302) otherwise it returns 200
+        self.assertEqual(
+            client.post('/admin/login/?next=/admin/', {'username': 'ad@m.in', 'password': '12345678!'}).status_code,
+            302)
+        staff_user = User.objects.get(email='st@a.ff')
+        staff_user.is_active = True
+        staff_user.save()
+        self.assertEqual(
+            client.post('/admin/login/?next=/admin/', {'username': 'st@a.ff', 'password': '12345678!'}).status_code,
+            302)
+
+    def test_invalid_logins(self):
+        client = self.client
+        self.assertEqual(
+            client.post('/admin/login/?next=/admin/', {'username': 'du@s.er', 'password': '12345678!'}).status_code,
+            200)
+        self.assertEqual(
+            client.post('/admin/login/?next=/admin/', {'username': 'au@s.er', 'password': '12345678!'}).status_code,
+            200)
+        # staff user is still inactive, so no login to admin panel
+        self.assertEqual(
+            client.post('/admin/login/?next=/admin/', {'username': 'st@a.ff', 'password': '12345678!'}).status_code,
+            200)
+
+    def test_routes_accessible(self):
+        client = self.client
+        user = User.objects.get(email='ad@m.in')
+        response = client.post('/admin/login/?next=/admin/', {'username': user.email, 'password': '12345678!'})
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(client.get(f'/admin/').status_code, 200)
+        # -----CORE_USER-----
+        self.assertEqual(client.get(f'/admin/core_user/user/').status_code, 200)
+        # filter by superuser flag
+        self.assertEqual(client.get(f'/admin/core_user/user/?is_superuser__exact=1').status_code, 200)
+        self.assertEqual(client.get(f'/admin/core_user/user/add/').status_code, 200)
+        # routes for changing yourself
+        self.assertEqual(client.get(f'/admin/core_user/user/{user.id}/change/').status_code, 200)
+        self.assertEqual(client.get(f'/admin/core_user/user/{user.id}/history/').status_code, 200)
+        # routes for changing another user
+        other_user_id = User.objects.get(email="du@s.er").id
+        self.assertEqual(client.get(f'/admin/core_user/user/{other_user_id}/change/').status_code, 200)
+        self.assertEqual(client.get(f'/admin/core_user/user/{other_user_id}/history/').status_code, 200)
+        # -----CORE_FILEUPLOAD-----
+        self.assertEqual(client.get(f'/admin/core_fileupload/file/').status_code, 200)
+        self.assertEqual(client.get(f'/admin/core_fileupload/file/add/').status_code, 200)
+        # try to change the only file which is uploaded
+        self.assertEqual(client.get(f'/admin/core_fileupload/file/1/change/').status_code, 200)
+        self.assertEqual(client.get(f'/admin/core_fileupload/file/1/history/').status_code, 200)

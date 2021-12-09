@@ -12,6 +12,12 @@ Assure correct dependencies are installed
 ### Install requirements
 `pip install -r requirements.txt`
 
+### Setup backend environment
+Copy `backend/ddueruemweb/.env.example` to `backend/ddueruemweb/.env`
+```bash
+cp backend/ddueruemweb/.env.example backend/ddueruemweb/.env
+```
+
 ### Create new superuser
 `python manage.py createsuperuser`
 
