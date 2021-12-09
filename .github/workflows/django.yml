@@ -68,4 +68,5 @@ jobs:
       - name: Run Tests
         run: |
           mv './ddueruemweb/.env.testing' './ddueruemweb/.env'
+          python manage.py makemigrations python manage.py migrate --run-syncdb
           python manage.py test
