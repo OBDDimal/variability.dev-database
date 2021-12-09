@@ -39,7 +39,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: django-env
-          path: ddueruemweb/.env.testing
+          path: ddueruemweb/settings.py
 
       - name: Install Dependencies
         if: steps.python-cache.outputs.cache-hit != 'true'
