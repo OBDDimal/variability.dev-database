@@ -16,11 +16,11 @@ jobs:
     strategy:
       max-parallel: 4
       matrix:
-        python-version: [3.7, 3.8, 3.9]
+        python-version: [3.9]
     steps:
       - uses: actions/checkout@v2
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v2
+      - uses: actions/setup-python@v2
         with:
           python-version: ${{ matrix.python-version }}
 
@@ -31,15 +31,12 @@ jobs:
           path: ${{ env.pythonLocation }}
           key: ${{ env.pythonLocation }}-pip-${{ hashFiles('requirements.txt') }}
           
-      - name: Copy environment
-        run: |
-          mv './ddueruemweb/.env.testing' './ddueruemweb/.env'
-          
       - name: Upload env
-        uses: actions/upload-artifact@v2
+      - run: mv './ddueruemweb/.env.testing' './ddueruemweb/.env'
+      - uses: actions/upload-artifact@v2
         with:
           name: django-env
-          path: ./backend/ddueruemweb/.env
+          path: ./ddueruemweb/.env
 
       - name: Install Dependencies
         if: steps.python-cache.outputs.cache-hit != 'true'
@@ -56,11 +53,11 @@ jobs:
     strategy:
       max-parallel: 4
       matrix:
-        python-version: [3.7, 3.8, 3.9]
+        python-version: [3.9]
     steps:
       - uses: actions/checkout@v2
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v2
+      - uses: actions/setup-python@v2
         with:
           python-version: ${{ matrix.python-version }}
 
@@ -101,11 +98,11 @@ jobs:
     strategy:
       max-parallel: 4
       matrix:
-        python-version: [3.7, 3.8, 3.9]
+        python-version: [3.9]
     steps:
       - uses: actions/checkout@v2
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v2
+      - uses: actions/setup-python@v2
         with:
           python-version: ${{ matrix.python-version }}
 
