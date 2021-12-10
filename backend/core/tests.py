@@ -5,13 +5,14 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.test import TestCase, Client
 from django.utils import timezone
 
+from core.fileupload.models import Tag
 from core.fileupload.models.file import File
 from core.user.models import User
 from ddueruemweb.settings import PASSWORD_RESET_TIMEOUT_DAYS
 from core.jobs.hourly.check_user_activation_period_expired import Job as InactiveUserJob
 
 
-# ####################### DJANGO TESTS #######################
+# ####################### MODEL TESTS #######################
 # details, see https://docs.djangoproject.com/en/3.2/topics/testing/overview/
 # When tests interactive with db use  import django.test.TestCase rather than unittest.TestCase
 class UserModelTests(TestCase):
@@ -190,9 +191,10 @@ class UserModelTests(TestCase):
         pass
 
 
-class AdminPanelTests(TestCase):
+# ####################### SINGLE ADMIN PANEL TESTS #######################
+class UserAdminPanelTests(TestCase):
     """
-    Tests for the admin panel. These tests require a working User and File model.
+    Tests for the admin panel. These tests require a working User model.
     """
     client = Client()
 
@@ -204,12 +206,6 @@ class AdminPanelTests(TestCase):
         active_user.is_active = True
         active_user.save()
         self.assertIs(len(User.objects.all()), 4)
-        f = File()
-        f.owner = superuser
-        f.description = 'A binary test file'
-        f.license = File.LICENSES[0]
-        f.local_file = SimpleUploadedFile("a/pathTo/ulFile.txt", b"File content needs to be in bytes!")
-        f.save()
 
     def test_valid_logins(self):
         client = self.client
@@ -255,9 +251,135 @@ class AdminPanelTests(TestCase):
         other_user_id = User.objects.get(email="du@s.er").id
         self.assertEqual(client.get(f'/admin/core_user/user/{other_user_id}/change/').status_code, 200)
         self.assertEqual(client.get(f'/admin/core_user/user/{other_user_id}/history/').status_code, 200)
-        # -----CORE_FILEUPLOAD-----
+
+
+class FileAdminPanelTests(TestCase):
+    """
+    Tests for the admin panel. These tests require a working User and File model.
+    """
+    client = Client()
+
+    def setUp(self):
+        User.objects.create_superuser(email="ad@m.in", password="12345678!")  # is_active per default
+        self.assertIs(len(User.objects.all()), 1)
+        # if login was successful, admin panel does a redirect (302) otherwise it returns 200
+        self.assertEqual(self.client.post('/admin/login/?next=/admin/',
+                                          {'username': 'ad@m.in', 'password': '12345678!'}).status_code, 302)
+
+    def test_add_alter_delete_single_file(self):
+        self.assertIs(len(File.objects.all()), 0)
+        # add a file
+        f = File()
+        expected_owner = User.objects.get(email='ad@m.in')
+        expected_description = 'A binary test file'
+        f.owner = expected_owner
+        f.description = expected_description
+        f.license = File.LICENSES[0]
+        f.local_file = SimpleUploadedFile("a/pathTo/ulFile.txt", b"File content needs to be in bytes!")
+        f.save()
+        self.assertIs(len(File.objects.all()), 1)
+        f = File.objects.get(id=1)
+        self.assertEqual(f.owner, expected_owner)
+        self.assertEqual(f.description, expected_description)
+        # None because blank=True AND null=True
+        self.assertIsNone(f.new_version_of)
+        # how many tags are there ?
+        self.assertEqual(len(f.tags.all()), 0)
+        now = timezone.now()
+        self.assertTrue(now - timedelta(seconds=1) <= f.uploaded_at <= now)
+        # alter added file
+        f = File.objects.get(id=1)
+        expected_description = 'new description'
+        f.description = expected_description
+        f.save()
+        f = File.objects.get(id=1)
+        self.assertEqual(f.description, expected_description)
+        # delete file
+        self.assertIs(len(File.objects.all()), 1)
+        File.objects.get(id=1).delete()
+        self.assertIs(len(File.objects.all()), 0)
+
+    def test_file_routes_accessible(self):
+        client = self.client
+        user = User.objects.get(email='ad@m.in')
         self.assertEqual(client.get(f'/admin/core_fileupload/file/').status_code, 200)
         self.assertEqual(client.get(f'/admin/core_fileupload/file/add/').status_code, 200)
+        # add file
+        f = File()
+        f.owner = User.objects.get(email='ad@m.in')
+        f.description = 'A binary test file'
+        f.license = File.LICENSES[0]
+        f.local_file = SimpleUploadedFile("a/pathTo/ulFile.txt", b"File content needs to be in bytes!")
+        f.save()
         # try to change the only file which is uploaded
+        self.assertIs(len(File.objects.all()), 1)
         self.assertEqual(client.get(f'/admin/core_fileupload/file/1/change/').status_code, 200)
         self.assertEqual(client.get(f'/admin/core_fileupload/file/1/history/').status_code, 200)
+
+
+class TagAdminPanelTests(TestCase):
+    """
+    Tests for the admin panel. These tests require a working User, File and Tag model.
+    """
+    client = Client()
+
+    def setUp(self):
+        superuser = User.objects.create_superuser(email="ad@m.in", password="12345678!")  # is_active per default
+        User.objects.create_staffuser(email="st@a.ff", password="12345678!")
+        User.objects.create_user(email="du@s.er", password="12345678!")
+        active_user = User.objects.create_user(email="au@s.er", password="12345678!")
+        active_user.is_active = True
+        active_user.save()
+        self.assertIs(len(User.objects.all()), 4)
+        # if login was successful, admin panel does a redirect (302) otherwise it returns 200
+        self.assertEqual(self.client.post('/admin/login/?next=/admin/',
+                                          {'username': 'ad@m.in', 'password': '12345678!'}).status_code, 302)
+
+    def test_add_alter_delete_single_tag(self):
+        self.assertIs(len(Tag.objects.all()), 0)
+        expected_label = 'testingTag'
+        # add a tag
+        t = Tag()
+        t.creator = User.objects.get(email='ad@m.in')
+        t.label = expected_label
+        t.description = ''
+        t.is_public = True
+        t.save()
+        self.assertIs(len(Tag.objects.all()), 1)
+        t = Tag.objects.get(id=1)
+        self.assertEqual(t.label, expected_label)
+        self.assertIsNotNone(t.description)
+        self.assertEqual(t.description, '')
+        self.assertTrue(t.is_public)
+        now = timezone.now()
+        self.assertTrue(now - timedelta(seconds=1) <= t.date_created <= now)
+        # alter added tag
+        expected_description = 'use this tag only for ...'
+        t = Tag.objects.get(id=1)
+        expected_label = 'new testingTag'
+        t.label = expected_label
+        t.description = expected_description
+        t.save()
+        t = Tag.objects.get(id=1)
+        self.assertEqual(t.label, expected_label)
+        self.assertEqual(t.description, expected_description)
+        # delete tag
+        self.assertIs(len(Tag.objects.all()), 1)
+        Tag.objects.get(id=1).delete()
+        self.assertIs(len(Tag.objects.all()), 0)
+
+    def test_tag_routes_accessible(self):
+        client = self.client
+        user = User.objects.get(email='ad@m.in')
+        self.assertEqual(client.get(f'/admin/core_fileupload/tag/').status_code, 200)
+        self.assertEqual(client.get(f'/admin/core_fileupload/tag/add/').status_code, 200)
+        # add tag
+        t = Tag()
+        t.label = 'testTag'
+        t.creator = user
+        t.is_public = True
+        t.save()
+        # try to change the only file which is uploaded
+        self.assertIs(len(Tag.objects.all()), 1)
+        self.assertEqual(client.get(f'/admin/core_fileupload/tag/1/change/').status_code, 200)
+        self.assertEqual(client.get(f'/admin/core_fileupload/tag/1/history/').status_code, 200)

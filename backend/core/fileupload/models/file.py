@@ -18,7 +18,7 @@ class File(models.Model):
     local_file = models.FileField(upload_to='files/')
     uploaded_at = models.DateTimeField(auto_now_add=True)
     license = models.CharField(choices=LICENSES, max_length=255, default='CC BY - Mention')
-    tags = models.ManyToManyField(Tag, blank=True)
+    tags = models.ManyToManyField(Tag)
     new_version_of = models.ForeignKey('self', null=True, blank=True, on_delete=models.RESTRICT)
 
     def __str__(self):
