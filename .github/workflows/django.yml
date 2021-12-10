@@ -2,9 +2,9 @@ name: Django CI
 
 on:
   push:
-    branches: [issue-45]
+    branches: [dev]
   pull_request:
-    branches: [issue-45]
+    branches: [dev]
 
 jobs:
 
@@ -33,7 +33,7 @@ jobs:
           
       - name: make env
         run: |
-          mv ./ddueruemweb/.env.testing ./ddueruemweb/.env
+          mv './ddueruemweb/.env.testing' './ddueruemweb/.env'
           cat ./ddueruemweb/.env
           
       - name: upload-env
@@ -44,6 +44,7 @@ jobs:
 
       - name: Install Dependencies
         if: steps.python-cache.outputs.cache-hit != 'true'
+          path: ${{ github.workspace }}/backend/ddueruemweb/.env
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
@@ -81,9 +82,10 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: django-env
+          path: ${{ github.workspace }}/backend/ddueruemweb/.env
 
       - name: Install Dependencies
-        if: steps.python-cache.outputs.cache-hit != 'true'
+        #if: steps.python-cache.outputs.cache-hit != 'true'
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
@@ -126,6 +128,8 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: django-env
+          path: ${{ github.workspace }}/backend/ddueruemweb/.env
+
 
       - name: Install Dependencies
         #if: steps.python-cache.outputs.cache-hit != 'true'  #todo: fix caching of django-environ
