@@ -3,6 +3,10 @@ from core.user.models import User
 
 
 class Tag(models.Model):
+    """
+    Data Model for a file tag.
+    A file can be related to many tags and a single tag can be related to many files.
+    """
 
     creator = models.ForeignKey(User, on_delete=models.CASCADE)  # TODO: Remove on_delete=CASCADE
     label = models.CharField(max_length=30, unique=False, blank=False)

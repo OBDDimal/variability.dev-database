@@ -192,6 +192,8 @@ class UserModelTests(TestCase):
 
 
 # ####################### SINGLE ADMIN PANEL TESTS #######################
+# Many tests could profit of build in Selenium support
+# https://docs.djangoproject.com/en/dev/topics/testing/tools/#testing-responses
 class UserAdminPanelTests(TestCase):
     """
     Tests for the admin panel. These tests require a working User model.
@@ -383,3 +385,27 @@ class TagAdminPanelTests(TestCase):
         self.assertIs(len(Tag.objects.all()), 1)
         self.assertEqual(client.get(f'/admin/core_fileupload/tag/1/change/').status_code, 200)
         self.assertEqual(client.get(f'/admin/core_fileupload/tag/1/history/').status_code, 200)
+
+    def test_tag_a_file(self):
+        client = self.client
+        user = User.objects.get(email='ad@m.in')
+        f = File()
+        expected_description = 'A binary test file'
+        f.owner = user
+        f.description = expected_description
+        f.license = File.LICENSES[0]
+        f.local_file = SimpleUploadedFile("a/pathTo/ulFile.txt", b"File content needs to be in bytes!")
+        f.save()
+        self.assertIs(len(File.objects.all()), 1)
+        t = Tag()
+        t.label = 'testTag'
+        t.creator = user
+        t.is_public = True
+        t.save()
+        self.assertIs(len(Tag.objects.all()), 1)
+        self.assertEqual(client.get(f'/admin/core_fileupload/file/1/change/').status_code, 200)
+        f = File.objects.get(id=1)
+        f.tags.add(t)
+        f.save()
+        f = File.objects.get(id=1)
+        self.assertEqual(f.tags.get(id=1), t)
