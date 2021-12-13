@@ -21,7 +21,7 @@ type State = {
   openSource: boolean;
 };
 
-export default class upload extends Component<Props, State> {
+export default class Upload extends Component<Props, State> {
   state: State = {
     description: undefined,
     file: undefined,

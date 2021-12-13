@@ -2,11 +2,10 @@ import React, { Component } from "react";
 import api from "../services/api.service";
 import { Button } from "react-bootstrap";
 import { ReactTabulator, reactFormatter } from "react-tabulator";
-import MultiValueFormatter from "react-tabulator/lib/formatters/MultiValueFormatter";
 import "react-tabulator/lib/styles.css"; // default theme
 import "react-tabulator/css/bootstrap/tabulator_bootstrap.min.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCoffee } from "@fortawesome/free-solid-svg-icons";
+import { faEye } from "@fortawesome/free-solid-svg-icons";
 
 const API_URL = process.env.REACT_APP_DOMAIN;
 
@@ -16,6 +15,19 @@ type State = {
   files: [];
 };
 
+function TableButton(props: any) {
+  const rowData = props.cell._cell.row.data;
+  return (
+    <Button
+      variant='secondary'
+      type='button'
+      onClick={() => window.location.replace(`/files/${rowData.id}`)}
+    >
+      <FontAwesomeIcon icon={faEye}></FontAwesomeIcon>
+    </Button>
+  );
+}
+
 const columns = [
   { title: "Id", field: "id" },
   { title: "Description", field: "description" },
@@ -24,20 +36,19 @@ const columns = [
   {
     title: "Tags",
     field: "tags",
+    // TODO: Cosmetic update to display nice pills
     formatter: (cell: any) => {
-      console.log(cell.getValue().label);
+      const cellValues = cell.getValue();
+      const labels = cellValues.map((cellValue: { label: string }) => {
+        return cellValue.label;
+      });
 
-      return JSON.stringify(cell.getValue());
+      return labels.toString();
     },
-    formatterParams: { style: "PILL" },
   },
   { title: "Uploaded at", field: "uploaded_at" },
   {
-    formatter: reactFormatter(
-      <Button variant='secondary' type='button'>
-        <FontAwesomeIcon icon={faCoffee} />
-      </Button>
-    ),
+    formatter: reactFormatter(<TableButton></TableButton>),
   },
 ];
 
