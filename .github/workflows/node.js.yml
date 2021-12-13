@@ -119,6 +119,12 @@ jobs:
         with:
           name: sonar-report-frontend
           path: ${{ github.workspace }}/frontend/sonar-report.xml
+          
+      - name: Upload Sonar Test Coverage Frontend
+        uses: actions/upload-artifact@v2
+        with:
+          name: sonar-coverage-frontend
+          path: ${{ github.workspace }}/frontend/coverage/lcov.info
 
   sonarqube:
     needs: test
@@ -135,6 +141,12 @@ jobs:
       with:
         name: sonar-report-frontend
         path: ${{ github.workspace }}/frontend
+        
+    - name: Download Sonar Test Coverage Frontend
+      uses: actions/download-artifact@v2
+      with:
+        name: sonar-coverage-frontend
+        path: ${{ github.workspace }}/frontend/coverage
         
     - name: SonarQube Scan
       uses: sonarsource/sonarqube-scan-action@master
