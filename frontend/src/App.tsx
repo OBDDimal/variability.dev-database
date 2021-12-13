@@ -10,6 +10,7 @@ import Register from "./routes/Register";
 import Profile from "./routes/Profile";
 import authService from "./services/auth.service";
 import Files from "./routes/Files";
+import File from "./routes/File";
 
 import "./styles/app.css";
 
@@ -59,6 +60,14 @@ function App() {
                 </RequireAuth>
               }
             />
+            <Route
+              path='/files/:id'
+              element={
+                <RequireAuth>
+                  <File />
+                </RequireAuth>
+              }
+            ></Route>
           </Routes>
         </Row>
       </Container>

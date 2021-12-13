@@ -1,14 +1,9 @@
-import React, { Component } from "react";
-import api from "../services/api.service";
-import { Button } from "react-bootstrap";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useParams } from "react-router-dom";
 
-const API_URL = process.env.REACT_APP_DOMAIN;
+function File() {
+  let { id } = useParams<"id">();
 
-type Props = {};
-
-type State = {};
-
-export default class File extends Component<Props, State> {
-  state: State = {};
+  return <h3>{id}</h3>;
 }
+
+export default File;
