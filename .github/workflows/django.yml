@@ -40,7 +40,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: django-env
-          path: ${{ env.working-directory }}/ddueruemweb/.env
+          path:  ${{ github.workspace }}/backend/ddueruemweb/.env
 
       - name: Install Dependencies
         if: steps.python-cache.outputs.cache-hit != 'true'
@@ -81,7 +81,7 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: django-env
-          path: ${{ github.workspace }}/backend/ddueruemweb/.env
+          path: ${{ github.workspace }}/backend/ddueruemweb
 
       - name: Install Dependencies
         #if: steps.python-cache.outputs.cache-hit != 'true'
@@ -127,7 +127,7 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: django-env
-          path: ${{ github.workspace }}/backend/ddueruemweb/.env
+          path: ${{ github.workspace }}/backend/ddueruemweb
 
 
       - name: Install Dependencies
