@@ -38,9 +38,7 @@ class RegistrationViewSet(ModelViewSet):
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
-        print('hey')
         serializer.is_valid(raise_exception=True)
-        print('ho')
         user = serializer.save()
         refresh = RefreshToken.for_user(user)
         res = {

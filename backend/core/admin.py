@@ -81,7 +81,7 @@ class FileAdmin(ModelAdmin):
 
 class TagAdmin(ModelAdmin):
     """
-    Class for defining the backend file admin panel and which data should be displayed.
+    Class for defining the backend tag admin panel and which data should be displayed.
     """
     model = Tag
     list_display = ('id', 'label', 'is_public', 'creator', 'date_created')

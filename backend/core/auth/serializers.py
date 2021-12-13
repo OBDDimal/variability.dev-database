@@ -80,10 +80,3 @@ class RegistrationSerializer(UserSerializer):
                     'token': encode_user_to_token(extended_user)
                 }))
                 return user
-
-    def validate(self, attrs):
-        try:
-            User.objects.get(email=attrs['email'])
-            raise serializers.ValidationError(f"User with {attrs['email']} scho dau")
-        except ObjectDoesNotExist:
-            super(RegistrationSerializer, self).validate(attrs)
