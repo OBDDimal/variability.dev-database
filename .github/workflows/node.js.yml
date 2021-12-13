@@ -113,6 +113,12 @@ jobs:
         run: yarn build --if-present
 
       - run: yarn test:ci
+      
+      - name: Upload Sonar Test Results Frontend
+        uses: actions/upload-artifact@v2
+        with:
+          name: sonar-report-frontend
+          path: ${{ github.workspace }}/frontend/sonar-report.xml
 
   sonarQubeTrigger:
     needs: test
@@ -120,6 +126,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@master
+    
+    - name: Download Sonar Test Results Frontend
+      uses: actions/download-artifact@v2
+      with:
+        name: sonar-report-frontend
+        path: ${{ github.workspace }}/frontend/sonar-report.xml
+    
     - name: SonarQube Scan
       uses: kitabisa/sonarqube-action@v1.1.1
       with:
