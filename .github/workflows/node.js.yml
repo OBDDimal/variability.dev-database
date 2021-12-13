@@ -131,7 +131,7 @@ jobs:
       uses: actions/download-artifact@v2
       with:
         name: sonar-report-frontend
-        path: ${{ github.workspace }}/frontend/sonar-report.xml
+        path: ${{ github.workspace }}/frontend
     
     - name: SonarQube Scan
       uses: kitabisa/sonarqube-action@v1.1.1
