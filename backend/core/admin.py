@@ -2,7 +2,8 @@ from django.contrib import admin
 from django.utils import timezone
 from datetime import timedelta
 from django.contrib.admin import ModelAdmin
-from core.fileupload.models import File
+from core.fileupload.models.tag import Tag
+from core.fileupload.models.file import File
 from core.user.forms import AdminUserChangeForm, AdminUserCreationForm
 from core.user.models import User
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
@@ -64,12 +65,12 @@ class FileAdmin(ModelAdmin):
     """
     model = File
     # Show attributes in list view
-    list_display = ('id', 'file', 'owner', 'uploaded_at')
+    list_display = ('id', 'new_version_of', 'local_file', 'owner', 'uploaded_at')
     # list_filter = ('is_superuser',)
     # Define how view should look like after clicking on an email
     fieldsets = [
         (None, {'fields': ['owner']}),
-        ('Information', {'fields': ['description', 'file', 'license']}),
+        ('Information', {'fields': ['description', 'local_file', 'license', 'tags', 'new_version_of']}),
         ('Important dates', {'fields': ['uploaded_at']})
     ]
     readonly_fields = ('uploaded_at',)
@@ -78,6 +79,24 @@ class FileAdmin(ModelAdmin):
     filter_horizontal = ()
 
 
+class TagAdmin(ModelAdmin):
+    """
+    Class for defining the backend tag admin panel and which data should be displayed.
+    """
+    model = Tag
+    list_display = ('id', 'label', 'is_public', 'creator', 'date_created')
+    fieldsets = [
+        (None, {'fields': ['id']}),
+        ('Information', {'fields': ['label', 'is_public', 'creator', 'description']}),
+        ('Important dates', {'fields': ['date_created']})
+    ]
+    readonly_fields = ('id', 'date_created')
+    search_fields = ('creator',)
+    ordering = ('creator', 'date_created')
+    filter_horizontal = ()
+
+
 # Register your models here.
 admin.site.register(User, UserAdmin)
 admin.site.register(File, FileAdmin)
+admin.site.register(Tag, TagAdmin)
