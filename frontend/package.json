@@ -30,7 +30,7 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "test:ci": "react-scripts test --env=jsdom --testResultsProcessor ./node_modules/jestSonarReporter/index.js",
+    "test:ci": "react-scripts test --env=jsdom --testResultsProcessor ./node_modules/jest-sonar-reporter/index.js",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {
