@@ -1,5 +1,5 @@
-import React, {Component} from "react";
-import {Button, Form} from "react-bootstrap";
+import React, { Component } from "react";
+import { Button, Form } from "react-bootstrap";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
 import api from "../services/api.service";
@@ -34,13 +34,13 @@ export default class upload extends Component<Props, State> {
 
   onDescriptionChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const description = e.target as HTMLInputElement;
-    this.setState({description: description.value});
+    this.setState({ description: description.value });
   };
 
   onFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target as HTMLInputElement;
     if (file.files) {
-      this.setState({file: file.files[0]});
+      this.setState({ file: file.files[0] });
     }
   };
 
@@ -64,8 +64,8 @@ export default class upload extends Component<Props, State> {
     ) {
       const data = new FormData();
 
-      data.append("description", this.state.description as string);
-      data.append("file", this.state.file as File);
+      data.append("description", this.state.description);
+      data.append("file", this.state.file);
       data.append("license", this.state.license);
 
       api
@@ -112,7 +112,7 @@ export default class upload extends Component<Props, State> {
         <Form.Group className='mb-3'>
           <Form.Label>Description</Form.Label>
           <Form.Control
-            data-testid="description"
+            data-testid='description'
             as='textarea'
             onChange={this.onDescriptionChange}
             placeholder='Leave a comment here'
@@ -121,7 +121,7 @@ export default class upload extends Component<Props, State> {
         <Form.Group className='mb-3'>
           <Form.Label>File Upload</Form.Label>
           <Form.Control
-            data-testid="file-upload"
+            data-testid='file-upload'
             type='file'
             onChange={this.onFileChange}
           />
@@ -140,29 +140,29 @@ export default class upload extends Component<Props, State> {
         </Form.Group>
         <Form.Group className='mb-3'>
           <Form.Check
-            data-testid="legal-share"
+            data-testid='legal-share'
             type='checkbox'
             checked={this.state.legalShare}
             onChange={() =>
-              this.setState({legalShare: !this.state.legalShare})
+              this.setState({ legalShare: !this.state.legalShare })
             }
             id='legal-share'
             label='I am legally allowed to share this model'
           />
           <Form.Check
-            data-testid="user-data"
+            data-testid='user-data'
             type='checkbox'
             checked={this.state.userData}
-            onChange={() => this.setState({userData: !this.state.userData})}
+            onChange={() => this.setState({ userData: !this.state.userData })}
             id='user-data'
             label='My email and a date will always be tied to the file upload (even after account deletion)'
           />
           <Form.Check
-            data-testid="open-source"
+            data-testid='open-source'
             type='checkbox'
             checked={this.state.openSource}
             onChange={() =>
-              this.setState({openSource: !this.state.openSource})
+              this.setState({ openSource: !this.state.openSource })
             }
             id='open-source'
             label='All information will be published according to your chosen license'
@@ -175,7 +175,7 @@ export default class upload extends Component<Props, State> {
           onClick={this.onSubmit}
         >
           {this.state.loading && (
-            <span className='spinner-border spinner-border-sm'/>
+            <span className='spinner-border spinner-border-sm' />
           )}
           Upload!
         </Button>

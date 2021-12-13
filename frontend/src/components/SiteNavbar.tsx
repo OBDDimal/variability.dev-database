@@ -3,7 +3,7 @@ import { Navbar, Container, Nav, NavDropdown } from "react-bootstrap";
 import authService from "../services/auth.service";
 
 type Props = {
-  url: String;
+  url: string;
 };
 
 type State = {

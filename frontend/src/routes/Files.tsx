@@ -1,9 +1,12 @@
 import React, { Component } from "react";
-import ReactDataGrid from "@inovua/reactdatagrid-community";
-import "@inovua/reactdatagrid-community/index.css";
-import "@inovua/reactdatagrid-community/theme/blue-light.css";
 import api from "../services/api.service";
-import { Container } from "react-bootstrap";
+import { Button } from "react-bootstrap";
+import { ReactTabulator, reactFormatter } from "react-tabulator";
+import MultiValueFormatter from "react-tabulator/lib/formatters/MultiValueFormatter";
+import "react-tabulator/lib/styles.css"; // default theme
+import "react-tabulator/css/bootstrap/tabulator_bootstrap.min.css";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCoffee } from "@fortawesome/free-solid-svg-icons";
 
 const API_URL = process.env.REACT_APP_DOMAIN;
 
@@ -12,6 +15,31 @@ type Props = {};
 type State = {
   files: [];
 };
+
+const columns = [
+  { title: "Id", field: "id" },
+  { title: "Description", field: "description" },
+  { title: "File", field: "local_file" },
+  { title: "License", field: "license" },
+  {
+    title: "Tags",
+    field: "tags",
+    formatter: (cell: any) => {
+      console.log(cell.getValue().label);
+
+      return JSON.stringify(cell.getValue());
+    },
+    formatterParams: { style: "PILL" },
+  },
+  { title: "Uploaded at", field: "uploaded_at" },
+  {
+    formatter: reactFormatter(
+      <Button variant='secondary' type='button'>
+        <FontAwesomeIcon icon={faCoffee} />
+      </Button>
+    ),
+  },
+];
 
 export default class Files extends Component<Props, State> {
   state: State = {
@@ -31,19 +59,11 @@ export default class Files extends Component<Props, State> {
 
   render() {
     return (
-      <Container className='files-container'>
-        <ReactDataGrid
-          style={{ height: "80vh" }}
-          columns={[
-            { name: "description", header: "Description" },
-            { name: "file", header: "File" },
-            { name: "license", header: "License" },
-            { name: "uploaded_at", header: "Upload Date" },
-          ]}
-          dataSource={this.state.files}
-          theme='blue-light'
-        />
-      </Container>
+      <ReactTabulator
+        layout='fitDataTable'
+        columns={columns}
+        data={this.state.files}
+      ></ReactTabulator>
     );
   }
 }
