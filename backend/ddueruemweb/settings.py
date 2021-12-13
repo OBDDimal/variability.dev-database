@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 import os, environ
 from pathlib import Path
 
+
 env = environ.Env(DEBUG=(bool, False))
 environ.Env.read_env()
 
@@ -34,6 +35,9 @@ ALLOWED_HOSTS = []
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
+    'core',
+    'core.user',
+    'core.fileupload',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
@@ -43,9 +47,6 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework_simplejwt',
     'corsheaders',
-    'core',
-    'core.user',
-    'core.fileupload'
 ]
 
 MIDDLEWARE = [
@@ -83,13 +84,27 @@ WSGI_APPLICATION = 'ddueruemweb.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
-DATABASES = {
+DATABASES = {}
+
+if env('USE_POSTGRES') != 'True':
+    DATABASES = {
     # Should be in the environment as well
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql_psycopg2',
+            'NAME': env('DB_NAME'),
+            'USER': env('DB_USER'),
+            'PASSWORD': env('DB_PASSWORD'),
+            'HOST': env('DB_HOST'),
+            'PORT': env('DB_PORT'),
+        }
+    }
 
 # Password validation
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
@@ -138,6 +153,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
 STATIC_URL = '/static/'
+STATIC_ROOT = 'static'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
@@ -151,15 +167,13 @@ AUTH_USER_MODEL = 'core_user.User'
 
 # LOGIN_REDIRECT_URL = "dashboard"  # define URL to which user should be redirected after successful login
 # LOGOUT_REDIRECT_URL = "home"
+CORS_ORIGIN_ALLOW_ALL = True
 
-CORS_ALLOWED_ORIGINS = [
-    'http://localhost:3000',
-]
 
 # https://docs.djangoproject.com/en/3.2/topics/email/
 EMAIL_HOST = env('EMAIL_HOST')  # define host and port for email backend
-# EMAIL_HOST_USER="backend"
-# EMAIL_HOST_PASSWORD="123"
+EMAIL_HOST_USER= env('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD= env('EMAIL_HOST_PASSWORD')
 EMAIL_PORT = env('EMAIL_PORT')
 # EMAIL_USE_TLS = True
 # EMAIL_USE_SSL = False

@@ -28,7 +28,7 @@ class LoginViewSet(ModelViewSet, TokenObtainPairView):
         return Response(serializer.validated_data, status=status.HTTP_200_OK)
 
 
-class RegistrationViewSet(ModelViewSet, TokenObtainPairView):
+class RegistrationViewSet(ModelViewSet):
     """
     Define the registration view set for the backend with needed serializer
     """
@@ -38,7 +38,6 @@ class RegistrationViewSet(ModelViewSet, TokenObtainPairView):
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
-
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
         refresh = RefreshToken.for_user(user)

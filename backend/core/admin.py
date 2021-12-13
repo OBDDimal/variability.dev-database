@@ -2,7 +2,8 @@ from django.contrib import admin
 from django.utils import timezone
 from datetime import timedelta
 from django.contrib.admin import ModelAdmin
-from core.fileupload.models import File
+from core.fileupload.models.tag import Tag
+from core.fileupload.models.file import File
 from core.user.forms import AdminUserChangeForm, AdminUserCreationForm
 from core.user.models import User
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
@@ -17,20 +18,21 @@ class UserAdmin(BaseUserAdmin):
     model = User
     form = AdminUserChangeForm
     add_form = AdminUserCreationForm
-    # Shows attributes in list view
-    list_display = ('email', 'institute', 'is_active_ex', 'is_staff', 'is_superuser', 'last_login', 'date_joined')
-    list_filter = ('is_superuser',)
-    # Define how view should look like after clicking on a email
+    # Show attributes in overall list view
+    list_display = ('id', 'email', 'institute', 'is_active_ex', 'is_staff', 'is_superuser', 'last_login', 'date_joined')
+    list_filter = ('institute', 'is_active', 'is_staff', 'is_superuser', 'last_login', 'date_joined')
+    # Define which (and how) attributes should be displayed when clicking on a certain user
     fieldsets = [
         (None, {'fields': ['email', 'password']}),
         ('Personal Information', {'fields': ['institute', 'bio']}),
         # groups and user_permissions come from PermissionsMixin
         ('Permissions', {'fields': ['is_staff', 'is_active', 'groups', 'user_permissions']}),
-        ('Important dates', {'fields': ['last_login']})
+        ('Important dates', {'fields': ['last_login', 'date_joined']})
     ]
+    readonly_fields = ('date_joined',)
     # add_fieldsets is not a standard ModelAdmin attribute.
     # UserAdmin overrides get_fieldsets to use this attribute when creating a user.
-    # otherwise it would throw the following error when trying to add a new user
+    # otherwise, it would throw the following error when trying to add a new user
     # "The value of 'ordering[0]' refers to 'username', which is not an attribute of 'core_user.User'"
     add_fieldsets = (
         (None, {
@@ -62,19 +64,39 @@ class FileAdmin(ModelAdmin):
     Class for defining the backend file admin panel and which data should be displayed.
     """
     model = File
-    # Shows attributes in list view
-    list_display = ('file', 'owner', 'uploaded_at')
+    # Show attributes in list view
+    list_display = ('id', 'new_version_of', 'local_file', 'owner', 'uploaded_at')
     # list_filter = ('is_superuser',)
-    # Define how view should look like after clicking on a email
+    # Define how view should look like after clicking on an email
     fieldsets = [
         (None, {'fields': ['owner']}),
-        ('Information', {'fields': ['description', 'uploaded_at', 'file']}),
+        ('Information', {'fields': ['description', 'local_file', 'license', 'tags', 'new_version_of']}),
+        ('Important dates', {'fields': ['uploaded_at']})
     ]
+    readonly_fields = ('uploaded_at',)
     search_fields = ('owner',)
     ordering = ('owner', 'uploaded_at')
+    filter_horizontal = ()
+
+
+class TagAdmin(ModelAdmin):
+    """
+    Class for defining the backend tag admin panel and which data should be displayed.
+    """
+    model = Tag
+    list_display = ('id', 'label', 'is_public', 'creator', 'date_created')
+    fieldsets = [
+        (None, {'fields': ['id']}),
+        ('Information', {'fields': ['label', 'is_public', 'creator', 'description']}),
+        ('Important dates', {'fields': ['date_created']})
+    ]
+    readonly_fields = ('id', 'date_created')
+    search_fields = ('creator',)
+    ordering = ('creator', 'date_created')
     filter_horizontal = ()
 
 
 # Register your models here.
 admin.site.register(User, UserAdmin)
 admin.site.register(File, FileAdmin)
+admin.site.register(Tag, TagAdmin)
