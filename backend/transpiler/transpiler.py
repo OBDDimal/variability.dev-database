@@ -144,28 +144,26 @@ def xml_to_graphology(file_path):
 path = f"{Path(__file__).resolve().parent}{os.path.sep}xmlExamples{os.path.sep}"
 
 # ----- to JSON
-parsed_model = xml_to_json(path + 'BerkeleyDB.xml')
+
 with open(f"{path}model.json", 'w') as fp:
-    json.dump(parsed_model, fp, indent=2)
-parsed_model = xml_to_json(path + 'Automotive02v04.xml')
+    json.dump(xml_to_json(path + 'BerkeleyDB.xml'), fp, indent=2)
+
 with open(f"{path}model_big.json", 'w') as fp:
-    json.dump(parsed_model, fp, indent=2)
+    json.dump(xml_to_json(path + 'Automotive02v04.xml'), fp, indent=2)
 
 # ----- to GRAPHOLOGY
-parsed_model = xml_to_graphology(path + 'BerkeleyDB.xml')
 with open(f"{path}graphology_model.json", 'w') as fp:
-    json.dump(parsed_model, fp, indent=2)
-parsed_model = xml_to_graphology(path + 'Automotive02v04.xml')
-with open(f"{path}graphology_model_big.json", 'w') as fp:
-    json.dump(parsed_model, fp, indent=2)
-parsed_model = xml_to_graphology(path + 'oldsmall.xml')
+    json.dump(xml_to_g6(path + 'BerkeleyDB.xml'), fp, indent=2)
+
 with open(f"{path}graphology_model_small.json", 'w') as fp:
-    json.dump(parsed_model, fp, indent=2)
+    json.dump(xml_to_g6(path + 'oldsmall.xml'), fp, indent=2)
+
+with open(f"{path}graphology_model_big.json", 'w') as fp:
+    json.dump(xml_to_g6(path + 'Automotive02v04.xml'), fp, indent=2)
 
 # ----- to G6
-parsed_model = xml_to_g6(path + 'BerkeleyDB.xml')
 with open(f"{path}g6_model.json", 'w') as fp:
-    json.dump(parsed_model, fp, indent=2)
-parsed_model = xml_to_g6(path + 'Automotive02v04.xml')
+    json.dump(xml_to_g6(path + 'BerkeleyDB.xml'), fp, indent=2)
+
 with open(f"{path}g6_model_big.json", 'w') as fp:
-    json.dump(parsed_model, fp, indent=2)
+    json.dump(xml_to_g6(path + 'Automotive02v04.xml'), fp, indent=2)
