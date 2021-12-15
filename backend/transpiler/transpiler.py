@@ -101,8 +101,8 @@ def _parse_graphology_item(item, nodes=[], edges=[]):
     for key in item:
         if key == 'name' or key == 'children':
             continue
-    # sigmajs has problems with custom attributes
-    # attributes.update({key: item[key]})
+        # sigmajs has problems with custom attributes
+        attributes.update({key: item[key]})
     new_node.update({'attributes': attributes})
     nodes.append(new_node)
     if item['children'] is None:
@@ -114,18 +114,22 @@ def _parse_graphology_item(item, nodes=[], edges=[]):
         edges.append({
             'source': new_node['key'],
             'target': nodes[-1]['key'],
-            # 'undirected': 'true'
+            # 'undirected': True
         })
     return nodes, edges
 
 
-def json_to_graphology(content):
-    nodes, edges = _parse_graphology_item(content)
+def json_to_graphology(content, with_dimension=False):
+    nodes, edges = _parse_graphology_item(content, [], [])
+    if with_dimension:
+        leafs = [x for x in content if len(x['children']) == 0]
+        print(len(leafs))
+
     return {
         'attributes': {'name': 'test graph'},
         'options': {
-            'allowSelfLoops': 'true',
-            'multi': 'false',
+            'allowSelfLoops': True,
+            'multi': False,
             'type': 'mixed'
         },
         'nodes': nodes,
@@ -133,37 +137,32 @@ def json_to_graphology(content):
     }
 
 
-def xml_to_graphology(file_path):
+def xml_to_graphology(file_path, with_dimension=False):
     file_as_json = xml_to_json(file_path)
-    json_as_graphology = json_to_graphology(file_as_json)
+    json_as_graphology = json_to_graphology(file_as_json, with_dimension)
     return json_as_graphology
 
 
-# ---------------------------------MAIN----------------------------------------------
+# ---------------------------------Utils---------------------------------------------
+def write_to_file(source, target_file):
+    with open(target_file, 'w') as f:
+        f.write(source)
 
+
+# ---------------------------------MAIN----------------------------------------------
 path = f"{Path(__file__).resolve().parent}{os.path.sep}xmlExamples{os.path.sep}"
 
-# ----- to JSON
-
-with open(f"{path}model.json", 'w') as fp:
-    json.dump(xml_to_json(path + 'BerkeleyDB.xml'), fp, indent=2)
-
-with open(f"{path}model_big.json", 'w') as fp:
-    json.dump(xml_to_json(path + 'Automotive02v04.xml'), fp, indent=2)
-
 # ----- to GRAPHOLOGY
-with open(f"{path}graphology_model.json", 'w') as fp:
-    json.dump(xml_to_g6(path + 'BerkeleyDB.xml'), fp, indent=2)
+write_to_file(json.dumps(xml_to_graphology(path + 'BerkeleyDB.xml'), indent=2), f"{path}graphology_model.json")
+write_to_file(json.dumps(xml_to_graphology(path + 'oldsmall.xml'), indent=2), f"{path}graphology_model_small.json")
+write_to_file(json.dumps(xml_to_graphology(path + 'Automotive02v04.xml'), indent=2), f"{path}graphology_model_big.json")
 
-with open(f"{path}graphology_model_small.json", 'w') as fp:
-    json.dump(xml_to_g6(path + 'oldsmall.xml'), fp, indent=2)
-
-with open(f"{path}graphology_model_big.json", 'w') as fp:
-    json.dump(xml_to_g6(path + 'Automotive02v04.xml'), fp, indent=2)
+# ----- to JSON
+write_to_file(json.dumps(xml_to_json(path + 'BerkeleyDB.xml'), indent=2), f"{path}model.json")
+write_to_file(json.dumps(xml_to_json(path + 'oldsmall.xml'), indent=2), f"{path}model_small.json")
+write_to_file(json.dumps(xml_to_json(path + 'Automotive02v04.xml'), indent=2), f"{path}model_big.json")
 
 # ----- to G6
-with open(f"{path}g6_model.json", 'w') as fp:
-    json.dump(xml_to_g6(path + 'BerkeleyDB.xml'), fp, indent=2)
-
-with open(f"{path}g6_model_big.json", 'w') as fp:
-    json.dump(xml_to_g6(path + 'Automotive02v04.xml'), fp, indent=2)
+write_to_file(json.dumps(xml_to_g6(path + 'BerkeleyDB.xml'), indent=2), f"{path}g6_model.json")
+write_to_file(json.dumps(xml_to_g6(path + 'oldsmall.xml'), indent=2), f"{path}g6_model_small.json")
+write_to_file(json.dumps(xml_to_g6(path + 'Automotive02v04.xml'), indent=2), f"{path}g6_model_big.json")
