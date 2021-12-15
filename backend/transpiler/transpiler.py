@@ -136,7 +136,6 @@ def json_to_graphology(content):
 def xml_to_graphology(file_path):
     file_as_json = xml_to_json(file_path)
     json_as_graphology = json_to_graphology(file_as_json)
-    print(json.dumps(json_as_graphology, indent=2))
     return json_as_graphology
 
 
@@ -158,6 +157,9 @@ with open(f"{path}graphology_model.json", 'w') as fp:
     json.dump(parsed_model, fp, indent=2)
 parsed_model = xml_to_graphology(path + 'Automotive02v04.xml')
 with open(f"{path}graphology_model_big.json", 'w') as fp:
+    json.dump(parsed_model, fp, indent=2)
+parsed_model = xml_to_graphology(path + 'oldsmall.xml')
+with open(f"{path}graphology_model_small.json", 'w') as fp:
     json.dump(parsed_model, fp, indent=2)
 
 # ----- to G6
