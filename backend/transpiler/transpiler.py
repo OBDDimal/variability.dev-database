@@ -101,7 +101,8 @@ def _parse_graphology_item(item, nodes=[], edges=[]):
     for key in item:
         if key == 'name' or key == 'children':
             continue
-        attributes.update({key: item[key]})
+    # sigmajs has problems with custom attributes
+    # attributes.update({key: item[key]})
     new_node.update({'attributes': attributes})
     nodes.append(new_node)
     if item['children'] is None:
@@ -113,7 +114,7 @@ def _parse_graphology_item(item, nodes=[], edges=[]):
         edges.append({
             'source': new_node['key'],
             'target': nodes[-1]['key'],
-            #'undirected': 'true'
+            # 'undirected': 'true'
         })
     return nodes, edges
 
@@ -142,22 +143,27 @@ def xml_to_graphology(file_path):
 # ---------------------------------MAIN----------------------------------------------
 
 path = f"{Path(__file__).resolve().parent}{os.path.sep}xmlExamples{os.path.sep}"
-# model_as_json = xml_to_json(path + 'BerkeleyDB.xml')
-model_as_json = xml_to_graphology(path + 'BerkeleyDB.xml')
-with open(f"{path}graphology_data.json", 'w') as fp:
-    json.dump(model_as_json, fp, indent=2)
-# print(json.dumps(model_as_json, indent=2))
-"""
-with open(f"{path}model_data.json", 'w') as fp:
-    json.dump(model_as_json, fp, indent=2)
-model_as_g6 = json_to_g6(model_as_json)
-with open(f"{path}g6_data.json", 'w') as fp:
-    json.dump(model_as_g6, fp, indent=2)
 
-model_as_json = xml_to_json(path + 'Automotive02v04.xml')
-with open(f"{path}model_data_big.json", 'w') as fp:
-    json.dump(model_as_json, fp, indent=2)
-model_as_g6 = json_to_g6(model_as_json)
-with open(f"{path}g6_data_big.json", 'w') as fp:
-    json.dump(model_as_g6, fp, indent=2)
-"""
+# ----- to JSON
+parsed_model = xml_to_json(path + 'BerkeleyDB.xml')
+with open(f"{path}model.json", 'w') as fp:
+    json.dump(parsed_model, fp, indent=2)
+parsed_model = xml_to_json(path + 'Automotive02v04.xml')
+with open(f"{path}model_big.json", 'w') as fp:
+    json.dump(parsed_model, fp, indent=2)
+
+# ----- to GRAPHOLOGY
+parsed_model = xml_to_graphology(path + 'BerkeleyDB.xml')
+with open(f"{path}graphology_model.json", 'w') as fp:
+    json.dump(parsed_model, fp, indent=2)
+parsed_model = xml_to_graphology(path + 'Automotive02v04.xml')
+with open(f"{path}graphology_model_big.json", 'w') as fp:
+    json.dump(parsed_model, fp, indent=2)
+
+# ----- to G6
+parsed_model = xml_to_g6(path + 'BerkeleyDB.xml')
+with open(f"{path}g6_model.json", 'w') as fp:
+    json.dump(parsed_model, fp, indent=2)
+parsed_model = xml_to_g6(path + 'Automotive02v04.xml')
+with open(f"{path}g6_model_big.json", 'w') as fp:
+    json.dump(parsed_model, fp, indent=2)
