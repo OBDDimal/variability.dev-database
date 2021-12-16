@@ -119,27 +119,23 @@ def _parse_graphology_item(item, nodes=[], edges=[]):
     return nodes, edges
 
 
-def json_to_graphology(content, with_dimension=False):
+def json_to_graphology(content):
     nodes, edges = _parse_graphology_item(content, [], [])
-    if with_dimension:
-        leafs = [x for x in content if len(x['children']) == 0]
-        print(len(leafs))
-
     return {
         'attributes': {'name': 'test graph'},
         'options': {
             'allowSelfLoops': True,
             'multi': False,
-            'type': 'mixed'
+            'type': 'undirected'
         },
         'nodes': nodes,
         'edges': edges
     }
 
 
-def xml_to_graphology(file_path, with_dimension=False):
+def xml_to_graphology(file_path):
     file_as_json = xml_to_json(file_path)
-    json_as_graphology = json_to_graphology(file_as_json, with_dimension)
+    json_as_graphology = json_to_graphology(file_as_json)
     return json_as_graphology
 
 
