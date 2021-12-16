@@ -96,14 +96,16 @@ def _parse_graphology_item(item, nodes=[], edges=[]):
     """
     if item['name'] is None:
         raise ValueError("Node does not have name attribute !")
-    new_node = {'key': item['name']}
+    id = 'key'
+    new_node = {id: item['name']}
     attributes = {}
     for key in item:
         if key == 'name' or key == 'children':
             continue
         # sigmajs has problems with custom attributes
         attributes.update({key: item[key]})
-    new_node.update({'attributes': attributes})
+    # new_node.update({'attributes': attributes})
+    new_node.update({'attributes': {'x': item['x'], 'y': item['y']}})
     nodes.append(new_node)
     if item['children'] is None:
         raise ValueError("Node does have child array !")
@@ -112,8 +114,8 @@ def _parse_graphology_item(item, nodes=[], edges=[]):
         nodes, edges = _parse_graphology_item(child, nodes, edges)
         # last element of nodes is first child of current node
         edges.append({
-            'source': new_node['key'],
-            'target': nodes[-1]['key'],
+            'source': new_node[id],
+            'target': nodes[-1][id],
             # 'undirected': True
         })
     return nodes, edges
@@ -122,12 +124,9 @@ def _parse_graphology_item(item, nodes=[], edges=[]):
 def json_to_graphology(content):
     nodes, edges = _parse_graphology_item(content, [], [])
     return {
-        'attributes': {'name': 'test graph'},
-        'options': {
-            'allowSelfLoops': True,
-            'multi': False,
-            'type': 'undirected'
-        },
+        'directed': False,
+        'multigraph': False,
+        'graph': {},
         'nodes': nodes,
         'edges': edges
     }
@@ -149,9 +148,9 @@ def write_to_file(source, target_file):
 path = f"{Path(__file__).resolve().parent}{os.path.sep}xmlExamples{os.path.sep}"
 
 # ----- to GRAPHOLOGY
-write_to_file(json.dumps(xml_to_graphology(path + 'BerkeleyDB.xml'), indent=2), f"{path}graphology_model.json")
-write_to_file(json.dumps(xml_to_graphology(path + 'oldsmall.xml'), indent=2), f"{path}graphology_model_small.json")
-write_to_file(json.dumps(xml_to_graphology(path + 'Automotive02v04.xml'), indent=2), f"{path}graphology_model_big.json")
+# write_to_file(json.dumps(xml_to_graphology(path + 'BerkeleyDB.xml'), indent=2), f"{path}graphology_model.json")
+# write_to_file(json.dumps(xml_to_graphology(path + 'oldsmall.xml'), indent=2), f"{path}graphology_model_small.json")
+# write_to_file(json.dumps(xml_to_graphology(path + 'Automotive02v04.xml'), indent=2), f"{path}graphology_model_big.json")
 
 # ----- to JSON
 write_to_file(json.dumps(xml_to_json(path + 'BerkeleyDB.xml'), indent=2), f"{path}model.json")
@@ -159,6 +158,6 @@ write_to_file(json.dumps(xml_to_json(path + 'oldsmall.xml'), indent=2), f"{path}
 write_to_file(json.dumps(xml_to_json(path + 'Automotive02v04.xml'), indent=2), f"{path}model_big.json")
 
 # ----- to G6
-write_to_file(json.dumps(xml_to_g6(path + 'BerkeleyDB.xml'), indent=2), f"{path}g6_model.json")
-write_to_file(json.dumps(xml_to_g6(path + 'oldsmall.xml'), indent=2), f"{path}g6_model_small.json")
-write_to_file(json.dumps(xml_to_g6(path + 'Automotive02v04.xml'), indent=2), f"{path}g6_model_big.json")
+# write_to_file(json.dumps(xml_to_g6(path + 'BerkeleyDB.xml'), indent=2), f"{path}g6_model.json")
+# write_to_file(json.dumps(xml_to_g6(path + 'oldsmall.xml'), indent=2), f"{path}g6_model_small.json")
+# write_to_file(json.dumps(xml_to_g6(path + 'Automotive02v04.xml'), indent=2), f"{path}g6_model_big.json")
