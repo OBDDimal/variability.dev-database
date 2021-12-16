@@ -148,6 +148,12 @@ jobs:
         name: sonar-coverage-frontend
         path: ${{ github.workspace }}/frontend/coverage
         
+    - name: fix code coverage paths
+      working-directory: ./frontend
+      run: |
+        sed -i 's/\/home\/runner\/work\/ddueruem-web\/ddueruem-web\//\/github\/workspace\//g' coverage/lcov.info
+        sed -i 's/\/home\/runner\/work\/ddueruem-web\/ddueruem-web\//\/github\/workspace\//g' sonar-report.xml
+        
     - name: SonarQube Scan
       uses: sonarsource/sonarqube-scan-action@master
       with:
