@@ -2,9 +2,9 @@ name: Django CI
 
 on:
   push:
-    branches: [dev, issue-48]
+    branches: [dev]
   pull_request:
-    branches: [dev, issue-48]
+    branches: [dev]
 
 jobs:
 
