@@ -149,7 +149,7 @@ jobs:
       - name: Run Coverage
         run: |
           coverage erase
-          coverage run --branch
+          coverage run manage.py test
           coverage xml -i
           
       - name: Upload Sonar Test Coverage Backend
