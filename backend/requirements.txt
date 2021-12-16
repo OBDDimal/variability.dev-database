@@ -1,6 +1,7 @@
 asgiref==3.4.1
 Django==3.2.8
 django-cors-headers==3.10.0
+django-crispy-forms==1.13.0
 django-environ==0.8.1
 django-extensions==3.1.5
 django-rest-auth==0.9.5
@@ -11,3 +12,4 @@ PyJWT==2.3.0
 pytz==2021.3
 six==1.16.0
 sqlparse==0.4.2
+texttable==1.6.4
