@@ -1,2 +1,4 @@
 [run]
 plugins = django_coverage_plugin
+source = .
+branch = True
