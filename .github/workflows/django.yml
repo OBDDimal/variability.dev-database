@@ -146,17 +146,17 @@ jobs:
         run: |
           python manage.py test
           
-      - name: Upload Sonar Test Results Backend
-        uses: actions/upload-artifact@v2
-        with:
-          name: sonar-report-backend
-          path: ${{ github.workspace }}/backend/sonar-report.xml
+      - name: Run Coverage
+        run: |
+          coverage erase
+          coverage run --branch
+          coverage xml -i
           
       - name: Upload Sonar Test Coverage Backend
         uses: actions/upload-artifact@v2
         with:
           name: sonar-coverage-backend
-          path: ${{ github.workspace }}/backend/coverage/lcov.info
+          path: ${{ github.workspace }}/backend/coverage.xml
 
   sonarqube:
     needs: test
@@ -168,17 +168,11 @@ jobs:
         # Disabling shallow clone is recommended for improving relevancy of reporting
         fetch-depth: 0
         
-    - name: Download Sonar Test Results Backend
-      uses: actions/download-artifact@v2
-      with:
-        name: sonar-report-backend
-        path: ${{ github.workspace }}/backend
-        
     - name: Download Sonar Test Coverage Backend
       uses: actions/download-artifact@v2
       with:
         name: sonar-coverage-backend
-        path: ${{ github.workspace }}/backend/coverage
+        path: ${{ github.workspace }}/backend
         
     - name: SonarQube Scan
       uses: sonarsource/sonarqube-scan-action@master
