@@ -1,0 +1,97 @@
+<!--EXECUTE: npx serve in transpiler folder to see visualisation -->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://gw.alipayobjects.com/os/lib/antv/g6/4.3.11/dist/g6.min.js"></script>
+    <title>Test</title>
+  </head>
+  <body>
+    <div style="width: 100vw; height: 100vh" id="mountNode"></div>
+    <script defer>
+      fetch("xmlExamples/g6_data.json")
+        .then((res) => res.json())
+        .then((data) => {
+          const container = document.getElementById("mountNode");
+          const width = container.scrollWidth;
+          const height = container.scrollHeight || 500;
+          const treeDir = "LR" // H / V / LR / RL / TB / BT
+          const graph = new G6.TreeGraph({
+            container: "mountNode",
+            width,
+            height,
+            linkCenter: true,
+            modes: {
+              default: [
+                {
+                  type: "collapse-expand-combo",
+                  trigger: "click",
+                  onChange(item, collapsed) {
+                    data.collapsed = collapsed;
+                    return true;
+                  },
+                  relayout: true,
+                },
+                "drag-canvas",
+                "zoom-canvas",
+              ],
+            },
+            defaultNode: {
+              size: 26,
+              anchorPoints: [
+                [0, 0.5],
+                [1, 0.5],
+              ],
+            },
+            defaultEdge: {
+              type: "cubic-vertical",
+            },
+            layout: {
+              type: "dendrogram",
+              direction: treeDir,
+              nodeSep: 40,
+              rankSep: 100,
+            },
+          });
+
+          graph.node(function (node) {
+            let position = "right";
+            let rotate = 0;
+            if (treeDir == "TB" && !node.children.length) {
+              position = "bottom";
+              rotate = Math.PI / 2;
+            }
+            return {
+              label: node.id,
+              labelCfg: {
+                position,
+                offset: 5,
+                style: {
+                  rotate,
+                  textAlign: "start",
+                },
+              },
+            };
+          });
+
+          graph.data(data);
+          graph.render();
+          graph.fitView();
+
+          if (typeof window !== "undefined")
+            window.onresize = () => {
+              if (!graph || graph.get("destroyed")) return;
+              if (
+                !container ||
+                !container.scrollWidth ||
+                !container.scrollHeight
+              )
+                return;
+              graph.changeSize(container.scrollWidth, container.scrollHeight);
+            };
+        });
+    </script>
+  </body>
+</html>
