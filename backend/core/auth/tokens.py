@@ -19,7 +19,7 @@ def decode_token_to_user(token):
     If the given is string is a token in the sense of this class, then if will return a dict of attributes
     otherwise it throws BadSignature exception
     details: https://docs.djangoproject.com/en/3.2/topics/signing/
-    throws BadSignature exception
+    throws BadSignature exception or DjangoUnicodeDecodeError
     @param token includes parameters for hashing. This needs to contain at least the user email and creation timestamp
     :return:
     """

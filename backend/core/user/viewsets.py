@@ -35,6 +35,8 @@ class ActivateUserViewSet(GenericViewSet, CreateModelMixin):
         try:
             user = decode_token_to_user(token)
             actual_request_timestamp = dateparse.parse_datetime(user.pop('timestamp'))
+            if user.pop('purpose') != 'user_activation':
+                raise BadSignature('Token purpose does not match!')
             min_possible_request_timestamp = timezone.now() - timedelta(days=PASSWORD_RESET_TIMEOUT_DAYS)
             valid = min_possible_request_timestamp <= actual_request_timestamp
             if not valid:
