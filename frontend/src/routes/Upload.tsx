@@ -21,7 +21,7 @@ type State = {
   openSource: boolean;
 };
 
-export default class upload extends Component<Props, State> {
+export default class Upload extends Component<Props, State> {
   state: State = {
     description: undefined,
     file: undefined,
@@ -64,8 +64,8 @@ export default class upload extends Component<Props, State> {
     ) {
       const data = new FormData();
 
-      data.append("description", this.state.description as string);
-      data.append("file", this.state.file as File);
+      data.append("description", this.state.description);
+      data.append("file", this.state.file);
       data.append("license", this.state.license);
 
       api
@@ -81,7 +81,6 @@ export default class upload extends Component<Props, State> {
             document
               .querySelectorAll("textarea, input[type=file]")
               .forEach((e: Element) => {
-                console.log(e);
                 const element = e as HTMLInputElement;
                 element.value = "";
               });
