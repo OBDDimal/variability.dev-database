@@ -701,3 +701,10 @@ MigrationBackup/
 # .pnp.*
 
 # End of https://www.toptal.com/developers/gitignore/api/python,django,node,yarn,vs,pycharm+all
+
+# these will be created in the backend if the coverage command is executed: 'coverage run manage.py test'
+backend/htmlcov/
+backend/.coverage
+backend/.coverage.*
+backend/coverage.xml
+backend/*.cover
