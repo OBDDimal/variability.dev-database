@@ -1,11 +1,10 @@
 import React, { Component } from "react";
 import api from "../services/api.service";
-import { Button } from "react-bootstrap";
 import { ReactTabulator, reactFormatter } from "react-tabulator";
 import "react-tabulator/lib/styles.css"; // default theme
 import "react-tabulator/css/bootstrap/tabulator_bootstrap.min.css";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye } from "@fortawesome/free-solid-svg-icons";
+import TableButton from "../components/TableButton";
 
 const API_URL = process.env.REACT_APP_DOMAIN;
 
@@ -14,19 +13,6 @@ type Props = {};
 type State = {
   files: [];
 };
-
-function TableButton(props: any) {
-  const rowData = props.cell._cell.row.data;
-  return (
-    <Button
-      variant='secondary'
-      type='button'
-      onClick={() => window.location.replace(`/files/${rowData.id}`)}
-    >
-      <FontAwesomeIcon icon={faEye}></FontAwesomeIcon>
-    </Button>
-  );
-}
 
 const columns = [
   { title: "Id", field: "id" },
@@ -48,7 +34,9 @@ const columns = [
   },
   { title: "Uploaded at", field: "uploaded_at" },
   {
-    formatter: reactFormatter(<TableButton></TableButton>),
+    formatter: reactFormatter(
+      <TableButton basePath={"files"} icon={faEye}></TableButton>
+    ),
   },
 ];
 

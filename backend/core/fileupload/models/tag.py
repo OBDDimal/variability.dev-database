@@ -8,7 +8,7 @@ class Tag(models.Model):
     A file can be related to many tags and a single tag can be related to many files.
     """
 
-    creator = models.ForeignKey(User, on_delete=models.CASCADE)  # TODO: Remove on_delete=CASCADE
+    creator = models.ForeignKey(User, on_delete=models.RESTRICT)  # TODO: Remove on_delete=CASCADE
     label = models.CharField(max_length=30, unique=False, blank=False)
     description = models.TextField(blank=True)
     is_public = models.BooleanField(default=False)

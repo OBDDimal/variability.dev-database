@@ -1,10 +1,13 @@
 import React, { Component } from "react";
 import { Button, Form } from "react-bootstrap";
+import Select from "react-select";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
 import api from "../services/api.service";
 
 const MySwal = withReactContent(Swal);
+
+const API_URL = process.env.REACT_APP_DOMAIN;
 
 // Can't use enums because of iteration problems
 const license = ["CC BY - Mention", "CC BY-NC - Mention - Non-commercial"];
@@ -12,9 +15,12 @@ const license = ["CC BY - Mention", "CC BY-NC - Mention - Non-commercial"];
 type Props = {};
 
 type State = {
+  label: string;
   description?: string;
   file?: File;
   license: string;
+  gottenTags: Array<{ key: string; value: string }>;
+  tags: string;
   loading: boolean;
   legalShare: boolean;
   userData: boolean;
@@ -22,14 +28,43 @@ type State = {
 };
 
 export default class Upload extends Component<Props, State> {
+  constructor(props: Props | Readonly<Props>) {
+    super(props);
+    this.getTags();
+  }
+
   state: State = {
+    label: "",
     description: undefined,
     file: undefined,
     license: license[0],
+    gottenTags: [],
+    tags: "",
     loading: false,
     legalShare: false,
     userData: false,
     openSource: false,
+  };
+
+  getTags = () => {
+    api.get(API_URL + "tags/").then((response) => {
+      let tags = response.data.results;
+      tags = tags.map((tag: { id: number; label: string }) => {
+        return { value: tag.id, label: tag.label };
+      });
+      this.setState({ gottenTags: tags });
+    });
+  };
+
+  onTagChange = (options: any) => {
+    console.log(options);
+
+    this.setState({ tags: options.map((option: any) => option.value) });
+  };
+
+  onLabelChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const label = e.target as HTMLInputElement;
+    this.setState({ label: label.value });
   };
 
   onDescriptionChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -46,6 +81,8 @@ export default class Upload extends Component<Props, State> {
 
   isReady = () => {
     return (
+      this.state.tags &&
+      this.state.label &&
       this.state.file &&
       this.state.description &&
       this.state.legalShare &&
@@ -56,6 +93,8 @@ export default class Upload extends Component<Props, State> {
 
   onSubmit = () => {
     if (
+      this.state.tags &&
+      this.state.label &&
       this.state.file &&
       this.state.description &&
       this.state.legalShare &&
@@ -64,12 +103,14 @@ export default class Upload extends Component<Props, State> {
     ) {
       const data = new FormData();
 
+      data.append("label", this.state.label);
       data.append("description", this.state.description);
-      data.append("file", this.state.file);
+      data.append("local_file", this.state.file);
       data.append("license", this.state.license);
+      data.append("tags", "1");
 
       api
-        .post(`${process.env.REACT_APP_DOMAIN}files/`, data, {
+        .post(`${API_URL}files/`, data, {
           headers: { "Content-Type": "multipart/form-data" },
         })
         .then((result) => {
@@ -86,6 +127,7 @@ export default class Upload extends Component<Props, State> {
                 element.value = "";
               });
             this.setState({
+              label: "",
               description: undefined,
               file: undefined,
               license: license[0],
@@ -109,6 +151,14 @@ export default class Upload extends Component<Props, State> {
   render() {
     return (
       <div>
+        <Form.Group className='mb-3'>
+          <Form.Label>File name</Form.Label>
+          <Form.Control
+            data-testid='label'
+            onChange={this.onLabelChange}
+            placeholder='Leave a filename'
+          />
+        </Form.Group>
         <Form.Group className='mb-3'>
           <Form.Label>Description</Form.Label>
           <Form.Control
@@ -137,6 +187,14 @@ export default class Upload extends Component<Props, State> {
               );
             })}
           </Form.Select>
+        </Form.Group>
+        <Form.Group className='mb-3'>
+          <Form.Label>Tags</Form.Label>
+          <Select
+            isMulti
+            onChange={this.onTagChange}
+            options={this.state.gottenTags}
+          />
         </Form.Group>
         <Form.Group className='mb-3'>
           <Form.Check

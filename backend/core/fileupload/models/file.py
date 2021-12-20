@@ -14,6 +14,7 @@ class File(models.Model):
     ]
 
     owner = models.ForeignKey(User, on_delete=models.RESTRICT)
+    label = models.CharField(max_length=255)
     description = models.TextField(blank=True)
     local_file = models.FileField(upload_to='files/')
     uploaded_at = models.DateTimeField(auto_now_add=True)
