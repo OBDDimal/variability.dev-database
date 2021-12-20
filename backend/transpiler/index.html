@@ -2,97 +2,118 @@
 <!--THIS FILE IS FOR TESTING PURPOSE ONLY AND CAN BE DELETED -->
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8"/>
-    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <script src="https://gw.alipayobjects.com/os/lib/antv/g6/4.3.11/dist/g6.min.js"></script>
     <title>Test</title>
 </head>
+
 <body>
-<div style="width: 100vw; height: 100vh" id="mountNode"></div>
-<script defer>
-    fetch("xmlExamples/g6_model_small.json")
-        .then((res) => res.json())
-        .then((data) => {
-            const container = document.getElementById("mountNode");
-            const width = container.scrollWidth;
-            const height = container.scrollHeight || 500;
-            const treeDir = "LR" // H / V / LR / RL / TB / BT
-            const graph = new G6.TreeGraph({
-                container: "mountNode",
-                width,
-                height,
-                linkCenter: true,
-                modes: {
-                    default: [
-                        {
-                            type: "collapse-expand-combo",
-                            trigger: "click",
-                            onChange(item, collapsed) {
-                                data.collapsed = collapsed;
-                                return true;
+    <div style="width: 100vw; height: 100vh" id="mountNode"></div>
+    <script defer>
+        fetch("xmlExamples/g6_model.json")
+            .then((res) => res.json())
+            .then((data) => {
+                const container = document.getElementById("mountNode");
+                const width = container.scrollWidth;
+                const height = container.scrollHeight || 2048;
+                const treeDir = "TB" // H / V / LR / RL / TB / BT
+                const graph = new G6.TreeGraph({
+                    container: "mountNode",
+                    width,
+                    height,
+                    linkCenter: true,
+                    modes: {
+                        default: [
+                            {
+                                type: "collapse-expand-combo",
+                                trigger: "click",
+                                onChange(item, collapsed) {
+                                    data.collapsed = collapsed;
+                                    return true;
+                                },
+                                relayout: true,
                             },
-                            relayout: true,
-                        },
-                        "drag-canvas",
-                        "zoom-canvas",
-                    ],
-                },
-                defaultNode: {
-                    size: 26,
-                    anchorPoints: [
-                        [0, 0.5],
-                        [1, 0.5],
-                    ],
-                },
-                defaultEdge: {
-                    type: "cubic-vertical",
-                },
-                layout: {
-                    type: "dendrogram",
-                    direction: treeDir,
-                    nodeSep: 40,
-                    rankSep: 100,
-                },
-            });
-
-            graph.node(function (node) {
-                let position = "right";
-                let rotate = 0;
-                if (treeDir == "TB" && !node.children.length) {
-                    position = "bottom";
-                    rotate = Math.PI / 2;
-                }
-                return {
-                    label: node.id,
-                    labelCfg: {
-                        position,
-                        offset: 5,
-                        style: {
-                            rotate,
-                            textAlign: "start",
-                        },
+                            {
+                                type: 'zoom-canvas',
+                                enableOptimize: true,
+                                optimizeZoom: 0.9,
+                            },
+                            {
+                                type: 'drag-canvas',
+                                enableOptimize: true,
+                            },
+                            'brush-select', //what does this?
+                        ],
                     },
-                };
+                    defaultNode: {
+                        type: 'rect',
+                        size: [20, 20], //default node size, will be overwritten later
+                        anchorPoints: [
+                            [0, 0.5],
+                            [1, 0.5],
+                        ],
+                    },
+                    defaultEdge: {
+                        type: "cubic-vertical",
+                    },
+                    layout: {
+                        type: "dendrogram", // is TreeGraph
+                        direction: treeDir,
+                        nodeSep: 40,
+                        rankSep: 100,
+                    },
+                });
+
+                graph.node(function (node) {
+                    let fontSizeDuplicator = 7 //choosen via try and error
+                    //label's position, options: center, top, bottom, left, right
+                    let position = "center";
+                    let rotate = 0;
+                    //resize node according to label length
+                    let newPos = (node.id.length + 2) * fontSizeDuplicator;
+                    let size = [newPos, node.size[1]]
+                    if (treeDir == "TB" && !node.children.length) {
+                        //position = "bottom"; //pos for label of node
+                        rotate = Math.PI / 2;
+                        //interchange width and height
+                        size = [size[1], size[0]];
+                    } 
+
+                    return {
+                        label: node.id,
+                        size: size,
+                        labelCfg: {
+                            position,
+                            offset: 1,
+                            style: {
+                                rotate,
+                                fontFamily: 'courier'
+                            },
+                        },
+                    };
+                });
+
+                graph.data(data);
+                graph.render();
+                graph.fitView();
+
+                if (typeof window !== "undefined")
+                    window.onresize = () => {
+                        if (!graph || graph.get("destroyed")) return;
+                        if (
+                            !container ||
+                            !container.scrollWidth ||
+                            !container.scrollHeight
+                        )
+                            return;
+                        graph.changeSize(container.scrollWidth, container.scrollHeight);
+                    };
             });
-
-            graph.data(data);
-            graph.render();
-            graph.fitView();
-
-            if (typeof window !== "undefined")
-                window.onresize = () => {
-                    if (!graph || graph.get("destroyed")) return;
-                    if (
-                        !container ||
-                        !container.scrollWidth ||
-                        !container.scrollHeight
-                    )
-                        return;
-                    graph.changeSize(container.scrollWidth, container.scrollHeight);
-                };
-        });
-</script>
+    </script>
 </body>
+
 </html>

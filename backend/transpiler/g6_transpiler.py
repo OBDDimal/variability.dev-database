@@ -1,5 +1,5 @@
 # ------------------From XML or JSON to G6 Tree format ------------------
-from transpiler.xml_parser import xml_to_json
+from xml_parser import xml_to_json
 
 
 def _parse_g6_item(item):
