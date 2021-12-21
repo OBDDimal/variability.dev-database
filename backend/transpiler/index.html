@@ -19,8 +19,11 @@
             .then((data) => {
                 const container = document.getElementById("mountNode");
                 const width = container.scrollWidth;
-                const height = container.scrollHeight || 2048;
-                const treeDir = "TB" // H / V / LR / RL / TB / BT
+                const height = container.scrollHeight || 500;
+                const treeDir = "TB"; // H / V / LR / RL / TB / BT
+                const strokeColor = '#a2a2a2';
+                const concreteNodeColor = '#ccccff';
+                const abstractNodeColor = '#f2f2ff';
                 const graph = new G6.TreeGraph({
                     container: "mountNode",
                     width,
@@ -31,22 +34,29 @@
                             {
                                 type: "collapse-expand-combo",
                                 trigger: "click",
+                                /*
                                 onChange(item, collapsed) {
                                     data.collapsed = collapsed;
                                     return true;
                                 },
+                                */
                                 relayout: true,
                             },
                             {
                                 type: 'zoom-canvas',
                                 enableOptimize: true,
-                                optimizeZoom: 0.9,
+                                //optimizeZoom: 0.9,
                             },
                             {
                                 type: 'drag-canvas',
                                 enableOptimize: true,
                             },
-                            'brush-select', //what does this?
+                            /*
+                            {
+                                type: 'scroll-canvas',
+                                enableOptimize: true,
+                            },
+                            */
                         ],
                     },
                     defaultNode: {
@@ -56,6 +66,10 @@
                             [0, 0.5],
                             [1, 0.5],
                         ],
+                        style: {
+                            fill: concreteNodeColor,
+                            stroke: strokeColor,
+                        },
                     },
                     defaultEdge: {
                         type: "cubic-vertical",
@@ -63,6 +77,8 @@
                     layout: {
                         type: "dendrogram", // is TreeGraph
                         direction: treeDir,
+                        gpuEnabled: true,
+                        preventOverlap: true,
                         nodeSep: 40,
                         rankSep: 100,
                     },
@@ -86,6 +102,10 @@
                     return {
                         label: node.id,
                         size: size,
+                        style: {
+                            fill: (node.fm_attributes.abstract ? abstractNodeColor : concreteNodeColor),
+                            stroke: strokeColor,
+                        },
                         labelCfg: {
                             position,
                             offset: 1,
@@ -99,7 +119,7 @@
 
                 graph.data(data);
                 graph.render();
-                graph.fitView();
+                graph.fitCenter();
 
                 if (typeof window !== "undefined")
                     window.onresize = () => {
