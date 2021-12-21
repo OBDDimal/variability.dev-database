@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<featureModel>
+    <properties>
+        <graphics key="legendautolayout" value="true"/>
+        <graphics key="showshortnames" value="false"/>
+        <graphics key="layout" value="horizontal"/>
+        <graphics key="showcollapsedconstraints" value="true"/>
+        <graphics key="legendhidden" value="false"/>
+        <graphics key="layoutalgorithm" value="1"/>
+    </properties>
+    <struct>
+        <and abstract="true" mandatory="true" name="NPC">
+            <alt mandatory="true" name="Mood">
+                <feature name="Friendly"/>
+                <feature name="Enemy"/>
+            </alt>
+            <or mandatory="true" name="Type">
+                <feature name="Farmer"/>
+                <feature name="Villager"/>
+                <feature name="Warrior"/>
+            </or>
+            <and name="HarvestSkills">
+                <feature mandatory="true" name="Reaping"/>
+                <feature mandatory="true" name="Hauling"/>
+                <feature mandatory="true" name="Threshing"/>
+            </and>
+        </and>
+    </struct>
+    <constraints>
+        <rule>
+            <imp>
+                <conj>
+                    <disj>
+                        <var>Farmer</var>
+                        <var>Villager</var>
+                    </disj>
+                    <not>
+                        <var>Warrior</var>
+                    </not>
+                </conj>
+                <var>Friendly</var>
+            </imp>
+        </rule>
+        <rule>
+            <imp>
+                <var>Farmer</var>
+                <var>HarvestSkills</var>
+            </imp>
+        </rule>
+    </constraints>
+</featureModel>
