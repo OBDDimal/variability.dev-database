@@ -26,7 +26,7 @@ def _parse_g6_item(item):
         fm_attributes.update({'abstract': item['abstract']})
     if item.get('mandatory') is not None:
         fm_attributes.update({'mandatory': item['mandatory']})
-    new_item.update({'fm-attributes': fm_attributes})
+    new_item.update({'fm_attributes': fm_attributes})
     for child in item['children']:
         children.append(_parse_g6_item(child))
     new_item.update({'children': children})
