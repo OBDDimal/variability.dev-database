@@ -10,16 +10,23 @@ def _parse_g6_item(item):
         "abstract": True,
         "mandatory": True,
         "name": "someName", # can be used as id and is case-sensitive
-        "children": [{type: "and", alt ....}, {type: "or", alt ....}]
+        "children": [{type: "and", abstract ....}, {type: "or", abstract ...}, ...]
     }
     TO
     {
-        "id": <content of previous name attribute>
-        "children": [{id: "...", children: [...]}, {id: "...", children: [...]}]
+        "id": <content of previous name attribute>,
+        "fm-attributes" : {"type": "alt", "abstract": True, ...},
+        "children": [{id: "...", "fm-attributes": {...}, children: [...]}, "fm-attributes": {...}, id: "...", ...}, ...]
     }
     """
     new_item = {'id': item['name']}
     children = []
+    fm_attributes = {'type': item['type']}
+    if item.get('abstract') is not None:
+        fm_attributes.update({'abstract': item['abstract']})
+    if item.get('mandatory') is not None:
+        fm_attributes.update({'mandatory': item['mandatory']})
+    new_item.update({'fm-attributes': fm_attributes})
     for child in item['children']:
         children.append(_parse_g6_item(child))
     new_item.update({'children': children})
