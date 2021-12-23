@@ -32,8 +32,7 @@ class FilesSerializer(serializers.ModelSerializer):
         return File.objects.create(**validated_data)
 
     def to_internal_value(self, data):
-        json_data = json.loads(data['tags'])
-        data.pop('tags')
-        data.update({'data': json_data})
         print(data)
+        json_data = {'tags': json.loads(data['tags']), 'local_file': data.pop('local_file')}
+        print(json_data)
         return super().to_internal_value(data)

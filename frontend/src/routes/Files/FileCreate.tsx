@@ -107,7 +107,7 @@ export default class FileCreate extends Component<Props, State> {
       data.append("description", this.state.description);
       data.append("local_file", this.state.file);
       data.append("license", this.state.license);
-      data.append("tags", '[{"id": 2, "label": "Tobi", "creator": "t@b.de", "description": "asd", "date_created": "2021-12-21T14:53:08.363408Z", "is_public": "false"}]');
+      data.append("tags", '[{"id": "2", "label": "Tobi"},{"id": "1", "label": "Eric"}]');
 
       api
         .post(`${API_URL}files/`, data, {

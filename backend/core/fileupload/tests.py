@@ -43,7 +43,7 @@ class TobiRageTests(APITestCase):
             "description": "test",
             "local_file": file,
             "license": File.LICENSES[0],
-            "tags": tags}
+            "tags": '[{"id": "2", "label": "Tobi"},{"id": "1", "label": "Eric"}]'}
         msg_as_multipart = encode_multipart(data=raw_data, boundary=BOUNDARY)
         # MULTIPART_CONTENT == multipart/form-data; boundary=BoUnDaRyStRiNg
         print(f"Raw data to user: {raw_data}")
