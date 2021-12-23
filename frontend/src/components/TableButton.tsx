@@ -17,7 +17,7 @@ export default function TableButton(props: {
       type='button'
       onClick={() => window.location.replace(`/${props.basePath}/${rowDataId}`)}
     >
-      <FontAwesomeIcon icon={props.icon}></FontAwesomeIcon>
+      <FontAwesomeIcon icon={props.icon}/>
     </Button>
   );
 }

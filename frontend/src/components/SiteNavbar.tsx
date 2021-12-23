@@ -1,5 +1,5 @@
-import React, { Component } from "react";
-import { Navbar, Container, Nav, NavDropdown } from "react-bootstrap";
+import React, {Component} from "react";
+import {Container, Nav, Navbar, NavDropdown} from "react-bootstrap";
 import authService from "../services/auth.service";
 
 type Props = {
@@ -21,7 +21,7 @@ export default class SiteNavbar extends Component<Props, State> {
 
   logout() {
     authService.logout();
-    this.setState({ loggedIn: false });
+    this.setState({loggedIn: false});
   }
 
   render() {
@@ -29,7 +29,7 @@ export default class SiteNavbar extends Component<Props, State> {
       <Navbar bg='light' expand='lg'>
         <Container>
           <Navbar.Brand href='/'>DDueruem</Navbar.Brand>
-          <Navbar.Toggle aria-controls='basic-navbar-nav' />
+          <Navbar.Toggle aria-controls='basic-navbar-nav'/>
           <Navbar.Collapse id='basic-navbar-nav'>
             <Nav className='me-auto'>
               <Nav.Link
@@ -93,6 +93,15 @@ export default class SiteNavbar extends Component<Props, State> {
                 </Nav.Link>
               )}
 
+              {this.state.loggedIn && (
+                <Nav.Link
+                  href='/tags'
+                  className={this.props.url === "/tags" ? "active" : ""}
+                >
+                  Tags
+                </Nav.Link>
+              )}
+
               <NavDropdown title='Dropdown' id='basic-nav-dropdown'>
                 <NavDropdown.Item href='#action/3.1'>Dummy</NavDropdown.Item>
                 <NavDropdown.Item href='#action/3.2'>
@@ -101,7 +110,7 @@ export default class SiteNavbar extends Component<Props, State> {
                 <NavDropdown.Item href='#action/3.3'>
                   Something
                 </NavDropdown.Item>
-                <NavDropdown.Divider />
+                <NavDropdown.Divider/>
                 <NavDropdown.Item href='#action/3.4'>
                   Separated link
                 </NavDropdown.Item>

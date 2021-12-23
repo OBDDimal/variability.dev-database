@@ -3,7 +3,7 @@ import { Button, Form } from "react-bootstrap";
 import Select from "react-select";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
-import api from "../services/api.service";
+import api from "../../services/api.service";
 
 const MySwal = withReactContent(Swal);
 
@@ -27,7 +27,7 @@ type State = {
   openSource: boolean;
 };
 
-export default class Upload extends Component<Props, State> {
+export default class FileCreate extends Component<Props, State> {
   constructor(props: Props | Readonly<Props>) {
     super(props);
     this.getTags();
@@ -107,7 +107,7 @@ export default class Upload extends Component<Props, State> {
       data.append("description", this.state.description);
       data.append("local_file", this.state.file);
       data.append("license", this.state.license);
-      data.append("tags", "1");
+      data.append("tags", '[{"id": 2, "label": "Tobi", "creator": "t@b.de", "description": "asd", "date_created": "2021-12-21T14:53:08.363408Z", "is_public": "false"}]');
 
       api
         .post(`${API_URL}files/`, data, {

@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import api from "../services/api.service";
+import api from "../../services/api.service";
 
 const API_URL = process.env.REACT_APP_DOMAIN;
 
-function File() {
+function FileShow() {
   let { id } = useParams<"id">();
   const [state, setState] = useState("");
 
@@ -17,4 +17,4 @@ function File() {
   return <div>{state}</div>;
 }
 
-export default File;
+export default FileShow;

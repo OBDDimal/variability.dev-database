@@ -1,10 +1,10 @@
-import React, { Component } from "react";
-import api from "../services/api.service";
-import { ReactTabulator, reactFormatter } from "react-tabulator";
+import React, {Component} from "react";
+import api from "../../services/api.service";
+import {reactFormatter, ReactTabulator} from "react-tabulator";
 import "react-tabulator/lib/styles.css"; // default theme
 import "react-tabulator/css/bootstrap/tabulator_bootstrap.min.css";
-import { faEye } from "@fortawesome/free-solid-svg-icons";
-import TableButton from "../components/TableButton";
+import {faEye} from "@fortawesome/free-solid-svg-icons";
+import TableButton from "../../components/TableButton";
 
 const API_URL = process.env.REACT_APP_DOMAIN;
 
@@ -15,10 +15,11 @@ type State = {
 };
 
 const columns = [
-  { title: "Id", field: "id" },
-  { title: "Description", field: "description" },
-  { title: "File", field: "local_file" },
-  { title: "License", field: "license" },
+  {title: "Id", field: "id"},
+  {title: "Label", field: "label"},
+  {title: "Description", field: "description"},
+  {title: "File", field: "local_file"},
+  {title: "License", field: "license"},
   {
     title: "Tags",
     field: "tags",
@@ -32,7 +33,7 @@ const columns = [
       return labels.toString();
     },
   },
-  { title: "Uploaded at", field: "uploaded_at" },
+  {title: "Uploaded at", field: "uploaded_at"},
   {
     formatter: reactFormatter(
       <TableButton basePath={"files"} icon={faEye}></TableButton>
@@ -40,7 +41,7 @@ const columns = [
   },
 ];
 
-export default class Files extends Component<Props, State> {
+export default class FileIndex extends Component<Props, State> {
   state: State = {
     files: [],
   };
@@ -52,17 +53,17 @@ export default class Files extends Component<Props, State> {
 
   getFiles = () => {
     api.get(API_URL + "files/").then((response) => {
-      this.setState({ files: response.data.results });
+      this.setState({files: response.data.results});
     });
   };
 
   render() {
     return (
       <ReactTabulator
-        layout='fitDataTable'
+        layout='fitColumns'
         columns={columns}
         data={this.state.files}
-      ></ReactTabulator>
+      />
     );
   }
 }

@@ -1,27 +1,26 @@
 import "bootstrap/dist/css/bootstrap.min.css";
-
-import { Navigate, Route, Routes } from "react-router-dom";
+import {Navigate, Route, Routes} from "react-router-dom";
 import SiteNavbar from "./components/SiteNavbar";
-import Upload from "./routes/Upload";
-import { Container, Row } from "react-bootstrap";
+import FileCreate from "./routes/Files/FileCreate";
+import {Container, Row} from "react-bootstrap";
 import Home from "./routes/Home";
 import Login from "./routes/Login";
 import Register from "./routes/Register";
 import Profile from "./routes/Profile";
 import authService from "./services/auth.service";
-import Files from "./routes/Files";
-import File from "./routes/File";
-
+import FileIndex from "./routes/Files/FileIndex";
 import "./styles/app.css";
+import TagIndex from "./routes/Tags/TagIndex";
+import FileShow from "./routes/Files/FileShow";
 
 interface AuthChildren {
   children: JSX.Element; // Maybe there is a way to define this better and directly in RequireAuth
 }
 
-function RequireAuth({ children }: AuthChildren) {
+function RequireAuth({children}: AuthChildren) {
   const authenticated = authService.getCurrentUser() ?? undefined;
 
-  return authenticated ? children : <Navigate to='/login' replace />;
+  return authenticated ? children : <Navigate to='/login' replace/>;
 }
 
 function App() {
@@ -33,14 +32,14 @@ function App() {
       <Container>
         <Row>
           <Routes>
-            <Route path='/' element={<Home />} />
-            <Route path='/login' element={<Login />} />
-            <Route path='/register' element={<Register />} />
+            <Route path='/' element={<Home/>}/>
+            <Route path='/login' element={<Login/>}/>
+            <Route path='/register' element={<Register/>}/>
             <Route
               path='/upload'
               element={
                 <RequireAuth>
-                  <Upload />
+                  <FileCreate/>
                 </RequireAuth>
               }
             />
@@ -48,7 +47,7 @@ function App() {
               path='/files'
               element={
                 <RequireAuth>
-                  <Files />
+                  <FileIndex/>
                 </RequireAuth>
               }
             />
@@ -56,7 +55,7 @@ function App() {
               path='/profile'
               element={
                 <RequireAuth>
-                  <Profile />
+                  <Profile/>
                 </RequireAuth>
               }
             />
@@ -64,10 +63,18 @@ function App() {
               path='/files/:id'
               element={
                 <RequireAuth>
-                  <File />
+                  <FileShow/>
                 </RequireAuth>
               }
-            ></Route>
+            />
+            <Route
+              path='/tags'
+              element={
+                <RequireAuth>
+                  <TagIndex/>
+                </RequireAuth>
+              }
+            />
           </Routes>
         </Row>
       </Container>
