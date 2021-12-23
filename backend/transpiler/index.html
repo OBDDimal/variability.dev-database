@@ -14,12 +14,13 @@
 <body>
     <div style="width: 100vw; height: 100vh" id="mountNode"></div>
     <script defer>
-        fetch("xmlExamples/g6_model.json")
+        fetch("xmlExamples/g6_model_npc.json")
             .then((res) => res.json())
             .then((data) => {
                 const container = document.getElementById("mountNode");
                 const width = container.scrollWidth;
                 const height = container.scrollHeight || 500;
+                const defaultRankSep = 180;
                 const treeDir = "TB"; // H / V / LR / RL / TB / BT
                 const strokeColor = '#a2a2a2';
                 const concreteNodeColor = '#ccccff';
@@ -31,15 +32,21 @@
                     linkCenter: true,
                     modes: {
                         default: [
+                            //'click-select',
                             {
-                                type: "collapse-expand-combo",
+                                type: "collapse-expand",
+                                enableDelegate: true,
                                 trigger: "click",
-                                /*
-                                onChange(item, collapsed) {
-                                    data.collapsed = collapsed;
-                                    return true;
+                                //only subtrees which leaf nodes only can be expanded or not   
+                                shouldBegin: (e) => {
+                                    if(e.item && e.item.getModel().children.length){
+                                        node = e.item.getModel();
+                                        currentChildren = node.children;
+                                        leaves = node.children.filter(child => !child.children.length);
+                                        return (leaves.length == currentChildren.length);
+                                    }
+                                    return false;
                                 },
-                                */
                                 relayout: true,
                             },
                             {
@@ -49,7 +56,7 @@
                             },
                             {
                                 type: 'drag-canvas',
-                                enableOptimize: true,
+                               // enableOptimize: true,
                             },
                             /*
                             {
@@ -58,7 +65,7 @@
                             },
                             */
                         ],
-                    },
+                    },                    
                     defaultNode: {
                         type: 'rect',
                         size: [20, 20], //default node size, will be overwritten later
@@ -80,24 +87,25 @@
                         gpuEnabled: true,
                         preventOverlap: true,
                         nodeSep: 40,
-                        rankSep: 100,
+                        rankSep: defaultRankSep,
                     },
                 });
-
+                let maxSep = defaultRankSep;
                 graph.node(function (node) {
                     let fontSizeDuplicator = 7 //choosen via try and error
                     //label's position, options: center, top, bottom, left, right
                     let position = "center";
                     let rotate = 0;
                     //resize node according to label length
-                    let newPos = (node.id.length + 2) * fontSizeDuplicator;
-                    let size = [newPos, node.size[1]]
+                    let newWidth = (node.id.length + 2) * fontSizeDuplicator;
+                    let size = [newWidth, node.size[1]]
                     if (treeDir == "TB" && !node.children.length) {
                         //position = "bottom"; //pos for label of node
                         rotate = Math.PI / 2;
                         //interchange width and height
                         size = [size[1], size[0]];
-                    } 
+                    }
+                    maxSep = (newWidth > maxSep ? newWidth: maxSep) 
 
                     return {
                         label: node.id,
@@ -106,9 +114,10 @@
                             fill: (node.fm_attributes.abstract ? abstractNodeColor : concreteNodeColor),
                             stroke: strokeColor,
                         },
+                        //anchorPoints:(!node.children.length ? [1,1]: node.anchorPoints),
                         labelCfg: {
                             position,
-                            offset: 1,
+                            //offset: 1,
                             style: {
                                 rotate,
                                 fontFamily: 'courier'
@@ -119,8 +128,22 @@
 
                 graph.data(data);
                 graph.render();
-                graph.fitCenter();
-
+                console.log(maxSep);
+                //graph.updateLayout({rankSep: maxSep});
+                //graph.fitCenter();
+                graph.fitView();
+/*
+                // Click a node
+                graph.on('node:click', (e) => {
+                // Swich the 'click' state of the node to be false
+                const clickNodes = graph.findAllByState('node', 'click');
+                clickNodes.forEach((cn) => {
+                    graph.setItemState(cn, 'click', false);
+                });
+                const nodeItem = e.item; // et the clicked item
+                graph.setItemState(nodeItem, 'click', true); // Set the state 'click' of the item to be true
+                });
+*/
                 if (typeof window !== "undefined")
                     window.onresize = () => {
                         if (!graph || graph.get("destroyed")) return;
