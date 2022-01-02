@@ -16,7 +16,7 @@ class File(models.Model):
     owner = models.ForeignKey(User, on_delete=models.RESTRICT)
     label = models.CharField(max_length=255)
     description = models.TextField(blank=True)
-    local_file = models.FileField(upload_to='files/')
+    local_file = models.FileField(upload_to='files/', blank=True)
     uploaded_at = models.DateTimeField(auto_now_add=True)
     license = models.CharField(choices=LICENSES, max_length=255, default='CC BY - Mention')
     tags = models.ManyToManyField(Tag)

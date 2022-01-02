@@ -2,6 +2,7 @@ import json
 
 from core.fileupload.models.file import File, Tag
 from rest_framework import serializers
+from django.http import QueryDict
 
 
 class TagsSerializer(serializers.ModelSerializer):
@@ -32,7 +33,5 @@ class FilesSerializer(serializers.ModelSerializer):
         return File.objects.create(**validated_data)
 
     def to_internal_value(self, data):
-        print(data)
-        json_data = {'tags': json.loads(data['tags']), 'local_file': data.pop('local_file')}
-        print(json_data)
+        # json_data = {'tags': json.loads(data['tags']), 'local_file': data.pop('local_file')}
         return super().to_internal_value(data)
