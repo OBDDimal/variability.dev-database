@@ -70,7 +70,7 @@ class FileAdmin(ModelAdmin):
     # Define how view should look like after clicking on an email
     fieldsets = [
         (None, {'fields': ['owner']}),
-        ('Information', {'fields': ['description', 'local_file', 'license', 'tags', 'new_version_of']}),
+        ('Information', {'fields': ['label', 'description', 'local_file', 'license', 'tags', 'new_version_of']}),
         ('Important dates', {'fields': ['uploaded_at']})
     ]
     readonly_fields = ('uploaded_at',)

@@ -20,6 +20,8 @@ type State = {
   file?: File;
   license: string;
   gottenTags: Array<{ key: string; value: string }>;
+  gottenFiles: Array<{ value: number; label: string }>;
+  newVersionOf: string;
   tags: string;
   loading: boolean;
   legalShare: boolean;
@@ -31,6 +33,7 @@ export default class FileCreate extends Component<Props, State> {
   constructor(props: Props | Readonly<Props>) {
     super(props);
     this.getTags();
+    this.getNewVersionOf();
   }
 
   state: State = {
@@ -39,7 +42,9 @@ export default class FileCreate extends Component<Props, State> {
     file: undefined,
     license: license[0],
     gottenTags: [],
+    gottenFiles: [],
     tags: "",
+    newVersionOf: "null",
     loading: false,
     legalShare: false,
     userData: false,
@@ -56,9 +61,17 @@ export default class FileCreate extends Component<Props, State> {
     });
   };
 
-  onTagChange = (options: any) => {
-    console.log(options);
+  getNewVersionOf = () => {
+    api.get(API_URL + "files/").then((response) => {
+      let files = response.data.results;
+      files = files.map((file: { id: number; label: string }) => {
+        return { value: file.id, label: file.label };
+      });
+      this.setState({ gottenFiles: files });
+    });
+  };
 
+  onTagChange = (options: any) => {
     this.setState({ tags: options.map((option: any) => option.value) });
   };
 
@@ -77,6 +90,16 @@ export default class FileCreate extends Component<Props, State> {
     if (file.files) {
       this.setState({ file: file.files[0] });
     }
+  };
+
+  onNewVersionOfChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const newVersionOf = e.target as HTMLSelectElement;
+    this.setState({ newVersionOf: newVersionOf.value });
+  };
+
+  onLicenseChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const license = e.target as HTMLSelectElement;
+    this.setState({ license: license.value });
   };
 
   isReady = () => {
@@ -107,7 +130,11 @@ export default class FileCreate extends Component<Props, State> {
       data.append("description", this.state.description);
       data.append("local_file", this.state.file);
       data.append("license", this.state.license);
-      data.append("tags", '[{"id": "2", "label": "Tobi"},{"id": "1", "label": "Eric"}]');
+      data.append("new_version_of", this.state.newVersionOf);
+      data.append(
+        "tags",
+        '[{"id": "2", "label": "Tobi"},{"id": "1", "label": "Eric"}]'
+      );
 
       api
         .post(`${API_URL}files/`, data, {
@@ -178,7 +205,7 @@ export default class FileCreate extends Component<Props, State> {
         </Form.Group>
         <Form.Group className='mb-3'>
           <Form.Label>License</Form.Label>
-          <Form.Select aria-label='Default select example'>
+          <Form.Select onChange={this.onLicenseChange}>
             {license.map((key) => {
               return (
                 <option key={key} value={key}>
@@ -186,6 +213,24 @@ export default class FileCreate extends Component<Props, State> {
                 </option>
               );
             })}
+          </Form.Select>
+        </Form.Group>
+        <Form.Group className='mb-3'>
+          <Form.Label>New version of</Form.Label>
+          <Form.Select
+            onChange={this.onNewVersionOfChange}
+            defaultValue={"null"}
+          >
+            {this.state.gottenFiles.map((key) => {
+              return (
+                <option key={key.value} value={key.value}>
+                  {key.value}: {key.label}
+                </option>
+              );
+            })}
+            <option key='null' value='null'>
+              ---
+            </option>
           </Form.Select>
         </Form.Group>
         <Form.Group className='mb-3'>
