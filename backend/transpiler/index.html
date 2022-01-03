@@ -47,7 +47,6 @@
                                     }
                                     return false;
                                 },
-                                relayout: true,
                             },
                             {
                                 type: 'zoom-canvas',
@@ -128,10 +127,22 @@
 
                 graph.data(data);
                 graph.render();
-                console.log(maxSep);
+                //console.log(maxSep);
                 //graph.updateLayout({rankSep: maxSep});
                 //graph.fitCenter();
                 graph.fitView();
+                graph.on('itemcollapsed', e => {
+                    //console.log(e.item.getModel().size);
+                    if(e.item.collapsed) {
+                        //collapsing node
+                        console.log("collapsing node");
+                    } else {
+                        //expanding node
+                        console.log("expanding node");
+                        console.log(e.item.getModel().size);
+                    }
+                })
+
 /*
                 // Click a node
                 graph.on('node:click', (e) => {
