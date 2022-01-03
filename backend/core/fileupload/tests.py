@@ -34,6 +34,7 @@ class FileUploadWithTagsTests(APITestCase):
         t2.save()
         raw_data = {
             "description": "some description text",
+            "label": "my_file_name",
             "local_file": parent_file,
             "license": File.LICENSES[0],
             "tags": '[{"id": "2", "label": "Tobi"},{"id": "1", "label": "Eric Test"}]'}
@@ -49,6 +50,7 @@ class FileUploadWithTagsTests(APITestCase):
         new_file = ContentFile(b"foobar", "test_new.xml")
         raw_data = {
             "description": "some description text",
+            "label": "new_my_file_name",
             "local_file": new_file,
             "license": File.LICENSES[0],
             "new_version_of": 1,
@@ -89,6 +91,7 @@ def test_tags_required(self):
 
     raw_data = {
         "description": "some description text",
+        "label": "my_file_name",
         "local_file": file,
         "license": File.LICENSES[0],
         # only the tag ids are used internally. labels wont be checked and will be overwritten by the tag labels

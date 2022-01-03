@@ -11,6 +11,8 @@ class FileManager(models.Manager):
         """
         Saves a file with the given attributes to the database
         """
+        if kwargs.get('label', None) is None:
+            raise TypeError('File name is not set')
         if local_file is None:
             raise TypeError('File path is not set')
         tags = kwargs.pop('tags')
@@ -55,7 +57,7 @@ class File(models.Model):
     ]
 
     owner = models.ForeignKey(User, on_delete=models.RESTRICT)
-    label = models.CharField(max_length=255)
+    label = models.CharField(blank=False, max_length=255)
     description = models.TextField(blank=True)
     local_file = models.FileField(upload_to=relative_upload_dir)
     uploaded_at = models.DateTimeField(auto_now_add=True)
