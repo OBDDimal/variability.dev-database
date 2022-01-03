@@ -1,13 +1,7 @@
 from django.db import models
-from django.utils import timezone
-
 from .tag import Tag
 from core.user.models import User
-from django.core.files.storage import default_storage
-import os
-from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
-from django.conf import settings
 
 
 class FileManager(models.Manager):
@@ -19,24 +13,14 @@ class FileManager(models.Manager):
         """
         if local_file is None:
             raise TypeError('File path is not set')
-        print(f"kwargs={kwargs}")
         tags = kwargs.pop('tags')
+        if tags is None:
+            raise TypeError('Tags is not set')
         file = self.model(**kwargs)
-
-        print(f"local={local_file}")
-        # fname = default_storage.save('TEST', local_file)
-        # file.save(using=self._db)
         file.save()
-        # for some reason tags is an array again
-        for tag in list(tags):
-            file.tags.set(tag)
-        # for some reason uploaded file is an array again
-        temp = local_file[0]
-        # print(f"temp={temp[0]} {type(temp)}")
-        # print(f"file={file}\n{type(file)}")
+        file.tags.set(tags)
         file.save()
-        print("-----------------")
-        print(f"name={temp.name}\nfile={temp.file}\n")
+        temp = local_file
         # save to disk
         relative_file_path = f"{File.relative_upload_dir}/{temp.name}"
         # better if files can be large
@@ -44,9 +28,7 @@ class FileManager(models.Manager):
         # with default_storage.open(relative_file_path, 'wb+') as destination:
         #    for chunk in temp.chunks():
         #        destination.write(chunk)
-        f = ContentFile(temp.file.read(), temp.name)
-        # file.local_file = temp.file
-        file.local_file = f
+        file.local_file = ContentFile(temp.file.read(), temp.name)
         file.save()
         return file
 

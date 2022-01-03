@@ -9,7 +9,7 @@ from core.fileupload.models import File, Tag
 from core.user.models import User
 
 
-class TobiRageTests(APITestCase):
+class FileUploadWithTagsTests(APITestCase):
 
     def setUp(self):
         User.objects.create_superuser(email="ad@m.in", password="12345678!")
@@ -18,7 +18,6 @@ class TobiRageTests(APITestCase):
         c = self.client
         l_res = c.post('/auth/login/', {'email': 'ad@m.in', 'password': '12345678!'})
         content_as_dict = json.loads(l_res.content.decode("utf-8"))
-        # print(f"{type(content_as_dict)} {content_as_dict}")
         token = content_as_dict['access']
         # both ways work, difference is type of local_file before sending
         # file = SimpleUploadedFile("a/pathTo/ulFile.txt", b"File content needs to be in bytes!")
