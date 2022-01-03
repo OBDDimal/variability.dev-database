@@ -21,6 +21,7 @@
                 const width = container.scrollWidth;
                 const height = container.scrollHeight || 500;
                 const defaultRankSep = 180;
+                const defaultNodeSize = [20, 20];
                 const treeDir = "TB"; // H / V / LR / RL / TB / BT
                 const strokeColor = '#a2a2a2';
                 const concreteNodeColor = '#ccccff';
@@ -47,6 +48,7 @@
                                     }
                                     return false;
                                 },
+                                relayout: true,
                             },
                             {
                                 type: 'zoom-canvas',
@@ -67,7 +69,7 @@
                     },                    
                     defaultNode: {
                         type: 'rect',
-                        size: [20, 20], //default node size, will be overwritten later
+                        size: defaultNodeSize, //default node size, will be overwritten later
                         anchorPoints: [
                             [0, 0.5],
                             [1, 0.5],
@@ -90,42 +92,51 @@
                     },
                 });
                 let maxSep = defaultRankSep;
+                graph.data(data);
                 graph.node(function (node) {
-                    let fontSizeDuplicator = 7 //choosen via try and error
-                    //label's position, options: center, top, bottom, left, right
-                    let position = "center";
-                    let rotate = 0;
-                    //resize node according to label length
-                    let newWidth = (node.id.length + 2) * fontSizeDuplicator;
-                    let size = [newWidth, node.size[1]]
-                    if (treeDir == "TB" && !node.children.length) {
-                        //position = "bottom"; //pos for label of node
-                        rotate = Math.PI / 2;
-                        //interchange width and height
-                        size = [size[1], size[0]];
-                    }
-                    maxSep = (newWidth > maxSep ? newWidth: maxSep) 
-
-                    return {
-                        label: node.id,
-                        size: size,
-                        style: {
-                            fill: (node.fm_attributes.abstract ? abstractNodeColor : concreteNodeColor),
-                            stroke: strokeColor,
-                        },
-                        //anchorPoints:(!node.children.length ? [1,1]: node.anchorPoints),
-                        labelCfg: {
-                            position,
-                            //offset: 1,
+                    //console.log(node.id + " old size " + node.size );
+                    if(!node.wasRendered) {
+                        let fontSizeDuplicator = 7 //choosen via try and error
+                        //label's position, options: center, top, bottom, left, right
+                        let position = "center";
+                        let rotate = 0;
+                        //resize node according to label length
+                        let newWidth = (node.id.length + 2) * fontSizeDuplicator;
+                        let size = [newWidth, node.size[1]];
+         
+                        //console.log(node.id + " old size " + node.size + " ? " + node.wasRendered);
+                        if (treeDir == "TB" && !node.children.length) {
+                            //position = "bottom"; //pos for label of node
+                            rotate = Math.PI / 2;
+                            //interchange width and height
+                            size = [size[1], size[0]];
+                        }
+                        maxSep = (newWidth > maxSep ? newWidth: maxSep) 
+                        //console.log(node.id + " new size " + size );
+                        return {
+                            label: node.id,
+                            size: size,
+                            wasRendered: true,
                             style: {
-                                rotate,
-                                fontFamily: 'courier'
+                                fill: (node.fm_attributes.abstract ? abstractNodeColor : concreteNodeColor),
+                                stroke: strokeColor,
                             },
-                        },
-                    };
+                            //anchorPoints:(!node.children.length ? [1,1]: node.anchorPoints),
+                            labelCfg: {
+                                position,
+                                //offset: 1,
+                                style: {
+                                    rotate,
+                                    fontFamily: 'courier'
+                                },
+                            },
+                        };
+                    } else {
+                        return node;
+                    }
                 });
 
-                graph.data(data);
+
                 graph.render();
                 //console.log(maxSep);
                 //graph.updateLayout({rankSep: maxSep});
