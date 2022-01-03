@@ -2,7 +2,7 @@ import json
 
 from django.core.files.uploadedfile import SimpleUploadedFile
 from rest_framework.test import APITestCase
-from django.test.client import MULTIPART_CONTENT, encode_multipart, BOUNDARY, JSON_CONTENT_TYPE_RE
+from django.test.client import MULTIPART_CONTENT, encode_multipart, BOUNDARY
 from django.core.files.base import ContentFile
 
 from core.fileupload.models import File, Tag
@@ -21,18 +21,18 @@ class TobiRageTests(APITestCase):
         # print(f"{type(content_as_dict)} {content_as_dict}")
         token = content_as_dict['access']
         # both ways work, difference is type of local_file before sending
-        file = SimpleUploadedFile("a/pathTo/ulFile.txt", b"File content needs to be in bytes!")
-        # file = ContentFile(b"foo", "test.png")
+        # file = SimpleUploadedFile("a/pathTo/ulFile.txt", b"File content needs to be in bytes!")
+        file = ContentFile(b"foo", "test.xml")
         t1 = Tag()
         t1.creator = User.objects.get(email='ad@m.in')
         t1.label = 'cool'
-        t1.description = 'testing'
+        t1.description = 'cool testing des'
         t1.is_public = True
         t1.save()
         t2 = Tag()
         t2.creator = User.objects.get(email='ad@m.in')
-        t2.label = 'asd'
-        t2.description = 'testing'
+        t2.label = 'short'
+        t2.description = 'short testing des'
         t2.is_public = True
         t2.save()
         tags = []
@@ -40,16 +40,15 @@ class TobiRageTests(APITestCase):
             tags.append({"id": t.id, "label": t.label})
 
         raw_data = {
-            "description": "test",
-            # "local_file": file,
+            "description": "some description text",
+            "local_file": file,
             "license": File.LICENSES[0],
-            "tags": '[{"id": "2", "label": "Tobi"},{"id": "1", "label": "Eric"}]'}
-        # msg_as_multipart = encode_multipart(data=raw_data, boundary=BOUNDARY)
-        msg_as_json = json.dumps(raw_data)
+            "tags": '[{"id": "2", "label": "Tobi"},{"id": "1", "label": "Eric Test"}]'}
+        msg_as_multipart = encode_multipart(data=raw_data, boundary=BOUNDARY)
         # MULTIPART_CONTENT == multipart/form-data; boundary=BoUnDaRyStRiNg
         print(f"Raw data to user: {raw_data}")
-        print(f"Sending data to backend... with content type application/json and {msg_as_json}")
-        f_res = c.post('/files/', msg_as_json,
-                       content_type='application/json',
+        print("Sending data to backend...")
+        f_res = c.post('/files/', msg_as_multipart,
+                       content_type=MULTIPART_CONTENT,
                        HTTP_AUTHORIZATION='Bearer ' + token)
         print(f"\n{f_res.status_code} {f_res.content}")

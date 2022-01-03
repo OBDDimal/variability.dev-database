@@ -22,10 +22,11 @@ class FileUploadViewSet(viewsets.ModelViewSet):
             # TODO: For Issue #28 'delete_domain': 'localhost:8000/'
         }))
 
-class TagsViewSet(viewsets.ModelViewSet):
-  queryset = Tag.objects.all()
-  serializer_class = TagsSerializer
-  permission_classes = [permissions.AllowAny]
 
-  def perform_create(self, serializer):
-    serializer.save(creator=self.request.user)
+class TagsViewSet(viewsets.ModelViewSet):
+    queryset = Tag.objects.all()
+    serializer_class = TagsSerializer
+    permission_classes = [permissions.AllowAny]
+
+    def perform_create(self, serializer):
+        serializer.save(creator=self.request.user)
