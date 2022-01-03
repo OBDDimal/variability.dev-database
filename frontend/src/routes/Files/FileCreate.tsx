@@ -72,7 +72,11 @@ export default class FileCreate extends Component<Props, State> {
   };
 
   onTagChange = (options: any) => {
-    this.setState({ tags: options.map((option: any) => option.value) });
+    this.setState({
+      tags: options.map((option: any) => {
+        return { id: option.value, label: option.label };
+      }),
+    });
   };
 
   onLabelChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -130,11 +134,10 @@ export default class FileCreate extends Component<Props, State> {
       data.append("description", this.state.description);
       data.append("local_file", this.state.file);
       data.append("license", this.state.license);
-      data.append("new_version_of", this.state.newVersionOf);
-      data.append(
-        "tags",
-        '[{"id": "2", "label": "Tobi"},{"id": "1", "label": "Eric"}]'
-      );
+      if (this.state.newVersionOf !== "---") {
+        data.append("new_version_of", this.state.newVersionOf);
+      }
+      data.append("tags", JSON.stringify(this.state.tags));
 
       api
         .post(`${API_URL}files/`, data, {
@@ -144,32 +147,16 @@ export default class FileCreate extends Component<Props, State> {
           MySwal.fire({
             icon: "success",
             title: "Success!!",
-            text: JSON.stringify(result),
+            text: JSON.stringify(result.data),
           }).then(() => {
-            document
-              .querySelectorAll("textarea, input[type=file]")
-              .forEach((e: Element) => {
-                console.log(e);
-                const element = e as HTMLInputElement;
-                element.value = "";
-              });
-            this.setState({
-              label: "",
-              description: undefined,
-              file: undefined,
-              license: license[0],
-              loading: false,
-              legalShare: false,
-              userData: false,
-              openSource: false,
-            });
+            window.location.reload();
           });
         })
         .catch((error) => {
           MySwal.fire({
             icon: "error",
             title: "Error!!",
-            text: JSON.stringify(error),
+            text: JSON.stringify(error.message),
           });
         });
     }
@@ -219,7 +206,7 @@ export default class FileCreate extends Component<Props, State> {
           <Form.Label>New version of</Form.Label>
           <Form.Select
             onChange={this.onNewVersionOfChange}
-            defaultValue={"null"}
+            defaultValue={"---"}
           >
             {this.state.gottenFiles.map((key) => {
               return (
@@ -228,7 +215,7 @@ export default class FileCreate extends Component<Props, State> {
                 </option>
               );
             })}
-            <option key='null' value='null'>
+            <option key='---' value='---'>
               ---
             </option>
           </Form.Select>
