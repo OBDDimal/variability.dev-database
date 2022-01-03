@@ -5,6 +5,8 @@ import { Button } from "react-bootstrap";
 export default function TableButton(props: {
   cell?: { _cell: { row: { data: { id: string } } } };
   basePath: string;
+  method?: string;
+  variant?: string;
   icon: IconDefinition;
 }) {
   let rowDataId = "";
@@ -12,12 +14,16 @@ export default function TableButton(props: {
     rowDataId = props.cell._cell.row.data.id;
   }
   return (
-    <Button
-      variant='secondary'
-      type='button'
-      onClick={() => window.location.replace(`/${props.basePath}/${rowDataId}`)}
+    <a
+      href={
+        props.method
+          ? `/${props.basePath}/${props.method}/${rowDataId}`
+          : `/${props.basePath}/${rowDataId}`
+      }
     >
-      <FontAwesomeIcon icon={props.icon}/>
-    </Button>
+      <Button variant={props.variant || "secondary"} type='button'>
+        <FontAwesomeIcon icon={props.icon} />
+      </Button>
+    </a>
   );
 }
