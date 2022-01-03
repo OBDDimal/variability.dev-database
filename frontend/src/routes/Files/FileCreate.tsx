@@ -44,7 +44,7 @@ export default class FileCreate extends Component<Props, State> {
     gottenTags: [],
     gottenFiles: [],
     tags: "",
-    newVersionOf: "null",
+    newVersionOf: "---",
     loading: false,
     legalShare: false,
     userData: false,
