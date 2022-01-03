@@ -54,8 +54,5 @@ class FilesSerializer(serializers.ModelSerializer):
         for tag in tags_as_json:
             tags_from_db.append(Tag.objects.get(id=tag['id']))
         internal_rep['tags'] = tags_from_db
-        print(f"internal_rep= {internal_rep.dict()}")
-        print(f"data={data}")
-        print(f"tags_as_json={tags_as_json}")
 
         return internal_rep.dict()
