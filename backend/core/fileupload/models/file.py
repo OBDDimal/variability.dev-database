@@ -16,6 +16,9 @@ class FileManager(models.Manager):
         tags = kwargs.pop('tags')
         if tags is None:
             raise TypeError('Tags is not set')
+        # get file from id
+        if kwargs.get('new_version_of', None) is not None:
+            kwargs.update({'new_version_of': File.objects.get(id=kwargs['new_version_of'])})
         file = self.model(**kwargs)
         file.save()
         file.tags.set(tags)
