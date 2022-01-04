@@ -1,14 +1,18 @@
 import "bootstrap/dist/css/bootstrap.min.css";
-
 import { Navigate, Route, Routes } from "react-router-dom";
 import SiteNavbar from "./components/SiteNavbar";
-import Upload from "./routes/Upload";
+import FileCreate from "./routes/Files/FileCreate";
 import { Container, Row } from "react-bootstrap";
 import Home from "./routes/Home";
 import Login from "./routes/Login";
 import Register from "./routes/Register";
 import Profile from "./routes/Profile";
 import authService from "./services/auth.service";
+import FileIndex from "./routes/Files/FileIndex";
+import "./styles/app.css";
+import TagIndex from "./routes/Tags/TagIndex";
+import FileShow from "./routes/Files/FileShow";
+import TagCreate from "./routes/Tags/TagCreate";
 
 interface AuthChildren {
   children: JSX.Element; // Maybe there is a way to define this better and directly in RequireAuth
@@ -33,10 +37,18 @@ function App() {
             <Route path='/login' element={<Login />} />
             <Route path='/register' element={<Register />} />
             <Route
-              path='/upload'
+              path='/files/create'
               element={
                 <RequireAuth>
-                  <Upload />
+                  <FileCreate />
+                </RequireAuth>
+              }
+            />
+            <Route
+              path='/files'
+              element={
+                <RequireAuth>
+                  <FileIndex />
                 </RequireAuth>
               }
             />
@@ -45,6 +57,30 @@ function App() {
               element={
                 <RequireAuth>
                   <Profile />
+                </RequireAuth>
+              }
+            />
+            <Route
+              path='/files/:id'
+              element={
+                <RequireAuth>
+                  <FileShow />
+                </RequireAuth>
+              }
+            />
+            <Route
+              path='/tags'
+              element={
+                <RequireAuth>
+                  <TagIndex />
+                </RequireAuth>
+              }
+            />
+            <Route
+              path='/tags/create'
+              element={
+                <RequireAuth>
+                  <TagCreate />
                 </RequireAuth>
               }
             />

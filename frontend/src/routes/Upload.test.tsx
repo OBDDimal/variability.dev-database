@@ -1,40 +1,47 @@
-import React from "react";
 import { fireEvent, render, screen } from "@testing-library/react";
-import Upload from "./Upload";
-import { AxiosRequestConfig } from "axios";
+import FileCreate from "./Files/FileCreate";
 import api from "../services/api.service";
 
-/*jest.mock("../services/api.service", () => {
-  return {
-    __esModule: true,
-    default: () => {
-      return {
-        post: (url: string, data?: FormData | undefined, config?: AxiosRequestConfig<FormData> | undefined) => {
-          return new Promise((resolve, reject) => {
-            process.nextTick(() => {
-              resolve("I am an API result")
-            })
-          })
-        }
-      }
-    }
-  }
-})*/
-
 jest.mock("../services/api.service");
+const mockedApi = api as jest.Mocked<typeof api>;
 
-describe("<Upload />", () => {
+interface Tag {
+  id: number;
+  label: string;
+}
+
+describe("<FileCreate />", () => {
   test("button should be initially disabled", async () => {
-    render(<Upload />);
+    mockedApi.get.mockResolvedValue(
+      new Promise((resolve, reject) => {
+        let mockedTags: Tag[] = [{ id: 1337, label: "testlabel" }];
+        let mockedResponse = { data: { results: mockedTags } };
+        resolve(mockedResponse);
+      })
+    );
+    render(<FileCreate />);
     const uploadButton = screen.getByText(/Upload!/i) as HTMLButtonElement;
     expect(uploadButton.disabled).toBeTruthy();
   });
 
-  test("button should enable after description, file, legalShare, userData and openSource have been entered", async () => {
-    render(<Upload />);
+  test("button should enable after label, description, file, legalShare, userData and openSource have been entered", async () => {
+    mockedApi.get.mockResolvedValue(
+      new Promise((resolve, reject) => {
+        let mockedTags: Tag[] = [{ id: 1337, label: "testlabel" }];
+        let mockedResponse = { data: { results: mockedTags } };
+        resolve(mockedResponse);
+      })
+    );
+    render(<FileCreate />);
 
     const uploadButton = screen.getByText(/Upload!/i) as HTMLButtonElement;
     expect(uploadButton.disabled).toBeTruthy();
+
+    //type label
+    const labelFormControl = await screen.findByTestId("label");
+    fireEvent.change(labelFormControl, {
+      target: { value: "test label" },
+    });
 
     //type description
     const descriptionFormControl = await screen.findByTestId("description");
@@ -64,7 +71,14 @@ describe("<Upload />", () => {
   });
 
   test("button should not enable if no file has been selected", async () => {
-    render(<Upload />);
+    mockedApi.get.mockResolvedValue(
+      new Promise((resolve, reject) => {
+        let mockedTags: Tag[] = [{ id: 1337, label: "testlabel" }];
+        let mockedResponse = { data: { results: mockedTags } };
+        resolve(mockedResponse);
+      })
+    );
+    render(<FileCreate />);
 
     const uploadButton = screen.getByText(/Upload!/i) as HTMLButtonElement;
     expect(uploadButton.disabled).toBeTruthy();
@@ -95,7 +109,14 @@ describe("<Upload />", () => {
   });
 
   test("submit data should reset the form", async () => {
-    render(<Upload />);
+    mockedApi.get.mockResolvedValue(
+      new Promise((resolve, reject) => {
+        let mockedTags: Tag[] = [{ id: 1337, label: "testlabel" }];
+        let mockedResponse = { data: { results: mockedTags } };
+        resolve(mockedResponse);
+      })
+    );
+    render(<FileCreate />);
 
     //type description
     const descriptionFormControl = (await screen.findByTestId(
