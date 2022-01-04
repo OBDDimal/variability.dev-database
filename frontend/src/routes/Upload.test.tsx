@@ -1,6 +1,7 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import FileCreate from "./Files/FileCreate";
 import api from "../services/api.service";
+import selectEvent from "react-select-event";
 
 jest.mock("../services/api.service");
 const mockedApi = api as jest.Mocked<typeof api>;
@@ -67,6 +68,9 @@ describe("<FileCreate />", () => {
     const openSourceCheckbox = await screen.findByTestId("open-source");
     fireEvent.click(openSourceCheckbox);
 
+    //click tags
+    await selectEvent.select(screen.getByLabelText("Tags"), "testlabel");
+
     expect(uploadButton.disabled).toBeFalsy();
   });
 
@@ -118,6 +122,14 @@ describe("<FileCreate />", () => {
     );
     render(<FileCreate />);
 
+    //type label
+    const labelFormControl = (await screen.findByTestId(
+      "label"
+    )) as HTMLInputElement;
+    fireEvent.change(labelFormControl, {
+      target: { value: "test label" },
+    });
+
     //type description
     const descriptionFormControl = (await screen.findByTestId(
       "description"
@@ -152,6 +164,9 @@ describe("<FileCreate />", () => {
     )) as HTMLInputElement;
     fireEvent.click(openSourceCheckbox);
 
+    //click tags
+    await selectEvent.select(screen.getByLabelText("Tags"), "testlabel");
+
     //click Upload!
     const uploadButton = screen.getByText(/Upload!/i) as HTMLButtonElement;
     fireEvent.click(uploadButton);
@@ -159,10 +174,12 @@ describe("<FileCreate />", () => {
     const response = "test response";
     (api.post as jest.Mock).mockResolvedValue(response);
 
+    expect(labelFormControl.value).toBeUndefined();
     expect(descriptionFormControl.value).toBeUndefined();
     expect(fileUploadFormControl.files).toBeUndefined();
     expect(legalShareCheckbox.checked).toBeFalsy();
     expect(userDataCheckbox.checked).toBeFalsy();
     expect(openSourceCheckbox.checked).toBeFalsy();
+    expect(screen.getByTestId("tag-form")).toHaveFormValues({ tags: "" });
   });
 });
