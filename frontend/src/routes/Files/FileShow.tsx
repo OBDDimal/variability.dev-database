@@ -5,7 +5,7 @@ import api from "../../services/api.service";
 const API_URL = process.env.REACT_APP_DOMAIN;
 
 function FileShow() {
-  let { id } = useParams<"id">();
+  const { id } = useParams<"id">();
   const [state, setState] = useState("");
 
   useEffect(() => {

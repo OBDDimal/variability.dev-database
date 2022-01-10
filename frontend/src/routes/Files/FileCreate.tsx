@@ -19,7 +19,7 @@ type State = {
   description?: string;
   file?: File;
   license: string;
-  gottenTags: Array<{ key: string; value: string }>;
+  gottenTags: Array<{ label: string; value: string }>;
   gottenFiles: Array<{ value: number; label: string }>;
   newVersionOf: string;
   tags: string;
