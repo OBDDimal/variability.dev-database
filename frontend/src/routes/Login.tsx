@@ -1,10 +1,7 @@
 import React, { Component } from "react";
 import AuthService from "../services/auth.service";
-import Swal from "sweetalert2";
-import withReactContent from "sweetalert2-react-content";
+import { Modal } from "../components/Modal";
 import { Button, Form } from "react-bootstrap";
-
-const MySwal = withReactContent(Swal);
 
 type Props = {};
 
@@ -42,7 +39,7 @@ export default class Login extends Component<Props, State> {
 
       AuthService.login(this.state.email, this.state.password).then(
         () => {
-          MySwal.fire({
+          Modal.fire({
             icon: "success",
             title: "Login successful",
             toast: true,
@@ -56,7 +53,7 @@ export default class Login extends Component<Props, State> {
         },
         (error) => {
           this.setState({ loading: false });
-          MySwal.fire({
+          Modal.fire({
             icon: "error",
             title: "Error!!",
             text: `Wrong login credentials! ${error.toString()}`,
@@ -69,26 +66,26 @@ export default class Login extends Component<Props, State> {
   render() {
     return (
       <div>
-        <Form.Group className='mb-3'>
+        <Form.Group className="mb-3">
           <Form.Label>Email</Form.Label>
           <Form.Control
-            type='email'
-            placeholder='Email'
+            type="email"
+            placeholder="Email"
             onChange={this.onEmailChange}
           />
         </Form.Group>
-        <Form.Group className='mb-3'>
+        <Form.Group className="mb-3">
           <Form.Label>Password</Form.Label>
-          <Form.Control type='password' onChange={this.onPasswordChange} />
+          <Form.Control type="password" onChange={this.onPasswordChange} />
         </Form.Group>
         <Button
-          variant='primary'
-          type='button'
+          variant="primary"
+          type="button"
           disabled={!this.isReady() || this.state.loading ? true : undefined}
           onClick={this.onSubmit}
         >
           {this.state.loading && (
-            <span className='spinner-border spinner-border-sm' />
+            <span className="spinner-border spinner-border-sm" />
           )}
           Login!
         </Button>

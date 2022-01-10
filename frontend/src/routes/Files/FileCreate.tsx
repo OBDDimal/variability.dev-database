@@ -1,11 +1,8 @@
 import React, { Component } from "react";
 import { Button, Form } from "react-bootstrap";
 import Select from "react-select";
-import Swal from "sweetalert2";
-import withReactContent from "sweetalert2-react-content";
+import { Modal } from "../../components/Modal";
 import api from "../../services/api.service";
-
-const MySwal = withReactContent(Swal);
 
 const API_URL = process.env.REACT_APP_DOMAIN;
 
@@ -27,6 +24,7 @@ type State = {
   legalShare: boolean;
   userData: boolean;
   openSource: boolean;
+  resetId: number;
 };
 
 export default class FileCreate extends Component<Props, State> {
@@ -49,6 +47,7 @@ export default class FileCreate extends Component<Props, State> {
     legalShare: false,
     userData: false,
     openSource: false,
+    resetId: 0,
   };
 
   getTags = () => {
@@ -144,16 +143,17 @@ export default class FileCreate extends Component<Props, State> {
           headers: { "Content-Type": "multipart/form-data" },
         })
         .then((result) => {
-          MySwal.fire({
+          Modal.fire({
             icon: "success",
             title: "Success!!",
             text: JSON.stringify(result.data),
           }).then(() => {
-            window.location.reload();
+            this.setState({ resetId: Math.floor(Math.random() * 20000) }); //TODO: this could overflow
+            //window.location.reload();
           });
         })
         .catch((error) => {
-          MySwal.fire({
+          Modal.fire({
             icon: "error",
             title: "Error!!",
             text: JSON.stringify(error.message),
@@ -164,7 +164,7 @@ export default class FileCreate extends Component<Props, State> {
 
   render() {
     return (
-      <div>
+      <div key={this.state.resetId}>
         <Form.Group className="mb-3">
           <Form.Label>File name</Form.Label>
           <Form.Control

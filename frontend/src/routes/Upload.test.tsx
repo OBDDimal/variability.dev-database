@@ -1,10 +1,18 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import FileCreate from "./Files/FileCreate";
 import api from "../services/api.service";
 import selectEvent from "react-select-event";
+import { Modal } from "../components/Modal";
+import Swal, { SweetAlertResult } from "sweetalert2";
+import { ReactSweetAlert } from "sweetalert2-react-content";
 
 jest.mock("../services/api.service");
 const mockedApi = api as jest.Mocked<typeof api>;
+
+jest.mock("../components/Modal");
+const MockedModal = Modal as jest.Mocked<typeof Swal & ReactSweetAlert>;
+
+jest.setTimeout(60000);
 
 interface Tag {
   id: number;
@@ -12,6 +20,28 @@ interface Tag {
 }
 
 describe("<FileCreate />", () => {
+  const original = window.location;
+
+  const reloadFn = () => {
+    cleanup();
+    render(<FileCreate />);
+    //window.location.reload();
+  };
+
+  beforeAll(() => {
+    Object.defineProperty(window, "location", {
+      configurable: true,
+      value: { reload: jest.fn() },
+    });
+  });
+
+  afterAll(() => {
+    Object.defineProperty(window, "location", {
+      configurable: true,
+      value: original,
+    });
+  });
+
   test("button should be initially disabled", async () => {
     mockedApi.get.mockResolvedValue(
       new Promise((resolve, reject) => {
@@ -113,6 +143,7 @@ describe("<FileCreate />", () => {
   });
 
   test("submit data should reset the form", async () => {
+    jest.setTimeout(30000);
     mockedApi.get.mockResolvedValue(
       new Promise((resolve, reject) => {
         let mockedTags: Tag[] = [{ id: 1337, label: "testlabel" }];
@@ -120,6 +151,40 @@ describe("<FileCreate />", () => {
         resolve(mockedResponse);
       })
     );
+
+    mockedApi.post.mockResolvedValue(
+      new Promise((resolve, reject) => {
+        let mockedResponse = { data: { testResponseKey: "testResponseValue" } };
+        resolve(mockedResponse);
+      })
+    );
+
+    // MockedModal.fire.mockResolvedValue(
+    //   new Promise((resolve, reject) => {
+    //     let sweetResult = {
+    //       isConfirmed: true,
+    //       isDenied: false,
+    //       isDismissed: false,
+    //     } as SweetAlertResult<string>;
+    //     resolve(sweetResult);
+    //   })
+    // );
+
+    MockedModal.fire.mockImplementation((options) => {
+      //window.location.reload();
+
+      cleanup();
+      render(<FileCreate />);
+
+      //reloadFn();
+      let sweetResult = {
+        isConfirmed: true,
+        isDenied: false,
+        isDismissed: false,
+      } as SweetAlertResult<string>;
+      return Promise.resolve(sweetResult);
+    });
+
     render(<FileCreate />);
 
     //type label
@@ -171,8 +236,23 @@ describe("<FileCreate />", () => {
     const uploadButton = screen.getByText(/Upload!/i) as HTMLButtonElement;
     fireEvent.click(uploadButton);
 
-    const response = "test response";
-    (api.post as jest.Mock).mockResolvedValue(response);
+    //wait for modal, then click ok
+    // let modalTitle = (await waitFor(() =>
+    //   screen.getByText(/Success!!/i)
+    // )) as HTMLHeadingElement;
+    // let modal = modalTitle.parentElement as HTMLDivElement;
+    // let okButton: HTMLButtonElement = getByText(
+    //   modal,
+    //   "OK"
+    // ) as HTMLButtonElement;
+    // let clickResult = fireEvent.click(okButton);
+
+    //wait for site refresh
+    await new Promise((r) => setTimeout(r, 5000));
+
+    expect(mockedApi.get).toHaveBeenCalled();
+    expect(mockedApi.post).toHaveBeenCalled();
+    expect(MockedModal.fire).toHaveBeenCalled();
 
     expect(labelFormControl.value).toBeUndefined();
     expect(descriptionFormControl.value).toBeUndefined();
