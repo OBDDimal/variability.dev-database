@@ -14,7 +14,7 @@
 <body>
     <div style="width: 100vw; height: 100vh" id="mountNode"></div>
     <script defer>
-        fetch("xmlExamples/g6_model_npc.json")
+        fetch("xmlExamples/g6_model.json")
             .then((res) => res.json())
             .then((data) => {
                 const container = document.getElementById("mountNode");
@@ -39,13 +39,10 @@
                                 type: "collapse-expand",
                                 enableDelegate: true,
                                 trigger: "click",
-                                //only subtrees with leaf nodes only can be expanded or not   
+                                //prevent collapsing/expanding on leaf nodes
                                 shouldBegin: (e) => {
                                     if (e.item && e.item.getModel().children.length) {
-                                        node = e.item.getModel();
-                                        currentChildren = node.children;
-                                        leaves = node.children.filter(child => !child.children.length);
-                                        return (leaves.length == currentChildren.length);
+                                        return true;
                                     }
                                     return false;
                                 },
@@ -54,11 +51,10 @@
                             {
                                 type: 'zoom-canvas',
                                 enableOptimize: true,
-                                //optimizeZoom: 0.9,
+                                optimizeZoom: 0.9,
                             },
                             {
                                 type: 'drag-canvas',
-                                direction: 'x',
                                 // enableOptimize: true,
                             },
                             /*
@@ -119,6 +115,10 @@
                             //interchange width and height
                             size = [size[1], size[0]];
                         }
+                        /*
+                        * Mandatory circles not visible on leaf nodes (node box is overlaying it)
+                        * View does automatically fit after expanding
+                        */
                         maxSep = (newWidth > maxSep ? newWidth : maxSep);
                         switch (node.fm_attributes.type) {
                             default:
@@ -154,12 +154,13 @@
                 graph.edge((edge) => {
                     let parent = graph.findById(edge.source);
                     let currentDepth = graph.findById(edge.source).get('model').depth;
-                    console.log("parent depth= " +currentDepth);
+                    //console.log("parent depth= " +currentDepth);
                     //collapse every node where depth > 1
                     if(currentDepth == 1) {
                         let newModel = graph.findById(edge.source).get('model');
                         //do this only on init, means collapse is undefined
                         if(newModel.collapsed == undefined) {
+                            //PROBLEM: THIS CAUSES that at some point, the node is always expanding (true) and never collapsing (false)
                             newModel.collapsed = true;
                             graph.updateItem(parent, newModel);
                         }
@@ -204,9 +205,12 @@
                     } else {
                         //expanding node
                         console.log("expanding node");
+                        //graph.focusItem(graph.findById(e.item.getModel().id), true);
+                        //graph.fitView();
                         console.log(e.item.getModel().size);
                     }
                 })
+                graph.save();
 
                 /*
                                 // Click a node
