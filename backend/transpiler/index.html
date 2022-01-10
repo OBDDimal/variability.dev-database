@@ -39,7 +39,7 @@
                                 type: "collapse-expand",
                                 enableDelegate: true,
                                 trigger: "click",
-                                //only subtrees which leaf nodes only can be expanded or not   
+                                //only subtrees with leaf nodes only can be expanded or not   
                                 shouldBegin: (e) => {
                                     if (e.item && e.item.getModel().children.length) {
                                         node = e.item.getModel();
@@ -102,14 +102,14 @@
                 graph.data(data);
                 //customize nodes
                 graph.node(function (node) {
-                    //console.log(node.id + " old size " + node.size );
                     if (!node.wasRendered) {
                         let fontSizeDuplicator = 7 //choosen via try and error
                         //label's position, options: center, top, bottom, left, right
                         let position = "center";
                         let rotate = 0;
                         //resize node according to label length
-                        let newWidth = (node.id.length + 2) * fontSizeDuplicator;
+                        let newLabel = (node.fm_attributes.type != 'feature' && node.fm_attributes.type != 'and') ? node.fm_attributes.type  + " | " + node.id : node.id;
+                        let newWidth = (newLabel.length + 2) * fontSizeDuplicator;
                         let size = [newWidth, node.size[1]];
 
                         //console.log(node.id + " old size " + node.size + " ? " + node.wasRendered);
@@ -123,7 +123,8 @@
                         switch (node.fm_attributes.type) {
                             default:
                                 return {
-                                    label: node.id,
+                                    id: node.id,
+                                    label: newLabel,
                                     size: size,
                                     wasRendered: true,
                                     style: {
@@ -151,10 +152,20 @@
                 //Note that, if fm_attributes.type == 'and' then there can be a new attribute 'mandatory'
                 //more: https://g6.antv.vision/en/docs/manual/middle/elements/edges/defaultEdge#the-common-property 
                 graph.edge((edge) => {
-                    //console.log("edge: " + edge.id + " s: " + edge.source + " t: " + edge.target);
-                    let parent = graph.findById(edge.source).get('model');
+                    let parent = graph.findById(edge.source);
+                    let currentDepth = graph.findById(edge.source).get('model').depth;
+                    console.log("parent depth= " +currentDepth);
+                    //collapse every node where depth > 1
+                    if(currentDepth == 1) {
+                        let newModel = graph.findById(edge.source).get('model');
+                        //do this only on init, means collapse is undefined
+                        if(newModel.collapsed == undefined) {
+                            newModel.collapsed = true;
+                            graph.updateItem(parent, newModel);
+                        }
+                    }
                     let child = graph.findById(edge.target).get('model');
-                    console.log(parent.fm_attributes.type);
+                    parent = graph.findById(edge.source).get('model');
                     switch (parent.fm_attributes.type) {
                         case 'and':
                             //add and color mandatory circle accordingly
@@ -172,7 +183,6 @@
                                 }
                             };
                         default:
-                            console.log("default reached");
                             return {
                                 id: edge.id,
                                 source: edge.source,
@@ -181,7 +191,7 @@
                             };
                     }
                 });
-
+                graph.layout(); //to activate the collapse information given above, see: https://g6.antv.vision/en/docs/manual/middle/states/defaultBehavior#collapse-expand
                 graph.render();
                 //console.log(maxSep);
                 //graph.updateLayout({rankSep: maxSep});
