@@ -38,6 +38,17 @@ class FilesSerializer(serializers.ModelSerializer):
         file = File.objects.create(**validated_data)
         return file
 
+    def update(self, instance, validated_data):
+        """
+        Updates the label, description, tags and new_version_of an already existing file.
+        """
+        instance.label = validated_data.get('label', instance.label)
+        instance.description = validated_data.get('label', instance.description)
+        instance.tags = validated_data.get('tags', instance.tags)
+        instance.new_version_of = validated_data.get('tags', instance.new_version_of)
+        instance.save()
+        return instance
+
     def to_internal_value(self, data):
         """
         Turns the received data from frontend into the internally used representation.
