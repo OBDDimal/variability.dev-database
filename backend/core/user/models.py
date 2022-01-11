@@ -63,7 +63,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_active = models.BooleanField(default=False)
     is_staff = models.BooleanField(default=False)
     date_joined = models.DateTimeField('date joined', auto_now_add=True, editable=False)
-    institute = models.CharField(db_index=True, max_length=255, unique=False)
+    institute = models.CharField(max_length=255, unique=False, blank=True)
     bio = models.TextField(max_length=500, blank=True)
 
     USERNAME_FIELD = 'email'

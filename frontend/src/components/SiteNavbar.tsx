@@ -1,9 +1,9 @@
 import React, { Component } from "react";
-import { Navbar, Container, Nav, NavDropdown } from "react-bootstrap";
+import { Container, Nav, Navbar, NavDropdown } from "react-bootstrap";
 import authService from "../services/auth.service";
 
 type Props = {
-  url: String;
+  url: string;
 };
 
 type State = {
@@ -77,10 +77,19 @@ export default class SiteNavbar extends Component<Props, State> {
 
               {this.state.loggedIn && (
                 <Nav.Link
-                  href='/upload'
-                  className={this.props.url === "/upload" ? "active" : ""}
+                  href='/files'
+                  className={this.props.url === "/files" ? "active" : ""}
                 >
-                  Upload
+                  Files
+                </Nav.Link>
+              )}
+
+              {this.state.loggedIn && (
+                <Nav.Link
+                  href='/tags'
+                  className={this.props.url === "/tags" ? "active" : ""}
+                >
+                  Tags
                 </Nav.Link>
               )}
 

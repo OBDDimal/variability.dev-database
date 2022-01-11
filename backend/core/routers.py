@@ -3,7 +3,7 @@ from django.urls import path, include
 from rest_framework import routers
 
 from core.fileupload import views
-from core.fileupload.views import FileUploadViewSet
+from core.fileupload.views import FileUploadViewSet, TagsViewSet
 from core.user.viewsets import UserViewSet, ActivateUserViewSet
 from core.auth.viewsets import LoginViewSet, RegistrationViewSet, RefreshViewSet
 from ddueruemweb.settings import STATIC_ROOT, STATIC_URL, MEDIA_URL, MEDIA_ROOT
@@ -23,6 +23,9 @@ router.register(r'user', UserViewSet, basename='user')
 
 # FILES
 router.register(r'files', FileUploadViewSet, basename='file-upload')
+
+# TAGS
+router.register(r'tags', TagsViewSet, basename='tags')
 # details file upload https://djangotricks.blogspot.com/2020/03/how-to-upload-a-file-using-django-rest-framework.html
 # router.register(r'^media/files/(?P<filename>[^/]+)$', FileUploadViewSet, basename='file-view')
 # router.register(r'files/(?P<path>.+)', views.download, basename='file-download')

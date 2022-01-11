@@ -1,16 +1,16 @@
 import React from "react";
 import {fireEvent, render, screen} from "@testing-library/react";
-import Upload from "./Upload";
+import FileCreate from "./Files/FileCreate";
 
 describe("<Upload />", () => {
   test('button should be initially disabled', async () => {
-    render(<Upload/>);
+    render(<FileCreate/>);
     const uploadButton = screen.getByText(/Upload!/i) as HTMLButtonElement;
     expect(uploadButton.disabled).toBeTruthy();
   });
 
   test('button should enable after description, file, legalShare, userData and openSource have been entered', async () => {
-    render(<Upload/>);
+    render(<FileCreate/>);
 
     const uploadButton = screen.getByText(/Upload!/i) as HTMLButtonElement;
     expect(uploadButton.disabled).toBeTruthy();
