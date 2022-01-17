@@ -19,7 +19,7 @@ class FileUploadViewSet(viewsets.ModelViewSet):
         Replace email address of file owner and label creator with True or False,
         indicating if the user which has sent the request is the owner/creator.
         """
-        queryset = File.objects.all()
+        queryset = self.queryset
         files = FilesSerializer(queryset, many=True).data
         changed_files = []
         for file in files:
@@ -61,6 +61,25 @@ class TagsViewSet(viewsets.ModelViewSet):
     queryset = Tag.objects.all()
     serializer_class = TagsSerializer
     permission_classes = [permissions.AllowAny]
+
+    def list(self, request, **kwargs):
+        """
+        Replace email address of file owner and label creator with True or False,
+        indicating if the user which has sent the request is the owner/creator.
+        """
+        queryset = self.queryset
+        tags = TagsSerializer(queryset, many=True).data
+        changed_tags = []
+        for tag in tags:
+            changed_tag = OrderedDict()
+            for tuple in tag.items():
+                if tuple[0] == 'creator':
+                    user_mail = "" if request.user.is_anonymous else request.user.email
+                    changed_tag[tuple[0]] = tuple[1] == user_mail
+                else:
+                    changed_tag[tuple[0]] = tuple[1]
+            changed_tags.append(changed_tag)
+        return Response(changed_tags)
 
     def perform_create(self, serializer):
         serializer.save(creator=self.request.user)
