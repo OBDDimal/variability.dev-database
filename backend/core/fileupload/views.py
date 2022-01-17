@@ -14,6 +14,32 @@ class FileUploadViewSet(viewsets.ModelViewSet):
     serializer_class = FilesSerializer
     permission_classes = [permissions.AllowAny]
 
+    def list(self, request):
+        """
+        Replace email address of file owner and label creator with True or False,
+        indicating if the user which has sent the request is the owner/creator.
+        """
+        queryset = File.objects.all()
+        files = FilesSerializer(queryset, many=True).data[0]
+        changed_data = OrderedDict()
+        for tuple in files.items():
+            if tuple[0] == 'owner':
+                changed_data[tuple[0]] = True if tuple[1] == request.user else False
+            elif tuple[0] == 'tags':
+                tags = []
+                for tag in list(tuple[1]):
+                    new_tag = OrderedDict()
+                    for tagTuple in tag.items():
+                        if tagTuple[0] == 'creator':
+                            new_tag[tagTuple[0]] = True if tagTuple[1] == request.user else False
+                        else:
+                            new_tag[tagTuple[0]] = tagTuple[1]
+                    tags.append(new_tag)
+                changed_data[tuple[0]] = tags
+            else:
+                changed_data[tuple[0]] = tuple[1]
+        return Response(changed_data)
+
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
 
