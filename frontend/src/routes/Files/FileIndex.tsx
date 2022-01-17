@@ -21,15 +21,13 @@ type State = {
           description: string;
           license: string;
           tags: [];
-          owner: string;
+          owner: boolean;
           uploaded_at: string;
         }
       ]
     | [];
   columns: Array<any>;
 };
-
-const loggedInUserEmail = JSON.parse(localStorage.getItem("user") ?? "").email;
 
 const columns = [
   { title: "Id", field: "id", width: 60 },
@@ -65,7 +63,7 @@ const columns = [
       <TableButton
         variant='warning'
         method='edit'
-        basePath={"files"}
+        basePath='files'
         icon={faPen}
       />
     ),

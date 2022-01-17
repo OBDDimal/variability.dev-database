@@ -38,7 +38,7 @@ class FileUploadViewSet(viewsets.ModelViewSet):
                 changed_data[tuple[0]] = tags
             else:
                 changed_data[tuple[0]] = tuple[1]
-        return Response(changed_data)
+        return Response([changed_data])
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
