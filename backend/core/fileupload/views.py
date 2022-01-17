@@ -33,7 +33,7 @@ class FileUploadViewSet(viewsets.ModelViewSet):
                     for tag in list(tuple[1]):
                         new_tag = OrderedDict()
                         for tagTuple in tag.items():
-                            if tagTuple[0] == 'creator':
+                            if tagTuple[0] == 'owner':
                                 user_mail = "" if request.user.is_anonymous else request.user.email
                                 new_tag[tagTuple[0]] = tagTuple[1] == user_mail
                             else:
@@ -73,7 +73,7 @@ class TagsViewSet(viewsets.ModelViewSet):
         for tag in tags:
             changed_tag = OrderedDict()
             for tuple in tag.items():
-                if tuple[0] == 'creator':
+                if tuple[0] == 'owner':
                     user_mail = "" if request.user.is_anonymous else request.user.email
                     changed_tag[tuple[0]] = tuple[1] == user_mail
                 else:
@@ -82,4 +82,4 @@ class TagsViewSet(viewsets.ModelViewSet):
         return Response(changed_tags)
 
     def perform_create(self, serializer):
-        serializer.save(creator=self.request.user)
+        serializer.save(owner=self.request.user)

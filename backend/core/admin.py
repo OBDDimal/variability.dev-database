@@ -84,15 +84,15 @@ class TagAdmin(ModelAdmin):
     Class for defining the backend tag admin panel and which data should be displayed.
     """
     model = Tag
-    list_display = ('id', 'label', 'is_public', 'creator', 'date_created')
+    list_display = ('id', 'label', 'is_public', 'owner', 'date_created')
     fieldsets = [
         (None, {'fields': ['id']}),
-        ('Information', {'fields': ['label', 'is_public', 'creator', 'description']}),
+        ('Information', {'fields': ['label', 'is_public', 'owner', 'description']}),
         ('Important dates', {'fields': ['date_created']})
     ]
     readonly_fields = ('id', 'date_created')
-    search_fields = ('creator',)
-    ordering = ('creator', 'date_created')
+    search_fields = ('owner',)
+    ordering = ('owner', 'date_created')
     filter_horizontal = ()
 
 
