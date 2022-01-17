@@ -14,7 +14,7 @@ class FileUploadViewSet(viewsets.ModelViewSet):
     serializer_class = FilesSerializer
     permission_classes = [permissions.AllowAny]
 
-    def list(self, request):
+    def list(self, request, **kwargs):
         """
         Replace email address of file owner and label creator with True or False,
         indicating if the user which has sent the request is the owner/creator.
