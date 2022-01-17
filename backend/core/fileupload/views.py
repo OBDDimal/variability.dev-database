@@ -9,19 +9,10 @@ from core.fileupload.models.file import File
 from core.fileupload.serializers import FilesSerializer, TagsSerializer
 
 
-class FileUploadViewSet(viewsets.ViewSet):
+class FileUploadViewSet(viewsets.ModelViewSet):
+    queryset = File.objects.all()
     serializer_class = FilesSerializer
     permission_classes = [permissions.AllowAny]
-
-    def list(self, request):
-      queryset = File.objects.all()
-      serializer = FilesSerializer(queryset, many=True)
-      changed_data = OrderedDict()
-      changed_data.update(serializer.data)
-      for data in changed_data:
-        print(data)
-        #changed_data.update({'owner': data.owner == request.user})
-      return Response(changed_data)
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)

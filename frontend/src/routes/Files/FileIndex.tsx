@@ -67,7 +67,6 @@ const columns = [
         method='edit'
         basePath={"files"}
         icon={faPen}
-        loggedInUser
       />
     ),
     width: 60,

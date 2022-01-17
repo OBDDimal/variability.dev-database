@@ -3,27 +3,34 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Button } from "react-bootstrap";
 
 export default function TableButton(props: {
-  cell?: { _cell: { row: { data: { id: string } } } };
+  cell?: { _cell: { row: { data: { id: string; owner: boolean } } } };
   basePath: string;
   method?: string;
   variant?: string;
   icon: IconDefinition;
-  loggedInUserEmail?: string;
 }) {
   let rowDataId = "";
+  let isOwner = false;
   if (props.cell) {
     rowDataId = props.cell._cell.row.data.id;
+    isOwner = props.cell._cell.row.data.owner;
   }
   return (
     <a
       href={
-        props.method
+        isOwner && props.method
+          ? isOwner
+            ? `/${props.basePath}/${props.method}/${rowDataId}`
+            : "#"
+          : props.method
           ? `/${props.basePath}/${props.method}/${rowDataId}`
           : `/${props.basePath}/${rowDataId}`
       }
     >
       <Button
-        disabled={props.disabled ?? undefined}
+        disabled={
+          isOwner && props.method ? undefined : props.method ? true : undefined
+        }
         variant={props.variant ?? "secondary"}
         type='button'
       >
