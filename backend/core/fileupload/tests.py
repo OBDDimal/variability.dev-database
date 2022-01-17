@@ -99,10 +99,10 @@ def test_tags_required(self):
         "tags": '[{"id": "2", "label": "Tobi"},{"id": "1", "label": "Eric Test"}]'}
     msg_as_multipart = encode_multipart(data=raw_data, boundary=BOUNDARY)
     # MULTIPART_CONTENT == multipart/form-data; boundary=BoUnDaRyStRiNg
-    print(f"Raw data to user: {raw_data}")
-    print("Sending data to backend...")
+    # print(f"Raw data to user: {raw_data}")
+    # print("Sending data to backend...")
     f_res = c.post('/files/', msg_as_multipart,
                    content_type=MULTIPART_CONTENT,
                    HTTP_AUTHORIZATION='Bearer ' + token)
-    print(f"\n{f_res.status_code} {f_res.content}")
+    # print(f"\n{f_res.status_code} {f_res.content}")
     self.assertEqual(f_res.status_code, 201)
