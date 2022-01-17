@@ -1,8 +1,12 @@
 import json
 
+from django.core.files.base import ContentFile
+
 from core.fileupload.models.file import File, Tag
 from rest_framework import serializers
 from django.http import QueryDict
+
+from transpiler.g6_transpiler import xml_to_g6
 
 
 class TagsSerializer(serializers.ModelSerializer):
@@ -29,13 +33,21 @@ class FilesSerializer(serializers.ModelSerializer):
     class Meta:
         model = File
         fields = ['id', 'label', 'description', 'local_file', 'license', 'tags', 'owner', 'uploaded_at',
-                  'new_version_of']
+                  'new_version_of', 'transpiled_file']
 
     def create(self, validated_data):
         """
         Actually tries to create and save the internal representation into the database.
         """
         file = File.objects.create(**validated_data)
+        data = validated_data['local_file']
+        file_content = ''
+        for line in data:
+            file_content = file_content + line.decode()
+
+        transpiled = json.dumps(xml_to_g6(file_content, is_file_path=False), indent=2)
+        file.transpiled_file = ContentFile(bytes(transpiled, encoding='utf8'), f"{file.label}_as_g6.json")
+        file.save()
         return file
 
     def update(self, instance, validated_data):

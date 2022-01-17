@@ -64,6 +64,7 @@ class File(models.Model):
     license = models.CharField(choices=LICENSES, max_length=255, default='CC BY - Mention')
     tags = models.ManyToManyField(Tag)
     new_version_of = models.ForeignKey('self', null=True, blank=True, on_delete=models.RESTRICT)
+    transpiled_file = models.FileField(null=True, blank=True, upload_to=relative_upload_dir)
 
     def __str__(self):
         return f"{self.id}"
