@@ -19,7 +19,7 @@ class FileUploadViewSet(viewsets.ModelViewSet):
         Replace email address of file owner and label creator with True or False,
         indicating if the user which has sent the request is the owner/creator.
         """
-        queryset = self.queryset
+        queryset = File.objects.all()
         files = FilesSerializer(queryset, many=True).data
         changed_files = []
         for file in files:
@@ -67,7 +67,7 @@ class TagsViewSet(viewsets.ModelViewSet):
         Replace email address of file owner and label creator with True or False,
         indicating if the user which has sent the request is the owner/creator.
         """
-        queryset = self.queryset
+        queryset = Tag.objects.all()
         tags = TagsSerializer(queryset, many=True).data
         changed_tags = []
         for tag in tags:

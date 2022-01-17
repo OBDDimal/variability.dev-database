@@ -50,7 +50,7 @@ export default class FileCreate extends Component<Props, State> {
 
   getTags = () => {
     api.get(API_URL + "tags/").then((response) => {
-      let tags = response.data.results;
+      let tags = response.data;
       tags = tags.map((tag: { id: number; label: string }) => {
         return { value: tag.id, label: tag.label };
       });
