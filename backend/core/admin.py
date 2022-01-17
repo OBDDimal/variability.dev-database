@@ -71,7 +71,8 @@ class FileAdmin(ModelAdmin):
     fieldsets = [
         (None, {'fields': ['owner']}),
         ('Information', {'fields': ['label', 'description', 'local_file', 'license', 'tags', 'new_version_of']}),
-        ('Important dates', {'fields': ['uploaded_at']})
+        ('Important dates', {'fields': ['uploaded_at']}),
+        ('Transpiler Output', {'fields': ['transpiled_file']})
     ]
     readonly_fields = ('uploaded_at',)
     search_fields = ('owner',)

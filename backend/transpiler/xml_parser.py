@@ -39,10 +39,17 @@ def _parse_struct(element):
     return response
 
 
-def xml_to_json(file_path):
+def xml_to_json(file, is_file_path=True):
+    """
+    If is_file_path is set to True (also per default), the file parameter will be interpreted as
+    String containing the XML content, otherwise it will be interpreted as path to a file.
+    """
     response = {}
-    tree = xmlTree.parse(file_path)
-    root = tree.getroot()
+    if is_file_path:
+        root = xmlTree.parse(file).getroot()
+    else:
+        root = xmlTree.fromstring(file)
+
     # print(f"root: {root.tag}, size: {len(root)}")
     for child in root.iter():
         if child.tag == 'struct':

@@ -1,5 +1,5 @@
 # ------------------From XML or JSON to G6 Tree format ------------------
-from xml_parser import xml_to_json
+from .xml_parser import xml_to_json
 
 
 def _parse_g6_item(item):
@@ -39,7 +39,12 @@ def json_to_g6(content):
     return response
 
 
-def xml_to_g6(file_path):
-    file_as_json = xml_to_json(file_path)
-    json_as_g6 = json_to_g6(file_as_json)
+def xml_to_g6(file, is_file_path=True):
+    """
+    If is_file_path is set to True (also per default), the file parameter will be interpreted as
+    String containing the XML content, otherwise it will be interpreted as path to a file.
+    """
+    file_as_json = xml_to_json(file, is_file_path)
+    print(f"file as = {file_as_json}")
+    json_as_g6 = json_to_g6(file_as_json) if bool(file_as_json) else {}
     return json_as_g6
