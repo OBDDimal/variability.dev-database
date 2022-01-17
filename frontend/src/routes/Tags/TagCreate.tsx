@@ -1,10 +1,7 @@
 import { Component } from "react";
 import { Button, Form } from "react-bootstrap";
-import Swal from "sweetalert2";
-import withReactContent from "sweetalert2-react-content";
+import { Modal } from "../../components/Modal";
 import api from "../../services/api.service";
-
-const MySwal = withReactContent(Swal);
 
 const API_URL = process.env.REACT_APP_DOMAIN;
 
@@ -17,10 +14,6 @@ type State = {
 };
 
 export default class TagCreate extends Component<Props, State> {
-  constructor(props: Props | Readonly<Props>) {
-    super(props);
-  }
-
   state: State = {
     label: undefined,
     description: undefined,
@@ -46,7 +39,7 @@ export default class TagCreate extends Component<Props, State> {
       api
         .post(`${API_URL}tags/`, this.state)
         .then((result) => {
-          MySwal.fire({
+          Modal.fire({
             icon: "success",
             title: "Success!!",
             text: JSON.stringify(result.data),
@@ -55,7 +48,7 @@ export default class TagCreate extends Component<Props, State> {
           });
         })
         .catch((error) => {
-          MySwal.fire({
+          Modal.fire({
             icon: "error",
             title: "Error!!",
             text: JSON.stringify(error.message),

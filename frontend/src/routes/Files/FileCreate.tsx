@@ -185,6 +185,7 @@ export default class FileCreate extends Component<Props, State> {
             data-testid='file-upload'
             type='file'
             onChange={this.onFileChange}
+            accept='.xml'
           />
         </Form.Group>
         <Form.Group className='mb-3'>
