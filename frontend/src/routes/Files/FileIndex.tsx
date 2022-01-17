@@ -85,7 +85,7 @@ export default class FileIndex extends Component<Props, State> {
 
   getFiles = () => {
     api.get(API_URL + "files/").then((response) => {
-      this.setState({ files: response.data.results });
+      this.setState({ files: response.data });
     });
   };
 
