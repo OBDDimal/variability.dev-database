@@ -24,7 +24,6 @@ type State = {
   legalShare: boolean;
   userData: boolean;
   openSource: boolean;
-  resetId: number;
 };
 
 export default class FileCreate extends Component<Props, State> {
@@ -47,7 +46,6 @@ export default class FileCreate extends Component<Props, State> {
     legalShare: false,
     userData: false,
     openSource: false,
-    resetId: 0,
   };
 
   getTags = () => {
@@ -148,8 +146,7 @@ export default class FileCreate extends Component<Props, State> {
             title: "Success!!",
             text: JSON.stringify(result.data),
           }).then(() => {
-            this.setState({ resetId: Math.floor(Math.random() * 20000) }); //TODO: this could overflow
-            //window.location.reload();
+            window.location.reload();
           });
         })
         .catch((error) => {
@@ -164,7 +161,7 @@ export default class FileCreate extends Component<Props, State> {
 
   render() {
     return (
-      <div key={this.state.resetId}>
+      <div>
         <Form.Group className="mb-3">
           <Form.Label>File name</Form.Label>
           <Form.Control
