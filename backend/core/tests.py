@@ -342,7 +342,7 @@ class TagAdminPanelTests(TestCase):
         expected_label = 'testingTag'
         # add a tag
         t = Tag()
-        t.creator = User.objects.get(email='ad@m.in')
+        t.owner = User.objects.get(email='ad@m.in')
         t.label = expected_label
         t.description = ''
         t.is_public = True
@@ -378,7 +378,7 @@ class TagAdminPanelTests(TestCase):
         # add tag
         t = Tag()
         t.label = 'testTag'
-        t.creator = user
+        t.owner = user
         t.is_public = True
         t.save()
         # try to change the only file which is uploaded
@@ -399,7 +399,7 @@ class TagAdminPanelTests(TestCase):
         self.assertIs(len(File.objects.all()), 1)
         t = Tag()
         t.label = 'testTag'
-        t.creator = user
+        t.owner = user
         t.is_public = True
         t.save()
         self.assertIs(len(Tag.objects.all()), 1)

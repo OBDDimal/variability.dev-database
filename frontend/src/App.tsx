@@ -13,6 +13,7 @@ import "./styles/app.css";
 import TagIndex from "./routes/Tags/TagIndex";
 import FileShow from "./routes/Files/FileShow";
 import TagCreate from "./routes/Tags/TagCreate";
+import FileEdit from "./routes/Files/FileEdit";
 
 interface AuthChildren {
   children: JSX.Element; // Maybe there is a way to define this better and directly in RequireAuth
@@ -65,6 +66,14 @@ function App() {
               element={
                 <RequireAuth>
                   <FileShow />
+                </RequireAuth>
+              }
+            />
+            <Route
+              path='/files/edit/:id'
+              element={
+                <RequireAuth>
+                  <FileEdit />
                 </RequireAuth>
               }
             />

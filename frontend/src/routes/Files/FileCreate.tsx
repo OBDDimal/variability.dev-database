@@ -16,7 +16,7 @@ type State = {
   description?: string;
   file?: File;
   license: string;
-  gottenTags: Array<{ key: string; value: string }>;
+  gottenTags: Array<{ label: string; value: string }>;
   gottenFiles: Array<{ value: number; label: string }>;
   newVersionOf: string;
   tags: string;
@@ -50,7 +50,7 @@ export default class FileCreate extends Component<Props, State> {
 
   getTags = () => {
     api.get(API_URL + "tags/").then((response) => {
-      let tags = response.data.results;
+      let tags = response.data;
       tags = tags.map((tag: { id: number; label: string }) => {
         return { value: tag.id, label: tag.label };
       });
@@ -60,7 +60,7 @@ export default class FileCreate extends Component<Props, State> {
 
   getNewVersionOf = () => {
     api.get(API_URL + "files/").then((response) => {
-      let files = response.data.results;
+      let files = response.data;
       files = files.map((file: { id: number; label: string }) => {
         return { value: file.id, label: file.label };
       });
@@ -162,32 +162,32 @@ export default class FileCreate extends Component<Props, State> {
   render() {
     return (
       <div>
-        <Form.Group className="mb-3">
+        <Form.Group className='mb-3'>
           <Form.Label>File name</Form.Label>
           <Form.Control
-            data-testid="label"
+            data-testid='label'
             onChange={this.onLabelChange}
-            placeholder="Leave a filename"
+            placeholder='Leave a filename'
           />
         </Form.Group>
-        <Form.Group className="mb-3">
+        <Form.Group className='mb-3'>
           <Form.Label>Description</Form.Label>
           <Form.Control
-            data-testid="description"
-            as="textarea"
+            data-testid='description'
+            as='textarea'
             onChange={this.onDescriptionChange}
-            placeholder="Leave a comment here"
+            placeholder='Leave a comment here'
           />
         </Form.Group>
-        <Form.Group className="mb-3">
+        <Form.Group className='mb-3'>
           <Form.Label>File Upload</Form.Label>
           <Form.Control
-            data-testid="file-upload"
-            type="file"
+            data-testid='file-upload'
+            type='file'
             onChange={this.onFileChange}
           />
         </Form.Group>
-        <Form.Group className="mb-3">
+        <Form.Group className='mb-3'>
           <Form.Label>License</Form.Label>
           <Form.Select onChange={this.onLicenseChange}>
             {license.map((key) => {
@@ -199,7 +199,7 @@ export default class FileCreate extends Component<Props, State> {
             })}
           </Form.Select>
         </Form.Group>
-        <Form.Group className="mb-3">
+        <Form.Group className='mb-3'>
           <Form.Label>New version of</Form.Label>
           <Form.Select
             onChange={this.onNewVersionOfChange}
@@ -212,59 +212,59 @@ export default class FileCreate extends Component<Props, State> {
                 </option>
               );
             })}
-            <option key="---" value="---">
+            <option key='---' value='---'>
               ---
             </option>
           </Form.Select>
         </Form.Group>
-        <Form.Group data-testid="tag-form" className="mb-3">
-          <Form.Label htmlFor="tags">Tags</Form.Label>
+        <Form.Group data-testid='tag-form' className='mb-3'>
+          <Form.Label htmlFor='tags'>Tags</Form.Label>
           <Select
             isMulti
-            name="tags"
-            inputId="tags"
+            name='tags'
+            inputId='tags'
             onChange={this.onTagChange}
             options={this.state.gottenTags}
           />
         </Form.Group>
-        <Form.Group className="mb-3">
+        <Form.Group className='mb-3'>
           <Form.Check
-            data-testid="legal-share"
-            type="checkbox"
+            data-testid='legal-share'
+            type='checkbox'
             checked={this.state.legalShare}
             onChange={() =>
               this.setState({ legalShare: !this.state.legalShare })
             }
-            id="legal-share"
-            label="I am legally allowed to share this model"
+            id='legal-share'
+            label='I am legally allowed to share this model'
           />
           <Form.Check
-            data-testid="user-data"
-            type="checkbox"
+            data-testid='user-data'
+            type='checkbox'
             checked={this.state.userData}
             onChange={() => this.setState({ userData: !this.state.userData })}
-            id="user-data"
-            label="My email and a date will always be tied to the file upload (even after account deletion)"
+            id='user-data'
+            label='My email and a date will always be tied to the file upload (even after account deletion)'
           />
           <Form.Check
-            data-testid="open-source"
-            type="checkbox"
+            data-testid='open-source'
+            type='checkbox'
             checked={this.state.openSource}
             onChange={() =>
               this.setState({ openSource: !this.state.openSource })
             }
-            id="open-source"
-            label="All information will be published according to your chosen license"
+            id='open-source'
+            label='All information will be published according to your chosen license'
           />
         </Form.Group>
         <Button
-          variant="primary"
-          type="button"
+          variant='primary'
+          type='button'
           disabled={!this.isReady() ? true : undefined}
           onClick={this.onSubmit}
         >
           {this.state.loading && (
-            <span className="spinner-border spinner-border-sm" />
+            <span className='spinner-border spinner-border-sm' />
           )}
           Upload!
         </Button>

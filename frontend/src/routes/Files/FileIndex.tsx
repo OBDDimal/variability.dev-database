@@ -13,7 +13,20 @@ const API_URL = process.env.REACT_APP_DOMAIN;
 type Props = {};
 
 type State = {
-  files: [];
+  files:
+    | [
+        {
+          id: number;
+          label: string;
+          description: string;
+          license: string;
+          tags: [];
+          owner: boolean;
+          uploaded_at: string;
+        }
+      ]
+    | [];
+  columns: Array<any>;
 };
 
 const columns = [
@@ -50,7 +63,7 @@ const columns = [
       <TableButton
         variant='warning'
         method='edit'
-        basePath={"files"}
+        basePath='files'
         icon={faPen}
       />
     ),
@@ -62,6 +75,7 @@ const columns = [
 export default class FileIndex extends Component<Props, State> {
   state: State = {
     files: [],
+    columns: columns,
   };
 
   constructor(props: Props | Readonly<Props>) {
@@ -71,7 +85,7 @@ export default class FileIndex extends Component<Props, State> {
 
   getFiles = () => {
     api.get(API_URL + "files/").then((response) => {
-      this.setState({ files: response.data.results });
+      this.setState({ files: response.data });
     });
   };
 

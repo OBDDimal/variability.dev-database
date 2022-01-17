@@ -24,7 +24,12 @@ const columns = [
   {
     headerSort: false,
     formatter: reactFormatter(
-      <TableButton variant='warning' basePath={"tags"} icon={faPen} />
+      <TableButton
+        variant='warning'
+        method='edit'
+        basePath='tags'
+        icon={faPen}
+      />
     ),
     width: 60,
     hozAlign: "center",
@@ -32,7 +37,12 @@ const columns = [
   {
     headerSort: false,
     formatter: reactFormatter(
-      <TableButton variant='danger' basePath={"tags"} icon={faTrash} />
+      <TableButton
+        variant='danger'
+        method='delete'
+        basePath='tags'
+        icon={faTrash}
+      />
     ),
     width: 60,
     hozAlign: "center",
@@ -51,7 +61,7 @@ export default class TagIndex extends Component {
 
   getTags = () => {
     api.get(API_URL + "tags/").then((response) => {
-      this.setState({ tags: response.data.results });
+      this.setState({ tags: response.data });
     });
   };
 

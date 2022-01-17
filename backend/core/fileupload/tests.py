@@ -21,13 +21,13 @@ class FileUploadWithTagsTests(APITestCase):
         token = content_as_dict['access']
         parent_file = ContentFile(b"foo", "test.xml")
         t1 = Tag()
-        t1.creator = User.objects.get(email='ad@m.in')
+        t1.owner = User.objects.get(email='ad@m.in')
         t1.label = 'cool'
         t1.description = 'cool testing des'
         t1.is_public = True
         t1.save()
         t2 = Tag()
-        t2.creator = User.objects.get(email='ad@m.in')
+        t2.owner = User.objects.get(email='ad@m.in')
         t2.label = 'short'
         t2.description = 'short testing des'
         t2.is_public = True
@@ -74,13 +74,13 @@ def test_tags_required(self):
     # file = SimpleUploadedFile("a/pathTo/ulFile.txt", b"File content needs to be in bytes!")
     file = ContentFile(b"foo", "test.xml")
     t1 = Tag()
-    t1.creator = User.objects.get(email='ad@m.in')
+    t1.owner = User.objects.get(email='ad@m.in')
     t1.label = 'cool'
     t1.description = 'cool testing des'
     t1.is_public = True
     t1.save()
     t2 = Tag()
-    t2.creator = User.objects.get(email='ad@m.in')
+    t2.owner = User.objects.get(email='ad@m.in')
     t2.label = 'short'
     t2.description = 'short testing des'
     t2.is_public = True

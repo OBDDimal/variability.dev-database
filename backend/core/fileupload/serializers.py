@@ -9,11 +9,11 @@ class TagsSerializer(serializers.ModelSerializer):
     """
     A serializer for defining which file attributes should be converted to JSON
     """
-    creator = serializers.ReadOnlyField(source='creator.email')
+    owner = serializers.ReadOnlyField(source='owner.email')
 
     class Meta:
         model = Tag
-        fields = ['id', 'label', 'creator', 'description', 'date_created', 'is_public']
+        fields = ['id', 'label', 'owner', 'description', 'date_created', 'is_public']
 
 
 class FilesSerializer(serializers.ModelSerializer):
@@ -37,6 +37,17 @@ class FilesSerializer(serializers.ModelSerializer):
         """
         file = File.objects.create(**validated_data)
         return file
+
+    def update(self, instance, validated_data):
+        """
+        Updates the label, description, tags and new_version_of an already existing file.
+        """
+        instance.label = validated_data.get('label', instance.label)
+        instance.description = validated_data.get('label', instance.description)
+        instance.tags = validated_data.get('tags', instance.tags)
+        instance.new_version_of = validated_data.get('tags', instance.new_version_of)
+        instance.save()
+        return instance
 
     def to_internal_value(self, data):
         """
