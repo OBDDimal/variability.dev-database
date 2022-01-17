@@ -12,6 +12,12 @@ from core.user.models import User
 
 
 class FileUploadWithTagsTests(APITestCase):
+    upload_file_content = b"""<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>
+    <featureModel>
+        <properties/>
+        <struct>
+        </struct>
+    </featureModel>"""
 
     def setUp(self):
         User.objects.create_superuser(email="ad@m.in", password="12345678!")
@@ -21,7 +27,7 @@ class FileUploadWithTagsTests(APITestCase):
         l_res = c.post('/auth/login/', {'email': 'ad@m.in', 'password': '12345678!'})
         content_as_dict = json.loads(l_res.content.decode("utf-8"))
         token = content_as_dict['access']
-        parent_file = ContentFile(b"foo", "test.xml")
+        parent_file = ContentFile(self.upload_file_content, "test.xml")
         t1 = Tag()
         t1.owner = User.objects.get(email='ad@m.in')
         t1.label = 'cool'
@@ -49,7 +55,7 @@ class FileUploadWithTagsTests(APITestCase):
         print(f"\n{f_res.status_code} {f_res.content}")
         self.assertEqual(f_res.status_code, 201)
         # create new version file
-        new_file = ContentFile(b"foobar", "test_new.xml")
+        new_file = ContentFile(self.upload_file_content, "test_new.xml")
         raw_data = {
             "description": "some description text",
             "label": "new_my_file_name",
@@ -73,7 +79,7 @@ class FileUploadWithTagsTests(APITestCase):
         token = content_as_dict['access']
         # both ways work, difference is type of local_file before sending
         # file = SimpleUploadedFile("a/pathTo/ulFile.txt", b"File content needs to be in bytes!")
-        file = ContentFile(b"foo", "test.xml")
+        file = ContentFile(self.upload_file_content, "test.xml")
         t1 = Tag()
         t1.owner = User.objects.get(email='ad@m.in')
         t1.label = 'cool'
