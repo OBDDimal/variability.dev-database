@@ -26,14 +26,16 @@ class FileUploadViewSet(viewsets.ModelViewSet):
             changed_file = OrderedDict()
             for tuple in file.items():
                 if tuple[0] == 'owner':
-                    changed_file[tuple[0]] = tuple[1] == request.user.email
+                    user_mail = "" if request.user.is_anonymous else request.user.email
+                    changed_file[tuple[0]] = tuple[1] == user_mail
                 elif tuple[0] == 'tags':
                     tags = []
                     for tag in list(tuple[1]):
                         new_tag = OrderedDict()
                         for tagTuple in tag.items():
                             if tagTuple[0] == 'creator':
-                                new_tag[tagTuple[0]] = tagTuple[1] == request.user.email
+                                user_mail = "" if request.user.is_anonymous else request.user.email
+                                new_tag[tagTuple[0]] = tagTuple[1] == user_mail
                             else:
                                 new_tag[tagTuple[0]] = tagTuple[1]
                         tags.append(new_tag)
