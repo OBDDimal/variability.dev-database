@@ -8,6 +8,7 @@ export default function TableButton(props: {
   method?: string;
   variant?: string;
   icon: IconDefinition;
+  loggedInUserEmail?: string;
 }) {
   let rowDataId = "";
   if (props.cell) {
@@ -21,7 +22,11 @@ export default function TableButton(props: {
           : `/${props.basePath}/${rowDataId}`
       }
     >
-      <Button variant={props.variant || "secondary"} type='button'>
+      <Button
+        disabled={props.disabled ?? undefined}
+        variant={props.variant ?? "secondary"}
+        type='button'
+      >
         <FontAwesomeIcon icon={props.icon} />
       </Button>
     </a>

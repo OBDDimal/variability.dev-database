@@ -13,8 +13,23 @@ const API_URL = process.env.REACT_APP_DOMAIN;
 type Props = {};
 
 type State = {
-  files: [];
+  files:
+    | [
+        {
+          id: number;
+          label: string;
+          description: string;
+          license: string;
+          tags: [];
+          owner: string;
+          uploaded_at: string;
+        }
+      ]
+    | [];
+  columns: Array<any>;
 };
+
+const loggedInUserEmail = JSON.parse(localStorage.getItem("user") ?? "").email;
 
 const columns = [
   { title: "Id", field: "id", width: 60 },
@@ -52,6 +67,7 @@ const columns = [
         method='edit'
         basePath={"files"}
         icon={faPen}
+        loggedInUser
       />
     ),
     width: 60,
@@ -62,6 +78,7 @@ const columns = [
 export default class FileIndex extends Component<Props, State> {
   state: State = {
     files: [],
+    columns: columns,
   };
 
   constructor(props: Props | Readonly<Props>) {

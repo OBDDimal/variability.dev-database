@@ -1,27 +1,31 @@
 import React from "react";
-import {fireEvent, render, screen} from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import FileCreate from "./Files/FileCreate";
 
 describe("<Upload />", () => {
-  test('button should be initially disabled', async () => {
-    render(<FileCreate/>);
+  test("button should be initially disabled", async () => {
+    render(<FileCreate />);
     const uploadButton = screen.getByText(/Upload!/i) as HTMLButtonElement;
     expect(uploadButton.disabled).toBeTruthy();
   });
 
-  test('button should enable after description, file, legalShare, userData and openSource have been entered', async () => {
-    render(<FileCreate/>);
+  test("button should enable after description, file, legalShare, userData and openSource have been entered", async () => {
+    render(<FileCreate />);
 
     const uploadButton = screen.getByText(/Upload!/i) as HTMLButtonElement;
     expect(uploadButton.disabled).toBeTruthy();
 
     //type description
     const descriptionFormControl = await screen.findByTestId("description");
-    fireEvent.change(descriptionFormControl, {target: {value: 'test description'}});
+    fireEvent.change(descriptionFormControl, {
+      target: { value: "test description" },
+    });
 
     //select file
     const fileUploadFormControl = await screen.findByTestId("file-upload");
-    fireEvent.change(fileUploadFormControl, {target: {files: ['testfile content']}});
+    fireEvent.change(fileUploadFormControl, {
+      target: { files: ["testfile content"] },
+    });
 
     //click legal share checkbox
     const legalShareCheckbox = await screen.findByTestId("legal-share");
@@ -37,6 +41,4 @@ describe("<Upload />", () => {
 
     expect(uploadButton.disabled).toBeFalsy();
   });
-})
-
-
+});
