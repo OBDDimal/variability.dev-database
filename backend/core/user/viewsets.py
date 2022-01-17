@@ -3,6 +3,7 @@ from datetime import timedelta
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.signing import BadSignature
 from django.utils import timezone, dateparse
+from django.utils.encoding import DjangoUnicodeDecodeError
 from rest_framework.response import Response
 from core.user.serializers import UserSerializer
 from core.user.models import User
@@ -35,6 +36,8 @@ class ActivateUserViewSet(GenericViewSet, CreateModelMixin):
         try:
             user = decode_token_to_user(token)
             actual_request_timestamp = dateparse.parse_datetime(user.pop('timestamp'))
+            if user.pop('purpose') != 'user_activation':
+                raise BadSignature('Token purpose does not match!')
             min_possible_request_timestamp = timezone.now() - timedelta(days=PASSWORD_RESET_TIMEOUT_DAYS)
             valid = min_possible_request_timestamp <= actual_request_timestamp
             if not valid:
@@ -49,4 +52,6 @@ class ActivateUserViewSet(GenericViewSet, CreateModelMixin):
         except ObjectDoesNotExist as error:
             return Response({'message': str(error)})
         except BadSignature as error:
+            return Response({'message': str(error)})
+        except DjangoUnicodeDecodeError as error:
             return Response({'message': str(error)})

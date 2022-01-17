@@ -72,6 +72,7 @@ class RegistrationSerializer(UserSerializer):
                     'id': str(user.id),
                     'email': str(user.email),
                     'timestamp': str(timezone.now()),
+                    'purpose': 'user_activation'
                 }
                 user.email_user("DDueruem Account Activation", render_to_string('email/user_activation_email.html', {
                     'user': str(user.email),

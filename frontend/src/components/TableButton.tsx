@@ -15,15 +15,14 @@ export default function TableButton(props: {
     rowDataId = props.cell._cell.row.data.id;
     isOwner = props.cell._cell.row.data.owner;
   }
+
   return (
     <a
       href={
         isOwner && props.method
-          ? isOwner
-            ? `/${props.basePath}/${props.method}/${rowDataId}`
-            : "#"
-          : props.method
           ? `/${props.basePath}/${props.method}/${rowDataId}`
+          : props.method
+          ? "#"
           : `/${props.basePath}/${rowDataId}`
       }
     >

@@ -1,5 +1,12 @@
 {
   "name": "frontend",
+  "jestSonar": {
+    "sonar56x": true,
+    "reportPath": ".",
+    "reportFile": "sonar-report.xml",
+    "indent": 4,
+    "collectCoverage": true
+  },
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -29,6 +36,7 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
+    "test:ci": "react-scripts test --coverage --env=jsdom --testResultsProcessor ./node_modules/jest-sonar-reporter/index.js",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {
@@ -53,6 +61,8 @@
     "@testing-library/jest-dom": "^5.11.4",
     "@testing-library/react": "^11.1.0",
     "@testing-library/user-event": "^12.1.10",
-    "@types/jest": "^26.0.15"
+    "@types/jest": "^26.0.15",
+    "jest-sonar-reporter": "^2.0.0",
+    "react-select-event": "^5.3.0"
   }
 }

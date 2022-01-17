@@ -10,6 +10,7 @@ on:
     branches: [dev]
 
 jobs:
+
   install:
     runs-on: ubuntu-latest
     defaults:
@@ -111,4 +112,52 @@ jobs:
         if: steps.build-cache.outputs.cache-hit != 'true'
         run: yarn build --if-present
 
-      - run: yarn test
+      - run: yarn test:ci
+      
+      - name: Upload Sonar Test Results Frontend
+        uses: actions/upload-artifact@v2
+        with:
+          name: sonar-report-frontend
+          path: ${{ github.workspace }}/frontend/sonar-report.xml
+          
+      - name: Upload Sonar Test Coverage Frontend
+        uses: actions/upload-artifact@v2
+        with:
+          name: sonar-coverage-frontend
+          path: ${{ github.workspace }}/frontend/coverage/lcov.info
+
+  sonarqube:
+    needs: test
+    name: SonarQube Scan
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        # Disabling shallow clone is recommended for improving relevancy of reporting
+        fetch-depth: 0
+        
+    - name: Download Sonar Test Results Frontend
+      uses: actions/download-artifact@v2
+      with:
+        name: sonar-report-frontend
+        path: ${{ github.workspace }}/frontend
+        
+    - name: Download Sonar Test Coverage Frontend
+      uses: actions/download-artifact@v2
+      with:
+        name: sonar-coverage-frontend
+        path: ${{ github.workspace }}/frontend/coverage
+        
+    - name: fix code coverage paths
+      working-directory: ./frontend
+      run: |
+        sed -i 's/\/home\/runner\/work\/ddueruem-web\/ddueruem-web\//\/github\/workspace\//g' coverage/lcov.info
+        sed -i 's/\/home\/runner\/work\/ddueruem-web\/ddueruem-web\//\/github\/workspace\//g' sonar-report.xml
+        
+    - name: SonarQube Scan
+      uses: sonarsource/sonarqube-scan-action@master
+      with:
+        projectBaseDir: "./frontend"
+      env:
+        SONAR_TOKEN: ${{ secrets.SONARQUBE_TOKEN }}
+        SONAR_HOST_URL: ${{ secrets.SONARQUBE_HOST }}
