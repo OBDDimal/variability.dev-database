@@ -1,6 +1,6 @@
 import api from "../../services/api.service";
 import React, { Component } from "react";
-import G6, { INode, NodeConfig } from "@antv/g6";
+import G6, { EdgeConfig, INode, NodeConfig } from "@antv/g6";
 import ReactDOM from "react-dom";
 const API_URL = process.env.REACT_APP_DOMAIN;
 
@@ -109,7 +109,7 @@ export default class FileShow extends Component<Props, State> {
           this.graph.data(this.state.json);
 
           //customize nodes
-          /*this.graph.node((node: nodeConfig) => {
+          this.graph.node((node: nodeConfig) => {
             if (!node.wasRendered) {
               let fontSizeDuplicator = 7; //choosen via try and error
               //label position relative to node, options: center, top, bottom, left, right
@@ -162,62 +162,39 @@ export default class FileShow extends Component<Props, State> {
           //fm_attributes mandatory with field type (can be 'and', 'or', 'feautre', ...)
           //Note that, if fm_attributes.type == 'and' then there can be a new attribute 'mandatory'
           //more: https://g6.antv.vision/en/docs/manual/middle/elements/edges/defaultEdge#the-common-property
-          this.graph.edge(
-            (edge: {
-              source: any;
-              target: any;
-              id: any;
-              type: any;
-              style: any;
-            }) => {
-              if (
-                edge &&
-                edge.source &&
-                edge.target &&
-                edge.id &&
-                edge.type &&
-                edge.style
-              ) {
-                let parent = this.graph.findById(edge.source);
-                let currentDepth = this.graph
-                  .findById(edge.source)
-                  .get("model").depth;
-                //collapse subtrees on depth level 2
-                //https://g6.antv.vision/en/docs/manual/middle/states/defaultBehavior#collapse-expand
-                if (currentDepth == 2) {
-                  let newModel = this.graph.findById(edge.source).get("model");
-                  //do this only on init, means collapse is undefined
-                  if (newModel.collapsed == undefined) {
-                    newModel.collapsed = true;
-                    this.graph.updateItem(parent, newModel);
-                  }
-                }
-                let child = this.graph.findById(edge.target).get("model");
-                parent = this.graph.findById(edge.source).get("model");
-                switch (parent.fm_attributes.type) {
-                  case "and":
-                    //add and color mandatory circle accordingly
-                    return {
-                      id: edge.id,
-                      source: edge.source,
-                      target: edge.target,
-                      type: edge.type,
-                      style: {
-                        endArrow: {
-                          fill: child.fm_attributes.mandatory
-                            ? "#000000"
-                            : "#ffffff",
-                          path: G6.Arrow.circle(4, 8), //radius, offset
-                          d: 5,
-                        },
-                      },
-                    };
-                  default:
-                    return edge;
-                }
+          this.graph.edge((edge: EdgeConfig) => {
+            let parent = this.graph.findById(edge.source);
+            let currentDepth = this.graph
+              .findById(edge.source)
+              .get("model").depth;
+            //collapse subtrees on depth level 2
+            //https://g6.antv.vision/en/docs/manual/middle/states/defaultBehavior#collapse-expand
+            if (currentDepth == 2) {
+              let newModel = this.graph.findById(edge.source).get("model");
+              //do this only on init, means collapse is undefined
+              if (newModel.collapsed == undefined) {
+                newModel.collapsed = true;
+                this.graph.updateItem(parent, newModel);
               }
             }
-          ); */
+            let child = this.graph.findById(edge.target).get("model");
+            parent = this.graph.findById(edge.source).get("model");
+            switch (parent.fm_attributes.type) {
+              case "and":
+                //add and color mandatory circle accordingly
+                if (edge.style) {
+                  let newEndArrow = {
+                    fill: child.fm_attributes.mandatory ? "#000000" : "#ffffff",
+                    path: G6.Arrow.circle(4, 8), //radius, offset
+                    d: 5,
+                  };
+                  edge.style.endArrow = newEndArrow;
+                }
+                return edge;
+              default:
+                return edge;
+            }
+          });
         }
         this.graph.layout();
         this.graph.render();
@@ -240,6 +217,6 @@ export default class FileShow extends Component<Props, State> {
   };
 
   render() {
-    return <div id='graph-container'></div>;
+    return <div id="graph-container"></div>;
   }
 }

@@ -1,0 +1,4 @@
+# DDUERUEM
+# rest_framework_simplejwt
+msgid "user with this email already exists."
+msgstr "user with this email already exists!"
