@@ -182,7 +182,6 @@ export default class FileShow extends Component<Props, State> {
             switch (parent.fm_attributes.type) {
               case "and":
                 //add and color mandatory circle accordingly
-                console.log('here')
                 if (!edge.style) {
                   edge.style = {}
                 }
