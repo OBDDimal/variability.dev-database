@@ -15,3 +15,8 @@ code {
 .tabulator {
   padding: 0;
 }
+
+#graph-container {
+  height: 90vh;
+  width: 100vh;
+}

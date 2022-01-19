@@ -34,7 +34,8 @@ export default class TagCreate extends Component<Props, State> {
     return this.state.label && this.state.description;
   };
 
-  onSubmit = () => {
+  onSubmit = (e: { preventDefault: () => void }) => {
+    e.preventDefault();
     if (this.state.label && this.state.description) {
       api
         .post(`${API_URL}tags/`, this.state)
@@ -59,7 +60,7 @@ export default class TagCreate extends Component<Props, State> {
 
   render() {
     return (
-      <div>
+      <form onSubmit={this.onSubmit}>
         <Form.Group className='mb-3'>
           <Form.Label>Tag name</Form.Label>
           <Form.Control
@@ -81,14 +82,13 @@ export default class TagCreate extends Component<Props, State> {
           variant='primary'
           type='button'
           disabled={!this.isReady() ? true : undefined}
-          onClick={this.onSubmit}
         >
           {this.state.loading && (
             <span className='spinner-border spinner-border-sm' />
           )}
           Create!
         </Button>
-      </div>
+      </form>
     );
   }
 }

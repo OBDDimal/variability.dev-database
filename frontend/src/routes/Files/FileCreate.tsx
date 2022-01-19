@@ -115,7 +115,8 @@ export default class FileCreate extends Component<Props, State> {
     );
   };
 
-  onSubmit = () => {
+  onSubmit = (e: { preventDefault: () => void }) => {
+    e.preventDefault();
     if (
       this.state.tags &&
       this.state.label &&
@@ -161,7 +162,7 @@ export default class FileCreate extends Component<Props, State> {
 
   render() {
     return (
-      <div>
+      <form onSubmit={this.onSubmit}>
         <Form.Group className='mb-3'>
           <Form.Label>File name</Form.Label>
           <Form.Control
@@ -262,14 +263,13 @@ export default class FileCreate extends Component<Props, State> {
           variant='primary'
           type='button'
           disabled={!this.isReady() ? true : undefined}
-          onClick={this.onSubmit}
         >
           {this.state.loading && (
             <span className='spinner-border spinner-border-sm' />
           )}
           Upload!
         </Button>
-      </div>
+      </form>
     );
   }
 }

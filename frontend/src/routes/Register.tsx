@@ -44,7 +44,8 @@ export default class Register extends Component<Props, State> {
     );
   };
 
-  onSubmit = () => {
+  onSubmit = (e: { preventDefault: () => void }) => {
+    e.preventDefault();
     if (
       this.state.email &&
       this.state.password &&
@@ -83,38 +84,37 @@ export default class Register extends Component<Props, State> {
 
   render() {
     return (
-      <div>
-        <Form.Group className="mb-3">
+      <form onSubmit={this.onSubmit}>
+        <Form.Group className='mb-3'>
           <Form.Label>Email</Form.Label>
           <Form.Control
-            type="email"
-            placeholder="Email"
+            type='email'
+            placeholder='Email'
             onChange={this.onEmailChange}
           />
         </Form.Group>
-        <Form.Group className="mb-3">
+        <Form.Group className='mb-3'>
           <Form.Label>Password</Form.Label>
-          <Form.Control type="password" onChange={this.onPasswordChange} />
+          <Form.Control type='password' onChange={this.onPasswordChange} />
         </Form.Group>
-        <Form.Group className="mb-3">
+        <Form.Group className='mb-3'>
           <Form.Label>Password Confirmation</Form.Label>
           <Form.Control
-            type="password"
+            type='password'
             onChange={this.onPasswordConfirmationChange}
           />
         </Form.Group>
         <Button
-          variant="primary"
-          type="button"
+          variant='primary'
+          type='button'
           disabled={!this.isReady() || this.state.loading ? true : undefined}
-          onClick={this.onSubmit}
         >
           {this.state.loading && (
-            <span className="spinner-border spinner-border-sm" />
+            <span className='spinner-border spinner-border-sm' />
           )}
           Register!
         </Button>
-      </div>
+      </form>
     );
   }
 }

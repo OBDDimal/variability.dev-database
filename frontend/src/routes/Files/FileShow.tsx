@@ -43,9 +43,8 @@ export default class FileShow extends Component<Props, State> {
           const abstractNodeColor = "#f2f2ff";
           this.graph = new G6.TreeGraph({
             container: "graph-container",
-            width: 1200,
-            height: 600,
             linkCenter: true,
+            fitView: true,
             modes: {
               default: [
                 {
@@ -110,7 +109,7 @@ export default class FileShow extends Component<Props, State> {
           this.graph.data(this.state.json);
 
           //customize nodes
-          this.graph.node((node: nodeConfig) => {
+          /*this.graph.node((node: nodeConfig) => {
             if (!node.wasRendered) {
               let fontSizeDuplicator = 7; //choosen via try and error
               //label position relative to node, options: center, top, bottom, left, right
@@ -139,25 +138,21 @@ export default class FileShow extends Component<Props, State> {
               }
               maxSep = newWidth > maxSep ? newWidth : maxSep;
 
-              return {
-                id: node.id,
-                label: newLabel,
-                size: size,
-                wasRendered: true,
-                style: {
-                  fill: node.fm_attributes.abstract
-                    ? abstractNodeColor
-                    : concreteNodeColor,
-                  stroke: strokeColor,
-                },
-                labelCfg: {
-                  labelPos,
-                  style: {
-                    rotate,
-                    fontFamily: "courier",
-                  },
-                },
-              };
+              node.label = newLabel;
+              node.size = size;
+              node.wasRendered = true;
+              if (node.style && node.labelCfg && node.labelCfg.style) {
+                node.style.fill = node.fm_attributes.abstract
+                  ? abstractNodeColor
+                  : concreteNodeColor;
+                node.style.stroke = strokeColor;
+
+                node.labelCfg.position = labelPos;
+                node.labelCfg.style.rotate = rotate;
+                node.labelCfg.style.fontFamily = "courier";
+              }
+
+              return node;
             } else {
               return node;
             }
@@ -222,11 +217,10 @@ export default class FileShow extends Component<Props, State> {
                 }
               }
             }
-          );
+          ); */
         }
         this.graph.layout();
         this.graph.render();
-        this.graph.fitCenter();
         this.graph.on("itemcollapsed", (e: any) => {
           if (e.collapsed) {
             //collapsing node
