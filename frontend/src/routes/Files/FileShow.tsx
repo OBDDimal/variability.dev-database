@@ -182,14 +182,16 @@ export default class FileShow extends Component<Props, State> {
             switch (parent.fm_attributes.type) {
               case "and":
                 //add and color mandatory circle accordingly
-                if (edge.style) {
-                  let newEndArrow = {
-                    fill: child.fm_attributes.mandatory ? "#000000" : "#ffffff",
-                    path: G6.Arrow.circle(4, 8), //radius, offset
-                    d: 5,
-                  };
-                  edge.style.endArrow = newEndArrow;
+                console.log('here')
+                if (!edge.style) {
+                  edge.style = {}
                 }
+                let newEndArrow = {
+                  fill: child.fm_attributes.mandatory ? "#000000" : "#ffffff",
+                  path: G6.Arrow.circle(4, 8), //radius, offset
+                  d: 5,
+                };
+                edge.style.endArrow = newEndArrow  
                 return edge;
               default:
                 return edge;
