@@ -1,4 +1,5 @@
 import { Component } from "react";
+import { Row, Container } from "react-bootstrap";
 import AuthService from "../services/auth.service";
 
 interface IUser {
@@ -11,7 +12,6 @@ interface IUser {
 type Props = {};
 
 type State = {
-  userReady: boolean;
   currentUser: IUser & { accessToken: string };
 };
 export default class Profile extends Component<Props, State> {
@@ -19,7 +19,6 @@ export default class Profile extends Component<Props, State> {
     super(props);
 
     this.state = {
-      userReady: false,
       currentUser: { accessToken: "" },
     };
   }
@@ -29,15 +28,15 @@ export default class Profile extends Component<Props, State> {
 
     if (!currentUser) window.location.replace("/");
 
-    this.setState({ currentUser: currentUser, userReady: true });
+    this.setState({ currentUser: currentUser });
   }
 
   render() {
     const { currentUser } = this.state;
 
     return (
-      <div className='container'>
-        {this.state.userReady ? (
+      <Container>
+        <Row>
           <div>
             <header className='jumbotron'>
               <h3>
@@ -58,8 +57,8 @@ export default class Profile extends Component<Props, State> {
                 ))}
             </ul>
           </div>
-        ) : null}
-      </div>
+        </Row>
+      </Container>
     );
   }
 }

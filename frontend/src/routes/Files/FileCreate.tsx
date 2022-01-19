@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Button, Form } from "react-bootstrap";
+import { Button, Container, Form, Row } from "react-bootstrap";
 import Select from "react-select";
 import { Modal } from "../../components/Modal";
 import api from "../../services/api.service";
@@ -126,6 +126,7 @@ export default class FileCreate extends Component<Props, State> {
       this.state.userData &&
       this.state.openSource
     ) {
+      this.setState({ loading: true });
       const data = new FormData();
 
       data.append("label", this.state.label);
@@ -151,6 +152,7 @@ export default class FileCreate extends Component<Props, State> {
           });
         })
         .catch((error) => {
+          this.setState({ loading: false });
           Modal.fire({
             icon: "error",
             title: "Error!!",
@@ -162,114 +164,122 @@ export default class FileCreate extends Component<Props, State> {
 
   render() {
     return (
-      <form onSubmit={this.onSubmit}>
-        <Form.Group className='mb-3'>
-          <Form.Label>File name</Form.Label>
-          <Form.Control
-            data-testid='label'
-            onChange={this.onLabelChange}
-            placeholder='Leave a filename'
-          />
-        </Form.Group>
-        <Form.Group className='mb-3'>
-          <Form.Label>Description</Form.Label>
-          <Form.Control
-            data-testid='description'
-            as='textarea'
-            onChange={this.onDescriptionChange}
-            placeholder='Leave a comment here'
-          />
-        </Form.Group>
-        <Form.Group className='mb-3'>
-          <Form.Label>File Upload</Form.Label>
-          <Form.Control
-            data-testid='file-upload'
-            type='file'
-            onChange={this.onFileChange}
-            accept='.xml'
-          />
-        </Form.Group>
-        <Form.Group className='mb-3'>
-          <Form.Label>License</Form.Label>
-          <Form.Select onChange={this.onLicenseChange}>
-            {license.map((key) => {
-              return (
-                <option key={key} value={key}>
-                  {key}
+      <Container>
+        <Row>
+          <form onSubmit={this.onSubmit}>
+            <Form.Group className='mb-3'>
+              <Form.Label>File name</Form.Label>
+              <Form.Control
+                data-testid='label'
+                onChange={this.onLabelChange}
+                placeholder='Leave a filename'
+              />
+            </Form.Group>
+            <Form.Group className='mb-3'>
+              <Form.Label>Description</Form.Label>
+              <Form.Control
+                data-testid='description'
+                as='textarea'
+                onChange={this.onDescriptionChange}
+                placeholder='Leave a comment here'
+              />
+            </Form.Group>
+            <Form.Group className='mb-3'>
+              <Form.Label>File Upload</Form.Label>
+              <Form.Control
+                data-testid='file-upload'
+                type='file'
+                onChange={this.onFileChange}
+                accept='.xml'
+              />
+            </Form.Group>
+            <Form.Group className='mb-3'>
+              <Form.Label>License</Form.Label>
+              <Form.Select onChange={this.onLicenseChange}>
+                {license.map((key) => {
+                  return (
+                    <option key={key} value={key}>
+                      {key}
+                    </option>
+                  );
+                })}
+              </Form.Select>
+            </Form.Group>
+            <Form.Group className='mb-3'>
+              <Form.Label>New version of</Form.Label>
+              <Form.Select
+                onChange={this.onNewVersionOfChange}
+                defaultValue={"---"}
+              >
+                {this.state.gottenFiles.map((key) => {
+                  return (
+                    <option key={key.value} value={key.value}>
+                      {key.value}: {key.label}
+                    </option>
+                  );
+                })}
+                <option key='---' value='---'>
+                  ---
                 </option>
-              );
-            })}
-          </Form.Select>
-        </Form.Group>
-        <Form.Group className='mb-3'>
-          <Form.Label>New version of</Form.Label>
-          <Form.Select
-            onChange={this.onNewVersionOfChange}
-            defaultValue={"---"}
-          >
-            {this.state.gottenFiles.map((key) => {
-              return (
-                <option key={key.value} value={key.value}>
-                  {key.value}: {key.label}
-                </option>
-              );
-            })}
-            <option key='---' value='---'>
-              ---
-            </option>
-          </Form.Select>
-        </Form.Group>
-        <Form.Group data-testid='tag-form' className='mb-3'>
-          <Form.Label htmlFor='tags'>Tags</Form.Label>
-          <Select
-            isMulti
-            name='tags'
-            inputId='tags'
-            onChange={this.onTagChange}
-            options={this.state.gottenTags}
-          />
-        </Form.Group>
-        <Form.Group className='mb-3'>
-          <Form.Check
-            data-testid='legal-share'
-            type='checkbox'
-            checked={this.state.legalShare}
-            onChange={() =>
-              this.setState({ legalShare: !this.state.legalShare })
-            }
-            id='legal-share'
-            label='I am legally allowed to share this model'
-          />
-          <Form.Check
-            data-testid='user-data'
-            type='checkbox'
-            checked={this.state.userData}
-            onChange={() => this.setState({ userData: !this.state.userData })}
-            id='user-data'
-            label='My email and a date will always be tied to the file upload (even after account deletion)'
-          />
-          <Form.Check
-            data-testid='open-source'
-            type='checkbox'
-            checked={this.state.openSource}
-            onChange={() =>
-              this.setState({ openSource: !this.state.openSource })
-            }
-            id='open-source'
-            label='All information will be published according to your chosen license'
-          />
-        </Form.Group>
-        <Button
-          variant='primary'
-          type='button'
-          disabled={!this.isReady() ? true : undefined}
-        >
-          {this.state.loading && (
-            <span className='spinner-border spinner-border-sm' />
-          )}
-          Upload!
-        </Button>
-      </form>
+              </Form.Select>
+            </Form.Group>
+            <Form.Group data-testid='tag-form' className='mb-3'>
+              <Form.Label htmlFor='tags'>Tags</Form.Label>
+              <Select
+                isMulti
+                name='tags'
+                inputId='tags'
+                onChange={this.onTagChange}
+                options={this.state.gottenTags}
+              />
+            </Form.Group>
+            <Form.Group className='mb-3'>
+              <Form.Check
+                data-testid='legal-share'
+                type='checkbox'
+                checked={this.state.legalShare}
+                onChange={() =>
+                  this.setState({ legalShare: !this.state.legalShare })
+                }
+                id='legal-share'
+                label='I am legally allowed to share this model'
+              />
+              <Form.Check
+                data-testid='user-data'
+                type='checkbox'
+                checked={this.state.userData}
+                onChange={() =>
+                  this.setState({ userData: !this.state.userData })
+                }
+                id='user-data'
+                label='My email and a date will always be tied to the file upload (even after account deletion)'
+              />
+              <Form.Check
+                data-testid='open-source'
+                type='checkbox'
+                checked={this.state.openSource}
+                onChange={() =>
+                  this.setState({ openSource: !this.state.openSource })
+                }
+                id='open-source'
+                label='All information will be published according to your chosen license'
+              />
+            </Form.Group>
+            <Button
+              variant='primary'
+              type='submit'
+              disabled={
+                !this.isReady() || this.state.loading ? true : undefined
+              }
+            >
+              {this.state.loading && (
+                <span className='spinner-border spinner-border-sm' />
+              )}
+              Upload!
+            </Button>
+          </form>
+        </Row>
+      </Container>
     );
   }
 }

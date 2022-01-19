@@ -1,5 +1,5 @@
 import { Component } from "react";
-import { Button, Form } from "react-bootstrap";
+import { Button, Container, Form, Row } from "react-bootstrap";
 import { Modal } from "../../components/Modal";
 import api from "../../services/api.service";
 
@@ -37,6 +37,8 @@ export default class TagCreate extends Component<Props, State> {
   onSubmit = (e: { preventDefault: () => void }) => {
     e.preventDefault();
     if (this.state.label && this.state.description) {
+      this.setState({ loading: true });
+
       api
         .post(`${API_URL}tags/`, this.state)
         .then((result) => {
@@ -49,6 +51,7 @@ export default class TagCreate extends Component<Props, State> {
           });
         })
         .catch((error) => {
+          this.setState({ loading: false });
           Modal.fire({
             icon: "error",
             title: "Error!!",
@@ -60,35 +63,41 @@ export default class TagCreate extends Component<Props, State> {
 
   render() {
     return (
-      <form onSubmit={this.onSubmit}>
-        <Form.Group className='mb-3'>
-          <Form.Label>Tag name</Form.Label>
-          <Form.Control
-            data-testid='label'
-            onChange={this.onLabelChange}
-            placeholder='Leave a tagname'
-          />
-        </Form.Group>
-        <Form.Group className='mb-3'>
-          <Form.Label>Description</Form.Label>
-          <Form.Control
-            data-testid='description'
-            as='textarea'
-            onChange={this.onDescriptionChange}
-            placeholder='Leave a comment here'
-          />
-        </Form.Group>
-        <Button
-          variant='primary'
-          type='button'
-          disabled={!this.isReady() ? true : undefined}
-        >
-          {this.state.loading && (
-            <span className='spinner-border spinner-border-sm' />
-          )}
-          Create!
-        </Button>
-      </form>
+      <Container>
+        <Row>
+          <form onSubmit={this.onSubmit}>
+            <Form.Group className='mb-3'>
+              <Form.Label>Tag name</Form.Label>
+              <Form.Control
+                data-testid='label'
+                onChange={this.onLabelChange}
+                placeholder='Leave a tagname'
+              />
+            </Form.Group>
+            <Form.Group className='mb-3'>
+              <Form.Label>Description</Form.Label>
+              <Form.Control
+                data-testid='description'
+                as='textarea'
+                onChange={this.onDescriptionChange}
+                placeholder='Leave a comment here'
+              />
+            </Form.Group>
+            <Button
+              variant='primary'
+              type='submit'
+              disabled={
+                !this.isReady() || this.state.loading ? true : undefined
+              }
+            >
+              {this.state.loading && (
+                <span className='spinner-border spinner-border-sm' />
+              )}
+              Create!
+            </Button>
+          </form>
+        </Row>
+      </Container>
     );
   }
 }

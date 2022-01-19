@@ -30,7 +30,7 @@ export default class FileShow extends Component<Props, State> {
     this.ref = React.createRef();
 
     api.get(`${API_URL}files/${id}/`).then((response) => {
-      api.get(`${response.data.transpiled_file}/`).then((file) => {
+      api.get(`${response.data.transpiled_file}`).then((file) => {
         this.setState({ json: file.data });
 
         if (!this.graph) {
@@ -217,6 +217,6 @@ export default class FileShow extends Component<Props, State> {
   };
 
   render() {
-    return <div id="graph-container"></div>;
+    return <div id='graph-container'></div>;
   }
 }
