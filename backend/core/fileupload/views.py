@@ -59,7 +59,7 @@ class FileUploadViewSet(viewsets.ModelViewSet):
         })
         plain_message = strip_tags(html_message)
 
-        self.request.user.email_user('DDueruem File Upload', plain_message, html_message=html_message)
+        self.request.user._email_user('DDueruem File Upload', plain_message, html_message=html_message)
 
 
 class TagsViewSet(viewsets.ModelViewSet):
