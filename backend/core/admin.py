@@ -1,4 +1,6 @@
 from django.contrib import admin
+from django.http import HttpResponseRedirect
+from django.urls import reverse
 from django.utils import timezone
 from datetime import timedelta
 from django.contrib.admin import ModelAdmin
@@ -9,6 +11,16 @@ from core.user.models import User
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.admin.templatetags.admin_list import _boolean_icon
 from ddueruemweb.settings import PASSWORD_RESET_TIMEOUT_DAYS
+from django.contrib.admin.views.decorators import staff_member_required
+
+
+@staff_member_required
+def send_activation_email(request, user_id):
+    """
+    Function based view for resending activation link in the admin panel only.
+    """
+    User.objects.get(pk=user_id).send_activation_link()
+    return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
 
 class UserAdmin(BaseUserAdmin):
@@ -18,7 +30,6 @@ class UserAdmin(BaseUserAdmin):
     model = User
     form = AdminUserChangeForm
     add_form = AdminUserCreationForm
-    change_form_template = 'admin/extended_change_user_form.html'
     # Show attributes in overall list view
     list_display = ('id', 'email', 'institute', 'is_active_ex', 'is_staff', 'is_superuser', 'last_login', 'date_joined')
     list_filter = ('institute', 'is_active', 'is_staff', 'is_superuser', 'last_login', 'date_joined')
@@ -92,7 +103,7 @@ class TagAdmin(ModelAdmin):
         ('Information', {'fields': ['label', 'is_public', 'owner', 'description']}),
         ('Important dates', {'fields': ['date_created']})
     ]
-    readonly_fields = ('id', 'date_created', )
+    readonly_fields = ('id', 'date_created',)
     search_fields = ('owner',)
     ordering = ('owner', 'date_created')
     filter_horizontal = ()

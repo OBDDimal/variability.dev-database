@@ -81,7 +81,6 @@ class User(AbstractBaseUser, PermissionsMixin):
         verbose_name = 'user'
         verbose_name_plural = 'users'
 
-    @property
     def send_activation_link(self):
         """
         Send predefined activation email this user.
@@ -101,7 +100,6 @@ class User(AbstractBaseUser, PermissionsMixin):
         })
         plain_message = strip_tags(html_message)
         user._email_user("DDueruem Account Activation", plain_message, html_message=html_message)
-        return True
 
     def _email_user(self, subject, message, from_email=None, **kwargs):
         """
