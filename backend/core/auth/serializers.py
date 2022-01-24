@@ -5,11 +5,16 @@ from django.utils import timezone
 from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.settings import api_settings
+from django.utils.html import strip_tags
+import environ
 
 from core.user.models import User
 from core.user.serializers import UserSerializer
 from .tokens import encode_user_to_token
 
+
+env = environ.Env(DEBUG=(bool, False))
+environ.Env.read_env()
 
 class LoginSerializer(TokenObtainPairSerializer):
     """
@@ -74,10 +79,11 @@ class RegistrationSerializer(UserSerializer):
                     'timestamp': str(timezone.now()),
                     'purpose': 'user_activation'
                 }
-                user.email_user("DDueruem Account Activation", render_to_string('email/user_activation_email.html', {
+                link = f"http://{env('FRONTEND_URL')}/register/{encode_user_to_token(extended_user)}"
+                html_message = render_to_string('email/user_activation_email.html', {
                     'user': str(user.email),
-                    'protocol': 'http',
-                    'domain': 'localhost:8000/auth/register/confirm/',
-                    'token': encode_user_to_token(extended_user)
-                }))
+                    'link': link
+                })
+                plain_message = strip_tags(html_message)
+                user.email_user("DDueruem Account Activation", plain_message, html_message=html_message)
                 return user

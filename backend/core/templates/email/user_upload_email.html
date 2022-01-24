@@ -1,13 +1,8 @@
-{% autoescape off %}
-    <h3>Hello {{ user }},</h3>
-
-    To see your uploaded file {{ file_name }}, please click on the following link:
-    <br/>
-    <a href="{{ file_domain }}">See file</a>
-    <br/><br/>
-    If clicking the link above doesn't work, you can copy the plain link here:
-    <br/>
-    {{ file_domain }}
-    <br/><br/>
-    Thank you for uploading a file.
-{% endautoescape %}
+{% extends "email/email_template.html" %}
+    {% block greeting %}Hello {{ user }},{% endblock %}
+    {% block upper_text %}To see your uploaded file {{ file_name }}, please click on the following button: {% endblock %}
+    {% block call_to_action_link %}{{ file_domain }}{% endblock %}
+    {% block call_to_action_text %}See file{% endblock %}
+    {% block lower_text %}If clicking the button above doesn't work, you
+    can copy the plain link here: {{ file_domain }} {% endblock %}
+{% block salutation %}Thank you for uploading a file.{% endblock %}
