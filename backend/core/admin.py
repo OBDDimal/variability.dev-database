@@ -18,6 +18,7 @@ class UserAdmin(BaseUserAdmin):
     model = User
     form = AdminUserChangeForm
     add_form = AdminUserCreationForm
+    change_form_template = 'admin/extended_change_user_form.html'
     # Show attributes in overall list view
     list_display = ('id', 'email', 'institute', 'is_active_ex', 'is_staff', 'is_superuser', 'last_login', 'date_joined')
     list_filter = ('institute', 'is_active', 'is_staff', 'is_superuser', 'last_login', 'date_joined')
@@ -91,7 +92,7 @@ class TagAdmin(ModelAdmin):
         ('Information', {'fields': ['label', 'is_public', 'owner', 'description']}),
         ('Important dates', {'fields': ['date_created']})
     ]
-    readonly_fields = ('id', 'date_created')
+    readonly_fields = ('id', 'date_created', )
     search_fields = ('owner',)
     ordering = ('owner', 'date_created')
     filter_horizontal = ()
