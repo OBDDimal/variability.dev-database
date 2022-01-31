@@ -10,7 +10,9 @@ import { Button, Container, Row } from "react-bootstrap";
 
 const API_URL = process.env.REACT_APP_DOMAIN;
 
-type Props = {};
+type Props = {
+  readonly?: boolean;
+};
 
 type State = {
   files:
@@ -29,11 +31,10 @@ type State = {
   columns: Array<any>;
 };
 
-const columns = [
+let columns = [
   { title: "Id", field: "id", width: 60 },
   { title: "Label", field: "label" },
-  { title: "Description", field: "description" },
-  { title: "File", field: "local_file" },
+  { title: "Description", field: "description", formatter: "textarea" },
   { title: "License", field: "license" },
   {
     title: "Tags",
@@ -57,19 +58,6 @@ const columns = [
     width: 60,
     hozAlign: "center",
   },
-  {
-    headerSort: false,
-    formatter: reactFormatter(
-      <TableButton
-        variant='warning'
-        method='edit'
-        basePath='files'
-        icon={faPen}
-      />
-    ),
-    width: 60,
-    hozAlign: "center",
-  },
 ];
 
 export default class FileIndex extends Component<Props, State> {
@@ -80,6 +68,26 @@ export default class FileIndex extends Component<Props, State> {
 
   constructor(props: Props | Readonly<Props>) {
     super(props);
+
+    // Check for readonly property
+    if (!props.readonly) {
+      const editButton = {
+        headerSort: false,
+        formatter: reactFormatter(
+          <TableButton
+            variant='warning'
+            method='edit'
+            basePath='files'
+            icon={faPen}
+          />
+        ),
+        width: 60,
+        hozAlign: "center",
+      };
+
+      columns.push(editButton);
+    }
+
     this.getFiles();
   }
 
@@ -93,11 +101,13 @@ export default class FileIndex extends Component<Props, State> {
     return (
       <Container>
         <Row>
-          <a href='/files/create'>
-            <Button variant='primary' type='button'>
-              <FontAwesomeIcon icon={faPlus} />
-            </Button>
-          </a>
+          {!this.props.readonly && (
+            <a href='/files/create'>
+              <Button variant='primary' type='button'>
+                <FontAwesomeIcon icon={faPlus} />
+              </Button>
+            </a>
+          )}
           <ReactTabulator
             layout='fitColumns'
             columns={columns}

@@ -59,14 +59,7 @@ function App() {
             </RequireAuth>
           }
         />
-        <Route
-          path='/files/:id'
-          element={
-            <RequireAuth>
-              <FileShow />
-            </RequireAuth>
-          }
-        />
+        <Route path='/files/:id' element={<FileShow />} />
         <Route
           path='/files/edit/:id'
           element={

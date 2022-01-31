@@ -180,6 +180,7 @@ export default class FileCreate extends Component<Props, State> {
               <Form.Control
                 data-testid='description'
                 as='textarea'
+                maxLength={250}
                 onChange={this.onDescriptionChange}
                 placeholder='Leave a comment here'
               />
