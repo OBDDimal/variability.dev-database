@@ -45,6 +45,6 @@ In the frontend folder execute
 yarn install
 ```
 and then
-````
+```
 yarn start
 ```
