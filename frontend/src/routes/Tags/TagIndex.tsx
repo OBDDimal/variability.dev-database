@@ -19,7 +19,7 @@ type State = {
 const columns = [
   { title: "Id", field: "id", width: 60 },
   { title: "Label", field: "label" },
-  { title: "Description", field: "description" },
+  { title: "Description", field: "description", formatter: "textarea" },
   { title: "Public", field: "is_public", formatter: "tickCross" },
   {
     headerSort: false,
