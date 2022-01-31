@@ -146,7 +146,7 @@ export default class FileCreate extends Component<Props, State> {
           Modal.fire({
             icon: "success",
             title: "Success!!",
-            text: JSON.stringify(result.data),
+            text: "File was uploaded successfully!",
           }).then(() => {
             window.location.reload();
           });
