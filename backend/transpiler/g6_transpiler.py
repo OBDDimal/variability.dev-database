@@ -45,6 +45,5 @@ def xml_to_g6(file, is_file_path=True):
     String containing the XML content, otherwise it will be interpreted as path to a file.
     """
     file_as_json = xml_to_json(file, is_file_path)
-    print(f"file as = {file_as_json}")
     json_as_g6 = json_to_g6(file_as_json) if bool(file_as_json) else {}
     return json_as_g6
