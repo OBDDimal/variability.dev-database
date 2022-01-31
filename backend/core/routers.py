@@ -4,7 +4,7 @@ from rest_framework import routers
 
 from core.fileupload import views
 from core.fileupload.views import FileUploadViewSet, TagsViewSet
-from core.user.viewsets import UserViewSet, ActivateUserViewSet
+from core.user.viewsets import  ActivateUserViewSet
 from core.auth.viewsets import LoginViewSet, RegistrationViewSet, RefreshViewSet
 from ddueruemweb.settings import STATIC_ROOT, STATIC_URL, MEDIA_URL, MEDIA_ROOT
 
@@ -18,8 +18,6 @@ router.register(r'auth/register', RegistrationViewSet, basename='auth-register')
 router.register(r'auth/register/confirm/(?P<token>[\w\d]+)', ActivateUserViewSet, basename='auth-register-confirm')
 router.register(r'auth/refresh', RefreshViewSet, basename='auth-refresh')
 
-# USER
-router.register(r'user', UserViewSet, basename='user')
 
 # FILES
 router.register(r'files', FileUploadViewSet, basename='file-upload')

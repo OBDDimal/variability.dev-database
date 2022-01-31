@@ -31,71 +31,60 @@ function App() {
       <SiteNavbar
         url={window.location.href.substr(window.location.href.lastIndexOf("/"))}
       />
-      <Container>
-        <Row>
-          <Routes>
-            <Route path='/' element={<Home />} />
-            <Route path='/login' element={<Login />} />
-            <Route path='/register' element={<Register />} />
-            <Route
-              path='/files/create'
-              element={
-                <RequireAuth>
-                  <FileCreate />
-                </RequireAuth>
-              }
-            />
-            <Route
-              path='/files'
-              element={
-                <RequireAuth>
-                  <FileIndex />
-                </RequireAuth>
-              }
-            />
-            <Route
-              path='/profile'
-              element={
-                <RequireAuth>
-                  <Profile />
-                </RequireAuth>
-              }
-            />
-            <Route
-              path='/files/:id'
-              element={
-                <RequireAuth>
-                  <FileShow />
-                </RequireAuth>
-              }
-            />
-            <Route
-              path='/files/edit/:id'
-              element={
-                <RequireAuth>
-                  <FileEdit />
-                </RequireAuth>
-              }
-            />
-            <Route
-              path='/tags'
-              element={
-                <RequireAuth>
-                  <TagIndex />
-                </RequireAuth>
-              }
-            />
-            <Route
-              path='/tags/create'
-              element={
-                <RequireAuth>
-                  <TagCreate />
-                </RequireAuth>
-              }
-            />
-          </Routes>
-        </Row>
-      </Container>
+      <Routes>
+        <Route path='/' element={<Home />} />
+        <Route path='/login' element={<Login />} />
+        <Route path='/register' element={<Register />} />
+        <Route
+          path='/files/create'
+          element={
+            <RequireAuth>
+              <FileCreate />
+            </RequireAuth>
+          }
+        />
+        <Route
+          path='/files'
+          element={
+            <RequireAuth>
+              <FileIndex />
+            </RequireAuth>
+          }
+        />
+        <Route
+          path='/profile'
+          element={
+            <RequireAuth>
+              <Profile />
+            </RequireAuth>
+          }
+        />
+        <Route path='/files/:id' element={<FileShow />} />
+        <Route
+          path='/files/edit/:id'
+          element={
+            <RequireAuth>
+              <FileEdit />
+            </RequireAuth>
+          }
+        />
+        <Route
+          path='/tags'
+          element={
+            <RequireAuth>
+              <TagIndex />
+            </RequireAuth>
+          }
+        />
+        <Route
+          path='/tags/create'
+          element={
+            <RequireAuth>
+              <TagCreate />
+            </RequireAuth>
+          }
+        />
+      </Routes>
     </>
   );
 }

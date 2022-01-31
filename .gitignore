@@ -1,5 +1,7 @@
 #Backend: upload directory
 backend/media/
+backend/transpiler/xmlExamples/*.json
+
 
 #BDD stuff
 #locally uploaded files

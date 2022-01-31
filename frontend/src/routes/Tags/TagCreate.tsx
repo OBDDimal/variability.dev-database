@@ -1,10 +1,7 @@
 import { Component } from "react";
-import { Button, Form } from "react-bootstrap";
-import Swal from "sweetalert2";
-import withReactContent from "sweetalert2-react-content";
+import { Button, Container, Form, Row } from "react-bootstrap";
+import { Modal } from "../../components/Modal";
 import api from "../../services/api.service";
-
-const MySwal = withReactContent(Swal);
 
 const API_URL = process.env.REACT_APP_DOMAIN;
 
@@ -17,10 +14,6 @@ type State = {
 };
 
 export default class TagCreate extends Component<Props, State> {
-  constructor(props: Props | Readonly<Props>) {
-    super(props);
-  }
-
   state: State = {
     label: undefined,
     description: undefined,
@@ -41,21 +34,25 @@ export default class TagCreate extends Component<Props, State> {
     return this.state.label && this.state.description;
   };
 
-  onSubmit = () => {
+  onSubmit = (e: { preventDefault: () => void }) => {
+    e.preventDefault();
     if (this.state.label && this.state.description) {
+      this.setState({ loading: true });
+
       api
         .post(`${API_URL}tags/`, this.state)
         .then((result) => {
-          MySwal.fire({
+          Modal.fire({
             icon: "success",
             title: "Success!!",
-            text: JSON.stringify(result.data),
+            text: "Tag was created successfully!",
           }).then(() => {
             window.location.reload();
           });
         })
         .catch((error) => {
-          MySwal.fire({
+          this.setState({ loading: false });
+          Modal.fire({
             icon: "error",
             title: "Error!!",
             text: JSON.stringify(error.message),
@@ -66,36 +63,42 @@ export default class TagCreate extends Component<Props, State> {
 
   render() {
     return (
-      <div>
-        <Form.Group className='mb-3'>
-          <Form.Label>Tag name</Form.Label>
-          <Form.Control
-            data-testid='label'
-            onChange={this.onLabelChange}
-            placeholder='Leave a tagname'
-          />
-        </Form.Group>
-        <Form.Group className='mb-3'>
-          <Form.Label>Description</Form.Label>
-          <Form.Control
-            data-testid='description'
-            as='textarea'
-            onChange={this.onDescriptionChange}
-            placeholder='Leave a comment here'
-          />
-        </Form.Group>
-        <Button
-          variant='primary'
-          type='button'
-          disabled={!this.isReady() ? true : undefined}
-          onClick={this.onSubmit}
-        >
-          {this.state.loading && (
-            <span className='spinner-border spinner-border-sm' />
-          )}
-          Create!
-        </Button>
-      </div>
+      <Container>
+        <Row>
+          <form onSubmit={this.onSubmit}>
+            <Form.Group className='mb-3'>
+              <Form.Label>Tag name</Form.Label>
+              <Form.Control
+                data-testid='label'
+                onChange={this.onLabelChange}
+                placeholder='Leave a tagname'
+              />
+            </Form.Group>
+            <Form.Group className='mb-3'>
+              <Form.Label>Description</Form.Label>
+              <Form.Control
+                data-testid='description'
+                as='textarea'
+                maxLength={250}
+                onChange={this.onDescriptionChange}
+                placeholder='Leave a comment here'
+              />
+            </Form.Group>
+            <Button
+              variant='primary'
+              type='submit'
+              disabled={
+                !this.isReady() || this.state.loading ? true : undefined
+              }
+            >
+              {this.state.loading && (
+                <span className='spinner-border spinner-border-sm' />
+              )}
+              Create!
+            </Button>
+          </form>
+        </Row>
+      </Container>
     );
   }
 }

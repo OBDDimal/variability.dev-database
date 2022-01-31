@@ -6,7 +6,7 @@ import "react-tabulator/css/bootstrap/tabulator_bootstrap.min.css";
 import { faPen, faPlus, faTrash } from "@fortawesome/free-solid-svg-icons";
 import TableButton from "../../components/TableButton";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Button } from "react-bootstrap";
+import { Button, Container, Row } from "react-bootstrap";
 
 const API_URL = process.env.REACT_APP_DOMAIN;
 
@@ -19,7 +19,7 @@ type State = {
 const columns = [
   { title: "Id", field: "id", width: 60 },
   { title: "Label", field: "label" },
-  { title: "Description", field: "description" },
+  { title: "Description", field: "description", formatter: "textarea" },
   { title: "Public", field: "is_public", formatter: "tickCross" },
   {
     headerSort: false,
@@ -67,18 +67,20 @@ export default class TagIndex extends Component {
 
   render() {
     return (
-      <>
-        <a href='/tags/create'>
-          <Button variant='primary' type='button'>
-            <FontAwesomeIcon icon={faPlus} />
-          </Button>
-        </a>
-        <ReactTabulator
-          layout='fitColumns'
-          columns={columns}
-          data={this.state.tags}
-        />
-      </>
+      <Container>
+        <Row>
+          <a href='/tags/create'>
+            <Button variant='primary' type='button'>
+              <FontAwesomeIcon icon={faPlus} />
+            </Button>
+          </a>
+          <ReactTabulator
+            layout='fitColumns'
+            columns={columns}
+            data={this.state.tags}
+          />
+        </Row>
+      </Container>
     );
   }
 }

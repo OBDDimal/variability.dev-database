@@ -14,15 +14,6 @@ from ddueruemweb.settings import PASSWORD_RESET_TIMEOUT_DAYS
 from ..auth.tokens import decode_token_to_user
 
 
-class UserViewSet(ModelViewSet):
-    """
-    API endpoint that allows users to be viewed or edited
-    """
-    queryset = User.objects.all().order_by('-date_joined')
-    serializer_class = UserSerializer
-    permission_classes = [AllowAny]
-
-
 class ActivateUserViewSet(GenericViewSet, CreateModelMixin):
     """
     This view is called when the user tries to activate the user account, via a link which contains a token.

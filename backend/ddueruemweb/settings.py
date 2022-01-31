@@ -9,7 +9,8 @@ https://docs.djangoproject.com/en/3.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.2/ref/settings/
 """
-import os, environ
+import os
+import environ
 from pathlib import Path
 
 
@@ -65,8 +66,7 @@ ROOT_URLCONF = 'ddueruemweb.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates']
-        ,
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'debug': env('TEMPLATE_DEBUG'),
@@ -89,7 +89,7 @@ DATABASES = {}
 
 if env('USE_POSTGRES') != 'True':
     DATABASES = {
-    # Should be in the environment as well
+        # Should be in the environment as well
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
             'NAME': BASE_DIR / 'db.sqlite3',
@@ -133,7 +133,8 @@ REST_FRAMEWORK = {
     ),
     'DEFAULT_RENDERER_CLASSES': (
         'rest_framework.renderers.JSONRenderer',
-        'rest_framework.renderers.BrowsableAPIRenderer',  # enable django rest framework rendering in browser
+        # enable django rest framework rendering in browser
+        'rest_framework.renderers.BrowsableAPIRenderer',
     )
 }
 
@@ -168,15 +169,17 @@ AUTH_USER_MODEL = 'core_user.User'
 
 # LOGIN_REDIRECT_URL = "dashboard"  # define URL to which user should be redirected after successful login
 # LOGOUT_REDIRECT_URL = "home"
+ALLOWED_HOSTS = ['*']
 CORS_ORIGIN_ALLOW_ALL = True
 
 
 # https://docs.djangoproject.com/en/3.2/topics/email/
 EMAIL_HOST = env('EMAIL_HOST')  # define host and port for email backend
-EMAIL_HOST_USER= env('EMAIL_HOST_USER')
-EMAIL_HOST_PASSWORD= env('EMAIL_HOST_PASSWORD')
+EMAIL_HOST_USER = env('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD')
 EMAIL_PORT = env('EMAIL_PORT')
 # EMAIL_USE_TLS = True
 # EMAIL_USE_SSL = False
 
-PASSWORD_RESET_TIMEOUT_DAYS = 2  # also used for user email activation (token) timeout calc
+# also used for user email activation (token) timeout calc
+PASSWORD_RESET_TIMEOUT_DAYS = 2

@@ -2,8 +2,8 @@ from collections import OrderedDict
 from django.template.loader import render_to_string
 from core.fileupload.models.tag import Tag
 from rest_framework import viewsets, permissions
-from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework import status
 
 from core.fileupload.models.file import File
 from core.fileupload.serializers import FilesSerializer, TagsSerializer
@@ -83,3 +83,8 @@ class TagsViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
+
+    def delete(self, pk):
+      tag = self.get_object(pk)
+      tag.delete()
+      return Response(status=status.HTTP_204_NO_CONTENT)
