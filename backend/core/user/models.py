@@ -1,6 +1,12 @@
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin, Group
 from django.core.mail import send_mail
 from django.db import models
+from django.template.loader import render_to_string
+from django.utils import timezone
+from django.utils.html import strip_tags
+
+from core.auth.tokens import encode_user_to_token
+from ddueruemweb.settings import env
 
 
 class UserManager(BaseUserManager):
@@ -75,7 +81,27 @@ class User(AbstractBaseUser, PermissionsMixin):
         verbose_name = 'user'
         verbose_name_plural = 'users'
 
-    def email_user(self, subject, message, from_email=None, **kwargs):
+    def send_activation_link(self):
+        """
+        Send predefined activation email this user.
+        It is a method to make resending in e.g. admin view easier
+        """
+        user = self
+        extended_user = {
+            'id': str(user.id),
+            'email': str(user.email),
+            'timestamp': str(timezone.now()),
+            'purpose': 'user_activation'
+        }
+        link = f"http://{env('FRONTEND_URL')}/register/{encode_user_to_token(extended_user)}"
+        html_message = render_to_string('email/user_activation_email.html', {
+            'user': str(user.email),
+            'link': link
+        })
+        plain_message = strip_tags(html_message)
+        user._email_user("DDueruem Account Activation", plain_message, html_message=html_message)
+
+    def _email_user(self, subject, message, from_email=None, **kwargs):
         """
         Sends an email to this user
         """

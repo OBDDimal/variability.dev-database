@@ -1,7 +1,6 @@
 import api from "../../services/api.service";
 import React, { Component } from "react";
 import G6, { EdgeConfig, INode, NodeConfig } from "@antv/g6";
-import ReactDOM from "react-dom";
 const API_URL = process.env.REACT_APP_DOMAIN;
 
 type Props = {};
@@ -183,14 +182,14 @@ export default class FileShow extends Component<Props, State> {
               case "and":
                 //add and color mandatory circle accordingly
                 if (!edge.style) {
-                  edge.style = {}
+                  edge.style = {};
                 }
                 let newEndArrow = {
                   fill: child.fm_attributes.mandatory ? "#000000" : "#ffffff",
                   path: G6.Arrow.circle(4, 8), //radius, offset
                   d: 5,
                 };
-                edge.style.endArrow = newEndArrow  
+                edge.style.endArrow = newEndArrow;
                 return edge;
               default:
                 return edge;

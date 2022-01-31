@@ -1,14 +1,14 @@
+import environ
 from django.contrib.auth.models import update_last_login
 from django.core.exceptions import ObjectDoesNotExist
-from django.template.loader import render_to_string
-from django.utils import timezone
 from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.settings import api_settings
-
 from core.user.models import User
 from core.user.serializers import UserSerializer
-from .tokens import encode_user_to_token
+
+env = environ.Env(DEBUG=(bool, False))
+environ.Env.read_env()
 
 
 class LoginSerializer(TokenObtainPairSerializer):
@@ -67,17 +67,5 @@ class RegistrationSerializer(UserSerializer):
                 user = User.objects.get(email=validated_data['email'])
             except ObjectDoesNotExist:
                 user = User.objects.create_user(**validated_data)
-
-                extended_user = {
-                    'id': str(user.id),
-                    'email': str(user.email),
-                    'timestamp': str(timezone.now()),
-                    'purpose': 'user_activation'
-                }
-                user.email_user("DDueruem Account Activation", render_to_string('email/user_activation_email.html', {
-                    'user': str(user.email),
-                    'protocol': 'http',
-                    'domain': 'localhost:8000/auth/register/confirm/',
-                    'token': encode_user_to_token(extended_user)
-                }))
+                user.send_activation_link()
                 return user
