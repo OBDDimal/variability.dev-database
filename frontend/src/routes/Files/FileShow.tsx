@@ -1,7 +1,6 @@
 import api from "../../services/api.service";
 import React, { Component } from "react";
-import G6, { EdgeConfig, INode, NodeConfig } from "@antv/g6";
-import ReactDOM from "react-dom";
+import G6, { EdgeConfig, NodeConfig } from "@antv/g6";
 const API_URL = process.env.REACT_APP_DOMAIN;
 
 type Props = {};
@@ -117,7 +116,7 @@ export default class FileShow extends Component<Props, State> {
               let rotate = 0;
               //resize node according to label length
               let newLabel =
-                node.fm_attributes.type != "feature"
+                node.fm_attributes.type !== "feature"
                   ? node.fm_attributes.type + " | " + node.id
                   : node.id;
               let newWidth = (newLabel.length + 2) * fontSizeDuplicator;
@@ -130,7 +129,7 @@ export default class FileShow extends Component<Props, State> {
                   : 0,
               ];
 
-              if (treeDir == "TB" && node.children && !node.children.length) {
+              if (treeDir === "TB" && node.children && !node.children.length) {
                 //labelPos = "bottom"; //pos for label of node
                 rotate = Math.PI / 2;
                 //interchange width and height
@@ -169,10 +168,10 @@ export default class FileShow extends Component<Props, State> {
               .get("model").depth;
             //collapse subtrees on depth level 2
             //https://g6.antv.vision/en/docs/manual/middle/states/defaultBehavior#collapse-expand
-            if (currentDepth == 2) {
+            if (currentDepth === 2) {
               let newModel = this.graph.findById(edge.source).get("model");
               //do this only on init, means collapse is undefined
-              if (newModel.collapsed == undefined) {
+              if (newModel.collapsed === undefined) {
                 newModel.collapsed = true;
                 this.graph.updateItem(parent, newModel);
               }

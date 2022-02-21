@@ -2,7 +2,6 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import { Navigate, Route, Routes } from "react-router-dom";
 import SiteNavbar from "./components/SiteNavbar";
 import FileCreate from "./routes/Files/FileCreate";
-import { Container, Row } from "react-bootstrap";
 import Home from "./routes/Home";
 import Login from "./routes/Login";
 import Register from "./routes/Register";
