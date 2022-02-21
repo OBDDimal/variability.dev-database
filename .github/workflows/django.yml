@@ -2,9 +2,9 @@ name: Django CI
 
 on:
   push:
-    branches: [dev]
+    branches: [dev, issue-96-pipeline-caching-fix]
   pull_request:
-    branches: [dev]
+    branches: [dev, issue-96-pipeline-caching-fix]
 
 jobs:
 
