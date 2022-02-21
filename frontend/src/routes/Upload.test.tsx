@@ -44,7 +44,7 @@ describe("<FileCreate />", () => {
     mockedApi.get.mockResolvedValue(
       new Promise((resolve, reject) => {
         let mockedTags: Tag[] = [{ id: 1337, label: "testlabel" }];
-        let mockedResponse = { data: { results: mockedTags } };
+        let mockedResponse = { data: [{ results: mockedTags }] };
         resolve(mockedResponse);
       })
     );
@@ -56,8 +56,9 @@ describe("<FileCreate />", () => {
   test("button should enable after label, description, file, legalShare, userData and openSource have been entered", async () => {
     mockedApi.get.mockResolvedValue(
       new Promise((resolve, reject) => {
-        let mockedTags: Tag[] = [{ id: 1337, label: "testlabel" }];
-        let mockedResponse = { data: { results: mockedTags } };
+        let mockedResponse = {
+          data: [{ file: { id: 1337, label: "testlabel" } }],
+        };
         resolve(mockedResponse);
       })
     );
@@ -106,7 +107,7 @@ describe("<FileCreate />", () => {
     mockedApi.get.mockResolvedValue(
       new Promise((resolve, reject) => {
         let mockedTags: Tag[] = [{ id: 1337, label: "testlabel" }];
-        let mockedResponse = { data: { results: mockedTags } };
+        let mockedResponse = { data: [{ results: mockedTags }] };
         resolve(mockedResponse);
       })
     );
@@ -144,7 +145,7 @@ describe("<FileCreate />", () => {
     mockedApi.get.mockResolvedValue(
       new Promise((resolve, reject) => {
         let mockedTags: Tag[] = [{ id: 1337, label: "testlabel" }];
-        let mockedResponse = { data: { results: mockedTags } };
+        let mockedResponse = { data: [{ results: mockedTags }] };
         resolve(mockedResponse);
       })
     );
