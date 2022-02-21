@@ -2,7 +2,6 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import { Navigate, Route, Routes } from "react-router-dom";
 import SiteNavbar from "./components/SiteNavbar";
 import FileCreate from "./routes/Files/FileCreate";
-import { Container, Row } from "react-bootstrap";
 import Home from "./routes/Home";
 import Login from "./routes/Login";
 import Register from "./routes/Register";
@@ -23,7 +22,7 @@ interface AuthChildren {
 function RequireAuth({ children }: AuthChildren) {
   const authenticated = authService.getCurrentUser() ?? undefined;
 
-  return authenticated ? children : <Navigate to='/login' replace />;
+  return authenticated ? children : <Navigate to="/login" replace />;
 }
 
 function App() {
@@ -33,15 +32,15 @@ function App() {
         url={window.location.href.substr(window.location.href.lastIndexOf("/"))}
       />
       <Routes>
-        <Route path='/' element={<Home />} />
-        <Route path='/login' element={<Login />} />
-        <Route path='/register' element={<Register />} />
+        <Route path="/" element={<Home />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
         <Route
-          path='/register/:confirmationCode'
+          path="/register/:confirmationCode"
           element={<RegisterConfirmation />}
         />
         <Route
-          path='/files/create'
+          path="/files/create"
           element={
             <RequireAuth>
               <FileCreate />
@@ -49,7 +48,7 @@ function App() {
           }
         />
         <Route
-          path='/files'
+          path="/files"
           element={
             <RequireAuth>
               <FileIndex />
@@ -57,16 +56,16 @@ function App() {
           }
         />
         <Route
-          path='/profile'
+          path="/profile"
           element={
             <RequireAuth>
               <Profile />
             </RequireAuth>
           }
         />
-        <Route path='/files/:id' element={<FileShow />} />
+        <Route path="/files/:id" element={<FileShow />} />
         <Route
-          path='/files/edit/:id'
+          path="/files/edit/:id"
           element={
             <RequireAuth>
               <FileEdit />
@@ -74,7 +73,7 @@ function App() {
           }
         />
         <Route
-          path='/tags'
+          path="/tags"
           element={
             <RequireAuth>
               <TagIndex />
@@ -82,7 +81,7 @@ function App() {
           }
         />
         <Route
-          path='/tags/create'
+          path="/tags/create"
           element={
             <RequireAuth>
               <TagCreate />

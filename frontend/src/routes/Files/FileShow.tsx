@@ -116,7 +116,7 @@ export default class FileShow extends Component<Props, State> {
               let rotate = 0;
               //resize node according to label length
               let newLabel =
-                node.fm_attributes.type != "feature"
+                node.fm_attributes.type !== "feature"
                   ? node.fm_attributes.type + " | " + node.id
                   : node.id;
               let newWidth = (newLabel.length + 2) * fontSizeDuplicator;
@@ -129,7 +129,7 @@ export default class FileShow extends Component<Props, State> {
                   : 0,
               ];
 
-              if (treeDir == "TB" && node.children && !node.children.length) {
+              if (treeDir === "TB" && node.children && !node.children.length) {
                 //labelPos = "bottom"; //pos for label of node
                 rotate = Math.PI / 2;
                 //interchange width and height
@@ -168,10 +168,10 @@ export default class FileShow extends Component<Props, State> {
               .get("model").depth;
             //collapse subtrees on depth level 2
             //https://g6.antv.vision/en/docs/manual/middle/states/defaultBehavior#collapse-expand
-            if (currentDepth == 2) {
+            if (currentDepth === 2) {
               let newModel = this.graph.findById(edge.source).get("model");
               //do this only on init, means collapse is undefined
-              if (newModel.collapsed == undefined) {
+              if (newModel.collapsed === undefined) {
                 newModel.collapsed = true;
                 this.graph.updateItem(parent, newModel);
               }
@@ -217,6 +217,6 @@ export default class FileShow extends Component<Props, State> {
   };
 
   render() {
-    return <div id='graph-container'></div>;
+    return <div id="graph-container"></div>;
   }
 }
