@@ -1,6 +1,6 @@
 import api from "../../services/api.service";
 import React, { Component } from "react";
-import G6, { EdgeConfig, INode, NodeConfig } from "@antv/g6";
+import G6, { EdgeConfig, NodeConfig } from "@antv/g6";
 const API_URL = process.env.REACT_APP_DOMAIN;
 
 type Props = {};

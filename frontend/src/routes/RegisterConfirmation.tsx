@@ -4,7 +4,6 @@ import { Modal } from "../components/Modal";
 const API_URL = process.env.REACT_APP_DOMAIN;
 
 type Props = {};
-type State = {};
 
 export default class RegisterConfirmation extends Component {
   constructor(props: Props | Readonly<Props>) {
