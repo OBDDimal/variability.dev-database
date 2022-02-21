@@ -1,6 +1,7 @@
-import api from '../../services/api.service';
-import React, {Component} from 'react';
-import G6, {EdgeConfig, NodeConfig} from '@antv/g6';
+import React, { Component } from 'react';
+import G6, { EdgeConfig, NodeConfig } from '@antv/g6';
+import api from '../../services/api.service.ts';
+
 const API_URL = process.env.REACT_APP_DOMAIN;
 
 type Props = {};
@@ -20,17 +21,19 @@ type State = {
 
 export default class FileShow extends Component<Props, State> {
   ref: React.RefObject<HTMLDivElement>;
+
   graph: any;
 
   constructor(props: Props | Readonly<Props>) {
     super(props);
+    this.setState({ json: {} });
     const url = window.location.pathname;
     const id = url.substring(url.lastIndexOf('/') + 1);
     this.ref = React.createRef();
 
     api.get(`${API_URL}files/${id}/`).then((response) => {
       api.get(`${response.data.transpiled_file}`).then((file) => {
-        this.setState({json: file.data});
+        this.setState({ json: file.data });
 
         if (!this.graph) {
           const defaultRankSep = 180;
@@ -115,18 +118,17 @@ export default class FileShow extends Component<Props, State> {
               const labelPos = 'center';
               let rotate = 0;
               // resize node according to label length
-              const newLabel =
-                node.fm_attributes.type !== 'feature' ?
-                  node.fm_attributes.type + ' | ' + node.id :
-                  node.id;
+              const newLabel = node.fm_attributes.type !== 'feature'
+                ? `${node.fm_attributes.type} | ${node.id}`
+                : node.id;
               const newWidth = (newLabel.length + 2) * fontSizeDuplicator;
               let size = [
                 newWidth,
-                typeof node.size === 'number' ?
-                  node.size :
-                  node.size ?
-                  node.size[1] :
-                  0,
+                typeof node.size === 'number'
+                  ? node.size
+                  : node.size
+                    ? node.size[1]
+                    : 0,
               ];
 
               if (treeDir === 'TB' && node.children && !node.children.length) {
@@ -137,13 +139,14 @@ export default class FileShow extends Component<Props, State> {
               }
               maxSep = newWidth > maxSep ? newWidth : maxSep;
 
+              /* eslint-disable no-param-reassign */
               node.label = newLabel;
               node.size = size;
               node.wasRendered = true;
               if (node.style && node.labelCfg && node.labelCfg.style) {
-                node.style.fill = node.fm_attributes.abstract ?
-                  abstractNodeColor :
-                  concreteNodeColor;
+                node.style.fill = node.fm_attributes.abstract
+                  ? abstractNodeColor
+                  : concreteNodeColor;
                 node.style.stroke = strokeColor;
 
                 node.labelCfg.position = labelPos;
@@ -152,9 +155,8 @@ export default class FileShow extends Component<Props, State> {
               }
 
               return node;
-            } else {
-              return node;
             }
+            return node;
           });
           // customize edges
           // built in mandatory attributes: id, source, target, type
@@ -164,8 +166,8 @@ export default class FileShow extends Component<Props, State> {
           this.graph.edge((edge: EdgeConfig) => {
             let parent = this.graph.findById(edge.source);
             const currentDepth = this.graph
-                .findById(edge.source)
-                .get('model').depth;
+              .findById(edge.source)
+              .get('model').depth;
             // collapse subtrees on depth level 2
             // https://g6.antv.vision/en/docs/manual/middle/states/defaultBehavior#collapse-expand
             if (currentDepth === 2) {
@@ -178,17 +180,17 @@ export default class FileShow extends Component<Props, State> {
             }
             const child = this.graph.findById(edge.target).get('model');
             parent = this.graph.findById(edge.source).get('model');
+            const newEndArrow = {
+              fill: child.fm_attributes.mandatory ? '#000000' : '#ffffff',
+              path: G6.Arrow.circle(4, 8), // radius, offset
+              d: 5,
+            };
             switch (parent.fm_attributes.type) {
               case 'and':
                 // add and color mandatory circle accordingly
                 if (!edge.style) {
                   edge.style = {};
                 }
-                const newEndArrow = {
-                  fill: child.fm_attributes.mandatory ? '#000000' : '#ffffff',
-                  path: G6.Arrow.circle(4, 8), // radius, offset
-                  d: 5,
-                };
                 edge.style.endArrow = newEndArrow;
                 return edge;
               default:
@@ -196,27 +198,14 @@ export default class FileShow extends Component<Props, State> {
             }
           });
         }
+        /* eslint-enable no-param-reassign */
         this.graph.layout();
         this.graph.render();
-        this.graph.on('itemcollapsed', (e: any) => {
-          if (e.collapsed) {
-            // collapsing node
-            console.log('collapsing node');
-          } else {
-            // expanding node
-            console.log('expanding node');
-            console.log(e.item.getModel().size);
-          }
-        });
       });
     });
   }
 
-  state: State = {
-    json: {},
-  };
-
   render() {
-    return <div id='graph-container'></div>;
+    return <div id="graph-container" />;
   }
 }

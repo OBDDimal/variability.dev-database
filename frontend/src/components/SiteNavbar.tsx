@@ -1,6 +1,8 @@
-import React, {Component} from 'react';
-import {Container, Nav, Navbar, NavDropdown} from 'react-bootstrap';
-import authService from '../services/auth.service';
+import React, { Component } from 'react';
+import {
+  Container, Nav, Navbar, NavDropdown,
+} from 'react-bootstrap';
+import authService from '../services/auth.service.ts';
 
 type Props = {
   url: string;
@@ -15,32 +17,32 @@ export default class SiteNavbar extends Component<Props, State> {
     super(props);
 
     this.state = {
-      loggedIn: authService.getCurrentUser() ? true : false,
+      loggedIn: !!authService.getCurrentUser(),
     };
   }
 
   logout() {
     authService.logout();
-    this.setState({loggedIn: false});
+    this.setState({ loggedIn: false });
   }
 
   render() {
     return (
-      <Navbar bg='light' expand='lg'>
+      <Navbar bg="light" expand="lg">
         <Container>
-          <Navbar.Brand href='/'>DDueruem</Navbar.Brand>
-          <Navbar.Toggle aria-controls='basic-navbar-nav' />
-          <Navbar.Collapse id='basic-navbar-nav'>
-            <Nav className='me-auto'>
+          <Navbar.Brand href="/">DDueruem</Navbar.Brand>
+          <Navbar.Toggle aria-controls="basic-navbar-nav" />
+          <Navbar.Collapse id="basic-navbar-nav">
+            <Nav className="me-auto">
               <Nav.Link
                 className={this.props.url === '/' ? 'active' : ''}
-                href='/'
+                href="/"
               >
                 Home
               </Nav.Link>
               {!this.state.loggedIn && (
                 <Nav.Link
-                  href='/register'
+                  href="/register"
                   className={this.props.url === '/register' ? 'active' : ''}
                 >
                   Register
@@ -49,7 +51,7 @@ export default class SiteNavbar extends Component<Props, State> {
 
               {!this.state.loggedIn && (
                 <Nav.Link
-                  href='/login'
+                  href="/login"
                   className={this.props.url === '/login' ? 'active' : ''}
                 >
                   Login
@@ -58,7 +60,7 @@ export default class SiteNavbar extends Component<Props, State> {
 
               {this.state.loggedIn && (
                 <Nav.Link
-                  href='/profile'
+                  href="/profile"
                   className={this.props.url === '/profile' ? 'active' : ''}
                 >
                   Profile
@@ -67,7 +69,7 @@ export default class SiteNavbar extends Component<Props, State> {
 
               {this.state.loggedIn && (
                 <Nav.Link
-                  href='/logout'
+                  href="/logout"
                   className={this.props.url === '/logout' ? 'active' : ''}
                   onClick={this.logout}
                 >
@@ -77,7 +79,7 @@ export default class SiteNavbar extends Component<Props, State> {
 
               {this.state.loggedIn && (
                 <Nav.Link
-                  href='/files'
+                  href="/files"
                   className={this.props.url === '/files' ? 'active' : ''}
                 >
                   Files
@@ -86,23 +88,23 @@ export default class SiteNavbar extends Component<Props, State> {
 
               {this.state.loggedIn && (
                 <Nav.Link
-                  href='/tags'
+                  href="/tags"
                   className={this.props.url === '/tags' ? 'active' : ''}
                 >
                   Tags
                 </Nav.Link>
               )}
 
-              <NavDropdown title='Dropdown' id='basic-nav-dropdown'>
-                <NavDropdown.Item href='#action/3.1'>Dummy</NavDropdown.Item>
-                <NavDropdown.Item href='#action/3.2'>
+              <NavDropdown title="Dropdown" id="basic-nav-dropdown">
+                <NavDropdown.Item href="#action/3.1">Dummy</NavDropdown.Item>
+                <NavDropdown.Item href="#action/3.2">
                   Another action
                 </NavDropdown.Item>
-                <NavDropdown.Item href='#action/3.3'>
+                <NavDropdown.Item href="#action/3.3">
                   Something
                 </NavDropdown.Item>
                 <NavDropdown.Divider />
-                <NavDropdown.Item href='#action/3.4'>
+                <NavDropdown.Item href="#action/3.4">
                   Separated link
                 </NavDropdown.Item>
               </NavDropdown>
