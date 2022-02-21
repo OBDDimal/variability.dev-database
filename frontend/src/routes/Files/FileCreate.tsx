@@ -1,13 +1,13 @@
-import React, { Component } from "react";
-import { Button, Container, Form, Row } from "react-bootstrap";
-import Select from "react-select";
-import { Modal } from "../../components/Modal";
-import api from "../../services/api.service";
+import React, {Component} from 'react';
+import {Button, Container, Form, Row} from 'react-bootstrap';
+import Select from 'react-select';
+import {Modal} from '../../components/Modal';
+import api from '../../services/api.service';
 
 const API_URL = process.env.REACT_APP_DOMAIN;
 
 // Can't use enums because of iteration problems
-const license = ["CC BY - Mention", "CC BY-NC - Mention - Non-commercial"];
+const license = ['CC BY - Mention', 'CC BY-NC - Mention - Non-commercial'];
 
 type Props = {};
 
@@ -34,14 +34,14 @@ export default class FileCreate extends Component<Props, State> {
   }
 
   state: State = {
-    label: "",
+    label: '',
     description: undefined,
     file: undefined,
     license: license[0],
     gottenTags: [],
     gottenFiles: [],
-    tags: "",
-    newVersionOf: "---",
+    tags: '',
+    newVersionOf: '---',
     loading: false,
     legalShare: false,
     userData: false,
@@ -49,58 +49,58 @@ export default class FileCreate extends Component<Props, State> {
   };
 
   getTags = () => {
-    api.get(API_URL + "tags/").then((response) => {
+    api.get(API_URL + 'tags/').then((response) => {
       let tags = response.data;
       tags = tags.map((tag: { id: number; label: string }) => {
-        return { value: tag.id, label: tag.label };
+        return {value: tag.id, label: tag.label};
       });
-      this.setState({ gottenTags: tags });
+      this.setState({gottenTags: tags});
     });
   };
 
   getNewVersionOf = () => {
-    api.get(API_URL + "files/").then((response) => {
+    api.get(API_URL + 'files/').then((response) => {
       let files = response.data;
       files = files.map((file: { id: number; label: string }) => {
-        return { value: file.id, label: file.label };
+        return {value: file.id, label: file.label};
       });
-      this.setState({ gottenFiles: files });
+      this.setState({gottenFiles: files});
     });
   };
 
   onTagChange = (options: any) => {
     this.setState({
       tags: options.map((option: any) => {
-        return { id: option.value, label: option.label };
+        return {id: option.value, label: option.label};
       }),
     });
   };
 
   onLabelChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const label = e.target as HTMLInputElement;
-    this.setState({ label: label.value });
+    this.setState({label: label.value});
   };
 
   onDescriptionChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const description = e.target as HTMLInputElement;
-    this.setState({ description: description.value });
+    this.setState({description: description.value});
   };
 
   onFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target as HTMLInputElement;
     if (file.files) {
-      this.setState({ file: file.files[0] });
+      this.setState({file: file.files[0]});
     }
   };
 
   onNewVersionOfChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const newVersionOf = e.target as HTMLSelectElement;
-    this.setState({ newVersionOf: newVersionOf.value });
+    this.setState({newVersionOf: newVersionOf.value});
   };
 
   onLicenseChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const license = e.target as HTMLSelectElement;
-    this.setState({ license: license.value });
+    this.setState({license: license.value});
   };
 
   isReady = () => {
@@ -126,39 +126,39 @@ export default class FileCreate extends Component<Props, State> {
       this.state.userData &&
       this.state.openSource
     ) {
-      this.setState({ loading: true });
+      this.setState({loading: true});
       const data = new FormData();
 
-      data.append("label", this.state.label);
-      data.append("description", this.state.description);
-      data.append("local_file", this.state.file);
-      data.append("license", this.state.license);
-      if (this.state.newVersionOf !== "---") {
-        data.append("new_version_of", this.state.newVersionOf);
+      data.append('label', this.state.label);
+      data.append('description', this.state.description);
+      data.append('local_file', this.state.file);
+      data.append('license', this.state.license);
+      if (this.state.newVersionOf !== '---') {
+        data.append('new_version_of', this.state.newVersionOf);
       }
-      data.append("tags", JSON.stringify(this.state.tags));
+      data.append('tags', JSON.stringify(this.state.tags));
 
       api
-        .post(`${API_URL}files/`, data, {
-          headers: { "Content-Type": "multipart/form-data" },
-        })
-        .then((result) => {
-          Modal.fire({
-            icon: "success",
-            title: "Success!!",
-            text: "File was uploaded successfully!",
-          }).then(() => {
-            window.location.reload();
+          .post(`${API_URL}files/`, data, {
+            headers: {'Content-Type': 'multipart/form-data'},
+          })
+          .then((result) => {
+            Modal.fire({
+              icon: 'success',
+              title: 'Success!!',
+              text: 'File was uploaded successfully!',
+            }).then(() => {
+              window.location.reload();
+            });
+          })
+          .catch((error) => {
+            this.setState({loading: false});
+            Modal.fire({
+              icon: 'error',
+              title: 'Error!!',
+              text: JSON.stringify(error.message),
+            });
           });
-        })
-        .catch((error) => {
-          this.setState({ loading: false });
-          Modal.fire({
-            icon: "error",
-            title: "Error!!",
-            text: JSON.stringify(error.message),
-          });
-        });
     }
   };
 
@@ -210,7 +210,7 @@ export default class FileCreate extends Component<Props, State> {
               <Form.Label>New version of</Form.Label>
               <Form.Select
                 onChange={this.onNewVersionOfChange}
-                defaultValue={"---"}
+                defaultValue={'---'}
               >
                 {this.state.gottenFiles.map((key) => {
                   return (
@@ -240,7 +240,7 @@ export default class FileCreate extends Component<Props, State> {
                 type='checkbox'
                 checked={this.state.legalShare}
                 onChange={() =>
-                  this.setState({ legalShare: !this.state.legalShare })
+                  this.setState({legalShare: !this.state.legalShare})
                 }
                 id='legal-share'
                 label='I am legally allowed to share this model'
@@ -250,7 +250,7 @@ export default class FileCreate extends Component<Props, State> {
                 type='checkbox'
                 checked={this.state.userData}
                 onChange={() =>
-                  this.setState({ userData: !this.state.userData })
+                  this.setState({userData: !this.state.userData})
                 }
                 id='user-data'
                 label='My email and a date will always be tied to the file upload (even after account deletion)'
@@ -260,7 +260,7 @@ export default class FileCreate extends Component<Props, State> {
                 type='checkbox'
                 checked={this.state.openSource}
                 onChange={() =>
-                  this.setState({ openSource: !this.state.openSource })
+                  this.setState({openSource: !this.state.openSource})
                 }
                 id='open-source'
                 label='All information will be published according to your chosen license'

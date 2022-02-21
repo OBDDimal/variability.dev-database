@@ -1,6 +1,6 @@
-import React, { Component } from "react";
-import { Container, Nav, Navbar, NavDropdown } from "react-bootstrap";
-import authService from "../services/auth.service";
+import React, {Component} from 'react';
+import {Container, Nav, Navbar, NavDropdown} from 'react-bootstrap';
+import authService from '../services/auth.service';
 
 type Props = {
   url: string;
@@ -21,7 +21,7 @@ export default class SiteNavbar extends Component<Props, State> {
 
   logout() {
     authService.logout();
-    this.setState({ loggedIn: false });
+    this.setState({loggedIn: false});
   }
 
   render() {
@@ -33,7 +33,7 @@ export default class SiteNavbar extends Component<Props, State> {
           <Navbar.Collapse id='basic-navbar-nav'>
             <Nav className='me-auto'>
               <Nav.Link
-                className={this.props.url === "/" ? "active" : ""}
+                className={this.props.url === '/' ? 'active' : ''}
                 href='/'
               >
                 Home
@@ -41,7 +41,7 @@ export default class SiteNavbar extends Component<Props, State> {
               {!this.state.loggedIn && (
                 <Nav.Link
                   href='/register'
-                  className={this.props.url === "/register" ? "active" : ""}
+                  className={this.props.url === '/register' ? 'active' : ''}
                 >
                   Register
                 </Nav.Link>
@@ -50,7 +50,7 @@ export default class SiteNavbar extends Component<Props, State> {
               {!this.state.loggedIn && (
                 <Nav.Link
                   href='/login'
-                  className={this.props.url === "/login" ? "active" : ""}
+                  className={this.props.url === '/login' ? 'active' : ''}
                 >
                   Login
                 </Nav.Link>
@@ -59,7 +59,7 @@ export default class SiteNavbar extends Component<Props, State> {
               {this.state.loggedIn && (
                 <Nav.Link
                   href='/profile'
-                  className={this.props.url === "/profile" ? "active" : ""}
+                  className={this.props.url === '/profile' ? 'active' : ''}
                 >
                   Profile
                 </Nav.Link>
@@ -68,7 +68,7 @@ export default class SiteNavbar extends Component<Props, State> {
               {this.state.loggedIn && (
                 <Nav.Link
                   href='/logout'
-                  className={this.props.url === "/logout" ? "active" : ""}
+                  className={this.props.url === '/logout' ? 'active' : ''}
                   onClick={this.logout}
                 >
                   Logout
@@ -78,7 +78,7 @@ export default class SiteNavbar extends Component<Props, State> {
               {this.state.loggedIn && (
                 <Nav.Link
                   href='/files'
-                  className={this.props.url === "/files" ? "active" : ""}
+                  className={this.props.url === '/files' ? 'active' : ''}
                 >
                   Files
                 </Nav.Link>
@@ -87,7 +87,7 @@ export default class SiteNavbar extends Component<Props, State> {
               {this.state.loggedIn && (
                 <Nav.Link
                   href='/tags'
-                  className={this.props.url === "/tags" ? "active" : ""}
+                  className={this.props.url === '/tags' ? 'active' : ''}
                 >
                   Tags
                 </Nav.Link>

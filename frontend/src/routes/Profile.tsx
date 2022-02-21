@@ -1,6 +1,6 @@
-import { Component } from "react";
-import { Row, Container } from "react-bootstrap";
-import AuthService from "../services/auth.service";
+import {Component} from 'react';
+import {Row, Container} from 'react-bootstrap';
+import AuthService from '../services/auth.service';
 
 interface IUser {
   id?: any | null;
@@ -19,20 +19,20 @@ export default class Profile extends Component<Props, State> {
     super(props);
 
     this.state = {
-      currentUser: { accessToken: "" },
+      currentUser: {accessToken: ''},
     };
   }
 
   componentDidMount() {
     const currentUser = AuthService.getCurrentUser();
 
-    if (!currentUser) window.location.replace("/");
+    if (!currentUser) window.location.replace('/');
 
-    this.setState({ currentUser: currentUser });
+    this.setState({currentUser: currentUser});
   }
 
   render() {
-    const { currentUser } = this.state;
+    const {currentUser} = this.state;
 
     return (
       <Container>

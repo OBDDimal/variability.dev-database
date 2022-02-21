@@ -1,5 +1,5 @@
-import React, { Component } from "react";
-import FileIndex from "./Files/FileIndex";
+import React, {Component} from 'react';
+import FileIndex from './Files/FileIndex';
 
 export default class Home extends Component {
   render() {

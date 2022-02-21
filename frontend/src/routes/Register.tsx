@@ -1,7 +1,7 @@
-import React, { Component } from "react";
-import { Button, Container, Form, Row } from "react-bootstrap";
-import { Modal } from "../components/Modal";
-import AuthService from "../services/auth.service";
+import React, {Component} from 'react';
+import {Button, Container, Form, Row} from 'react-bootstrap';
+import {Modal} from '../components/Modal';
+import AuthService from '../services/auth.service';
 
 type Props = {};
 
@@ -22,17 +22,17 @@ export default class Register extends Component<Props, State> {
 
   onEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const email = e.target as HTMLInputElement;
-    this.setState({ email: email.value });
+    this.setState({email: email.value});
   };
 
   onPasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const password = e.target as HTMLInputElement;
-    this.setState({ password: password.value });
+    this.setState({password: password.value});
   };
 
   onPasswordConfirmationChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const passwordConfirmation = e.target as HTMLInputElement;
-    this.setState({ passwordConfirmation: passwordConfirmation.value });
+    this.setState({passwordConfirmation: passwordConfirmation.value});
   };
 
   isReady = () => {
@@ -53,31 +53,31 @@ export default class Register extends Component<Props, State> {
       this.state.password === this.state.passwordConfirmation
     ) {
       AuthService.register(
-        this.state.email,
-        this.state.password,
-        this.state.passwordConfirmation
+          this.state.email,
+          this.state.password,
+          this.state.passwordConfirmation,
       ).then(
-        () => {
-          Modal.fire({
-            icon: "success",
-            title: "Register successful, please check your mail",
-            toast: true,
-            position: "top-right",
-            showConfirmButton: false,
-            timer: 1500,
-            timerProgressBar: true,
-          }).then(() => {
-            window.location.replace("/");
-          });
-        },
-        (error) => {
-          this.setState({ loading: false });
-          Modal.fire({
-            icon: "error",
-            title: "Error!!",
-            text: `Something went wrong while registering! ${error.toString()}`,
-          });
-        }
+          () => {
+            Modal.fire({
+              icon: 'success',
+              title: 'Register successful, please check your mail',
+              toast: true,
+              position: 'top-right',
+              showConfirmButton: false,
+              timer: 1500,
+              timerProgressBar: true,
+            }).then(() => {
+              window.location.replace('/');
+            });
+          },
+          (error) => {
+            this.setState({loading: false});
+            Modal.fire({
+              icon: 'error',
+              title: 'Error!!',
+              text: `Something went wrong while registering! ${error.toString()}`,
+            });
+          },
       );
     }
   };
