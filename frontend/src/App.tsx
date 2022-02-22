@@ -1,24 +1,25 @@
 import React from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { Navigate, Route, Routes } from 'react-router-dom';
-import SiteNavbar from './components/SiteNavbar.tsx';
-import FileCreate from './routes/Files/FileCreate.tsx';
-import Home from './routes/Home.tsx';
-import Login from './routes/Login.tsx';
-import Register from './routes/Register.tsx';
-import Profile from './routes/Profile.tsx';
-import authService from './services/auth.service.ts';
-import FileIndex from './routes/Files/FileIndex.tsx';
+import SiteNavbar from './components/SiteNavbar';
+import FileCreate from './routes/Files/FileCreate';
+import Home from './routes/Home';
+import Login from './routes/Login';
+import Register from './routes/Register';
+import Profile from './routes/Profile';
+import authService from './services/auth.service';
+import FileIndex from './routes/Files/FileIndex';
 import './styles/app.css';
-import TagIndex from './routes/Tags/TagIndex.tsx';
-import FileShow from './routes/Files/FileShow.tsx';
-import TagCreate from './routes/Tags/TagCreate.tsx';
-import FileEdit from './routes/Files/FileEdit.tsx';
+import TagIndex from './routes/Tags/TagIndex';
+import FileShow from './routes/Files/FileShow';
+import TagCreate from './routes/Tags/TagCreate';
+import FileEdit from './routes/Files/FileEdit';
 
 interface AuthChildren {
   // Maybe there is a way to define this
   // better and directly in RequireAuth
-  children: JSX.Element; }
+  children: JSX.Element;
+}
 
 /**
  * Checks whether a user is authenticated.

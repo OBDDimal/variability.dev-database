@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Row, Container } from 'react-bootstrap';
-import AuthService from '../services/auth.service.ts';
+import AuthService from '../services/auth.service';
 
 interface IUser {
   id?: any | null;

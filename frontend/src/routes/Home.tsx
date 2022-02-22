@@ -1,5 +1,5 @@
 import React from 'react';
-import FileIndex from './Files/FileIndex.tsx';
+import FileIndex from './Files/FileIndex';
 
 export default function Home() {
   return (

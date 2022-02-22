@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import {
   Container, Nav, Navbar, NavDropdown,
 } from 'react-bootstrap';
-import authService from '../services/auth.service.ts';
+import authService from '../services/auth.service';
 
 type Props = {
   url: string;

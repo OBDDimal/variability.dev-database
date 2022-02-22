@@ -62,7 +62,10 @@ export default class FileCreate extends Component<Props, State> {
   getTags = () => {
     api.get(`${API_URL}tags/`).then((response) => {
       let tags = response.data;
-      tags = tags.map((tag: { id: number; label: string }) => ({ value: tag.id, label: tag.label }));
+      tags = tags.map((tag: { id: number; label: string }) => ({
+        value: tag.id,
+        label: tag.label,
+      }));
       this.setState({ gottenTags: tags });
     });
   };
@@ -70,14 +73,20 @@ export default class FileCreate extends Component<Props, State> {
   getNewVersionOf = () => {
     api.get(`${API_URL}files/`).then((response) => {
       let files = response.data;
-      files = files.map((file: { id: number; label: string }) => ({ value: file.id, label: file.label }));
+      files = files.map((file: { id: number; label: string }) => ({
+        value: file.id,
+        label: file.label,
+      }));
       this.setState({ gottenFiles: files });
     });
   };
 
   onTagChange = (options: any) => {
     this.setState({
-      tags: options.map((option: any) => ({ id: option.value, label: option.label })),
+      tags: options.map((option: any) => ({
+        id: option.value,
+        label: option.label,
+      })),
     });
   };
 
@@ -108,15 +117,13 @@ export default class FileCreate extends Component<Props, State> {
     this.setState({ license: license.value });
   };
 
-  isReady = () => (
-    this.state.tags
-      && this.state.label
-      && this.state.file
-      && this.state.description
-      && this.state.legalShare
-      && this.state.userData
-      && this.state.openSource
-  );
+  isReady = () => this.state.tags
+    && this.state.label
+    && this.state.file
+    && this.state.description
+    && this.state.legalShare
+    && this.state.userData
+    && this.state.openSource;
 
   onSubmit = (e: { preventDefault: () => void }) => {
     e.preventDefault();

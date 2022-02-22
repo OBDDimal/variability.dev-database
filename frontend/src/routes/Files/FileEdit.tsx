@@ -1,7 +1,7 @@
-import React, { Component } from "react";
-import { Container, Form, Row } from "react-bootstrap";
-import Select from "react-select";
-import api from "../../services/api.service.ts";
+import React, { Component } from 'react';
+import { Container, Form, Row } from 'react-bootstrap';
+import Select from 'react-select';
+import api from '../../services/api.service';
 
 const API_URL = process.env.REACT_APP_DOMAIN;
 
@@ -44,7 +44,7 @@ export default class FileEdit extends Component<Props, State> {
   constructor(props: Props | Readonly<Props>) {
     super(props);
     const url = window.location.pathname;
-    const id = url.substring(url.lastIndexOf("/") + 1);
+    const id = url.substring(url.lastIndexOf('/') + 1);
 
     api.get(`${API_URL}files/${id}/`).then((response) => {
       this.setState({ file: response.data });
@@ -60,7 +60,7 @@ export default class FileEdit extends Component<Props, State> {
     description: undefined,
     gottenTags: [],
     gottenFiles: [],
-    newVersionOf: "---",
+    newVersionOf: '---',
   };
 
   getTags = () => {
@@ -117,26 +117,26 @@ export default class FileEdit extends Component<Props, State> {
     return (
       <Container>
         <Row>
-          <Form.Group className='mb-3'>
+          <Form.Group className="mb-3">
             <Form.Label>File name</Form.Label>
             <Form.Control
-              data-testid='label'
+              data-testid="label"
               onChange={this.onLabelChange}
-              placeholder='Leave a filename'
+              placeholder="Leave a filename"
               value={this.state.file?.label}
             />
           </Form.Group>
-          <Form.Group className='mb-3'>
+          <Form.Group className="mb-3">
             <Form.Label>Description</Form.Label>
             <Form.Control
-              data-testid='description'
-              as='textarea'
+              data-testid="description"
+              as="textarea"
               onChange={this.onDescriptionChange}
-              placeholder='Leave a comment here'
+              placeholder="Leave a comment here"
               value={this.state.file?.description}
             />
           </Form.Group>
-          <Form.Group className='mb-3'>
+          <Form.Group className="mb-3">
             <Form.Label>New version of</Form.Label>
             <Form.Select
               onChange={this.onNewVersionOfChange}
@@ -144,14 +144,16 @@ export default class FileEdit extends Component<Props, State> {
             >
               {this.state.gottenFiles.map((key) => (
                 <option key={key.value} value={key.value}>
-                  {key.value}:{key.label}
+                  {key.value}
+                  :
+                  {key.label}
                 </option>
               ))}
-              <option key='---' value='---'>
+              <option key="---" value="---">
                 ---
               </option>
             </Form.Select>
-            <Form.Group className='mb-3'>
+            <Form.Group className="mb-3">
               <Form.Label>Tags</Form.Label>
               <Select
                 defaultValue={[this.state.gottenTags[0]]}

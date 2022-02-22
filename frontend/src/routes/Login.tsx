@@ -2,8 +2,8 @@ import React, { Component } from 'react';
 import {
   Button, Container, Form, Row,
 } from 'react-bootstrap';
-import AuthService from '../services/auth.service.ts';
-import { Modal } from '../components/Modal.tsx';
+import AuthService from '../services/auth.service';
+import { Modal } from '../components/Modal';
 
 type Props = {};
 

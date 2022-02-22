@@ -2,8 +2,8 @@ import React, { Component } from 'react';
 import {
   Button, Container, Form, Row,
 } from 'react-bootstrap';
-import { Modal } from '../components/Modal.tsx';
-import AuthService from '../services/auth.service.ts';
+import { Modal } from '../components/Modal';
+import AuthService from '../services/auth.service';
 
 type Props = {};
 
@@ -18,7 +18,10 @@ export default class Register extends Component<Props, State> {
   constructor(props: Props) {
     super(props);
     this.setState({
-      email: undefined, password: undefined, passwordConfirmation: undefined, loading: false,
+      email: undefined,
+      password: undefined,
+      passwordConfirmation: undefined,
+      loading: false,
     });
   }
 
@@ -37,12 +40,10 @@ export default class Register extends Component<Props, State> {
     this.setState({ passwordConfirmation: passwordConfirmation.value });
   };
 
-  isReady = () => (
-    this.state.email
-      && this.state.password
-      && this.state.passwordConfirmation
-      && this.state.password === this.state.passwordConfirmation
-  );
+  isReady = () => this.state.email
+    && this.state.password
+    && this.state.passwordConfirmation
+    && this.state.password === this.state.passwordConfirmation;
 
   onSubmit = (e: { preventDefault: () => void }) => {
     e.preventDefault();

@@ -19,6 +19,7 @@
     "react/require-default-props": [0],
     "react/destructuring-assignment": [0],
     "react/no-unused-class-component-methods": [0],
+    "import/extensions": [0],
     "no-undef": [0],
     "no-nested-ternary": [0]
   },
