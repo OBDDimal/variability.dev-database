@@ -1,7 +1,6 @@
 import json
 import os
 
-from django.core.files.uploadedfile import SimpleUploadedFile
 from pathlib import Path
 from rest_framework.test import APITestCase
 from django.test.client import MULTIPART_CONTENT, encode_multipart, BOUNDARY
@@ -9,6 +8,54 @@ from django.core.files.base import ContentFile
 
 from core.fileupload.models import File, Tag
 from core.user.models import User
+from core.fileupload.githubmirror.github_manager import eval_repo, post_file_in_pull_request
+
+
+class GithubMirrorTests(APITestCase):
+    upload_file_content = b"""<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>
+          <featureModel>
+              <properties/>
+              <struct>
+              </struct>
+          </featureModel>"""
+
+    def _tag_and_upload_file(self, file_label, file_name):
+        User.objects.create_superuser(email="ad@m.in", password="12345678!")
+        c = self.client
+        l_res = c.post('/auth/login/', {'email': 'ad@m.in', 'password': '12345678!'})
+        content_as_dict = json.loads(l_res.content.decode("utf-8"))
+        token = content_as_dict['access']
+        file = ContentFile(self.upload_file_content, file_name)
+        t1 = Tag()
+        t1.owner = User.objects.get(email='ad@m.in')
+        t1.label = 'cool'
+        t1.description = 'cool testing des'
+        t1.is_public = True
+        t1.save()
+        t2 = Tag()
+        t2.owner = User.objects.get(email='ad@m.in')
+        t2.label = 'short'
+        t2.description = 'short testing des'
+        t2.is_public = True
+        t2.save()
+        raw_data = {
+            "description": "some description text",
+            "label": file_label,
+            "local_file": file,
+            "license": File.LICENSES[0],
+            "tags": '[{"id": "2", "label": "Tobi"},{"id": "1", "label": "Eric Test"}]'}
+        msg_as_multipart = encode_multipart(data=raw_data, boundary=BOUNDARY)
+        # print(f"Raw data to user: {raw_data}")
+        # print("Sending first file to backend...")
+        f_res = c.post('/files/', msg_as_multipart,
+                       content_type=MULTIPART_CONTENT,
+                       HTTP_AUTHORIZATION='Bearer ' + token)
+        return File.objects.get(id=1)
+
+    def test_mirror_file_in_github(self):
+        file = self._tag_and_upload_file("fm_test2", "nameof.xml")
+        eval_repo()
+        post_file_in_pull_request(file=file)
 
 
 class FileUploadWithTagsTests(APITestCase):
