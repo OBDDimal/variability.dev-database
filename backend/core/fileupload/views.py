@@ -1,9 +1,12 @@
 from collections import OrderedDict
+from pydoc import html, plain
 from django.template.loader import render_to_string
 from core.fileupload.models.tag import Tag
 from rest_framework import viewsets, permissions
 from rest_framework.response import Response
 from rest_framework import status
+from django.utils.html import strip_tags
+
 
 from core.fileupload.models.file import File
 from core.fileupload.serializers import FilesSerializer, TagsSerializer
@@ -47,14 +50,16 @@ class FileUploadViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
-
-        self.request.user.email_user('DDueruem File Upload', render_to_string('email/user_upload_email.html', {
+        html_message = render_to_string('email/user_upload_email.html', {
             'user': str(self.request.user.email),
             'protocol': 'http',
-            'file_domain': str(serializer.data.get('file')),
-            'file_name': str(serializer.data.get('file')).split('/')[-1],
+            'file_domain': str(serializer.data.get('local_file')),
+            'file_name': str(serializer.data.get('local_file')).split('/')[-1],
             # TODO: For Issue #28 'delete_domain': 'localhost:8000/'
-        }))
+        })
+        plain_message = strip_tags(html_message)
+
+        self.request.user._email_user('DDueruem File Upload', plain_message, html_message=html_message)
 
 
 class TagsViewSet(viewsets.ModelViewSet):

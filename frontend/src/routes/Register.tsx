@@ -53,6 +53,7 @@ export default class Register extends Component<Props, State> {
       && this.state.passwordConfirmation
       && this.state.password === this.state.passwordConfirmation
     ) {
+      this.setState({ loading: true });
       AuthService.register(
         this.state.email,
         this.state.password,
@@ -68,7 +69,7 @@ export default class Register extends Component<Props, State> {
             timer: 1500,
             timerProgressBar: true,
           }).then(() => {
-            window.location.replace('/');
+            window.location.replace('/login');
           });
         },
         (error) => {

@@ -1,0 +1,11 @@
+<!--Previous folder hierarchy is mandatory for this to work -->
+{% extends 'admin/change_form.html' %}
+{% load i18n admin_urls %}
+{% block after_field_sets %}
+    {{ block.super }}
+    <div class="form-user-activation-line">
+        Resend activation link to {{ original }}?
+        <a class="button" href="{% url 'send-activation-email' original.pk %}">&nbsp;Click here&nbsp;</a>
+    </div>
+    <br/>
+{% endblock %}

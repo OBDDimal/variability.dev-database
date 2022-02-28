@@ -14,6 +14,7 @@ import TagIndex from './routes/Tags/TagIndex';
 import FileShow from './routes/Files/FileShow';
 import TagCreate from './routes/Tags/TagCreate';
 import FileEdit from './routes/Files/FileEdit';
+import RegisterConfirmation from './routes/RegisterConfirmation';
 
 interface AuthChildren {
   // Maybe there is a way to define this
@@ -45,6 +46,10 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route
+          path="/register/:confirmationCode"
+          element={<RegisterConfirmation />}
+        />
         <Route
           path="/files/create"
           element={(

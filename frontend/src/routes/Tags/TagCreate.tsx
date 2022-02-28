@@ -44,11 +44,11 @@ export default class TagCreate extends Component<Props, State> {
 
       api
         .post(`${API_URL}tags/`, this.state)
-        .then((result) => {
+        .then(() => {
           Modal.fire({
             icon: 'success',
             title: 'Success!!',
-            text: JSON.stringify(result.data),
+            text: 'Tag was created successfully!',
           }).then(() => {
             window.location.reload();
           });
@@ -82,6 +82,7 @@ export default class TagCreate extends Component<Props, State> {
               <Form.Control
                 data-testid="description"
                 as="textarea"
+                maxLength={250}
                 onChange={this.onDescriptionChange}
                 placeholder="Leave a comment here"
               />
