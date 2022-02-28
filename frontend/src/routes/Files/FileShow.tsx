@@ -26,14 +26,14 @@ export default class FileShow extends Component<Props, State> {
 
   constructor(props: Props | Readonly<Props>) {
     super(props);
-    this.setState({ json: {} });
+    this.state = { json: {} };
     const url = window.location.pathname;
     const id = url.substring(url.lastIndexOf('/') + 1);
     this.ref = React.createRef();
 
     api.get(`${API_URL}files/${id}/`).then((response) => {
       api.get(`${response.data.transpiled_file}`).then((file) => {
-        this.setState({ json: file.data });
+        this.state = { json: file.data };
 
         if (!this.graph) {
           const defaultRankSep = 180;

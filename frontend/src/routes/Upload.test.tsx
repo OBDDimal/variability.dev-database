@@ -1,16 +1,16 @@
-import React from "react";
-import { fireEvent, render, screen } from "@testing-library/react";
-import selectEvent from "react-select-event";
-import Swal, { SweetAlertResult } from "sweetalert2";
-import { ReactSweetAlert } from "sweetalert2-react-content";
-import FileCreate from "./Files/FileCreate";
-import api from "../services/api.service";
-import { default as Modal } from "../components/Modal";
+import React from 'react';
+import { fireEvent, render, screen } from '@testing-library/react';
+import selectEvent from 'react-select-event';
+import Swal, { SweetAlertResult } from 'sweetalert2';
+import { ReactSweetAlert } from 'sweetalert2-react-content';
+import FileCreate from './Files/FileCreate';
+import api from '../services/api.service';
+import { default as Modal } from '../components/Modal';
 
-jest.mock("../services/api.service");
+jest.mock('../services/api.service');
 const mockedApi = api as jest.Mocked<typeof api>;
 
-jest.mock("../components/Modal");
+jest.mock('../components/Modal');
 const MockedModal = Modal as jest.Mocked<typeof Swal & ReactSweetAlert>;
 
 jest.setTimeout(60000);
@@ -20,7 +20,7 @@ interface Tag {
   label: string;
 }
 
-describe("<FileCreate />", () => {
+describe('<FileCreate />', () => {
   const original = window.location;
 
   const reloadFn = () => {
@@ -28,39 +28,39 @@ describe("<FileCreate />", () => {
   };
 
   beforeAll(() => {
-    Object.defineProperty(window, "location", {
+    Object.defineProperty(window, 'location', {
       configurable: true,
       value: { reload: jest.fn() },
     });
   });
 
   afterAll(() => {
-    Object.defineProperty(window, "location", {
+    Object.defineProperty(window, 'location', {
       configurable: true,
       value: original,
     });
   });
 
-  test("button should be initially disabled", async () => {
+  test('button should be initially disabled', async () => {
     mockedApi.get.mockResolvedValue(
       new Promise((resolve) => {
-        const mockedTags: Tag[] = [{ id: 1337, label: "testlabel" }];
+        const mockedTags: Tag[] = [{ id: 1337, label: 'testlabel' }];
         const mockedResponse = { data: { results: mockedTags } };
         resolve(mockedResponse);
-      })
+      }),
     );
     render(<FileCreate />);
     const uploadButton = screen.getByText(/Upload!/i) as HTMLButtonElement;
     expect(uploadButton.disabled).toBeTruthy();
   });
 
-  test("button should enable after label, description, file, legalShare, userData and openSource have been entered", async () => {
+  test('button should enable after label, description, file, legalShare, userData and openSource have been entered', async () => {
     mockedApi.get.mockResolvedValue(
       new Promise((resolve) => {
-        const mockedTags: Tag[] = [{ id: 1337, label: "testlabel" }];
+        const mockedTags: Tag[] = [{ id: 1337, label: 'testlabel' }];
         const mockedResponse = { data: { results: mockedTags } };
         resolve(mockedResponse);
-      })
+      }),
     );
     render(<FileCreate />);
 
@@ -68,48 +68,48 @@ describe("<FileCreate />", () => {
     expect(uploadButton.disabled).toBeTruthy();
 
     // type label
-    const labelFormControl = await screen.findByTestId("label");
+    const labelFormControl = await screen.findByTestId('label');
     fireEvent.change(labelFormControl, {
-      target: { value: "test label" },
+      target: { value: 'test label' },
     });
 
     // type description
-    const descriptionFormControl = await screen.findByTestId("description");
+    const descriptionFormControl = await screen.findByTestId('description');
     fireEvent.change(descriptionFormControl, {
-      target: { value: "test description" },
+      target: { value: 'test description' },
     });
 
     // select file
-    const fileUploadFormControl = await screen.findByTestId("file-upload");
+    const fileUploadFormControl = await screen.findByTestId('file-upload');
     fireEvent.change(fileUploadFormControl, {
-      target: { files: ["testfile content"] },
+      target: { files: ['testfile content'] },
     });
 
     // click legal share checkbox
-    const legalShareCheckbox = await screen.findByTestId("legal-share");
+    const legalShareCheckbox = await screen.findByTestId('legal-share');
     fireEvent.click(legalShareCheckbox);
 
     // click user data checkbox
-    const userDataCheckbox = await screen.findByTestId("user-data");
+    const userDataCheckbox = await screen.findByTestId('user-data');
     fireEvent.click(userDataCheckbox);
 
     // click open source checkbox
-    const openSourceCheckbox = await screen.findByTestId("open-source");
+    const openSourceCheckbox = await screen.findByTestId('open-source');
     fireEvent.click(openSourceCheckbox);
 
     // click tags
-    await selectEvent.select(screen.getByLabelText("Tags"), "testlabel");
+    await selectEvent.select(screen.getByLabelText('Tags'), 'testlabel');
 
     expect(uploadButton.disabled).toBeFalsy();
   });
 
-  test("button should not enable if no file has been selected", async () => {
+  test('button should not enable if no file has been selected', async () => {
     mockedApi.get.mockResolvedValue(
       new Promise((resolve) => {
-        const mockedTags: Tag[] = [{ id: 1337, label: "testlabel" }];
+        const mockedTags: Tag[] = [{ id: 1337, label: 'testlabel' }];
         const mockedResponse = { data: { results: mockedTags } };
         resolve(mockedResponse);
-      })
+      }),
     );
     render(<FileCreate />);
 
@@ -117,46 +117,46 @@ describe("<FileCreate />", () => {
     expect(uploadButton.disabled).toBeTruthy();
 
     // type description
-    const descriptionFormControl = await screen.findByTestId("description");
+    const descriptionFormControl = await screen.findByTestId('description');
     fireEvent.change(descriptionFormControl, {
-      target: { value: "test description" },
+      target: { value: 'test description' },
     });
 
     // select file
-    const fileUploadFormControl = await screen.findByTestId("file-upload");
+    const fileUploadFormControl = await screen.findByTestId('file-upload');
     fireEvent.change(fileUploadFormControl, { target: {} });
 
     // click legal share checkbox
-    const legalShareCheckbox = await screen.findByTestId("legal-share");
+    const legalShareCheckbox = await screen.findByTestId('legal-share');
     fireEvent.click(legalShareCheckbox);
 
     // click user data checkbox
-    const userDataCheckbox = await screen.findByTestId("user-data");
+    const userDataCheckbox = await screen.findByTestId('user-data');
     fireEvent.click(userDataCheckbox);
 
     // click open source checkbox
-    const openSourceCheckbox = await screen.findByTestId("open-source");
+    const openSourceCheckbox = await screen.findByTestId('open-source');
     fireEvent.click(openSourceCheckbox);
 
     expect(uploadButton.disabled).toBeTruthy();
   });
 
-  test("submit data should reset the form", async () => {
+  test('submit data should reset the form', async () => {
     mockedApi.get.mockResolvedValue(
       new Promise((resolve) => {
-        const mockedTags: Tag[] = [{ id: 1337, label: "testlabel" }];
+        const mockedTags: Tag[] = [{ id: 1337, label: 'testlabel' }];
         const mockedResponse = { data: { results: mockedTags } };
         resolve(mockedResponse);
-      })
+      }),
     );
 
     mockedApi.post.mockResolvedValue(
       new Promise((resolve) => {
         const mockedResponse = {
-          data: { testResponseKey: "testResponseValue" },
+          data: { testResponseKey: 'testResponseValue' },
         };
         resolve(mockedResponse);
-      })
+      }),
     );
 
     // MockedModal.fire.mockResolvedValue(
@@ -184,48 +184,48 @@ describe("<FileCreate />", () => {
 
     // type label
     const labelFormControl = (await screen.findByTestId(
-      "label"
+      'label',
     )) as HTMLInputElement;
     fireEvent.change(labelFormControl, {
-      target: { value: "test label" },
+      target: { value: 'test label' },
     });
 
     // type description
     const descriptionFormControl = (await screen.findByTestId(
-      "description"
+      'description',
     )) as HTMLTextAreaElement;
     fireEvent.change(descriptionFormControl, {
-      target: { value: "test description" },
+      target: { value: 'test description' },
     });
 
     // select file
     const fileUploadFormControl = (await screen.findByTestId(
-      "file-upload"
+      'file-upload',
     )) as HTMLInputElement;
     fireEvent.change(fileUploadFormControl, {
-      target: { files: ["testfile content"] },
+      target: { files: ['testfile content'] },
     });
 
     // click legal share checkbox
     const legalShareCheckbox = (await screen.findByTestId(
-      "legal-share"
+      'legal-share',
     )) as HTMLInputElement;
     fireEvent.click(legalShareCheckbox);
 
     // click user data checkbox
     const userDataCheckbox = (await screen.findByTestId(
-      "user-data"
+      'user-data',
     )) as HTMLInputElement;
     fireEvent.click(userDataCheckbox);
 
     // click open source checkbox
     const openSourceCheckbox = (await screen.findByTestId(
-      "open-source"
+      'open-source',
     )) as HTMLInputElement;
     fireEvent.click(openSourceCheckbox);
 
     // click tags
-    await selectEvent.select(screen.getByLabelText("Tags"), "testlabel");
+    await selectEvent.select(screen.getByLabelText('Tags'), 'testlabel');
 
     // click Upload!
     const uploadButton = screen.getByText(/Upload!/i) as HTMLButtonElement;

@@ -5,8 +5,8 @@ import 'react-tabulator/css/bootstrap/tabulator_bootstrap.min.css';
 import { faPen, faPlus, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Button, Container, Row } from 'react-bootstrap';
-import api from '../../services/api.service.ts';
-import TableButton from '../../components/TableButton.tsx';
+import api from '../../services/api.service';
+import TableButton from '../../components/TableButton';
 
 const API_URL = process.env.REACT_APP_DOMAIN;
 

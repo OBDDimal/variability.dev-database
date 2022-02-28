@@ -1,7 +1,9 @@
-import React, { Component } from "react";
-import { Button, Container, Form, Row } from "react-bootstrap";
-import { default as Modal } from "../../components/Modal";
-import api from "../../services/api.service";
+import React, { Component } from 'react';
+import {
+  Button, Container, Form, Row,
+} from 'react-bootstrap';
+import { default as Modal } from '../../components/Modal';
+import api from '../../services/api.service';
 
 const API_URL = process.env.REACT_APP_DOMAIN;
 
@@ -44,8 +46,8 @@ export default class TagCreate extends Component<Props, State> {
         .post(`${API_URL}tags/`, this.state)
         .then((result) => {
           Modal.fire({
-            icon: "success",
-            title: "Success!!",
+            icon: 'success',
+            title: 'Success!!',
             text: JSON.stringify(result.data),
           }).then(() => {
             window.location.reload();
@@ -54,8 +56,8 @@ export default class TagCreate extends Component<Props, State> {
         .catch((error) => {
           this.setState({ loading: false });
           Modal.fire({
-            icon: "error",
-            title: "Error!!",
+            icon: 'error',
+            title: 'Error!!',
             text: JSON.stringify(error.message),
           });
         });
@@ -67,32 +69,32 @@ export default class TagCreate extends Component<Props, State> {
       <Container>
         <Row>
           <form onSubmit={this.onSubmit}>
-            <Form.Group className='mb-3'>
+            <Form.Group className="mb-3">
               <Form.Label>Tag name</Form.Label>
               <Form.Control
-                data-testid='label'
+                data-testid="label"
                 onChange={this.onLabelChange}
-                placeholder='Leave a tagname'
+                placeholder="Leave a tagname"
               />
             </Form.Group>
-            <Form.Group className='mb-3'>
+            <Form.Group className="mb-3">
               <Form.Label>Description</Form.Label>
               <Form.Control
-                data-testid='description'
-                as='textarea'
+                data-testid="description"
+                as="textarea"
                 onChange={this.onDescriptionChange}
-                placeholder='Leave a comment here'
+                placeholder="Leave a comment here"
               />
             </Form.Group>
             <Button
-              variant='primary'
-              type='submit'
+              variant="primary"
+              type="submit"
               disabled={
                 !this.isReady() || this.state.loading ? true : undefined
               }
             >
               {this.state.loading && (
-                <span className='spinner-border spinner-border-sm' />
+                <span className="spinner-border spinner-border-sm" />
               )}
               Create!
             </Button>

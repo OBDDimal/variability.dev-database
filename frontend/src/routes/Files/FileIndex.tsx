@@ -63,7 +63,7 @@ export default class FileIndex extends Component<Props, State> {
 
   constructor(props: Props | Readonly<Props>) {
     super(props);
-    this.setState({ files: [] });
+    this.state = { files: [], columns: [] };
     // Check for readonly property
     if (!props.readonly) {
       const editButton = {
@@ -105,7 +105,7 @@ export default class FileIndex extends Component<Props, State> {
           )}
           <ReactTabulator
             layout="fitColumns"
-            columns={columns}
+            columns={this.state.columns}
             data={this.state.files}
           />
         </Row>
