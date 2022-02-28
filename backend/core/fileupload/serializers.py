@@ -1,12 +1,21 @@
 import json
-
 from django.core.files.base import ContentFile
-
+from core.fileupload.models.family import Family
 from core.fileupload.models.file import File, Tag
 from rest_framework import serializers
 from django.http import QueryDict
-
 from transpiler.g6_transpiler import xml_to_g6
+
+
+class FamiliesSerializer(serializers.ModelSerializer):
+    """
+    A serializer for defining which Feature Model Family attributes should be converted to JSON
+    """
+    owner = serializers.ReadOnlyField(source='owner.email')
+
+    class Meta:
+        model = Family
+        fields = ['id', 'owner', 'label', 'description']
 
 
 class TagsSerializer(serializers.ModelSerializer):

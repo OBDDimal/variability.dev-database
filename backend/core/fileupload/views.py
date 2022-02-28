@@ -1,15 +1,16 @@
 from collections import OrderedDict
 from pydoc import html, plain
 from django.template.loader import render_to_string
+
+from core.fileupload.models.family import Family
 from core.fileupload.models.tag import Tag
 from rest_framework import viewsets, permissions
 from rest_framework.response import Response
 from rest_framework import status
 from django.utils.html import strip_tags
 
-
 from core.fileupload.models.file import File
-from core.fileupload.serializers import FilesSerializer, TagsSerializer
+from core.fileupload.serializers import FilesSerializer, TagsSerializer, FamiliesSerializer
 
 
 class FileUploadViewSet(viewsets.ModelViewSet):
@@ -19,8 +20,8 @@ class FileUploadViewSet(viewsets.ModelViewSet):
 
     def list(self, request, **kwargs):
         """
-        Replace email address of file owner and label creator with True or False,
-        indicating if the user which has sent the request is the owner/creator.
+        Replace email address of file owner with True or False,
+        indicating if the user which has sent the request is the owner.
         """
         queryset = File.objects.all()
         files = FilesSerializer(queryset, many=True).data
@@ -55,11 +56,35 @@ class FileUploadViewSet(viewsets.ModelViewSet):
             'protocol': 'http',
             'file_domain': str(serializer.data.get('local_file')),
             'file_name': str(serializer.data.get('local_file')).split('/')[-1],
-            # TODO: For Issue #28 'delete_domain': 'localhost:8000/'
         })
         plain_message = strip_tags(html_message)
 
         self.request.user._email_user('DDueruem File Upload', plain_message, html_message=html_message)
+
+
+class FamiliesViewSet(viewsets.ModelViewSet):
+    queryset = Family.objects.all()
+    serializer_class = FamiliesSerializer
+    permission_classes = [permissions.AllowAny]
+
+    def list(self, request, **kwargs):
+        """
+        Replace email address of family owner with True or False,
+        indicating if the user which has sent the request is the owner.
+        """
+        queryset = Family.objects.all()
+        families = FamiliesSerializer(queryset, many=True).data
+        changed_families = []
+        for family in families:
+            changed_family = OrderedDict()
+            for item in family.items():
+                if item[0] == 'owner':
+                    user_mail = "" if request.user.is_anonymous else request.user.email
+                    changed_family[item[0]] = item[1] == user_mail
+                else:
+                    changed_family[item[0]] = item[1]
+            changed_families.append(changed_family)
+        return Response(changed_families)
 
 
 class TagsViewSet(viewsets.ModelViewSet):
@@ -69,8 +94,8 @@ class TagsViewSet(viewsets.ModelViewSet):
 
     def list(self, request, **kwargs):
         """
-        Replace email address of file owner and label creator with True or False,
-        indicating if the user which has sent the request is the owner/creator.
+        Replace email address of tag owner with True or False,
+        indicating if the user which has sent the request is the owner.
         """
         queryset = Tag.objects.all()
         tags = TagsSerializer(queryset, many=True).data
@@ -90,6 +115,6 @@ class TagsViewSet(viewsets.ModelViewSet):
         serializer.save(owner=self.request.user)
 
     def delete(self, pk):
-      tag = self.get_object(pk)
-      tag.delete()
-      return Response(status=status.HTTP_204_NO_CONTENT)
+        tag = self.get_object(pk)
+        tag.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)

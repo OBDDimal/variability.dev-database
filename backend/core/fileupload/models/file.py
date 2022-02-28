@@ -1,5 +1,6 @@
 from django.db import models
 from .tag import Tag
+from .family import Family
 from core.user.models import User
 from django.core.files.base import ContentFile
 
@@ -41,6 +42,7 @@ class FileManager(models.Manager):
         """
         Creates a file
         """
+
         return self.save_file(kwargs.pop('local_file'), **kwargs)
 
 
@@ -57,6 +59,7 @@ class File(models.Model):
     ]
 
     owner = models.ForeignKey(User, on_delete=models.RESTRICT)
+    family = models.ForeignKey(Family, on_delete=models.CASCADE)
     label = models.CharField(blank=False, max_length=255)
     description = models.TextField(blank=True)
     local_file = models.FileField(upload_to=relative_upload_dir)
