@@ -1,0 +1,22 @@
+name: deploy
+on: 
+  push:
+    branches:
+      - dev
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install SSH key
+        uses: shimataro/ssh-key-action@v2
+        with:
+          key: ${{ secrets.DEPLOY_SECRET_KEY }}
+          name: id_rsa
+          known_hosts: ${{ secrets.SSH_HOST }}
+      - name: Adding Known Hosts
+        run: ssh-keyscan -H ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
+      - name: Checkout project
+        uses: actions/checkout@v2
+      - name: Deploy with rsync
+        run: rsync -avz ./ ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/home/${{ secrets.SSH_USER }}/sili-telegram-bot/
+      # Logic to run ...
