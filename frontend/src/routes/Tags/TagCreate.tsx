@@ -18,11 +18,11 @@ type State = {
 export default class TagCreate extends Component<Props, State> {
   constructor(props: Props) {
     super(props);
-    this.setState({
+    this.state = {
       label: undefined,
       description: undefined,
       loading: false,
-    });
+    };
   }
 
   onLabelChange = (e: React.ChangeEvent<HTMLInputElement>) => {
