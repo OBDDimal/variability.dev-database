@@ -1,7 +1,9 @@
-import { Component } from "react";
-import { Button, Container, Form, Row } from "react-bootstrap";
-import { Modal } from "../../components/Modal";
-import api from "../../services/api.service";
+import React, { Component } from 'react';
+import {
+  Button, Container, Form, Row,
+} from 'react-bootstrap';
+import { default as Modal } from '../../components/Modal';
+import api from '../../services/api.service';
 
 const API_URL = process.env.REACT_APP_DOMAIN;
 
@@ -14,11 +16,14 @@ type State = {
 };
 
 export default class TagCreate extends Component<Props, State> {
-  state: State = {
-    label: undefined,
-    description: undefined,
-    loading: false,
-  };
+  constructor(props: Props) {
+    super(props);
+    this.state = {
+      label: undefined,
+      description: undefined,
+      loading: false,
+    };
+  }
 
   onLabelChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const label = e.target as HTMLInputElement;
@@ -30,9 +35,7 @@ export default class TagCreate extends Component<Props, State> {
     this.setState({ description: description.value });
   };
 
-  isReady = () => {
-    return this.state.label && this.state.description;
-  };
+  isReady = () => this.state.label && this.state.description;
 
   onSubmit = (e: { preventDefault: () => void }) => {
     e.preventDefault();
@@ -41,11 +44,11 @@ export default class TagCreate extends Component<Props, State> {
 
       api
         .post(`${API_URL}tags/`, this.state)
-        .then((result) => {
+        .then(() => {
           Modal.fire({
-            icon: "success",
-            title: "Success!!",
-            text: "Tag was created successfully!",
+            icon: 'success',
+            title: 'Success!!',
+            text: 'Tag was created successfully!',
           }).then(() => {
             window.location.reload();
           });
@@ -53,8 +56,8 @@ export default class TagCreate extends Component<Props, State> {
         .catch((error) => {
           this.setState({ loading: false });
           Modal.fire({
-            icon: "error",
-            title: "Error!!",
+            icon: 'error',
+            title: 'Error!!',
             text: JSON.stringify(error.message),
           });
         });
@@ -66,33 +69,33 @@ export default class TagCreate extends Component<Props, State> {
       <Container>
         <Row>
           <form onSubmit={this.onSubmit}>
-            <Form.Group className='mb-3'>
+            <Form.Group className="mb-3">
               <Form.Label>Tag name</Form.Label>
               <Form.Control
-                data-testid='label'
+                data-testid="label"
                 onChange={this.onLabelChange}
-                placeholder='Leave a tagname'
+                placeholder="Leave a tagname"
               />
             </Form.Group>
-            <Form.Group className='mb-3'>
+            <Form.Group className="mb-3">
               <Form.Label>Description</Form.Label>
               <Form.Control
-                data-testid='description'
-                as='textarea'
+                data-testid="description"
+                as="textarea"
                 maxLength={250}
                 onChange={this.onDescriptionChange}
-                placeholder='Leave a comment here'
+                placeholder="Leave a comment here"
               />
             </Form.Group>
             <Button
-              variant='primary'
-              type='submit'
+              variant="primary"
+              type="submit"
               disabled={
                 !this.isReady() || this.state.loading ? true : undefined
               }
             >
               {this.state.loading && (
-                <span className='spinner-border spinner-border-sm' />
+                <span className="spinner-border spinner-border-sm" />
               )}
               Create!
             </Button>
