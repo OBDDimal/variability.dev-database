@@ -37,11 +37,12 @@ class FilesSerializer(serializers.ModelSerializer):
     # For further relations on serializers:
     # https://www.django-rest-framework.org/api-guide/relations
     tags = TagsSerializer(many=True)
+    family = FamiliesSerializer()
     new_version_of = 'self'
 
     class Meta:
         model = File
-        fields = ['id', 'label', 'description', 'local_file', 'license', 'tags', 'owner', 'uploaded_at',
+        fields = ['id', 'label', 'description', 'local_file', 'family', 'license', 'tags', 'owner', 'uploaded_at',
                   'new_version_of', 'transpiled_file']
 
     def create(self, validated_data):

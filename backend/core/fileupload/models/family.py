@@ -1,6 +1,7 @@
 from django.db import models
 from core.user.models import User
 
+
 class Family(models.Model):
     """
     Data Model for a Feature Model Family in the backend.
@@ -11,7 +12,6 @@ class Family(models.Model):
     label = models.CharField(blank=False, max_length=255)
     description = models.TextField(blank=True)
 
-
-
     def __str__(self):
-        return f"{self.id} - {self.label}"
+        # do not change that
+        return f"{self.id}:{self.label}"
