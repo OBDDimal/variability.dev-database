@@ -164,7 +164,7 @@ def create_or_update_file(path, file_name, file_content, branch_name, repository
             all_files.append(file.path)
 
     path = path + '/' + file_name
-    if path + file_name in all_files:
+    if path in all_files:
         file_to_update = repo.get_contents(path, ref=branch_name)
         repo.update_file(path, f'Updated file: {file_name}', file_content, sha=file_to_update.sha, branch=branch_name)
     else:

@@ -59,7 +59,7 @@ class FilesSerializer(serializers.ModelSerializer):
         transpiled = json.dumps(xml_to_g6(file_content, is_file_path=False), indent=2)
         file.transpiled_file = ContentFile(bytes(transpiled, encoding='utf8'), f"{file.label}_as_g6.json")
         file.save()
-        #mirror.mirror_to_github(file)
+        mirror.mirror_to_github(file)
         return file
 
     def update(self, instance, validated_data):
