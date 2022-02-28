@@ -20,6 +20,7 @@ type State = {
   license: string;
   gottenTags: Array<{ label: string; value: string }>;
   gottenFiles: Array<{ value: number; label: string }>;
+  gottenFamilies: Array<{ value: number; label: string }>;
   newVersionOf: string;
   featureFamily: string;
   tags: string;
@@ -45,6 +46,7 @@ export default class FileCreate extends Component<Props, State> {
     super(props);
     this.getTags();
     this.getNewVersionOf();
+    this.getFamilies();
 
     this.state = {
       label: '',
@@ -53,6 +55,7 @@ export default class FileCreate extends Component<Props, State> {
       license: license[0],
       gottenTags: [],
       gottenFiles: [],
+      gottenFamilies: [],
       tags: '',
       newVersionOf: '---',
       featureFamily: '---',
@@ -73,6 +76,17 @@ export default class FileCreate extends Component<Props, State> {
         label: tag.label,
       }));
       this.setState({ gottenTags: tags });
+    });
+  };
+
+  getFamilies = () => {
+    api.get(`${API_URL}families/`).then((response) => {
+      let families = response.data;
+      families = families.map((family: { id: number; label: string }) => ({
+        value: family.id,
+        label: family.label,
+      }));
+      this.setState({ gottenFamilies: families });
     });
   };
 
@@ -146,7 +160,8 @@ export default class FileCreate extends Component<Props, State> {
     && this.state.description
     && this.state.legalShare
     && this.state.userData
-    && this.state.openSource;
+    && this.state.openSource
+    && !(this.state.featureFamily === '---' && this.state.newVersionOf === '---');
 
   onSubmit = (e: { preventDefault: () => void }) => {
     e.preventDefault();
@@ -168,6 +183,9 @@ export default class FileCreate extends Component<Props, State> {
       data.append('license', this.state.license);
       if (this.state.newVersionOf !== '---') {
         data.append('new_version_of', this.state.newVersionOf);
+      }
+      if (this.state.featureFamily !== '---') {
+        data.append('family', this.state.featureFamily);
       }
       data.append('tags', JSON.stringify(this.state.tags));
 
@@ -246,6 +264,7 @@ export default class FileCreate extends Component<Props, State> {
                 <Form.Label>New version of</Form.Label>
                 <Form.Select
                   onChange={this.onNewVersionOfChange}
+                  disabled={!this.state.newVersionOfSelection ?? undefined}
                   defaultValue="---"
                 >
                   {this.state.gottenFiles.map((key) => (
@@ -263,11 +282,11 @@ export default class FileCreate extends Component<Props, State> {
               <Form.Group className="col-sm">
                 <Form.Label>Feature model family</Form.Label>
                 <Form.Select
-                  disabled={!this.state.featureModelFamilySelection ?? undefined}
                   onChange={this.onNewFamilyChange}
+                  disabled={!this.state.featureModelFamilySelection ?? undefined}
                   defaultValue="---"
                 >
-                  {this.state.gottenFiles.map((key) => (
+                  {this.state.gottenFamilies.map((key) => (
                     <option key={key.value} value={key.value}>
                       {key.value}
                       :
