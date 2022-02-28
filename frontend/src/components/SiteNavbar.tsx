@@ -1,6 +1,8 @@
-import React, { Component } from "react";
-import { Container, Nav, Navbar, NavDropdown } from "react-bootstrap";
-import authService from "../services/auth.service";
+import React, { Component } from 'react';
+import {
+  Container, Nav, Navbar, NavDropdown,
+} from 'react-bootstrap';
+import authService from '../services/auth.service';
 
 type Props = {
   url: string;
@@ -15,7 +17,7 @@ export default class SiteNavbar extends Component<Props, State> {
     super(props);
 
     this.state = {
-      loggedIn: authService.getCurrentUser() ? true : false,
+      loggedIn: !!authService.getCurrentUser(),
     };
   }
 
@@ -26,22 +28,22 @@ export default class SiteNavbar extends Component<Props, State> {
 
   render() {
     return (
-      <Navbar bg='light' expand='lg'>
+      <Navbar bg="light" expand="lg">
         <Container>
-          <Navbar.Brand href='/'>DDueruem</Navbar.Brand>
-          <Navbar.Toggle aria-controls='basic-navbar-nav' />
-          <Navbar.Collapse id='basic-navbar-nav'>
-            <Nav className='me-auto'>
+          <Navbar.Brand href="/">DDueruem</Navbar.Brand>
+          <Navbar.Toggle aria-controls="basic-navbar-nav" />
+          <Navbar.Collapse id="basic-navbar-nav">
+            <Nav className="me-auto">
               <Nav.Link
-                className={this.props.url === "/" ? "active" : ""}
-                href='/'
+                className={this.props.url === '/' ? 'active' : ''}
+                href="/"
               >
                 Home
               </Nav.Link>
               {!this.state.loggedIn && (
                 <Nav.Link
-                  href='/register'
-                  className={this.props.url === "/register" ? "active" : ""}
+                  href="/register"
+                  className={this.props.url === '/register' ? 'active' : ''}
                 >
                   Register
                 </Nav.Link>
@@ -49,8 +51,8 @@ export default class SiteNavbar extends Component<Props, State> {
 
               {!this.state.loggedIn && (
                 <Nav.Link
-                  href='/login'
-                  className={this.props.url === "/login" ? "active" : ""}
+                  href="/login"
+                  className={this.props.url === '/login' ? 'active' : ''}
                 >
                   Login
                 </Nav.Link>
@@ -58,8 +60,8 @@ export default class SiteNavbar extends Component<Props, State> {
 
               {this.state.loggedIn && (
                 <Nav.Link
-                  href='/profile'
-                  className={this.props.url === "/profile" ? "active" : ""}
+                  href="/profile"
+                  className={this.props.url === '/profile' ? 'active' : ''}
                 >
                   Profile
                 </Nav.Link>
@@ -67,8 +69,8 @@ export default class SiteNavbar extends Component<Props, State> {
 
               {this.state.loggedIn && (
                 <Nav.Link
-                  href='/logout'
-                  className={this.props.url === "/logout" ? "active" : ""}
+                  href="/logout"
+                  className={this.props.url === '/logout' ? 'active' : ''}
                   onClick={this.logout}
                 >
                   Logout
@@ -77,8 +79,8 @@ export default class SiteNavbar extends Component<Props, State> {
 
               {this.state.loggedIn && (
                 <Nav.Link
-                  href='/files'
-                  className={this.props.url === "/files" ? "active" : ""}
+                  href="/files"
+                  className={this.props.url === '/files' ? 'active' : ''}
                 >
                   Files
                 </Nav.Link>
@@ -86,23 +88,23 @@ export default class SiteNavbar extends Component<Props, State> {
 
               {this.state.loggedIn && (
                 <Nav.Link
-                  href='/tags'
-                  className={this.props.url === "/tags" ? "active" : ""}
+                  href="/tags"
+                  className={this.props.url === '/tags' ? 'active' : ''}
                 >
                   Tags
                 </Nav.Link>
               )}
 
-              <NavDropdown title='Dropdown' id='basic-nav-dropdown'>
-                <NavDropdown.Item href='#action/3.1'>Dummy</NavDropdown.Item>
-                <NavDropdown.Item href='#action/3.2'>
+              <NavDropdown title="Dropdown" id="basic-nav-dropdown">
+                <NavDropdown.Item href="#action/3.1">Dummy</NavDropdown.Item>
+                <NavDropdown.Item href="#action/3.2">
                   Another action
                 </NavDropdown.Item>
-                <NavDropdown.Item href='#action/3.3'>
+                <NavDropdown.Item href="#action/3.3">
                   Something
                 </NavDropdown.Item>
                 <NavDropdown.Divider />
-                <NavDropdown.Item href='#action/3.4'>
+                <NavDropdown.Item href="#action/3.4">
                   Separated link
                 </NavDropdown.Item>
               </NavDropdown>

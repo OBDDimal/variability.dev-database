@@ -1,3 +1,5 @@
+/* TODO: Remove this when this class is finished */
+/* eslint-disable */
 import React, { Component } from "react";
 import { Container, Form, Row } from "react-bootstrap";
 import Select from "react-select";
@@ -29,11 +31,32 @@ type State = {
   tags?: string;
 };
 
+/**
+ * This route is for editing uploaded files.
+ * It is only visible for authenticated users.
+ * @param {any} options description
+ * @param {any} e description
+ */
 export default class FileEdit extends Component<Props, State> {
+  /**
+   * Constructor for the file edit form.
+   * It fetches all files and tags.
+   * @param {Props} props is not used.
+   */
   constructor(props: Props | Readonly<Props>) {
     super(props);
     const url = window.location.pathname;
     const id = url.substring(url.lastIndexOf("/") + 1);
+
+    this.state = {
+      id: undefined,
+      file: undefined,
+      label: undefined,
+      description: undefined,
+      gottenTags: [],
+      gottenFiles: [],
+      newVersionOf: "---",
+    };
 
     api.get(`${API_URL}files/${id}/`).then((response) => {
       this.setState({ file: response.data });
@@ -42,41 +65,34 @@ export default class FileEdit extends Component<Props, State> {
     });
   }
 
-  state: State = {
-    id: undefined,
-    file: undefined,
-    label: undefined,
-    description: undefined,
-    gottenTags: [],
-    gottenFiles: [],
-    newVersionOf: "---",
-  };
-
   getTags = () => {
-    api.get(API_URL + "tags/").then((response) => {
+    api.get(`${API_URL}tags/`).then((response) => {
       let tags = response.data.results;
-      tags = tags.map((tag: { id: number; label: string }) => {
-        return { value: tag.id, label: tag.label };
-      });
+      tags = tags.map((tag: { id: number; label: string }) => ({
+        value: tag.id,
+        label: tag.label,
+      }));
       this.setState({ gottenTags: tags });
     });
   };
 
   getNewVersionOf = () => {
-    api.get(API_URL + "files/").then((response) => {
+    api.get(`${API_URL}files/`).then((response) => {
       let files = response.data.results;
-      files = files.map((file: { id: number; label: string }) => {
-        return { value: file.id, label: file.label };
-      });
+      files = files.map((file: { id: number; label: string }) => ({
+        value: file.id,
+        label: file.label,
+      }));
       this.setState({ gottenFiles: files });
     });
   };
 
   onTagChange = (options: any) => {
     this.setState({
-      tags: options.map((option: any) => {
-        return { id: option.value, label: option.label };
-      }),
+      tags: options.map((option: any) => ({
+        id: option.value,
+        label: option.label,
+      })),
     });
   };
 
@@ -95,10 +111,10 @@ export default class FileEdit extends Component<Props, State> {
     this.setState({ newVersionOf: newVersionOf.value });
   };
 
-  // const onSubmit = () => {};
-
-  // label, description, tags, new_version_of
-
+  /**
+   * Render the file edit form.
+   * @return {JSX} the form.
+   */
   render() {
     return (
       <Container>
@@ -128,13 +144,11 @@ export default class FileEdit extends Component<Props, State> {
               onChange={this.onNewVersionOfChange}
               defaultValue={this.state.file?.new_version_of}
             >
-              {this.state.gottenFiles.map((key) => {
-                return (
-                  <option key={key.value} value={key.value}>
-                    {key.value}: {key.label}
-                  </option>
-                );
-              })}
+              {this.state.gottenFiles.map((key) => (
+                <option key={key.value} value={key.value}>
+                  {key.value}:{key.label}
+                </option>
+              ))}
               <option key='---' value='---'>
                 ---
               </option>
