@@ -21,7 +21,10 @@
     "react/no-unused-class-component-methods": [0],
     "import/extensions": [0],
     "no-undef": [0],
-    "no-nested-ternary": [0]
+    "no-nested-ternary": [0],
+    "no-underscore-dangle": [0],
+    "react/jsx-no-bind": [0],
+    "react/no-access-state-in-setstate": [0]
   },
   "settings": {
     "import/resolver": {

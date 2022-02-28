@@ -42,22 +42,22 @@ export default class FileCreate extends Component<Props, State> {
     super(props);
     this.getTags();
     this.getNewVersionOf();
-  }
 
-  state: State = {
-    label: '',
-    description: undefined,
-    file: undefined,
-    license: license[0],
-    gottenTags: [],
-    gottenFiles: [],
-    tags: '',
-    newVersionOf: '---',
-    loading: false,
-    legalShare: false,
-    userData: false,
-    openSource: false,
-  };
+    this.state = {
+      label: '',
+      description: undefined,
+      file: undefined,
+      license: license[0],
+      gottenTags: [],
+      gottenFiles: [],
+      tags: '',
+      newVersionOf: '---',
+      loading: false,
+      legalShare: false,
+      userData: false,
+      openSource: false,
+    };
+  }
 
   getTags = () => {
     api.get(`${API_URL}tags/`).then((response) => {
@@ -113,8 +113,8 @@ export default class FileCreate extends Component<Props, State> {
   };
 
   onLicenseChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const license = e.target as HTMLSelectElement;
-    this.setState({ license: license.value });
+    const localLicense = e.target as HTMLSelectElement;
+    this.setState({ license: localLicense.value });
   };
 
   isReady = () => this.state.tags
@@ -152,7 +152,7 @@ export default class FileCreate extends Component<Props, State> {
         .post(`${API_URL}files/`, data, {
           headers: { 'Content-Type': 'multipart/form-data' },
         })
-        .then((result) => {
+        .then(() => {
           Modal.fire({
             icon: 'success',
             title: 'Success!!',

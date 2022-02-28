@@ -16,18 +16,19 @@ const instance = axios.create({
 instance.interceptors.request.use(
   (config) => {
     const token = authService.getAccessToken();
-
-    if (token && config.headers) {
-      config.headers.Authorization = `Bearer ${token}`;
+    const changeConfig = config;
+    if (token && changeConfig.headers) {
+      changeConfig.headers.Authorization = `Bearer ${token}`;
     }
 
-    return config;
+    return changeConfig;
   },
   // In case there is an error just pipe it through to the appropriate handler
   (error) => Promise.reject(error),
 );
 
-// Look at every answer from the API, in case it is unauthorized get another access token with the refresh token (Server -> Client)
+// Look at every answer from the API, in case it is unauthorized
+// get another access token with the refresh token (Server -> Client)
 instance.interceptors.response.use(
   // A fine response remains untouched
   (res) => res,
@@ -50,6 +51,7 @@ instance.interceptors.response.use(
         // Refresh Token is also not valid anymore -> return to login
         authService.logout();
         window.location.replace('/login');
+        return Promise.reject(error);
       }
     } else {
       return Promise.reject(error);

@@ -2,8 +2,7 @@ import axios from 'axios';
 
 const API_URL = `${process.env.REACT_APP_DOMAIN}auth/`;
 
-console.log(process.env.REACT_APP_DOMAIN);
-
+/* eslint-disable class-methods-use-this */
 class AuthService {
   login(email: string, password: string) {
     return axios
