@@ -7,6 +7,7 @@ from django.test.client import MULTIPART_CONTENT, encode_multipart, BOUNDARY
 from django.core.files.base import ContentFile
 
 from core.fileupload.models import File, Tag
+from core.fileupload.models.family import Family
 from core.user.models import User
 from core.fileupload.githubmirror.github_manager import eval_repo, post_file_in_pull_request
 
@@ -20,7 +21,7 @@ class GithubMirrorTests(APITestCase):
           </featureModel>"""
 
     def _tag_and_upload_file(self, file_label, file_name):
-        User.objects.create_superuser(email="ad@m.in", password="12345678!")
+        user = User.objects.create_superuser(email="ad@m.in", password="12345678!")
         c = self.client
         l_res = c.post('/auth/login/', {'email': 'ad@m.in', 'password': '12345678!'})
         content_as_dict = json.loads(l_res.content.decode("utf-8"))
@@ -38,10 +39,13 @@ class GithubMirrorTests(APITestCase):
         t2.description = 'short testing des'
         t2.is_public = True
         t2.save()
+        fam = Family(label='myFMFamily', description='with fancy des', owner_id=user.id)
+        fam.save()
         raw_data = {
             "description": "some description text",
             "label": file_label,
             "local_file": file,
+            "family": fam,
             "license": File.LICENSES[0],
             "tags": '[{"id": "2", "label": "Tobi"},{"id": "1", "label": "Eric Test"}]'}
         msg_as_multipart = encode_multipart(data=raw_data, boundary=BOUNDARY)

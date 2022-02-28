@@ -12,6 +12,8 @@ class FileManager(models.Manager):
         """
         Saves a file with the given attributes to the database
         """
+        if kwargs.get('owner', None) is None:
+            raise TypeError('File owner is not set')
         if kwargs.get('label', None) is None:
             raise TypeError('File name is not set')
         if local_file is None:
@@ -19,6 +21,12 @@ class FileManager(models.Manager):
         tags = kwargs.pop('tags')
         if tags is None:
             raise TypeError('Tags is not set')
+        family = kwargs.pop('family')
+        if family is None:
+            raise TypeError('Feature Model Family is not set')
+        else:
+            family_id = family.split(':')[0]
+            kwargs.update({'family': Family.objects.get(id=int(family_id))})
         # get file from id
         if kwargs.get('new_version_of', None) is not None:
             kwargs.update({'new_version_of': File.objects.get(id=kwargs['new_version_of'])})
@@ -70,4 +78,5 @@ class File(models.Model):
     transpiled_file = models.FileField(null=True, blank=True, upload_to=relative_upload_dir)
 
     def __str__(self):
+        # do not change that
         return f"{self.id}"
