@@ -10,6 +10,14 @@ token = os.getenv('GITHUB_TOKEN')
 g = Github(login_or_token=token)
 
 
+def mirror_to_github(file):
+    """
+    Mirrors a File to GitHub
+    """
+    eval_repo()
+    post_file_in_pull_request(file=file)
+
+
 def eval_repo(repo_name=init_repo_name):
     """
     Checks if the given GitHub repository contains a files' folder. If not it will be created.
@@ -31,6 +39,7 @@ def eval_repo(repo_name=init_repo_name):
     return has_file_folder
 
 
+# -----------------------------Code taken from 'deprecated' branch and slightly modified --------------------------
 def get_files_from_repo(full_access=False, repo_name=init_repo_name):
     """
     Returns all files that are present in the main branch of the repository.
@@ -62,7 +71,7 @@ def get_files_from_repo(full_access=False, repo_name=init_repo_name):
 
 def post_file_in_pull_request(file, branch_name=init_branch, repo_name=init_repo_name):
     """ 
-    Takes the given file and posts commits it in a new branch to the repository,
+    Takes the given file and posts commits it in a new branch to the repository
     and creates a pull request with this new branch.
 
     Args:
@@ -71,24 +80,39 @@ def post_file_in_pull_request(file, branch_name=init_branch, repo_name=init_repo
     """
     # access = 'public' if file.public else 'private'
     access = 'public'  # at the moment we do not support private models
-    # define path the new file is committed to
-    path = 'files/' + access + '/' + str(file.id) + '-' + file.label
+    # define file path
+    root_path = 'files/' + access + '/' + str(file.family.label)
+    fm_path = root_path + '/' + file.label
     filtered_file_name = re.sub(r'\W+', '', file.label)
     with file.local_file.open('r') as f:
         file_content = ''.join(f.readlines())
     create_branch(branch_name=filtered_file_name, repo_name=repo_name)
-    create_or_update_file(path, file.label, file_content, branch_name=filtered_file_name, repository_name=repo_name)
-    # create markdown file from file attributes
-    attributes = get_attributes_as_markdown(file)
+    # alter feature model xml
+    fname = file.label + '.xml'
+    create_or_update_file(fm_path, fname, file_content, branch_name=filtered_file_name, repository_name=repo_name)
+    # alter feature model readme
+    attributes = fm_to_markdown(file)
     md_name = 'readme.md'
-    path = 'files/' + access + '/' + md_name
-    create_or_update_file(path, md_name, attributes, branch_name=filtered_file_name, repository_name=repo_name)
+    create_or_update_file(fm_path, md_name, attributes, branch_name=filtered_file_name, repository_name=repo_name)
+    # alter feature model family readme
+    attributes = fmf_to_markdown(file.family)
+    md_name = 'readme.md'
+    create_or_update_file(root_path, md_name, attributes, branch_name=filtered_file_name, repository_name=repo_name)
     create_new_pull_request(branch_name, filtered_file_name, repo_name=repo_name)
 
 
-def get_attributes_as_markdown(file):
+def fmf_to_markdown(family):
     """
-    Retrieves attributes of a File and returns them as markdown string.
+    Returns the attributes of a Feature Model Family as markdown
+    """
+    return f"# Feature Model Family {family.label}\n" \
+           f"{family.description}\n" \
+           f"The uploader is **{' '.join(str(family.owner))}**\n"
+
+
+def fm_to_markdown(file):
+    """
+    Returns the attributes of a File as markdown
     """
     return f"# Feature Model {file.label}\n" \
            f"This feature model was uploaded at {file.uploaded_at}. The uploader is **{' '.join(str(file.owner))}**\n" \
@@ -96,12 +120,12 @@ def get_attributes_as_markdown(file):
            "The feature model was published with the following license:\n" \
            f"{file.license}\n" \
            "## Feature Model Family\n" \
-           f"This {'is the initial feature model of a family' if file.new_version_of is None else f'feature model has the following other versions {file.new_version_of}'}\n"
+           f"This Feature Model belongs to {str(file.family).split(':')[1]}\n"
 
 
 def create_branch(branch_name, base=init_branch, repo_name=init_repo_name):
     """
-    Creates a new branch in the github repo
+    Creates a new branch in the GitHub repo
 
     Args:
         branch_name: The name of the new branch 
@@ -117,7 +141,8 @@ def create_branch(branch_name, base=init_branch, repo_name=init_repo_name):
 
 def create_or_update_file(path, file_name, file_content, branch_name, repository_name=init_repo_name):
     """
-    Creates a new file in the git repository, or if a file with the same name already exists in that branch, overrides its content
+    Creates a new file in the git repository, or if a file with the same name already exists in that branch,
+    overrides its content
 
     Args:
         path: The folder path the file is created under
@@ -137,13 +162,13 @@ def create_or_update_file(path, file_name, file_content, branch_name, repository
             contents.extend(repo.get_contents(file.path, ref=branch_name))
         else:
             all_files.append(file.path)
-    if path in all_files:
+
+    path = path + '/' + file_name
+    if path + file_name in all_files:
         file_to_update = repo.get_contents(path, ref=branch_name)
-        repo.update_file(
-            path, f'Updated file: {file_name}', file_content, sha=file_to_update.sha, branch=branch_name)
+        repo.update_file(path, f'Updated file: {file_name}', file_content, sha=file_to_update.sha, branch=branch_name)
     else:
-        repo.create_file(path, f'Added a new file: {file_name}',
-                         file_content, branch=branch_name)
+        repo.create_file(path, f'Added a new file: {file_name}', file_content, branch=branch_name)
 
 
 def create_new_pull_request(base, head, repo_name=init_repo_name):

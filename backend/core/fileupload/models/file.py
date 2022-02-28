@@ -21,7 +21,7 @@ class FileManager(models.Manager):
         tags = kwargs.pop('tags')
         if tags is None:
             raise TypeError('Tags is not set')
-        family = kwargs.pop('family')
+        family = kwargs.get('family', None)
         if family is None:
             raise TypeError('Feature Model Family is not set')
         else:

@@ -20,9 +20,18 @@ class GithubMirrorTests(APITestCase):
               </struct>
           </featureModel>"""
 
-    def _tag_and_upload_file(self, file_label, file_name):
+    def setUp(self):
         user = User.objects.create_superuser(email="ad@m.in", password="12345678!")
+
+    def _tag_and_upload_file(self, file_label, file_name, new_version_of=None):
+        """
+        create feature model via API. If new_version_of is of type File then the new_version_of field
+        in the backend and API call is set accordingly.
+
+        returns File with id 1 if new_version_of is None otherwise it returns File with id 2
+        """
         c = self.client
+        user = User.objects.get(email="ad@m.in")
         l_res = c.post('/auth/login/', {'email': 'ad@m.in', 'password': '12345678!'})
         content_as_dict = json.loads(l_res.content.decode("utf-8"))
         token = content_as_dict['access']
@@ -39,27 +48,32 @@ class GithubMirrorTests(APITestCase):
         t2.description = 'short testing des'
         t2.is_public = True
         t2.save()
-        fam = Family(label='myFMFamily', description='with fancy des', owner_id=user.id)
+        fam, created = Family.objects.get_or_create(label='myFMFamily', description='with fancy des', owner_id=user.id)
         fam.save()
         raw_data = {
             "description": "some description text",
             "label": file_label,
             "local_file": file,
-            "family": fam,
+            "family": str(fam),
             "license": File.LICENSES[0],
             "tags": '[{"id": "2", "label": "Tobi"},{"id": "1", "label": "Eric Test"}]'}
+        if new_version_of is not None:
+            raw_data.update({'new_version_of': str(new_version_of)})
+        print(raw_data)
         msg_as_multipart = encode_multipart(data=raw_data, boundary=BOUNDARY)
         # print(f"Raw data to user: {raw_data}")
         # print("Sending first file to backend...")
         f_res = c.post('/files/', msg_as_multipart,
                        content_type=MULTIPART_CONTENT,
                        HTTP_AUTHORIZATION='Bearer ' + token)
-        return File.objects.get(id=1)
+        return File.objects.get(id=1) if new_version_of is None else File.objects.get(id=2)
 
-    def test_mirror_file_in_github(self):
-        file = self._tag_and_upload_file("fm_test2", "nameof.xml")
-        eval_repo()
-        post_file_in_pull_request(file=file)
+    def test_mirror_file_in_github_api(self):
+        file = self._tag_and_upload_file("fm_test3", "nameof.xml")
+        # eval_repo()
+        # post_file_in_pull_request(file=file)
+        file = self._tag_and_upload_file("fm_test4", "nameof.xml", file)
+        # post_file_in_pull_request(file=file)
 
 
 class FileUploadWithTagsTests(APITestCase):

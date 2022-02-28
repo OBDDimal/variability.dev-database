@@ -4,6 +4,7 @@ from core.fileupload.models.family import Family
 from core.fileupload.models.file import File, Tag
 from rest_framework import serializers
 from django.http import QueryDict
+import core.fileupload.githubmirror.github_manager as mirror
 from transpiler.g6_transpiler import xml_to_g6
 
 
@@ -58,6 +59,7 @@ class FilesSerializer(serializers.ModelSerializer):
         transpiled = json.dumps(xml_to_g6(file_content, is_file_path=False), indent=2)
         file.transpiled_file = ContentFile(bytes(transpiled, encoding='utf8'), f"{file.label}_as_g6.json")
         file.save()
+        #mirror.mirror_to_github(file)
         return file
 
     def update(self, instance, validated_data):
@@ -87,5 +89,8 @@ class FilesSerializer(serializers.ModelSerializer):
         for tag in tags_as_json:
             tags_from_db.append(Tag.objects.get(id=tag['id']))
         internal_rep['tags'] = tags_from_db
-
+        if internal_rep.get('family', None) is None:
+            new_version_of = internal_rep.get('new_version_of')
+            if new_version_of is not None:
+                internal_rep.update({'family': str(File.objects.get(id=new_version_of).family)})
         return internal_rep.dict()
