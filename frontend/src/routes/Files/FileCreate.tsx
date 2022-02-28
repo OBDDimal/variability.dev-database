@@ -21,11 +21,14 @@ type State = {
   gottenTags: Array<{ label: string; value: string }>;
   gottenFiles: Array<{ value: number; label: string }>;
   newVersionOf: string;
+  featureFamily: string;
   tags: string;
   loading: boolean;
   legalShare: boolean;
   userData: boolean;
   openSource: boolean;
+  newVersionOfSelection: boolean,
+  featureModelFamilySelection: boolean;
 };
 
 /**
@@ -52,10 +55,13 @@ export default class FileCreate extends Component<Props, State> {
       gottenFiles: [],
       tags: '',
       newVersionOf: '---',
+      featureFamily: '---',
       loading: false,
       legalShare: false,
       userData: false,
       openSource: false,
+      featureModelFamilySelection: true,
+      newVersionOfSelection: true,
     };
   }
 
@@ -110,6 +116,23 @@ export default class FileCreate extends Component<Props, State> {
   onNewVersionOfChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const newVersionOf = e.target as HTMLSelectElement;
     this.setState({ newVersionOf: newVersionOf.value });
+
+    if (newVersionOf.value === '---') {
+      this.setState({ featureModelFamilySelection: true });
+    } else {
+      this.setState({ featureModelFamilySelection: false });
+    }
+  };
+
+  onNewFamilyChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const featureFamily = e.target as HTMLSelectElement;
+    this.setState({ featureFamily: featureFamily.value });
+
+    if (featureFamily.value === '---') {
+      this.setState({ newVersionOfSelection: true });
+    } else {
+      this.setState({ newVersionOfSelection: false });
+    }
   };
 
   onLicenseChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -218,24 +241,45 @@ export default class FileCreate extends Component<Props, State> {
                 ))}
               </Form.Select>
             </Form.Group>
-            <Form.Group className="mb-3">
-              <Form.Label>New version of</Form.Label>
-              <Form.Select
-                onChange={this.onNewVersionOfChange}
-                defaultValue="---"
-              >
-                {this.state.gottenFiles.map((key) => (
-                  <option key={key.value} value={key.value}>
-                    {key.value}
-                    :
-                    {key.label}
+            <Row>
+              <Form.Group className="col-sm">
+                <Form.Label>New version of</Form.Label>
+                <Form.Select
+                  onChange={this.onNewVersionOfChange}
+                  defaultValue="---"
+                >
+                  {this.state.gottenFiles.map((key) => (
+                    <option key={key.value} value={key.value}>
+                      {key.value}
+                      :
+                      {key.label}
+                    </option>
+                  ))}
+                  <option key="---" value="---">
+                    ---
                   </option>
-                ))}
-                <option key="---" value="---">
-                  ---
-                </option>
-              </Form.Select>
-            </Form.Group>
+                </Form.Select>
+              </Form.Group>
+              <Form.Group className="col-sm">
+                <Form.Label>Feature model family</Form.Label>
+                <Form.Select
+                  disabled={!this.state.featureModelFamilySelection ?? undefined}
+                  onChange={this.onNewFamilyChange}
+                  defaultValue="---"
+                >
+                  {this.state.gottenFiles.map((key) => (
+                    <option key={key.value} value={key.value}>
+                      {key.value}
+                      :
+                      {key.label}
+                    </option>
+                  ))}
+                  <option key="---" value="---">
+                    ---
+                  </option>
+                </Form.Select>
+              </Form.Group>
+            </Row>
             <Form.Group data-testid="tag-form" className="mb-3">
               <Form.Label htmlFor="tags">Tags</Form.Label>
               <Select
