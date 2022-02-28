@@ -1,11 +1,12 @@
 # from module: pyGithub, details: https://pygithub.readthedocs.io/en/latest/examples/Repository.html
+import os
 import re
 from github import Github
 
 init_repo_name = 'wurstbroteater/djangoProject'
 init_branch = 'main'
-# token = os.getenv('GITHUB_TOKEN')
-token = 'FILLINTOKENHERE'
+token = os.getenv('GITHUB_TOKEN')
+
 g = Github(login_or_token=token)
 
 
