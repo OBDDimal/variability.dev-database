@@ -1,13 +1,11 @@
 # from module: pyGithub, details: https://pygithub.readthedocs.io/en/latest/examples/Repository.html
-import os
 import re
 from github import Github
-from django.core.files.base import ContentFile
 
 init_repo_name = 'wurstbroteater/djangoProject'
 init_branch = 'main'
 # token = os.getenv('GITHUB_TOKEN')
-token = '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'
+token = 'FILLINTOKENHERE'
 g = Github(login_or_token=token)
 
 
@@ -47,7 +45,6 @@ def get_files_from_repo(full_access=False, repo_name=init_repo_name):
         A list of all file names in the repository 
     """
     repo = g.get_repo(repo_name)
-    print(f"{repo} content: {repo.get_contents('')}")
     if 'files' not in [file.path for file in repo.get_contents('')]:
         return []
     if 'files/public' not in [file.path for file in repo.get_contents('files')]:
@@ -97,9 +94,6 @@ def get_attributes_as_markdown(file):
            "## License\n" \
            "The feature model was published with the following license:\n" \
            f"{file.license}\n" \
-           "## Tags\n" \
-           "On the initial uploaded the following tags were assigned (these might have changed by now)\n" \
-           f"{file.tags}\n" \
            "## Feature Model Family\n" \
            f"This {'is the initial feature model of a family' if file.new_version_of is None else f'feature model has the following other versions {file.new_version_of}'}\n"
 
