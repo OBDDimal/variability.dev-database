@@ -1,3 +1,6 @@
 {
-  "cSpell.words": ["Formik", "Swal"]
+  "cSpell.words": ["Formik", "Swal"],
+  "yaml.schemas": {
+    "https://json.schemastore.org/github-workflow.json": "file:///home/tobias/Projects/ddueruem-web/.github/workflows/deploy.yml"
+  }
 }
