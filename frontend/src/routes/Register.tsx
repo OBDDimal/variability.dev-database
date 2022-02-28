@@ -1,9 +1,7 @@
-import React, { Component } from 'react';
-import {
-  Button, Container, Form, Row,
-} from 'react-bootstrap';
-import { Modal } from '../components/Modal';
-import AuthService from '../services/auth.service';
+import React, { Component } from "react";
+import { Button, Container, Form, Row } from "react-bootstrap";
+import { default as Modal } from "../components/Modal";
+import AuthService from "../services/auth.service";
 
 type Props = {};
 
@@ -40,45 +38,46 @@ export default class Register extends Component<Props, State> {
     this.setState({ passwordConfirmation: passwordConfirmation.value });
   };
 
-  isReady = () => this.state.email
-    && this.state.password
-    && this.state.passwordConfirmation
-    && this.state.password === this.state.passwordConfirmation;
+  isReady = () =>
+    this.state.email &&
+    this.state.password &&
+    this.state.passwordConfirmation &&
+    this.state.password === this.state.passwordConfirmation;
 
   onSubmit = (e: { preventDefault: () => void }) => {
     e.preventDefault();
     if (
-      this.state.email
-      && this.state.password
-      && this.state.passwordConfirmation
-      && this.state.password === this.state.passwordConfirmation
+      this.state.email &&
+      this.state.password &&
+      this.state.passwordConfirmation &&
+      this.state.password === this.state.passwordConfirmation
     ) {
       AuthService.register(
         this.state.email,
         this.state.password,
-        this.state.passwordConfirmation,
+        this.state.passwordConfirmation
       ).then(
         () => {
           Modal.fire({
-            icon: 'success',
-            title: 'Register successful, please check your mail',
+            icon: "success",
+            title: "Register successful, please check your mail",
             toast: true,
-            position: 'top-right',
+            position: "top-right",
             showConfirmButton: false,
             timer: 1500,
             timerProgressBar: true,
           }).then(() => {
-            window.location.replace('/');
+            window.location.replace("/");
           });
         },
         (error) => {
           this.setState({ loading: false });
           Modal.fire({
-            icon: 'error',
-            title: 'Error!!',
+            icon: "error",
+            title: "Error!!",
             text: `Something went wrong while registering! ${error.toString()}`,
           });
-        },
+        }
       );
     }
   };
@@ -88,34 +87,34 @@ export default class Register extends Component<Props, State> {
       <Container>
         <Row>
           <form onSubmit={this.onSubmit}>
-            <Form.Group className="mb-3">
+            <Form.Group className='mb-3'>
               <Form.Label>Email</Form.Label>
               <Form.Control
-                type="email"
-                placeholder="Email"
+                type='email'
+                placeholder='Email'
                 onChange={this.onEmailChange}
               />
             </Form.Group>
-            <Form.Group className="mb-3">
+            <Form.Group className='mb-3'>
               <Form.Label>Password</Form.Label>
-              <Form.Control type="password" onChange={this.onPasswordChange} />
+              <Form.Control type='password' onChange={this.onPasswordChange} />
             </Form.Group>
-            <Form.Group className="mb-3">
+            <Form.Group className='mb-3'>
               <Form.Label>Password Confirmation</Form.Label>
               <Form.Control
-                type="password"
+                type='password'
                 onChange={this.onPasswordConfirmationChange}
               />
             </Form.Group>
             <Button
-              variant="primary"
-              type="submit"
+              variant='primary'
+              type='submit'
               disabled={
                 !this.isReady() || this.state.loading ? true : undefined
               }
             >
               {this.state.loading && (
-                <span className="spinner-border spinner-border-sm" />
+                <span className='spinner-border spinner-border-sm' />
               )}
               Register!
             </Button>
