@@ -1,6 +1,6 @@
-import { Component } from "react";
-import { Row, Container } from "react-bootstrap";
-import AuthService from "../services/auth.service";
+import React, { Component } from 'react';
+import { Row, Container } from 'react-bootstrap';
+import AuthService from '../services/auth.service';
 
 interface IUser {
   id?: any | null;
@@ -19,16 +19,16 @@ export default class Profile extends Component<Props, State> {
     super(props);
 
     this.state = {
-      currentUser: { accessToken: "" },
+      currentUser: { accessToken: '' },
     };
   }
 
   componentDidMount() {
     const currentUser = AuthService.getCurrentUser();
 
-    if (!currentUser) window.location.replace("/");
+    if (!currentUser) window.location.replace('/');
 
-    this.setState({ currentUser: currentUser });
+    this.setState({ currentUser });
   }
 
   render() {
@@ -38,21 +38,27 @@ export default class Profile extends Component<Props, State> {
       <Container>
         <Row>
           <div>
-            <header className='jumbotron'>
+            <header className="jumbotron">
               <h3>
-                <strong>{currentUser.email}</strong> Profile
+                <strong>{currentUser.email}</strong>
+                {' '}
+                Profile
               </h3>
             </header>
             <p>
-              <strong>Token:</strong> {AuthService.getAccessToken()}
+              <strong>Token:</strong>
+              {' '}
+              {AuthService.getAccessToken()}
             </p>
             <p>
-              <strong>Id:</strong> {currentUser.id}
+              <strong>Id:</strong>
+              {' '}
+              {currentUser.id}
             </p>
             <strong>Authorities:</strong>
             <ul>
-              {currentUser.roles &&
-                currentUser.roles.map((role, index) => (
+              {currentUser.roles
+                && currentUser.roles.map((role, index) => (
                   <li key={index}>{role}</li>
                 ))}
             </ul>
