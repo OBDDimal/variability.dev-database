@@ -1,16 +1,65 @@
 from collections import OrderedDict
-from pydoc import html, plain
 from django.template.loader import render_to_string
-
 from core.fileupload.models.family import Family
 from core.fileupload.models.tag import Tag
 from rest_framework import viewsets, permissions
-from rest_framework.response import Response
 from rest_framework import status
 from django.utils.html import strip_tags
-
 from core.fileupload.models.file import File
 from core.fileupload.serializers import FilesSerializer, TagsSerializer, FamiliesSerializer
+from django.core.exceptions import ObjectDoesNotExist
+from django.core.signing import BadSignature
+from django.utils.encoding import DjangoUnicodeDecodeError
+from rest_framework.response import Response
+from rest_framework.viewsets import GenericViewSet
+from rest_framework.permissions import AllowAny
+from rest_framework.mixins import CreateModelMixin
+from ..auth.tokens import decode_token_to_user
+from ..user.models import User
+import core.fileupload.githubmirror.github_manager as gm
+import datetime
+
+
+class ConfirmMirrorViewSet(GenericViewSet, CreateModelMixin):
+    """
+    This view is called when user clicked 'confirm GitHub Mirror' in the 'File Upload' email.
+    This token will be decoded and the GitHub mirror starts, if the token was valid.
+    """
+    permission_classes = [AllowAny]
+    http_method_names = ['get']
+
+    @staticmethod
+    def get(request, token):
+        try:
+            user = decode_token_to_user(token)
+            if user.pop('purpose') != 'mirror_confirm':
+                raise BadSignature('Token purpose does not match!')
+            file = File.objects.get(id=user.pop('file_id'))
+            if str(file.owner) != str(user['email']):
+                raise BadSignature('Request user is not file owner!')
+            if file.mirrored:
+                raise BadSignature('File already mirrored to GitHub!')
+            print('start mirroring...')
+            start = datetime.datetime.now()
+            html_message = render_to_string('email/file_mirror_notify_admin_email.html', {
+                'user': str(user['email']),
+                'protocol': 'http',
+                'link': gm.mirror_to_github(file)
+            })
+            delta = datetime.datetime.now() - start
+            print(f'..done! Took: {delta.total_seconds()} s')
+            plain_message = strip_tags(html_message)
+            file.mirrored = True
+            file.save()
+            for to_notify in User.objects.filter(is_staff=True) | User.objects.filter(is_superuser=True):
+                to_notify._email_user('[Staff] DDueruem new mirror request', plain_message, html_message=html_message)
+            return Response({'message': 'File mirrored to GitHub!'})
+        except ObjectDoesNotExist as error:
+            return Response({'message': str(error)})
+        except BadSignature as error:
+            return Response({'message': str(error)})
+        except DjangoUnicodeDecodeError as error:
+            return Response({'message': str(error)})
 
 
 class FileUploadViewSet(viewsets.ModelViewSet):
@@ -51,15 +100,8 @@ class FileUploadViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
-        html_message = render_to_string('email/user_upload_email.html', {
-            'user': str(self.request.user.email),
-            'protocol': 'http',
-            'file_domain': str(serializer.data.get('local_file')),
-            'file_name': str(serializer.data.get('local_file')).split('/')[-1],
-        })
-        plain_message = strip_tags(html_message)
-
-        self.request.user._email_user('DDueruem File Upload', plain_message, html_message=html_message)
+        self.request.user.send_link_to_file(serializer.data)
+        self.request.user.send_confirm_github_mirror(serializer.data)
 
 
 class FamiliesViewSet(viewsets.ModelViewSet):

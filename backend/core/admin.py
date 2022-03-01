@@ -93,11 +93,11 @@ class FileAdmin(ModelAdmin):
     Class for defining the backend file admin panel and which data should be displayed.
     """
     model = File
-    list_display = ('id', 'new_version_of', 'family', 'local_file', 'owner', 'uploaded_at')
+    list_display = ('id', 'new_version_of', 'mirrored', 'family', 'local_file', 'owner', 'uploaded_at')
     fieldsets = [
         (None, {'fields': ['owner']}),
         ('Information',
-         {'fields': ['label', 'description', 'family', 'local_file', 'license', 'tags', 'new_version_of']}),
+         {'fields': ['label', 'description', 'mirrored', 'family', 'local_file', 'license', 'tags', 'new_version_of']}),
         ('Important dates', {'fields': ['uploaded_at']}),
         ('Transpiler Output', {'fields': ['transpiled_file']})
     ]

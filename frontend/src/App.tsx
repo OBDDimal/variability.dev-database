@@ -15,6 +15,7 @@ import FileShow from './routes/Files/FileShow';
 import TagCreate from './routes/Tags/TagCreate';
 import FileEdit from './routes/Files/FileEdit';
 import RegisterConfirmation from './routes/RegisterConfirmation';
+import MirrorConfirmation from './routes/MirrorConfirmation';
 
 interface AuthChildren {
   // Maybe there is a way to define this
@@ -49,6 +50,14 @@ function App() {
         <Route
           path="/register/:confirmationCode"
           element={<RegisterConfirmation />}
+        />
+        <Route
+          path="/files/confirm/:confirmationCode"
+          element={(
+            <RequireAuth>
+              <MirrorConfirmation />
+            </RequireAuth>
+          )}
         />
         <Route
           path="/files/create"

@@ -12,10 +12,12 @@ g = Github(login_or_token=token)
 
 def mirror_to_github(file):
     """
-    Mirrors a File to GitHub
+    Checks the repository and commits the file as new pull request
+
+    returns link to pull request on success
     """
     eval_repo()
-    post_file_in_pull_request(file=file)
+    return post_file_in_pull_request(file=file).issue_url.replace('api.github.com/repos', 'github.com').replace('/issues/', '/pull/')
 
 
 def eval_repo(repo_name=init_repo_name):
@@ -98,7 +100,7 @@ def post_file_in_pull_request(file, branch_name=init_branch, repo_name=init_repo
     attributes = fmf_to_markdown(file.family)
     md_name = 'readme.md'
     create_or_update_file(root_path, md_name, attributes, branch_name=filtered_file_name, repository_name=repo_name)
-    create_new_pull_request(branch_name, filtered_file_name, repo_name=repo_name)
+    return create_new_pull_request(branch_name, filtered_file_name, repo_name=repo_name)
 
 
 def fmf_to_markdown(family):
@@ -166,9 +168,10 @@ def create_or_update_file(path, file_name, file_content, branch_name, repository
     path = path + '/' + file_name
     if path in all_files:
         file_to_update = repo.get_contents(path, ref=branch_name)
-        repo.update_file(path, f'Updated file: {file_name}', file_content, sha=file_to_update.sha, branch=branch_name)
+        return repo.update_file(path, f'Updated file: {file_name}', file_content, sha=file_to_update.sha,
+                                branch=branch_name)
     else:
-        repo.create_file(path, f'Added a new file: {file_name}', file_content, branch=branch_name)
+        return repo.create_file(path, f'Added a new file: {file_name}', file_content, branch=branch_name)
 
 
 def create_new_pull_request(base, head, repo_name=init_repo_name):
@@ -189,5 +192,4 @@ def create_new_pull_request(base, head, repo_name=init_repo_name):
     if len(pull_requests) == 0:
         # create a pull request
         body = 'Added a new feature model and stored relevant information in readme.md'
-        repo.create_pull(title='[Upload Mirror] added new Feature Model', body=body,
-                         base=base, head=head)
+        return repo.create_pull(title='[Upload Mirror] added new Feature Model', body=body, base=base, head=head)

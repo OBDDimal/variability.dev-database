@@ -12,6 +12,10 @@ class Family(models.Model):
     label = models.CharField(blank=False, max_length=255)
     description = models.TextField(blank=True)
 
+    class Meta:
+        verbose_name = 'family'
+        verbose_name_plural = 'families'
+
     def __str__(self):
         # do not change that
         return f"{self.id}:{self.label}"
