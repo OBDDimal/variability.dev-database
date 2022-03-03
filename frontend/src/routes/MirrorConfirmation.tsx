@@ -18,6 +18,15 @@ export default class MirrorConfirmation extends Component<Props, State> {
     super(props);
     const url = window.location.pathname;
     const confirmationCode = url.substring(url.lastIndexOf('/') + 1);
+    Modal.fire({
+      icon: 'info',
+      title: 'Mirroring Feature Model to Github...',
+      html:
+      '<b>PLEASE DO NOT CLOSE THIS PAGE YET!</b><br />'
+      + "<div class='lds-ellipsis'><div></div><div></div><div></div><div></div></div>",
+      allowOutsideClick: false,
+      showConfirmButton: false,
+    });
 
     api
       .get(`${API_URL}files/confirm/${confirmationCode}/`)
