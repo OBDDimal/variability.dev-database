@@ -6,7 +6,6 @@ const API_URL = process.env.REACT_APP_DOMAIN;
 
 type Props = {};
 type State = {};
-/* eslint indent: "off", brace-style: "off" */
 /**
 * TODO:
 * - Add loading bar while mirroring
@@ -47,16 +46,15 @@ export default class MirrorConfirmation extends Component<Props, State> {
           }).then(() => {
             window.location.replace('/login');
           });
+        } else {
+          Modal.fire({
+            icon: 'error',
+            title: 'Error!!',
+            text: 'Token invalid',
+          }).then(() => {
+            window.location.replace('/login');
+          });
         }
-        else {
-            Modal.fire({
-              icon: 'error',
-              title: 'Error!!',
-              text: 'Token invalid',
-            }).then(() => {
-              window.location.replace('/login');
-            });
-          }
       })
       .catch(() => {
         Modal.fire({
