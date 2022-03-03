@@ -16,6 +16,8 @@ import TagCreate from './routes/Tags/TagCreate';
 import FileEdit from './routes/Files/FileEdit';
 import RegisterConfirmation from './routes/RegisterConfirmation';
 import MirrorConfirmation from './routes/MirrorConfirmation';
+import FamilyCreate from './routes/Families/FamilyCreate';
+import FamilyIndex from './routes/Families/FamilyIndex';
 
 interface AuthChildren {
   // Maybe there is a way to define this
@@ -105,6 +107,22 @@ function App() {
           element={(
             <RequireAuth>
               <TagCreate />
+            </RequireAuth>
+          )}
+        />
+        <Route
+          path="/families"
+          element={(
+            <RequireAuth>
+              <FamilyIndex />
+            </RequireAuth>
+          )}
+        />
+        <Route
+          path="/families/create"
+          element={(
+            <RequireAuth>
+              <FamilyCreate />
             </RequireAuth>
           )}
         />
