@@ -128,6 +128,9 @@ class FamiliesViewSet(viewsets.ModelViewSet):
             changed_families.append(changed_family)
         return Response(changed_families)
 
+    def perform_create(self, serializer):
+        serializer.save(owner=self.request.user)
+
 
 class TagsViewSet(viewsets.ModelViewSet):
     queryset = Tag.objects.all()
