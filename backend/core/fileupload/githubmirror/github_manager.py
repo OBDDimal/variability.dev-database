@@ -178,7 +178,6 @@ def create_or_update_file(path, file_name, file_content, branch_name, overwrite=
         file_to_update = repo.get_contents(path, ref=branch_name)
         if not overwrite:
             file_content = repo.get_contents(path).decoded_content.decode() + file_content
-            print(file_content)
         return repo.update_file(path, f'Updated file: {file_name}', file_content, sha=file_to_update.sha,
                                 branch=branch_name)
     else:
