@@ -17,7 +17,8 @@ def mirror_to_github(file):
     returns link to pull request on success
     """
     eval_repo()
-    return post_file_in_pull_request(file=file).issue_url.replace('api.github.com/repos', 'github.com').replace('/issues/', '/pull/')
+    return post_file_in_pull_request(file=file).issue_url.replace('api.github.com/repos', 'github.com').replace(
+        '/issues/', '/pull/')
 
 
 def eval_repo(repo_name=init_repo_name):
@@ -100,6 +101,11 @@ def post_file_in_pull_request(file, branch_name=init_branch, repo_name=init_repo
     attributes = fmf_to_markdown(file.family)
     md_name = 'readme.md'
     create_or_update_file(root_path, md_name, attributes, branch_name=filtered_file_name, repository_name=repo_name)
+    # alter feature model family changelog
+    content = f"On '{file.uploaded_at}' the feature model '{file.label}' was uploaded by '{file.owner}'\n"
+    md_name = 'fmf_changelog'
+    create_or_update_file(root_path, md_name, content, overwrite=False, branch_name=filtered_file_name,
+                          repository_name=repo_name)
     return create_new_pull_request(branch_name, filtered_file_name, repo_name=repo_name)
 
 
@@ -118,6 +124,7 @@ def fm_to_markdown(file):
     """
     return f"# Feature Model {file.label}\n" \
            f"This feature model was uploaded at {file.uploaded_at}. The uploader is **{' '.join(str(file.owner))}**\n" \
+           f"{file.description}\n" \
            "## License\n" \
            "The feature model was published with the following license:\n" \
            f"{file.license}\n" \
@@ -141,16 +148,17 @@ def create_branch(branch_name, base=init_branch, repo_name=init_repo_name):
                             sha=base_branch.commit.sha)
 
 
-def create_or_update_file(path, file_name, file_content, branch_name, repository_name=init_repo_name):
+def create_or_update_file(path, file_name, file_content, branch_name, overwrite=True, repository_name=init_repo_name):
     """
     Creates a new file in the git repository, or if a file with the same name already exists in that branch,
-    overrides its content
+    overwrites its content if override is True (per default) otherwise file content will be updated.
 
     Args:
         path: The folder path the file is created under
         file_name: The name of the file 
         file_content: The content of the file as a String
         branch_name: The name of the branch that the file should be created/updated in
+        overwrite: Boolean flag indicating if an existing file should be overwritten (true) or updated (false)
         repository_name: Name of the repository
     """
 
@@ -168,6 +176,9 @@ def create_or_update_file(path, file_name, file_content, branch_name, repository
     path = path + '/' + file_name
     if path in all_files:
         file_to_update = repo.get_contents(path, ref=branch_name)
+        if not overwrite:
+            file_content = repo.get_contents(path).decoded_content.decode() + file_content
+            print(file_content)
         return repo.update_file(path, f'Updated file: {file_name}', file_content, sha=file_to_update.sha,
                                 branch=branch_name)
     else:

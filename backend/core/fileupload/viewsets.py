@@ -1,4 +1,6 @@
 from collections import OrderedDict
+from time import sleep
+
 from django.template.loader import render_to_string
 from core.fileupload.models.family import Family
 from core.fileupload.models.tag import Tag
