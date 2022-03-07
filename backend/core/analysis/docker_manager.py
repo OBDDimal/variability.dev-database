@@ -2,8 +2,10 @@ import os
 import docker
 import threading
 import time
+import logging
 from .models import DockerProcess, Analysis
 
+logger = logging.getLogger(__name__)
 absolute_path = os.path.abspath('')
 report_path = f'{absolute_path}/../_reports'
 log_path = f'{absolute_path}/../_log'
@@ -144,7 +146,7 @@ def create_container(process):
     ram, cpu = get_ram_and_cpu(process)
 
     container = client.containers.create(
-        repo_name,  # here: container name
+        'ubuntu',  # here: image name from which container should be created
         # TODO: start here with running docker
         command=f'git clone https://github.com/h3ssto/{repo_name}.git &&' +
                 f'mkdir {repo_name}/files &&' +
@@ -205,17 +207,20 @@ def start_process(new_container, process):
     used_cpu_cores = 0
     # get all active containers and add up their requirements
     for container in client.containers.list():
-        container_id = int(container.name.split('-')[1])
-        process = DockerProcess.objects.get(pk=container_id)
+        print(container.name)
+        container_id = 1  # int(container.name.split('-')[1])
+        process = DockerProcess.objects.get(pk=9)  # container_id)
         process_ram, process_cpu = get_ram_and_cpu(process)
         used_ram += process_ram
         used_cpu_cores += process_cpu
-    if used_ram + ram <= MAX_RAM and used_cpu_cores + cpu <= MAX_CPU:
-        # start the container
-        new_container.start()
-        containerManagerThread.started_containers.append(process.id)
-        # make sure the manager thread is running
-        if not containerManagerThread.is_started():
-            containerManagerThread.start()
-        return True
+        print(f'process: {process}\tram/used: {process_ram}/{used_ram}\t cpu/used: {process_cpu}/{used_cpu_cores}')
+        if used_ram + ram <= MAX_RAM and used_cpu_cores + cpu <= MAX_CPU:
+            # start the container
+            logging.warning('Starting new container')
+            new_container.start()
+            containerManagerThread.started_containers.append(process.id)
+            # make sure the manager thread is running
+            if not containerManagerThread.is_started():
+                containerManagerThread.start()
+            return True
     return False
