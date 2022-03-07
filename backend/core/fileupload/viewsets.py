@@ -100,6 +100,9 @@ class FileUploadViewSet(viewsets.ModelViewSet):
         return Response(changed_files)
 
     def perform_create(self, serializer):
+        """
+        Called within the create method to serializer for creation
+        """
         serializer.save(owner=self.request.user)
         self.request.user.send_link_to_file(serializer.data)
         self.request.user.send_confirm_github_mirror(serializer.data)

@@ -2,7 +2,7 @@ from django.http.response import HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 
 from .models import Analysis, DockerProcess
-from .dockerManager import start_or_queue_process, get_running_process_ids
+from .docker_manager import start_or_queue_process, get_running_process_ids
 
 
 def overview(request):

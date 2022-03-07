@@ -1,6 +1,5 @@
 from django.db import models
 from core.fileupload.models.file import File
-# different resource settings available
 from core.user.models import User
 
 RESOURCE_OPTIONS = {
@@ -16,6 +15,9 @@ LIBRARIES = (
 
 
 class DockerProcess(models.Model):
+    """
+    Is a not finished Analysis
+    """
     file_to_analyse = models.ForeignKey(File, on_delete=models.CASCADE)
     # maximal available server resources in the form 'RAM-CPU'
     resources = models.CharField(max_length=20, choices=RESOURCE_OPTIONS, default='4-1')
@@ -32,6 +34,9 @@ class DockerProcess(models.Model):
 
 
 class Analysis(models.Model):
+    """
+    finished analysis of a File with analysis report and order
+    """
     report = models.TextField(blank=True)
     order = models.TextField(blank=True)
     process = models.OneToOneField(DockerProcess, on_delete=models.CASCADE)
