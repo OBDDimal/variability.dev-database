@@ -2,6 +2,7 @@ import json
 from django.core.files.base import ContentFile
 from core.fileupload.models.family import Family
 from core.fileupload.models.file import File, Tag
+from core.fileupload.models.license import License
 from rest_framework import serializers
 from django.http import QueryDict
 from transpiler.g6_transpiler import xml_to_g6
@@ -18,9 +19,19 @@ class FamiliesSerializer(serializers.ModelSerializer):
         fields = ['id', 'owner', 'label', 'description']
 
 
+class LicensesSerializer(serializers.ModelSerializer):
+    """
+    A serializer for defining which License attributes should be converted to JSON
+    """
+
+    class Meta:
+        model = License
+        fields = ['id', 'label']
+
+
 class TagsSerializer(serializers.ModelSerializer):
     """
-    A serializer for defining which file attributes should be converted to JSON
+    A serializer for defining which Tag attributes should be converted to JSON
     """
     owner = serializers.ReadOnlyField(source='owner.email')
 
@@ -38,6 +49,7 @@ class FilesSerializer(serializers.ModelSerializer):
     # https://www.django-rest-framework.org/api-guide/relations
     tags = TagsSerializer(many=True)
     family = FamiliesSerializer()
+    license = LicensesSerializer()
     new_version_of = 'self'
 
     class Meta:

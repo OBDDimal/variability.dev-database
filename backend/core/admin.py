@@ -5,6 +5,7 @@ from datetime import timedelta
 from django.contrib.admin import ModelAdmin
 
 from core.fileupload.models.family import Family
+from core.fileupload.models.license import License
 from core.fileupload.models.tag import Tag
 from core.fileupload.models.file import File
 from core.user.forms import AdminUserChangeForm, AdminUserCreationForm
@@ -72,6 +73,20 @@ class UserAdmin(BaseUserAdmin):
         return _boolean_icon(True) if user.is_active else f"{delta.days}d{hour}h{minute:02}m{second:02}s"
 
 
+class LicenseAdmin(ModelAdmin):
+    """
+    Class for defining the backend License admin panel.
+    """
+    model = License
+    list_display = ('id', 'label')
+    fieldsets = [
+        (None, {'fields': ['label']}),
+    ]
+    search_fields = ('id', 'label')
+    ordering = ('label',)
+    filter_horizontal = ()
+
+
 class FamilyAdmin(ModelAdmin):
     """
     Class for defining the backend Feature Model Family admin panel.
@@ -85,6 +100,23 @@ class FamilyAdmin(ModelAdmin):
     ]
     search_fields = ('owner', 'id')
     ordering = ('owner',)
+    filter_horizontal = ()
+
+
+class TagAdmin(ModelAdmin):
+    """
+    Class for defining the backend tag admin panel and which data should be displayed.
+    """
+    model = Tag
+    list_display = ('id', 'label', 'is_public', 'owner', 'date_created')
+    fieldsets = [
+        (None, {'fields': ['id']}),
+        ('Information', {'fields': ['label', 'is_public', 'owner', 'description']}),
+        ('Important dates', {'fields': ['date_created']})
+    ]
+    readonly_fields = ('id', 'date_created',)
+    search_fields = ('owner',)
+    ordering = ('owner', 'date_created')
     filter_horizontal = ()
 
 
@@ -107,25 +139,9 @@ class FileAdmin(ModelAdmin):
     filter_horizontal = ()
 
 
-class TagAdmin(ModelAdmin):
-    """
-    Class for defining the backend tag admin panel and which data should be displayed.
-    """
-    model = Tag
-    list_display = ('id', 'label', 'is_public', 'owner', 'date_created')
-    fieldsets = [
-        (None, {'fields': ['id']}),
-        ('Information', {'fields': ['label', 'is_public', 'owner', 'description']}),
-        ('Important dates', {'fields': ['date_created']})
-    ]
-    readonly_fields = ('id', 'date_created',)
-    search_fields = ('owner',)
-    ordering = ('owner', 'date_created')
-    filter_horizontal = ()
-
-
 # Register your models here.
+admin.site.register(License, LicenseAdmin)
 admin.site.register(User, UserAdmin)
 admin.site.register(Family, FamilyAdmin)
-admin.site.register(File, FileAdmin)
 admin.site.register(Tag, TagAdmin)
+admin.site.register(File, FileAdmin)

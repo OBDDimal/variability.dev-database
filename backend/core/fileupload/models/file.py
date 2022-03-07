@@ -1,6 +1,7 @@
 from django.db import models
 from .tag import Tag
 from .family import Family
+from .license import License
 from core.user.models import User
 from django.core.files.base import ContentFile
 
@@ -30,6 +31,11 @@ class FileManager(models.Manager):
         # get file from id
         if kwargs.get('new_version_of', None) is not None:
             kwargs.update({'new_version_of': File.objects.get(id=kwargs['new_version_of'])})
+        # get license from id
+        if kwargs.get('license', None) is None:
+            raise TypeError('License not set!')
+        else:
+            kwargs.update({'license': License.objects.get(id=kwargs['license'])})
         file = self.model(**kwargs)
         file.save()
         file.tags.set(tags)
@@ -61,10 +67,6 @@ class File(models.Model):
     objects = FileManager()
 
     relative_upload_dir = 'files/'
-    LICENSES = [
-        ('CC BY - Mention', 'CC BY - Mention'),
-        ('CC BY-NC - Mention - Non-commercial', 'CC BY-NC - Mention - Non-commercial')
-    ]
 
     owner = models.ForeignKey(User, on_delete=models.RESTRICT)
     family = models.ForeignKey(Family, on_delete=models.CASCADE)
@@ -72,7 +74,7 @@ class File(models.Model):
     description = models.TextField(blank=True)
     local_file = models.FileField(upload_to=relative_upload_dir)
     uploaded_at = models.DateTimeField(auto_now_add=True)
-    license = models.CharField(choices=LICENSES, max_length=255, default='CC BY - Mention')
+    license = models.ForeignKey(License, on_delete=models.CASCADE)
     tags = models.ManyToManyField(Tag)
     new_version_of = models.ForeignKey('self', null=True, blank=True, on_delete=models.RESTRICT)
     transpiled_file = models.FileField(null=True, blank=True, upload_to=relative_upload_dir)
