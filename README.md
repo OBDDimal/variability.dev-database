@@ -1,43 +1,50 @@
 # Ddueruem-web
-Web service for sharing feature model instances and collaborative benchmarking.
-
-## Before start
-### Create new requirements
-Assure correct dependencies are installed
-
-`pip freeze > requirements.txt`
+A web service for sharing feature model instances, collaborative benchmarking and more.
 
 ## Fresh start
+You need to set up the `.env` file as shown later and then you can execute `docker-compose up --build` to run the service dockered or here you can find information how start the frontend and backend:
 
-### Install requirements
+### Backend
+In the backend folder do as follows
+#### Install requirements
 `pip install -r requirements.txt`
 
-### Setup backend environment
+#### Setup backend environment
 Copy `backend/ddueruemweb/.env.example` to `backend/ddueruemweb/.env`
 ```bash
 cp backend/ddueruemweb/.env.example backend/ddueruemweb/.env
 ```
+You may need to alter the fields for email and database access, secret key and frontend url.
+When you want to execute **docker-compose**, you need to name the file `.env.production` instead of `.env`. 
 
-### Create new superuser
-`python manage.py createsuperuser`
+#### Create new superuser
+You can use `python manage.py createsuperuser` or in case of **docker-compose** `docker exec -it ddueruem-web_backend_1 /api/manage.py createsuperuser`
 
-### Migrations
+#### Migrations
 The following two commands are summarized `makeMigrate`.sh (for linux) or .bat (for windows)
 ```
 python manage.py makemigrations djangoProject
 python manage.py migrate
 ```
-### Start Email Server
-Start local email server
-`python -m smtpd -n -c DebuggingServer localhost:1025`
 
-### Start jobs
- Run all hourly/daily/weekly/monthly jobs
+#### Start jobs
+ Run (in a cron job) all hourly/daily/weekly/monthly jobs
 ```
 python manage.py runjobs hourly
 ```
 Details, see: [django-extensions docu for job scheduling](https://django-extensions.readthedocs.io/en/latest/jobs_scheduling.html#create-a-job)
 
-## Start the backend
+#### Start the backend
+```
+python manage.py runserver
+```
 
-
+### Frontend
+In the frontend folder execute
+```
+yarn install
+```
+and then
+```
+yarn start
+```

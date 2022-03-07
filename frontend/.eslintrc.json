@@ -25,7 +25,8 @@
     "no-underscore-dangle": [0],
     "react/jsx-no-bind": [0],
     "react/no-access-state-in-setstate": [0],
-    "import/no-named-default": [0]
+    "import/no-named-default": [0],
+    "linebreak-style": ["error", "unix"]
   },
   "settings": {
     "import/resolver": {
