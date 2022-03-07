@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'core',
     'core.user',
     'core.fileupload',
+    'core.analysis',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',

@@ -4,6 +4,7 @@ from django.utils import timezone
 from datetime import timedelta
 from django.contrib.admin import ModelAdmin
 
+from core.analysis.models import Analysis, DockerProcess
 from core.fileupload.models.family import Family
 from core.fileupload.models.license import License
 from core.fileupload.models.tag import Tag
@@ -72,7 +73,6 @@ class UserAdmin(BaseUserAdmin):
 
         return _boolean_icon(True) if user.is_active else f"{delta.days}d{hour}h{minute:02}m{second:02}s"
 
-
 class LicenseAdmin(ModelAdmin):
     """
     Class for defining the backend License admin panel.
@@ -138,6 +138,33 @@ class FileAdmin(ModelAdmin):
     ordering = ('owner', 'uploaded_at')
     filter_horizontal = ()
 
+class AnalysisAdmin(ModelAdmin):
+    """
+    Class for defining the backend Analysis admin panel.
+    """
+    model = Analysis
+    list_display = ('id', 'order', 'process')
+    fieldsets = [
+        (None, {'fields': ['order', 'process']}),
+    ]
+    search_fields = ('id', 'process')
+    ordering = ('id',)
+    filter_horizontal = ()
+
+
+class DockerProcessAdmin(ModelAdmin):
+    """
+    Class for defining the backend DockerProcess admin panel.
+    """
+    model = DockerProcess
+    list_display = ('id', 'owner', 'library')
+    fieldsets = [
+        (None, {'fields': ['owner', 'file_to_analyse', 'resources', 'library']}),
+    ]
+    search_fields = ('id', 'owner', 'library')
+    ordering = ('id',)
+    filter_horizontal = ()
+
 
 # Register your models here.
 admin.site.register(License, LicenseAdmin)
@@ -145,3 +172,5 @@ admin.site.register(User, UserAdmin)
 admin.site.register(Family, FamilyAdmin)
 admin.site.register(Tag, TagAdmin)
 admin.site.register(File, FileAdmin)
+admin.site.register(Analysis, AnalysisAdmin)
+admin.site.register(DockerProcess, DockerProcessAdmin)
