@@ -225,7 +225,7 @@ export default class FileCreate extends Component<Props, State> {
                 defaultValue="---"
               >
                 {this.state.gottenFiles.map((key) => (
-                  <option key={key.value} value={key.value}>
+                  <option key={key.toString()} value={key.value}>
                     {key.value}
                     :
                     {key.label}
