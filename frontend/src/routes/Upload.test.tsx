@@ -250,7 +250,7 @@ describe('<FileCreate />', () => {
 
     expect(mockedApi.get).toHaveBeenCalled();
     expect(mockedApi.post).toHaveBeenCalled();
-    //expect(MockedModal.fire).toHaveBeenCalled();
+    // expect(MockedModal.fire).toHaveBeenCalled();
 
     // TODO: Somehow reset the form after modal fire
     // expect(labelFormControl.value).toBeUndefined();

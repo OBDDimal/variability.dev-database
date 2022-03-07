@@ -2,9 +2,10 @@ import React, { Component } from 'react';
 import {
   Button, Container, Form, Row,
 } from 'react-bootstrap';
-import Select from 'react-select';
+import CreatableSelect from 'react-select/creatable';
 import { default as Modal } from '../../components/Modal';
 import api from '../../services/api.service';
+import isNumeric from '../../services/numbers.service';
 
 const API_URL = process.env.REACT_APP_DOMAIN;
 
@@ -28,7 +29,7 @@ type State = {
   legalShare: boolean;
   userData: boolean;
   openSource: boolean;
-  newVersionOfSelection: boolean,
+  newVersionOfSelection: boolean;
   featureModelFamilySelection: boolean;
 };
 
@@ -68,25 +69,27 @@ export default class FileCreate extends Component<Props, State> {
     };
   }
 
-  getTags = () => {
-    api.get(`${API_URL}tags/`).then((response) => {
+  getTags = async () => {
+    await api.get(`${API_URL}tags/`).then((response) => {
       let tags = response.data;
       tags = tags.map((tag: { id: number; label: string }) => ({
         value: tag.id,
         label: tag.label,
       }));
       this.setState({ gottenTags: tags });
+      return tags;
     });
   };
 
-  getFamilies = () => {
-    api.get(`${API_URL}families/`).then((response) => {
+  getFamilies = async () => {
+    await api.get(`${API_URL}families/`).then((response) => {
       let families = response.data;
       families = families.map((family: { id: number; label: string }) => ({
         value: family.id,
         label: family.label,
       }));
       this.setState({ gottenFamilies: families });
+      return families;
     });
   };
 
@@ -101,13 +104,43 @@ export default class FileCreate extends Component<Props, State> {
     });
   };
 
+  getTagsWithTagId = (options: any) => options.map((option: any) => {
+    let id = option.value;
+
+    if (!isNumeric(id)) {
+      const newElement = this.state.gottenTags.find((element) => (element.label === option.value));
+
+      if (newElement && newElement.value) {
+        id = newElement.value;
+      }
+    }
+
+    return {
+      id,
+      label: option.label,
+    };
+  });
+
   onTagChange = (options: any) => {
-    this.setState({
-      tags: options.map((option: any) => ({
-        id: option.value,
-        label: option.label,
-      })),
-    });
+    if (!this.state.gottenTags.some((e) => options[0].label === e.label)) {
+      api
+        .post(`${API_URL}tags/`, { label: options[0].label, description: '' })
+        .then(async () => {
+          await this.getTags();
+
+          const tags = this.getTagsWithTagId(options);
+
+          this.setState({
+            tags,
+          });
+        });
+    } else {
+      const tags = this.getTagsWithTagId(options);
+
+      this.setState({
+        tags,
+      });
+    }
   };
 
   onLabelChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -138,14 +171,48 @@ export default class FileCreate extends Component<Props, State> {
     }
   };
 
-  onNewFamilyChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const featureFamily = e.target as HTMLSelectElement;
-    this.setState({ featureFamily: featureFamily.value });
+  getFamilyWithFamilyId = (option: any) => {
+    let id = option.value;
 
-    if (featureFamily.value === '---') {
+    if (!isNumeric(id)) {
+      const newElement = this.state.gottenFamilies
+        .find((element) => (element.label === option.value));
+
+      if (newElement && newElement.value) {
+        id = newElement.value;
+      }
+    }
+
+    return id;
+  };
+
+  onNewFamilyChange = (option: any) => {
+    console.log(option);
+
+    if (option.value === '') {
       this.setState({ newVersionOfSelection: true });
     } else {
       this.setState({ newVersionOfSelection: false });
+    }
+
+    if (!this.state.gottenFamilies.some((e) => option.label === e.label)) {
+      api
+        .post(`${API_URL}families/`, { label: option.label, description: '' })
+        .then(async () => {
+          await this.getFamilies();
+
+          const featureFamily = this.getFamilyWithFamilyId(option);
+
+          this.setState({
+            featureFamily,
+          });
+        });
+    } else {
+      const featureFamily = this.getFamilyWithFamilyId(option);
+
+      this.setState({
+        featureFamily,
+      });
     }
   };
 
@@ -281,27 +348,18 @@ export default class FileCreate extends Component<Props, State> {
               </Form.Group>
               <Form.Group className="col-sm">
                 <Form.Label>Feature model family</Form.Label>
-                <Form.Select
+                <CreatableSelect
+                  isDisabled={!this.state.featureModelFamilySelection ?? undefined}
+                  name="families"
+                  inputId="families"
                   onChange={this.onNewFamilyChange}
-                  disabled={!this.state.featureModelFamilySelection ?? undefined}
-                  defaultValue="---"
-                >
-                  {this.state.gottenFamilies.map((key) => (
-                    <option key={key.value} value={key.value}>
-                      {key.value}
-                      :
-                      {key.label}
-                    </option>
-                  ))}
-                  <option key="---" value="---">
-                    ---
-                  </option>
-                </Form.Select>
+                  options={this.state.gottenFamilies}
+                />
               </Form.Group>
             </Row>
             <Form.Group data-testid="tag-form" className="mb-3">
               <Form.Label htmlFor="tags">Tags</Form.Label>
-              <Select
+              <CreatableSelect
                 isMulti
                 name="tags"
                 inputId="tags"
