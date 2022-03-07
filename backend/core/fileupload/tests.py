@@ -59,7 +59,6 @@ class GithubMirrorTests(APITestCase):
             "tags": '[{"id": "2", "label": "Tobi"},{"id": "1", "label": "Eric Test"}]'}
         if new_version_of is not None:
             raw_data.update({'new_version_of': str(new_version_of)})
-        print(raw_data)
         msg_as_multipart = encode_multipart(data=raw_data, boundary=BOUNDARY)
         # print(f"Raw data to user: {raw_data}")
         # print("Sending first file to backend...")
@@ -117,7 +116,7 @@ class FileUploadWithTagsTests(APITestCase):
         f_res = c.post('/files/', msg_as_multipart,
                        content_type=MULTIPART_CONTENT,
                        HTTP_AUTHORIZATION='Bearer ' + token)
-        print(f"\n{f_res.status_code} {f_res.content}")
+        # print(f"\n{f_res.status_code} {f_res.content}")
         self.assertEqual(f_res.status_code, 201)
         # create new version file
         new_file = ContentFile(self.upload_file_content, "test_new.xml")
@@ -134,7 +133,7 @@ class FileUploadWithTagsTests(APITestCase):
         f_res = c.post('/files/', msg_as_multipart,
                        content_type=MULTIPART_CONTENT,
                        HTTP_AUTHORIZATION='Bearer ' + token)
-        print(f"\n{f_res.status_code} {f_res.content}")
+        # print(f"\n{f_res.status_code} {f_res.content}")
         self.assertEqual(f_res.status_code, 201)
 
     def test_tags_required(self):
@@ -217,5 +216,5 @@ class FileUploadWithTagsTests(APITestCase):
         f_res = c.post('/files/', msg_as_multipart,
                        content_type=MULTIPART_CONTENT,
                        HTTP_AUTHORIZATION='Bearer ' + token)
-        print(f"\n{f_res.status_code} {f_res.content}")
+        # print(f"\n{f_res.status_code} {f_res.content}")
         self.assertEqual(f_res.status_code, 201)

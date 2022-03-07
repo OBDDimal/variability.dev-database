@@ -2,7 +2,9 @@
 import os
 import re
 from github import Github
+import logging
 
+logger = logging.getLogger(__name__)
 init_repo_name = 'wurstbroteater/djangoProject'
 init_branch = 'main'
 token = os.getenv('GITHUB_TOKEN')
@@ -37,7 +39,7 @@ def eval_repo(repo_name=init_repo_name):
     folders = [file.path for file in folders]  # file names only instead of ContentFile(path=...)
     has_file_folder = 'files' in folders
     if not has_file_folder:
-        print(f"[INFO] GHM: Creating 'files' folder in repo {repo_name}")
+        logger.warning(f"[Mirror]: Creating 'files' folder in repo {repo_name}")
         repo.create_file("files/.gitkeep", "created files folder", "", branch=init_branch)
     return has_file_folder
 
