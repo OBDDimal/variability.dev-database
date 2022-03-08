@@ -213,7 +213,7 @@ def start_process(new_container, process):
         process_ram, process_cpu = get_ram_and_cpu(process)
         used_ram += process_ram
         used_cpu_cores += process_cpu
-        print(f'process: {process}\tram/used: {process_ram}/{used_ram}\t cpu/used: {process_cpu}/{used_cpu_cores}')
+        print(f'process: {process}\tram/used: {process_ram}/{used_ram}\tcpu/used: {process_cpu}/{used_cpu_cores}')
         if used_ram + ram <= MAX_RAM and used_cpu_cores + cpu <= MAX_CPU:
             # start the container
             logging.warning('Starting new container')
