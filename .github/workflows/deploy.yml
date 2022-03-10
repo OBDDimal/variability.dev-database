@@ -3,20 +3,18 @@ on:
   push:
     branches:
       - dev
+      - issue-100-deploy-to-production
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Install SSH key
-        uses: shimataro/ssh-key-action@v2
+      - name: executing remote ssh commands using password
+        uses: appleboy/ssh-action@master
         with:
-          key: ${{ secrets.DEPLOY_SECRET_KEY }}
-          name: id_rsa
-          known_hosts: ${{ secrets.SSH_HOST }}
-      - name: Adding Known Hosts
-        run: ssh-keyscan -H ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
-      - name: Checkout project
-        uses: actions/checkout@v2
-      - name: Deploy with rsync
-        run: rsync -avz ./ ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/home/${{ secrets.SSH_USER }}/sili-telegram-bot/
-      # Logic to run ...
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          password: ${{ secrets.SSH_PW }}
+          port: 22
+          script: |
+            whoami
+            ls -la
