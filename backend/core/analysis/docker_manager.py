@@ -1,18 +1,27 @@
-import os
 import docker
 import threading
 import time
 import logging
 from .models import DockerProcess, Analysis
+import os
+from pathlib import Path
 
 logger = logging.getLogger(__name__)
-absolute_path = os.path.abspath('')
-report_path = f'{absolute_path}/../_reports'
-log_path = f'{absolute_path}/../_log'
+work_dir = f'{Path(__file__).resolve().parent}{os.path.sep}newAnalysis'
+absolute_path = work_dir  # os.path.abspath('')
+report_path = f'{absolute_path}{os.path.sep}nreports'
+log_path = f'{absolute_path}{os.path.sep}nlogs'
+client = docker.from_env()
+
+MAX_RAM = 32
+MAX_CPU = 16
 
 
 # -----------------------------Code taken from 'deprecated' branch and slightly modified --------------------------
 class ContainerManager(threading.Thread):
+    """
+    Run container and write report to database when finished
+    """
 
     def __init__(self):
         threading.Thread.__init__(self)
@@ -29,6 +38,7 @@ class ContainerManager(threading.Thread):
         self.running = True
         while self.running:
             # check for any processes that might have ended
+            print('running')
             self.update_finished_processes()
             # stop the thread if there are no more processes to queue
             if len(self.queued_containers) == 0:
@@ -57,6 +67,7 @@ class ContainerManager(threading.Thread):
         database and confirms that the process was stopped
         """
         # dictionary to keep track of all new files
+        print('update_finished')
         new_analysis = dict([(id, {'report': '', 'order': '', 'changed': False})
                              for id in self.started_containers])
         # all files in the output directory
@@ -114,11 +125,6 @@ class ContainerManager(threading.Thread):
         return self.running
 
 
-client = docker.from_env()
-
-MAX_RAM = 32
-MAX_CPU = 16
-
 containerManagerThread = ContainerManager()
 
 
@@ -132,7 +138,7 @@ def get_running_process_ids():
 
 def create_container(process):
     """
-    Creates a new Docker Container from the specified container
+    Creates a new Docker Container from the specified image
 
     Args:
         process: The process the container is based on
@@ -144,15 +150,9 @@ def create_container(process):
     file = process.file_to_analyse
     repo_name = 'ddueruem'
     ram, cpu = get_ram_and_cpu(process)
-
     container = client.containers.create(
-        'ubuntu',  # here: image name from which container should be created
-        # TODO: start here with running docker
-        command=f'git clone https://github.com/h3ssto/{repo_name}.git &&' +
-                f'mkdir {repo_name}/files &&' +
-                # TODO: Changes this to load DIMACS format of FM
-                f'mv {repo_name}/examples/berkeleydb.dimacs {repo_name}/files/{file.label}.dimacs &&' +
-                f'./ddueruem.py files/{file.label}.dimacs --lib {process.library}',
+        'ddueruem:latest',  # tag of image to use
+        # command='./entrypoint.sh',
         detach=True,
         cpu_count=cpu,
         mem_limit=f'{ram}g',
@@ -160,7 +160,7 @@ def create_container(process):
         volumes={
             log_path: {'bind': '/ddueruem/_log', 'mode': 'rw'},
             report_path: {'bind': '/ddueruem/_reports', 'mode': 'rw'},
-            f'{absolute_path}/../ddueruem/files': {'bind': '/ddueruem/files', 'mode': 'rw'},
+            # f'{absolute_path}/../ddueruem/files': {'bind': '/ddueruem/files', 'mode': 'rw'},
         },
     )
     return container
@@ -186,7 +186,7 @@ def start_or_queue_process(process):
     """
     ram, cpu = get_ram_and_cpu(process)
     container = create_container(process)
-    # ram, cpu, f'p-{process.id}', process.file, process.library)
+    print(ram, cpu, f'p-{process.id}', process.file_to_analyse, process.library)
     if not start_process(container, process):
         containerManagerThread.queued_containers.append((container, process))
 
@@ -202,25 +202,27 @@ def start_process(new_container, process):
     Returns:
         True if a new container was started successfully
     """
-    ram, cpu = get_ram_and_cpu(process)
     used_ram = 0
     used_cpu_cores = 0
+    ram, cpu = get_ram_and_cpu(process)
     # get all active containers and add up their requirements
     for container in client.containers.list():
-        print(container.name)
-        container_id = 1  # int(container.name.split('-')[1])
-        process = DockerProcess.objects.get(pk=9)  # container_id)
+        container_id = int(container.name.split('-')[1])
+        process = DockerProcess.objects.get(pk=container_id)
         process_ram, process_cpu = get_ram_and_cpu(process)
         used_ram += process_ram
         used_cpu_cores += process_cpu
-        print(f'process: {process}\tram/used: {process_ram}/{used_ram}\tcpu/used: {process_cpu}/{used_cpu_cores}')
-        if used_ram + ram <= MAX_RAM and used_cpu_cores + cpu <= MAX_CPU:
-            # start the container
-            logging.warning('Starting new container')
-            new_container.start()
-            containerManagerThread.started_containers.append(process.id)
-            # make sure the manager thread is running
-            if not containerManagerThread.is_started():
-                containerManagerThread.start()
-            return True
+
+    print(f'process: {process}\tram/max: {used_ram}/{MAX_CPU}\tcpu/max: {used_cpu_cores}/{MAX_CPU}')
+    if True or (used_ram + ram <= MAX_RAM and used_cpu_cores + cpu <= MAX_CPU):
+        # start the container
+        logging.warning('Starting new container')
+        new_container.start()
+        containerManagerThread.started_containers.append(process.id)
+        # make sure the manager thread is running
+        """
+        if not containerManagerThread.is_started():
+            containerManagerThread.start()
+        """
+        return True
     return False
