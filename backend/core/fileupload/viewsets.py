@@ -3,11 +3,11 @@ from collections import OrderedDict
 from django.template.loader import render_to_string
 from core.fileupload.models.family import Family
 from core.fileupload.models.tag import Tag
-from rest_framework import viewsets, permissions
+from rest_framework import viewsets, permissions, mixins
 from rest_framework import status
 from django.utils.html import strip_tags
 from core.fileupload.models.file import File
-from core.fileupload.serializers import FilesSerializer, TagsSerializer, FamiliesSerializer
+from core.fileupload.serializers import FilesSerializer, TagsSerializer, FamiliesSerializer, LicensesSerializer
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.signing import BadSignature
 from django.utils.encoding import DjangoUnicodeDecodeError
@@ -15,6 +15,8 @@ from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 from rest_framework.permissions import AllowAny
 from rest_framework.mixins import CreateModelMixin
+
+from .models.license import License
 from ..auth.tokens import decode_token_to_user
 from ..user.models import User
 import core.fileupload.githubmirror.github_manager as gm
@@ -131,6 +133,18 @@ class FamiliesViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
+
+
+class LicensesViewSet(viewsets.ModelViewSet, mixins.ListModelMixin):
+    queryset = License.objects.all()
+    serializer_class = LicensesSerializer
+    permission_classes = [permissions.AllowAny]
+
+    def create(self, request, *args, **kwargs):
+        return Response({'message': 'Create is prohibited'})
+
+    def update(self, request, *args, **kwargs):
+        return Response({'message': 'Update is prohibited'})
 
 
 class TagsViewSet(viewsets.ModelViewSet):
