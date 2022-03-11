@@ -9,21 +9,19 @@ import isNumeric from '../../services/numbers.service';
 
 const API_URL = process.env.REACT_APP_DOMAIN;
 
-// Can't use enums because of iteration problems
-const license = ['CC BY - Mention', 'CC BY-NC - Mention - Non-commercial'];
-
 type Props = {};
 
 type State = {
   label: string;
   description?: string;
   file?: File;
-  license: string;
+  gottenLicenses: Array<{label: string; value: string}>;
   gottenTags: Array<{ label: string; value: string }>;
   gottenFiles: Array<{ value: number; label: string }>;
   gottenFamilies: Array<{ value: number; label: string }>;
   newVersionOf: string;
   featureFamily: string;
+  license: string;
   tags: string;
   loading: boolean;
   legalShare: boolean;
@@ -48,18 +46,20 @@ export default class FileCreate extends Component<Props, State> {
     this.getTags();
     this.getNewVersionOf();
     this.getFamilies();
+    this.getLicenses();
 
     this.state = {
       label: '',
       description: undefined,
       file: undefined,
-      license: license[0],
+      gottenLicenses: [],
       gottenTags: [],
       gottenFiles: [],
       gottenFamilies: [],
       tags: '',
       newVersionOf: '---',
       featureFamily: '---',
+      license: '',
       loading: false,
       legalShare: false,
       userData: false,
@@ -90,6 +90,18 @@ export default class FileCreate extends Component<Props, State> {
       }));
       this.setState({ gottenFamilies: families });
       return families;
+    });
+  };
+
+  getLicenses = () => {
+    api.get(`${API_URL}licenses/`).then((response) => {
+      let licenses = response.data;
+      licenses = licenses.map((license: { id: number; label: string }) => ({
+        value: license.id,
+        label: license.label,
+      }));
+      this.setState({ gottenLicenses: licenses });
+      return licenses;
     });
   };
 
@@ -187,8 +199,6 @@ export default class FileCreate extends Component<Props, State> {
   };
 
   onNewFamilyChange = (option: any) => {
-    console.log(option);
-
     if (option.value === '') {
       this.setState({ newVersionOfSelection: true });
     } else {
@@ -217,8 +227,8 @@ export default class FileCreate extends Component<Props, State> {
   };
 
   onLicenseChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const localLicense = e.target as HTMLSelectElement;
-    this.setState({ license: localLicense.value });
+    const license = e.target as HTMLSelectElement;
+    this.setState({ license: license.value });
   };
 
   isReady = () => this.state.tags
@@ -318,12 +328,17 @@ export default class FileCreate extends Component<Props, State> {
             </Form.Group>
             <Form.Group className="mb-3">
               <Form.Label>License</Form.Label>
-              <Form.Select onChange={this.onLicenseChange}>
-                {license.map((key) => (
-                  <option key={key} value={key}>
-                    {key}
+              <Form.Select onChange={this.onLicenseChange} defaultValue="---">
+                {this.state.gottenLicenses.map((key) => (
+                  <option key={key.value} value={key.value}>
+                    {key.value}
+                    :
+                    {key.label}
                   </option>
                 ))}
+                <option key="---" value="---">
+                  ---
+                </option>
               </Form.Select>
             </Form.Group>
             <Row>

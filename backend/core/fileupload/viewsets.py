@@ -55,7 +55,8 @@ class ConfirmMirrorViewSet(GenericViewSet, CreateModelMixin):
             file.mirrored = True
             file.save()
             for to_notify in User.objects.filter(is_staff=True) | User.objects.filter(is_superuser=True):
-                to_notify._email_user('[Staff] DDueruem new mirror request', plain_message, html_message=html_message)
+                to_notify._email_user(
+                    '[Staff] DDueruem new mirror request', plain_message, html_message=html_message)
             return Response({'message': 'File mirrored to GitHub!'})
         except ObjectDoesNotExist as error:
             return Response({'message': str(error)})
@@ -139,6 +140,11 @@ class LicensesViewSet(viewsets.ModelViewSet, mixins.ListModelMixin):
     queryset = License.objects.all()
     serializer_class = LicensesSerializer
     permission_classes = [permissions.AllowAny]
+
+    def list(self, request, **kwargs):
+        queryset = License.objects.all()
+        licenses = LicensesSerializer(queryset, many=True).data
+        return Response(licenses)
 
     def create(self, request, *args, **kwargs):
         return Response({'message': 'Create is prohibited'})

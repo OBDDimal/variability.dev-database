@@ -35,7 +35,11 @@ export default class FileIndex extends Component<Props, State> {
     { title: 'Id', field: 'id', width: 60 },
     { title: 'Label', field: 'label' },
     { title: 'Description', field: 'description', formatter: 'textarea' },
-    { title: 'License', field: 'license' },
+    {
+      title: 'License',
+      field: 'license',
+      formatter: (cell: any) => cell.getValue().label,
+    },
     {
       title: 'Tags',
       field: 'tags',
