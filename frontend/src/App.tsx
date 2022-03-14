@@ -15,7 +15,6 @@ import FileShow from './routes/Files/FileShow';
 import TagCreate from './routes/Tags/TagCreate';
 import FileEdit from './routes/Files/FileEdit';
 import RegisterConfirmation from './routes/RegisterConfirmation';
-import MirrorConfirmation from './routes/MirrorConfirmation';
 import FamilyCreate from './routes/Families/FamilyCreate';
 import FamilyIndex from './routes/Families/FamilyIndex';
 import FileUploadConfirmation from './routes/Files/FileUploadConfirmation';
@@ -63,14 +62,6 @@ function App() {
         <Route
           path="/files/uploaded/unconfirmed/:id"
           element={<FileDelete />}
-        />
-        <Route
-          path="/files/confirm/:confirmationCode"
-          element={(
-            <RequireAuth>
-              <MirrorConfirmation />
-            </RequireAuth>
-          )}
         />
         <Route
           path="/files/create"

@@ -1,8 +1,13 @@
 # from module: pyGithub, details: https://pygithub.readthedocs.io/en/latest/examples/Repository.html
 import os
 import re
+
+from django.template.loader import render_to_string
+from django.utils.html import strip_tags
 from github import Github
 import logging
+
+from core.user.models import User
 
 logger = logging.getLogger(__name__)
 init_repo_name = 'wurstbroteater/djangoProject'
@@ -14,13 +19,23 @@ g = Github(login_or_token=token)
 
 def mirror_to_github(file):
     """
-    Checks the repository and commits the file as new pull request
-
-    returns link to pull request on success
+    Checks the repository and commits the file as new pull request and informs staff and admin about new PR.
     """
     eval_repo()
-    return post_file_in_pull_request(file=file).issue_url.replace('api.github.com/repos', 'github.com').replace(
+    link = post_file_in_pull_request(file=file).issue_url.replace('api.github.com/repos', 'github.com').replace(
         '/issues/', '/pull/')
+    html_message = render_to_string('email/file_mirror_notify_admin_email.html', {
+        'user': str(file.owner),
+        'protocol': 'http',
+        'link': link
+    })
+    plain_message = strip_tags(html_message)
+    file.mirrored = True
+    file.save()
+    for to_notify in User.objects.filter(is_staff=True) | User.objects.filter(is_superuser=True):
+        to_notify._email_user(
+            '[Staff] DDueruem new mirror request', plain_message, html_message=html_message)
+    pass
 
 
 def eval_repo(repo_name=init_repo_name):
