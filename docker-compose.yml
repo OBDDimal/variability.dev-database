@@ -26,10 +26,19 @@ services:
     build: ./frontend
     ports:
       - "80:80"
+      - "443:443"
+    volumes:
+      - certbot:/var/www/certbot/:ro
     depends_on:
       - backend
     command: nginx -g 'daemon off;'
 
+  certbot:
+    image: certbot/certbot:latest
+    volumes:
+      - certbot:/var/www/certbot/:rw  
+
 volumes:
   postgresdata:
   djangomedia:
+  certbot:
