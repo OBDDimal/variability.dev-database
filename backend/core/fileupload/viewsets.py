@@ -1,6 +1,8 @@
 from collections import OrderedDict
 
 from django.template.loader import render_to_string
+from django.utils import timezone, dateparse
+from datetime import timedelta
 from rest_framework.status import HTTP_401_UNAUTHORIZED, HTTP_405_METHOD_NOT_ALLOWED, HTTP_403_FORBIDDEN, HTTP_200_OK
 
 from core.fileupload.models.family import Family
@@ -18,6 +20,7 @@ from rest_framework.viewsets import GenericViewSet
 from rest_framework.permissions import AllowAny
 from rest_framework.mixins import CreateModelMixin
 
+from ddueruemweb.settings import PASSWORD_RESET_TIMEOUT_DAYS
 from .models.license import License
 from ..auth.tokens import decode_token_to_user
 from ..user.models import User
@@ -60,6 +63,44 @@ class ConfirmMirrorViewSet(GenericViewSet, CreateModelMixin):
                 to_notify._email_user(
                     '[Staff] DDueruem new mirror request', plain_message, html_message=html_message)
             return Response({'message': 'File mirrored to GitHub!'})
+        except ObjectDoesNotExist as error:
+            return Response({'message': str(error)})
+        except BadSignature as error:
+            return Response({'message': str(error)})
+        except DjangoUnicodeDecodeError as error:
+            return Response({'message': str(error)})
+
+
+class ConfirmFileUploadViewSet(GenericViewSet, CreateModelMixin):
+    """
+    This view is called when the user tries to confirm  a file, via a link which contains a token.
+    This token will be decoded and the file will be set to confirmed if the token is valid.
+    """
+    permission_classes = [AllowAny]
+    http_method_names = ['get']
+
+    @staticmethod
+    def get(request, token):
+        try:
+            decoded_token = decode_token_to_user(token)
+            actual_request_timestamp = dateparse.parse_datetime(decoded_token.pop('timestamp'))
+            if decoded_token.pop('purpose') != 'upload_confirm':
+                raise BadSignature('Token purpose does not match!')
+            min_possible_request_timestamp = timezone.now() - timedelta(days=PASSWORD_RESET_TIMEOUT_DAYS)
+            valid = min_possible_request_timestamp <= actual_request_timestamp
+            if not valid:
+                raise BadSignature('Token expired!')
+            else:
+                file_from_db = File.objects.get(pk=decoded_token.pop('file_id'))
+                if file_from_db.is_confirmed:
+                    raise BadSignature('File upload is already confirmed!')
+                file_from_db.is_confirmed = True
+                if not file_from_db.mirrored:
+                    # TODO: Async call github mirror
+                    # gm.mirror_to_github(file_from_db)
+                    file_from_db.mirrored = file_from_db.mirrored
+                file_from_db.save()
+                return Response({'file': FilesSerializer(file_from_db).data}, HTTP_200_OK)
         except ObjectDoesNotExist as error:
             return Response({'message': str(error)})
         except BadSignature as error:
@@ -159,57 +200,14 @@ class UnconfirmedFileViewSet(viewsets.ModelViewSet):
     def destroy(self, request, *args, **kwargs):
         try:
             file = File.objects.get(pk=kwargs['pk'])
+            if file.is_confirmed:
+                return Response({'message': 'Cannot delete confirmed files.'}, HTTP_403_FORBIDDEN)
             if file.owner.email != request.user.email:
                 return Response({'message': 'File owner does not match.'}, HTTP_403_FORBIDDEN)
             file.delete()
         except ObjectDoesNotExist as error:
             return Response({'message': str(error)})
         return Response(status=HTTP_200_OK)
-
-
-class DeleteUnconfirmedFileViewSet(viewsets.ModelViewSet):
-    queryset = File.objects.filter(is_confirmed=False)
-    serializer_class = FilesSerializer
-    permission_classes = [permissions.IsAuthenticated]
-
-    def list(self, request, **kwargs):
-        """
-        Replace email address of file owner with True or False,
-        indicating if the user which has sent the request is the owner.
-        Returns only the unconfirmed files of a user.
-        """
-        queryset = self.queryset
-        files = FilesSerializer(queryset, many=True).data
-        changed_files = []
-        if request.user.is_anonymous:
-            return Response({'message': 'Please login first'}, HTTP_401_UNAUTHORIZED)
-        else:
-            for file in files:
-                changed_file = OrderedDict()
-                for tuple in file.items():
-                    if tuple[0] == 'owner':
-                        changed_file[tuple[0]] = tuple[1] == request.user.email
-                    elif tuple[0] == 'tags':
-                        tags = []
-                        for tag in list(tuple[1]):
-                            new_tag = OrderedDict()
-                            for tagTuple in tag.items():
-                                if tagTuple[0] == 'owner':
-                                    new_tag[tagTuple[0]] = tagTuple[1] == request.user.email
-                                else:
-                                    new_tag[tagTuple[0]] = tagTuple[1]
-                            tags.append(new_tag)
-                        changed_file[tuple[0]] = tags
-                    else:
-                        changed_file[tuple[0]] = tuple[1]
-                changed_files.append(changed_file)
-        return Response(changed_files)
-
-    def create(self, request, *args, **kwargs):
-        return Response({'message': 'Create is prohibited'}, HTTP_405_METHOD_NOT_ALLOWED)
-
-    def update(self, request, *args, **kwargs):
-        return Response({'message': 'Update is prohibited'}, HTTP_405_METHOD_NOT_ALLOWED)
 
 
 class ConfirmedFileViewSet(viewsets.ModelViewSet):

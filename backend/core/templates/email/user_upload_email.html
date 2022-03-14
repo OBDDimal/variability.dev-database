@@ -1,8 +1,20 @@
 {% extends "email/email_template.html" %}
-    {% block greeting %}Hello {{ user }},{% endblock %}
-    {% block upper_text %}To see your uploaded file {{ file_name }}, please click on the following button: {% endblock %}
-    {% block call_to_action_link %}{{ file_domain }}{% endblock %}
-    {% block call_to_action_text %}See file{% endblock %}
-    {% block lower_text %}If clicking the button above doesn't work, you
-    can copy the plain link here: {{ file_domain }} {% endblock %}
+{% block greeting %}Hello {{ user }},{% endblock %}
+{% block upper_text %}We noticed you uploaded {{ file_name }}. You can now choose to add this file permanently (confirm
+    upload) or to delete it now.{% endblock %}
+{% block call_to_action_link %}{{ confirm_link }}{% endblock %}
+{% block call_to_action_text %}Confirm Upload{% endblock %}
+{% block lower_text %}
+    If you do not confirm your file upload within <strong>48 hours</strong> the file will be deleted automatically.
+    <br />
+    Once you confirmed the upload, you <strong>can not delete the file anymore</strong>.
+    <br />
+    If you want to delete the file and not confirm it <a href="{{ delete_link }}">click here</a>.
+    <br />
+    If clicking one of the buttons above doesn't work, you can copy the plain links here:
+    <ul>
+        <li>Confirm link: {{ confirm_link }}</li>
+        <li>Delete link: {{ delete_link }}</li>
+    </ul>
+{% endblock %}
 {% block salutation %}Thank you for uploading a file.{% endblock %}

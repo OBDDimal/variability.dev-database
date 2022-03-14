@@ -18,6 +18,8 @@ import RegisterConfirmation from './routes/RegisterConfirmation';
 import MirrorConfirmation from './routes/MirrorConfirmation';
 import FamilyCreate from './routes/Families/FamilyCreate';
 import FamilyIndex from './routes/Families/FamilyIndex';
+import FileUploadConfirmation from './routes/Files/FileUploadConfirmation';
+import FileDelete from './routes/Files/FileDelete';
 
 interface AuthChildren {
   // Maybe there is a way to define this
@@ -52,6 +54,14 @@ function App() {
         <Route
           path="/register/:confirmationCode"
           element={<RegisterConfirmation />}
+        />
+        <Route
+          path="/files/uploaded/unconfirmed/confirm/:confirmationCode"
+          element={<FileUploadConfirmation />}
+        />
+        <Route
+          path="/files/uploaded/unconfirmed/:id"
+          element={<FileDelete />}
         />
         <Route
           path="/files/confirm/:confirmationCode"
