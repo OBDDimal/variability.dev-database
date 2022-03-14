@@ -15,4 +15,5 @@ class Tag(models.Model):
     date_created = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
+        # do not change that
         return f"{self.id}:{self.label}"

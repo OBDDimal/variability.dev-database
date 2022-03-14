@@ -2,14 +2,12 @@ import React, { Component } from 'react';
 import {
   Button, Container, Form, Row,
 } from 'react-bootstrap';
-import Select from 'react-select';
+import CreatableSelect from 'react-select/creatable';
 import { default as Modal } from '../../components/Modal';
 import api from '../../services/api.service';
+import isNumeric from '../../services/numbers.service';
 
 const API_URL = process.env.REACT_APP_DOMAIN;
-
-// Can't use enums because of iteration problems
-const license = ['CC BY - Mention', 'CC BY-NC - Mention - Non-commercial'];
 
 type Props = {};
 
@@ -17,15 +15,20 @@ type State = {
   label: string;
   description?: string;
   file?: File;
-  license: string;
+  gottenLicenses: Array<{label: string; value: string}>;
   gottenTags: Array<{ label: string; value: string }>;
   gottenFiles: Array<{ value: number; label: string }>;
+  gottenFamilies: Array<{ value: number; label: string }>;
   newVersionOf: string;
+  featureFamily: string;
+  license: string;
   tags: string;
   loading: boolean;
   legalShare: boolean;
   userData: boolean;
   openSource: boolean;
+  newVersionOfSelection: boolean;
+  featureModelFamilySelection: boolean;
 };
 
 /**
@@ -42,31 +45,63 @@ export default class FileCreate extends Component<Props, State> {
     super(props);
     this.getTags();
     this.getNewVersionOf();
+    this.getFamilies();
+    this.getLicenses();
 
     this.state = {
       label: '',
       description: undefined,
       file: undefined,
-      license: license[0],
+      gottenLicenses: [],
       gottenTags: [],
       gottenFiles: [],
+      gottenFamilies: [],
       tags: '',
       newVersionOf: '---',
+      featureFamily: '---',
+      license: '',
       loading: false,
       legalShare: false,
       userData: false,
       openSource: false,
+      featureModelFamilySelection: true,
+      newVersionOfSelection: true,
     };
   }
 
-  getTags = () => {
-    api.get(`${API_URL}tags/`).then((response) => {
+  getTags = async () => {
+    await api.get(`${API_URL}tags/`).then((response) => {
       let tags = response.data;
       tags = tags.map((tag: { id: number; label: string }) => ({
         value: tag.id,
         label: tag.label,
       }));
       this.setState({ gottenTags: tags });
+      return tags;
+    });
+  };
+
+  getFamilies = async () => {
+    await api.get(`${API_URL}families/`).then((response) => {
+      let families = response.data;
+      families = families.map((family: { id: number; label: string }) => ({
+        value: family.id,
+        label: family.label,
+      }));
+      this.setState({ gottenFamilies: families });
+      return families;
+    });
+  };
+
+  getLicenses = () => {
+    api.get(`${API_URL}licenses/`).then((response) => {
+      let licenses = response.data;
+      licenses = licenses.map((license: { id: number; label: string }) => ({
+        value: license.id,
+        label: license.label,
+      }));
+      this.setState({ gottenLicenses: licenses });
+      return licenses;
     });
   };
 
@@ -81,13 +116,43 @@ export default class FileCreate extends Component<Props, State> {
     });
   };
 
+  getTagsWithTagId = (options: any) => options.map((option: any) => {
+    let id = option.value;
+
+    if (!Number.isInteger(id)) {
+      const newElement = this.state.gottenTags.find((element) => (element.label === option.value));
+
+      if (newElement && newElement.value) {
+        id = newElement.value;
+      }
+    }
+
+    return {
+      id,
+      label: option.label,
+    };
+  });
+
   onTagChange = (options: any) => {
-    this.setState({
-      tags: options.map((option: any) => ({
-        id: option.value,
-        label: option.label,
-      })),
-    });
+    if (!this.state.gottenTags.some((e) => options[options.length - 1].label === e.label)) {
+      api
+        .post(`${API_URL}tags/`, { label: options[options.length - 1].label, description: '' })
+        .then(async () => {
+          await this.getTags();
+
+          const tags = this.getTagsWithTagId(options);
+
+          this.setState({
+            tags,
+          });
+        });
+    } else {
+      const tags = this.getTagsWithTagId(options);
+
+      this.setState({
+        tags,
+      });
+    }
   };
 
   onLabelChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -110,11 +175,60 @@ export default class FileCreate extends Component<Props, State> {
   onNewVersionOfChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const newVersionOf = e.target as HTMLSelectElement;
     this.setState({ newVersionOf: newVersionOf.value });
+
+    if (newVersionOf.value === '---') {
+      this.setState({ featureModelFamilySelection: true });
+    } else {
+      this.setState({ featureModelFamilySelection: false });
+    }
+  };
+
+  getFamilyWithFamilyId = (option: any) => {
+    let id = option.value;
+
+    if (!isNumeric(id)) {
+      const newElement = this.state.gottenFamilies
+        .find((element) => (element.label === option.value));
+
+      if (newElement && newElement.value) {
+        id = newElement.value;
+      }
+    }
+
+    return id;
+  };
+
+  onNewFamilyChange = (option: any) => {
+    if (option.value === '') {
+      this.setState({ newVersionOfSelection: true });
+    } else {
+      this.setState({ newVersionOfSelection: false });
+    }
+
+    if (!this.state.gottenFamilies.some((e) => option.label === e.label)) {
+      api
+        .post(`${API_URL}families/`, { label: option.label, description: '' })
+        .then(async () => {
+          await this.getFamilies();
+
+          const featureFamily = this.getFamilyWithFamilyId(option);
+
+          this.setState({
+            featureFamily,
+          });
+        });
+    } else {
+      const featureFamily = this.getFamilyWithFamilyId(option);
+
+      this.setState({
+        featureFamily,
+      });
+    }
   };
 
   onLicenseChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const localLicense = e.target as HTMLSelectElement;
-    this.setState({ license: localLicense.value });
+    const license = e.target as HTMLSelectElement;
+    this.setState({ license: license.value });
   };
 
   isReady = () => this.state.tags
@@ -123,7 +237,8 @@ export default class FileCreate extends Component<Props, State> {
     && this.state.description
     && this.state.legalShare
     && this.state.userData
-    && this.state.openSource;
+    && this.state.openSource
+    && !(this.state.featureFamily === '---' && this.state.newVersionOf === '---');
 
   onSubmit = (e: { preventDefault: () => void }) => {
     e.preventDefault();
@@ -145,6 +260,9 @@ export default class FileCreate extends Component<Props, State> {
       data.append('license', this.state.license);
       if (this.state.newVersionOf !== '---') {
         data.append('new_version_of', this.state.newVersionOf);
+      }
+      if (this.state.featureFamily !== '---') {
+        data.append('family', this.state.featureFamily);
       }
       data.append('tags', JSON.stringify(this.state.tags));
 
@@ -210,22 +328,9 @@ export default class FileCreate extends Component<Props, State> {
             </Form.Group>
             <Form.Group className="mb-3">
               <Form.Label>License</Form.Label>
-              <Form.Select onChange={this.onLicenseChange}>
-                {license.map((key) => (
-                  <option key={key} value={key}>
-                    {key}
-                  </option>
-                ))}
-              </Form.Select>
-            </Form.Group>
-            <Form.Group className="mb-3">
-              <Form.Label>New version of</Form.Label>
-              <Form.Select
-                onChange={this.onNewVersionOfChange}
-                defaultValue="---"
-              >
-                {this.state.gottenFiles.map((key) => (
-                  <option key={key.toString()} value={key.value}>
+              <Form.Select onChange={this.onLicenseChange} defaultValue="---">
+                {this.state.gottenLicenses.map((key) => (
+                  <option key={key.value} value={key.value}>
                     {key.value}
                     :
                     {key.label}
@@ -236,9 +341,40 @@ export default class FileCreate extends Component<Props, State> {
                 </option>
               </Form.Select>
             </Form.Group>
+            <Row>
+              <Form.Group className="col-sm">
+                <Form.Label>New version of</Form.Label>
+                <Form.Select
+                  onChange={this.onNewVersionOfChange}
+                  disabled={!this.state.newVersionOfSelection ?? undefined}
+                  defaultValue="---"
+                >
+                  {this.state.gottenFiles.map((key) => (
+                    <option key={key.value} value={key.value}>
+                      {key.value}
+                      :
+                      {key.label}
+                    </option>
+                  ))}
+                  <option key="---" value="---">
+                    ---
+                  </option>
+                </Form.Select>
+              </Form.Group>
+              <Form.Group className="col-sm">
+                <Form.Label>Feature model family</Form.Label>
+                <CreatableSelect
+                  isDisabled={!this.state.featureModelFamilySelection ?? undefined}
+                  name="families"
+                  inputId="families"
+                  onChange={this.onNewFamilyChange}
+                  options={this.state.gottenFamilies}
+                />
+              </Form.Group>
+            </Row>
             <Form.Group data-testid="tag-form" className="mb-3">
               <Form.Label htmlFor="tags">Tags</Form.Label>
-              <Select
+              <CreatableSelect
                 isMulti
                 name="tags"
                 inputId="tags"

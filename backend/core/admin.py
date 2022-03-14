@@ -1,9 +1,11 @@
 from django.contrib import admin
 from django.http import HttpResponseRedirect
-from django.urls import reverse
 from django.utils import timezone
 from datetime import timedelta
 from django.contrib.admin import ModelAdmin
+
+from core.fileupload.models.family import Family
+from core.fileupload.models.license import License
 from core.fileupload.models.tag import Tag
 from core.fileupload.models.file import File
 from core.user.forms import AdminUserChangeForm, AdminUserCreationForm
@@ -71,24 +73,33 @@ class UserAdmin(BaseUserAdmin):
         return _boolean_icon(True) if user.is_active else f"{delta.days}d{hour}h{minute:02}m{second:02}s"
 
 
-class FileAdmin(ModelAdmin):
+class LicenseAdmin(ModelAdmin):
     """
-    Class for defining the backend file admin panel and which data should be displayed.
+    Class for defining the backend License admin panel.
     """
-    model = File
-    # Show attributes in list view
-    list_display = ('id', 'new_version_of', 'local_file', 'owner', 'uploaded_at')
-    # list_filter = ('is_superuser',)
-    # Define how view should look like after clicking on an email
+    model = License
+    list_display = ('id', 'label')
+    fieldsets = [
+        (None, {'fields': ['label']}),
+    ]
+    search_fields = ('id', 'label')
+    ordering = ('label',)
+    filter_horizontal = ()
+
+
+class FamilyAdmin(ModelAdmin):
+    """
+    Class for defining the backend Feature Model Family admin panel.
+    """
+    model = Family
+    list_display = ('id', 'label', 'owner')
     fieldsets = [
         (None, {'fields': ['owner']}),
-        ('Information', {'fields': ['label', 'description', 'local_file', 'license', 'tags', 'new_version_of']}),
-        ('Important dates', {'fields': ['uploaded_at']}),
-        ('Transpiler Output', {'fields': ['transpiled_file']})
+        ('Information',
+         {'fields': ['label', 'description']}),
     ]
-    readonly_fields = ('uploaded_at',)
-    search_fields = ('owner',)
-    ordering = ('owner', 'uploaded_at')
+    search_fields = ('owner', 'id')
+    ordering = ('owner',)
     filter_horizontal = ()
 
 
@@ -109,7 +120,28 @@ class TagAdmin(ModelAdmin):
     filter_horizontal = ()
 
 
+class FileAdmin(ModelAdmin):
+    """
+    Class for defining the backend file admin panel and which data should be displayed.
+    """
+    model = File
+    list_display = ('id', 'new_version_of', 'mirrored', 'family', 'local_file', 'owner', 'uploaded_at')
+    fieldsets = [
+        (None, {'fields': ['owner']}),
+        ('Information',
+         {'fields': ['label', 'description', 'mirrored', 'family', 'local_file', 'license', 'tags', 'new_version_of']}),
+        ('Important dates', {'fields': ['uploaded_at']}),
+        ('Transpiler Output', {'fields': ['transpiled_file']})
+    ]
+    readonly_fields = ('uploaded_at',)
+    search_fields = ('owner', 'family')
+    ordering = ('owner', 'uploaded_at')
+    filter_horizontal = ()
+
+
 # Register your models here.
+admin.site.register(License, LicenseAdmin)
 admin.site.register(User, UserAdmin)
-admin.site.register(File, FileAdmin)
+admin.site.register(Family, FamilyAdmin)
 admin.site.register(Tag, TagAdmin)
+admin.site.register(File, FileAdmin)

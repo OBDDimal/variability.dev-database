@@ -13,7 +13,6 @@ import os
 import environ
 from pathlib import Path
 
-
 env = environ.Env(DEBUG=(bool, False))
 environ.Env.read_env()
 
@@ -172,7 +171,6 @@ AUTH_USER_MODEL = 'core_user.User'
 ALLOWED_HOSTS = ['*']
 CORS_ORIGIN_ALLOW_ALL = True
 
-
 # https://docs.djangoproject.com/en/3.2/topics/email/
 EMAIL_HOST = env('EMAIL_HOST')  # define host and port for email backend
 EMAIL_HOST_USER = env('EMAIL_HOST_USER')
@@ -183,3 +181,8 @@ EMAIL_PORT = env('EMAIL_PORT')
 
 # also used for user email activation (token) timeout calc
 PASSWORD_RESET_TIMEOUT_DAYS = 2
+# Customize Logging details: https://docs.djangoproject.com/en/4.0/howto/logging/
+LOGGING = {
+    'version': 1,  # the dictConfig format version
+    'disable_existing_loggers': False,  # retain the default loggers
+}

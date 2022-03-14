@@ -1,17 +1,37 @@
 import json
-
 from django.core.files.base import ContentFile
-
+from core.fileupload.models.family import Family
 from core.fileupload.models.file import File, Tag
+from core.fileupload.models.license import License
 from rest_framework import serializers
 from django.http import QueryDict
-
 from transpiler.g6_transpiler import xml_to_g6
+
+
+class FamiliesSerializer(serializers.ModelSerializer):
+    """
+    A serializer for defining which Feature Model Family attributes should be converted to JSON
+    """
+    owner = serializers.ReadOnlyField(source='owner.email')
+
+    class Meta:
+        model = Family
+        fields = ['id', 'owner', 'label', 'description']
+
+
+class LicensesSerializer(serializers.ModelSerializer):
+    """
+    A serializer for defining which License attributes should be converted to JSON
+    """
+
+    class Meta:
+        model = License
+        fields = ['id', 'label']
 
 
 class TagsSerializer(serializers.ModelSerializer):
     """
-    A serializer for defining which file attributes should be converted to JSON
+    A serializer for defining which Tag attributes should be converted to JSON
     """
     owner = serializers.ReadOnlyField(source='owner.email')
 
@@ -28,11 +48,13 @@ class FilesSerializer(serializers.ModelSerializer):
     # For further relations on serializers:
     # https://www.django-rest-framework.org/api-guide/relations
     tags = TagsSerializer(many=True)
+    family = FamiliesSerializer()
+    license = LicensesSerializer()
     new_version_of = 'self'
 
     class Meta:
         model = File
-        fields = ['id', 'label', 'description', 'local_file', 'license', 'tags', 'owner', 'uploaded_at',
+        fields = ['id', 'label', 'description', 'local_file', 'family', 'license', 'tags', 'owner', 'uploaded_at',
                   'new_version_of', 'transpiled_file']
 
     def create(self, validated_data):
@@ -77,5 +99,8 @@ class FilesSerializer(serializers.ModelSerializer):
         for tag in tags_as_json:
             tags_from_db.append(Tag.objects.get(id=tag['id']))
         internal_rep['tags'] = tags_from_db
-
+        if internal_rep.get('family', None) is None:
+            new_version_of = internal_rep.get('new_version_of')
+            if new_version_of is not None:
+                internal_rep.update({'family': str(File.objects.get(id=new_version_of).family)})
         return internal_rep.dict()

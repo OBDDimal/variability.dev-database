@@ -81,6 +81,38 @@ class User(AbstractBaseUser, PermissionsMixin):
         verbose_name = 'user'
         verbose_name_plural = 'users'
 
+    def send_confirm_github_mirror(self, file):
+        user = self
+        extended_user = {
+            'id': str(user.id),
+            'email': str(user.email),
+            'timestamp': str(timezone.now()),
+            'purpose': 'mirror_confirm',
+            'file_id': file.get('id', None),
+        }
+        link = f"http://{env('FRONTEND_URL')}/files/confirm/{encode_user_to_token(extended_user)}"
+        html_message = render_to_string('email/file_mirror_confirm_email.html', {
+            'user': str(user.email),
+            'link': link
+        })
+        plain_message = strip_tags(html_message)
+        user._email_user("DDueruem Confirm File Mirror", plain_message, html_message=html_message)
+
+    def send_link_to_file(self, data):
+        """
+        Send predefined email with link to File after successful upload.
+        """
+        user = self
+        html_message = render_to_string('email/user_upload_email.html', {
+            'user': str(user.email),
+            'protocol': 'http',
+            'file_domain': str(data.get('local_file')),
+            'file_name': str(data.get('local_file')).split('/')[-1],
+        })
+        plain_message = strip_tags(html_message)
+
+        user._email_user('DDueruem File Upload', plain_message, html_message=html_message)
+
     def send_activation_link(self):
         """
         Send predefined activation email this user.
