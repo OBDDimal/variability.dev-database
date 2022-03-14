@@ -9,6 +9,7 @@ https://docs.djangoproject.com/en/3.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.2/ref/settings/
 """
+import logging
 import os
 import environ
 from pathlib import Path
@@ -183,6 +184,13 @@ EMAIL_PORT = env('EMAIL_PORT')
 # also used for user email activation (token) timeout and file confirmed time calculation
 PASSWORD_RESET_TIMEOUT_DAYS = 2
 # Customize Logging details: https://docs.djangoproject.com/en/4.0/howto/logging/
+if DEBUG:
+    # only print logger.debug(...) to console if DEBUG is active
+    # also includes logger.info(...)
+    logging.basicConfig(
+        level=logging.DEBUG,
+        format='%(asctime)s %(levelname)s %(message)s',
+    )
 LOGGING = {
     'version': 1,  # the dictConfig format version
     'disable_existing_loggers': False,  # retain the default loggers

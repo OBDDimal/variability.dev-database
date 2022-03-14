@@ -8,9 +8,8 @@ from pathlib import Path
 
 logger = logging.getLogger(__name__)
 work_dir = f'{Path(__file__).resolve().parent}{os.path.sep}newAnalysis'
-absolute_path = work_dir  # os.path.abspath('')
-report_path = f'{absolute_path}{os.path.sep}nreports'
-log_path = f'{absolute_path}{os.path.sep}nlogs'
+report_path = f'{work_dir}{os.path.sep}nreports'
+log_path = f'{work_dir}{os.path.sep}nlogs'
 client = docker.from_env()
 
 MAX_RAM = 32
@@ -18,7 +17,7 @@ MAX_CPU = 16
 
 
 # -----------------------------Code taken from 'deprecated' branch and slightly modified --------------------------
-class ContainerManager(threading.Thread):
+class MonitorContainerThread(threading.Thread):
     """
     Run container and write report to database when finished
     """
@@ -48,7 +47,7 @@ class ContainerManager(threading.Thread):
                     continue
                 self.running = False
                 # replace the containerManager thread
-                containerManagerThread = ContainerManager()
+                containerManagerThread = MonitorContainerThread()
                 return
             container = self.queued_containers[0]
             # get process to the container
@@ -125,7 +124,7 @@ class ContainerManager(threading.Thread):
         return self.running
 
 
-containerManagerThread = ContainerManager()
+containerManagerThread = MonitorContainerThread()
 
 
 def get_running_process_ids():
