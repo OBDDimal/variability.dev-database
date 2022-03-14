@@ -9,21 +9,19 @@ import isNumeric from '../../services/numbers.service';
 
 const API_URL = process.env.REACT_APP_DOMAIN;
 
-// Can't use enums because of iteration problems
-const license = ['CC BY - Mention', 'CC BY-NC - Mention - Non-commercial'];
-
 type Props = {};
 
 type State = {
   label: string;
   description?: string;
   file?: File;
-  license: string;
+  gottenLicenses: Array<{label: string; value: string}>;
   gottenTags: Array<{ label: string; value: string }>;
   gottenFiles: Array<{ value: number; label: string }>;
   gottenFamilies: Array<{ value: number; label: string }>;
   newVersionOf: string;
   featureFamily: string;
+  license: string;
   tags: string;
   loading: boolean;
   legalShare: boolean;
@@ -48,18 +46,20 @@ export default class FileCreate extends Component<Props, State> {
     this.getTags();
     this.getNewVersionOf();
     this.getFamilies();
+    this.getLicenses();
 
     this.state = {
       label: '',
       description: undefined,
       file: undefined,
-      license: license[0],
+      gottenLicenses: [],
       gottenTags: [],
       gottenFiles: [],
       gottenFamilies: [],
       tags: '',
       newVersionOf: '---',
       featureFamily: '---',
+      license: '',
       loading: false,
       legalShare: false,
       userData: false,
@@ -93,6 +93,18 @@ export default class FileCreate extends Component<Props, State> {
     });
   };
 
+  getLicenses = () => {
+    api.get(`${API_URL}licenses/`).then((response) => {
+      let licenses = response.data;
+      licenses = licenses.map((license: { id: number; label: string }) => ({
+        value: license.id,
+        label: license.label,
+      }));
+      this.setState({ gottenLicenses: licenses });
+      return licenses;
+    });
+  };
+
   getNewVersionOf = () => {
     api.get(`${API_URL}files/`).then((response) => {
       let files = response.data;
@@ -107,7 +119,7 @@ export default class FileCreate extends Component<Props, State> {
   getTagsWithTagId = (options: any) => options.map((option: any) => {
     let id = option.value;
 
-    if (!isNumeric(id)) {
+    if (!Number.isInteger(id)) {
       const newElement = this.state.gottenTags.find((element) => (element.label === option.value));
 
       if (newElement && newElement.value) {
@@ -122,9 +134,9 @@ export default class FileCreate extends Component<Props, State> {
   });
 
   onTagChange = (options: any) => {
-    if (!this.state.gottenTags.some((e) => options[0].label === e.label)) {
+    if (!this.state.gottenTags.some((e) => options[options.length - 1].label === e.label)) {
       api
-        .post(`${API_URL}tags/`, { label: options[0].label, description: '' })
+        .post(`${API_URL}tags/`, { label: options[options.length - 1].label, description: '' })
         .then(async () => {
           await this.getTags();
 
@@ -187,8 +199,6 @@ export default class FileCreate extends Component<Props, State> {
   };
 
   onNewFamilyChange = (option: any) => {
-    console.log(option);
-
     if (option.value === '') {
       this.setState({ newVersionOfSelection: true });
     } else {
@@ -217,17 +227,20 @@ export default class FileCreate extends Component<Props, State> {
   };
 
   onLicenseChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const localLicense = e.target as HTMLSelectElement;
-    this.setState({ license: localLicense.value });
+    const license = e.target as HTMLSelectElement;
+    this.setState({ license: license.value });
   };
 
   isReady = () => this.state.tags
+    && !(this.state.license === '---')
     && this.state.label
     && this.state.file
     && this.state.description
     && this.state.legalShare
     && this.state.userData
     && this.state.openSource
+    && this.state.license !== '---'
+    && this.state.license
     && !(this.state.featureFamily === '---' && this.state.newVersionOf === '---');
 
   onSubmit = (e: { preventDefault: () => void }) => {
@@ -240,6 +253,8 @@ export default class FileCreate extends Component<Props, State> {
       && this.state.legalShare
       && this.state.userData
       && this.state.openSource
+      && this.state.license !== '---'
+      && !(this.state.featureFamily === '---' && this.state.newVersionOf === '---')
     ) {
       this.setState({ loading: true });
       const data = new FormData();
@@ -318,18 +333,24 @@ export default class FileCreate extends Component<Props, State> {
             </Form.Group>
             <Form.Group className="mb-3">
               <Form.Label>License</Form.Label>
-              <Form.Select onChange={this.onLicenseChange}>
-                {license.map((key) => (
-                  <option key={key} value={key}>
-                    {key}
+              <Form.Select data-testid="license" onChange={this.onLicenseChange} defaultValue="---">
+                {this.state.gottenLicenses.map((key) => (
+                  <option key={key.value} value={key.value}>
+                    {key.value}
+                    :
+                    {key.label}
                   </option>
                 ))}
+                <option key="---" value="---">
+                  ---
+                </option>
               </Form.Select>
             </Form.Group>
             <Row>
               <Form.Group className="col-sm">
                 <Form.Label>New version of</Form.Label>
                 <Form.Select
+                  data-testid="version"
                   onChange={this.onNewVersionOfChange}
                   disabled={!this.state.newVersionOfSelection ?? undefined}
                   defaultValue="---"
@@ -347,7 +368,7 @@ export default class FileCreate extends Component<Props, State> {
                 </Form.Select>
               </Form.Group>
               <Form.Group className="col-sm">
-                <Form.Label>Feature model family</Form.Label>
+                <Form.Label htmlFor="families">Feature model family</Form.Label>
                 <CreatableSelect
                   isDisabled={!this.state.featureModelFamilySelection ?? undefined}
                   name="families"
@@ -357,7 +378,7 @@ export default class FileCreate extends Component<Props, State> {
                 />
               </Form.Group>
             </Row>
-            <Form.Group data-testid="tag-form" className="mb-3">
+            <Form.Group className="mb-3">
               <Form.Label htmlFor="tags">Tags</Form.Label>
               <CreatableSelect
                 isMulti

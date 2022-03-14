@@ -49,6 +49,9 @@ instance.interceptors.response.use(
         return instance(originalRequest);
       } catch (responseError) {
         // Refresh Token is also not valid anymore -> return to login
+        // Also save the previously surfed URL to relocate to when logged in
+        localStorage.setItem('previousURL', `${window.location.protocol}//${window.location.host}${window.location.pathname}${window.location.search}`);
+
         authService.logout();
         window.location.replace('/login');
         return Promise.reject(error);

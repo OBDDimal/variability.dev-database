@@ -71,11 +71,11 @@ jobs:
           path: ${{ env.pythonLocation }}
           key: ${{ env.pythonLocation }}-${{ hashFiles('requirements.txt') }}
           
-      - uses: actions/cache@v2
-        id: migration-cache
-        with:
-          path: ./**/migrations/*
-          key: migrationskey
+      #- uses: actions/cache@v2
+      #  id: migration-cache
+      #  with:
+      #    path: ./**/migrations/*
+      #    key: migrationskey
           
       - name: Download env
         uses: actions/download-artifact@v2
@@ -117,11 +117,11 @@ jobs:
           path: ${{ env.pythonLocation }}
           key: ${{ env.pythonLocation }}-${{ hashFiles('requirements.txt') }}
           
-      - uses: actions/cache@v2
-        id: migration-cache
-        with:
-          path: ./**/migrations/*
-          key: migrationskey
+      #- uses: actions/cache@v2
+      #  id: migration-cache
+      #  with:
+      #    path: ./**/migrations/*
+      #    key: migrationskey
           
       - name: Download env
         uses: actions/download-artifact@v2

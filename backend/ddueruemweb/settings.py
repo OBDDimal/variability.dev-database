@@ -180,7 +180,7 @@ EMAIL_PORT = env('EMAIL_PORT')
 # EMAIL_USE_TLS = True
 # EMAIL_USE_SSL = False
 
-# also used for user email activation (token) timeout calc
+# also used for user email activation (token) timeout and file confirmed time calculation
 PASSWORD_RESET_TIMEOUT_DAYS = 2
 # Customize Logging details: https://docs.djangoproject.com/en/4.0/howto/logging/
 LOGGING = {
