@@ -1,5 +1,4 @@
 from collections import OrderedDict
-from django.template.loader import render_to_string
 from django.utils import timezone, dateparse
 from datetime import timedelta
 from rest_framework.status import HTTP_405_METHOD_NOT_ALLOWED, HTTP_403_FORBIDDEN, HTTP_200_OK
@@ -7,7 +6,6 @@ from core.fileupload.models.family import Family
 from core.fileupload.models.tag import Tag
 from rest_framework import viewsets, permissions, mixins
 from rest_framework import status
-from django.utils.html import strip_tags
 from core.fileupload.models.file import File
 from core.fileupload.serializers import FilesSerializer, TagsSerializer, FamiliesSerializer, LicensesSerializer
 from django.core.exceptions import ObjectDoesNotExist
@@ -20,9 +18,7 @@ from rest_framework.mixins import CreateModelMixin
 from ddueruemweb.settings import PASSWORD_RESET_TIMEOUT_DAYS
 from .models.license import License
 from ..auth.tokens import decode_token_to_user
-from ..user.models import User
 import core.fileupload.githubmirror.github_manager as gm
-import datetime
 from multiprocessing import Process
 
 
@@ -51,10 +47,10 @@ class ConfirmFileUploadViewSet(GenericViewSet, CreateModelMixin):
                     raise BadSignature('File upload is already confirmed!')
                 file_from_db.is_confirmed = True
                 if not file_from_db.mirrored:
-                    start = datetime.datetime.now()
+                    # async start mirror. Details: https://docs.python.org/3/library/multiprocessing.html
                     mirror_process = Process(target=gm.mirror_to_github, args=(file_from_db,))
                     mirror_process.start()
-                    file_from_db.mirrored = file_from_db.mirrored
+                    file_from_db.mirrored = True
                 file_from_db.save()
                 return Response({'file': FilesSerializer(file_from_db).data}, HTTP_200_OK)
         except ObjectDoesNotExist as error:
