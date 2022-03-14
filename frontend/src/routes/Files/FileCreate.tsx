@@ -238,8 +238,8 @@ export default class FileCreate extends Component<Props, State> {
     && this.state.legalShare
     && this.state.userData
     && this.state.openSource
-		&& this.state.license !== '---'
-		&& this.state.license
+    && this.state.license !== '---'
+    && this.state.license
     && !(this.state.featureFamily === '---' && this.state.newVersionOf === '---');
 
   onSubmit = (e: { preventDefault: () => void }) => {
@@ -252,8 +252,8 @@ export default class FileCreate extends Component<Props, State> {
       && this.state.legalShare
       && this.state.userData
       && this.state.openSource
-			&& this.state.license !== '---'
-			&& !(this.state.featureFamily === '---' && this.state.newVersionOf === '---')
+      && this.state.license !== '---'
+      && !(this.state.featureFamily === '---' && this.state.newVersionOf === '---')
     ) {
       this.setState({ loading: true });
       const data = new FormData();
