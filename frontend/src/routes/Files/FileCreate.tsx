@@ -232,6 +232,7 @@ export default class FileCreate extends Component<Props, State> {
   };
 
   isReady = () => this.state.tags
+    && !(this.state.license === '---')
     && this.state.label
     && this.state.file
     && this.state.description
@@ -328,7 +329,7 @@ export default class FileCreate extends Component<Props, State> {
             </Form.Group>
             <Form.Group className="mb-3">
               <Form.Label>License</Form.Label>
-              <Form.Select onChange={this.onLicenseChange} defaultValue="---">
+              <Form.Select data-testid="license" onChange={this.onLicenseChange} defaultValue="---">
                 {this.state.gottenLicenses.map((key) => (
                   <option key={key.value} value={key.value}>
                     {key.value}
@@ -345,6 +346,7 @@ export default class FileCreate extends Component<Props, State> {
               <Form.Group className="col-sm">
                 <Form.Label>New version of</Form.Label>
                 <Form.Select
+                  data-testid="version"
                   onChange={this.onNewVersionOfChange}
                   disabled={!this.state.newVersionOfSelection ?? undefined}
                   defaultValue="---"
@@ -362,7 +364,7 @@ export default class FileCreate extends Component<Props, State> {
                 </Form.Select>
               </Form.Group>
               <Form.Group className="col-sm">
-                <Form.Label>Feature model family</Form.Label>
+                <Form.Label htmlFor="families">Feature model family</Form.Label>
                 <CreatableSelect
                   isDisabled={!this.state.featureModelFamilySelection ?? undefined}
                   name="families"
@@ -372,7 +374,7 @@ export default class FileCreate extends Component<Props, State> {
                 />
               </Form.Group>
             </Row>
-            <Form.Group data-testid="tag-form" className="mb-3">
+            <Form.Group className="mb-3">
               <Form.Label htmlFor="tags">Tags</Form.Label>
               <CreatableSelect
                 isMulti
