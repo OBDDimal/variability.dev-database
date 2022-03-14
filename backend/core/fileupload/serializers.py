@@ -56,6 +56,7 @@ class FilesSerializer(serializers.ModelSerializer):
         model = File
         fields = ['id', 'label', 'description', 'local_file', 'family', 'license', 'tags', 'owner', 'uploaded_at',
                   'new_version_of', 'transpiled_file']
+        read_only_field = ['mirrored', 'is_confirmed']
 
     def create(self, validated_data):
         """
