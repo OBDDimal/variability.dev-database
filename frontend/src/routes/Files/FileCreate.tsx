@@ -119,7 +119,7 @@ export default class FileCreate extends Component<Props, State> {
   getTagsWithTagId = (options: any) => options.map((option: any) => {
     let id = option.value;
 
-    if (!isNumeric(id)) {
+    if (!Number.isInteger(id)) {
       const newElement = this.state.gottenTags.find((element) => (element.label === option.value));
 
       if (newElement && newElement.value) {
