@@ -34,6 +34,7 @@ interface AuthChildren {
  */
 function RequireAuth({ children }: AuthChildren) {
   const authenticated = authService.getCurrentUser() ?? undefined;
+  localStorage.setItem('previousURL', `${window.location.protocol}//${window.location.host}${window.location.pathname}${window.location.search}`);
   return authenticated ? children : <Navigate to="/login" replace />;
 }
 
