@@ -113,7 +113,7 @@ class FileUploadViewSet(viewsets.ModelViewSet):
 class UnconfirmedFileViewSet(viewsets.ModelViewSet):
     queryset = File.objects.filter(is_confirmed=False)
     serializer_class = FilesSerializer
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [permissions.IsAuthenticated]
 
     def list(self, request, **kwargs):
         """
