@@ -20,7 +20,7 @@ jobs:
       - name: Checkout project
         uses: actions/checkout@v2
       - name: Deploy with rsync
-        run: rsync -avz ./ deployer@${{ secrets.SSH_HOST }}:/home/deployer/sili-telegram-bot/
+        run: rsync -avz ./ deployer@${{ secrets.SSH_HOST }}:/home/deployer/ddueruem-web/
       - name: executing remote ssh commands using ssh key
         uses: appleboy/ssh-action@master
         with:
