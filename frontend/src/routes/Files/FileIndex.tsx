@@ -53,7 +53,11 @@ export default class FileIndex extends Component<Props, State> {
         return labels.toString();
       },
     },
-    { title: 'Uploaded at', field: 'uploaded_at' },
+    {
+      title: 'Uploaded at',
+      field: 'uploaded_at',
+      formatter: (cell: any) => new Date(cell.getValue()).toLocaleString('en-US'),
+    },
     {
       headerSort: false,
       formatter: reactFormatter(

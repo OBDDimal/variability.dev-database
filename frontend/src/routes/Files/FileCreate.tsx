@@ -134,9 +134,9 @@ export default class FileCreate extends Component<Props, State> {
   });
 
   onTagChange = (options: any) => {
-    if (!this.state.gottenTags.some((e) => options[0].label === e.label)) {
+    if (!this.state.gottenTags.some((e) => options[options.length - 1].label === e.label)) {
       api
-        .post(`${API_URL}tags/`, { label: options[0].label, description: '' })
+        .post(`${API_URL}tags/`, { label: options[options.length - 1].label, description: '' })
         .then(async () => {
           await this.getTags();
 
