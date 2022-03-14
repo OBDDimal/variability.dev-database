@@ -48,7 +48,14 @@ export default class Login extends Component<Props, State> {
             timer: 1500,
             timerProgressBar: true,
           }).then(() => {
-            window.location.replace('/');
+            // Check for saved URLS, relocate and wipe them
+            const newUrl = localStorage.getItem('previousURL');
+            if (newUrl) {
+              localStorage.removeItem('previousURL');
+              window.location.replace(newUrl);
+            } else {
+              window.location.replace('/');
+            }
           });
         },
         (error) => {

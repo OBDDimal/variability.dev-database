@@ -15,9 +15,10 @@ import FileShow from './routes/Files/FileShow';
 import TagCreate from './routes/Tags/TagCreate';
 import FileEdit from './routes/Files/FileEdit';
 import RegisterConfirmation from './routes/RegisterConfirmation';
-import MirrorConfirmation from './routes/MirrorConfirmation';
 import FamilyCreate from './routes/Families/FamilyCreate';
 import FamilyIndex from './routes/Families/FamilyIndex';
+import FileUploadConfirmation from './routes/Files/FileUploadConfirmation';
+import FileDelete from './routes/Files/FileDelete';
 
 interface AuthChildren {
   // Maybe there is a way to define this
@@ -32,6 +33,7 @@ interface AuthChildren {
  */
 function RequireAuth({ children }: AuthChildren) {
   const authenticated = authService.getCurrentUser() ?? undefined;
+  localStorage.setItem('previousURL', `${window.location.protocol}//${window.location.host}${window.location.pathname}${window.location.search}`);
   return authenticated ? children : <Navigate to="/login" replace />;
 }
 
@@ -54,12 +56,12 @@ function App() {
           element={<RegisterConfirmation />}
         />
         <Route
-          path="/files/confirm/:confirmationCode"
-          element={(
-            <RequireAuth>
-              <MirrorConfirmation />
-            </RequireAuth>
-          )}
+          path="/files/uploaded/unconfirmed/confirm/:confirmationCode"
+          element={<FileUploadConfirmation />}
+        />
+        <Route
+          path="/files/uploaded/unconfirmed/:id"
+          element={<FileDelete />}
         />
         <Route
           path="/files/create"

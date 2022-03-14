@@ -79,6 +79,7 @@ class File(models.Model):
     new_version_of = models.ForeignKey('self', null=True, blank=True, on_delete=models.RESTRICT)
     transpiled_file = models.FileField(null=True, blank=True, upload_to=relative_upload_dir)
     mirrored = models.BooleanField(default=False)  # indicates if the file was already mirrored to GitHub
+    is_confirmed = models.BooleanField(default=False)  # indicates if the user confirmed the upload
 
     def __str__(self):
         # do not change that

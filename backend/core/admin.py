@@ -125,11 +125,12 @@ class FileAdmin(ModelAdmin):
     Class for defining the backend file admin panel and which data should be displayed.
     """
     model = File
-    list_display = ('id', 'new_version_of', 'mirrored', 'family', 'local_file', 'owner', 'uploaded_at')
+    list_display = ('id', 'new_version_of', 'is_confirmed_ex', 'mirrored', 'family', 'local_file', 'owner', 'uploaded_at')
     fieldsets = [
         (None, {'fields': ['owner']}),
         ('Information',
-         {'fields': ['label', 'description', 'mirrored', 'family', 'local_file', 'license', 'tags', 'new_version_of']}),
+         {'fields': ['label', 'description', 'is_confirmed', 'mirrored', 'family', 'local_file', 'license', 'tags',
+                     'new_version_of']}),
         ('Important dates', {'fields': ['uploaded_at']}),
         ('Transpiler Output', {'fields': ['transpiled_file']})
     ]
@@ -137,6 +138,20 @@ class FileAdmin(ModelAdmin):
     search_fields = ('owner', 'family')
     ordering = ('owner', 'uploaded_at')
     filter_horizontal = ()
+
+    @staticmethod
+    def is_confirmed_ex(file):
+        """
+        Extended is_confirmed attribute which either is true or returns
+        how much time is left (Hh:Mm:Ss) until the activation period ends.
+        :return:
+        """
+
+        delta = (file.uploaded_at + timedelta(days=PASSWORD_RESET_TIMEOUT_DAYS)) - timezone.now()
+        total_minute, second = divmod(delta.seconds, 60)
+        hour, minute = divmod(total_minute, 60)
+
+        return _boolean_icon(True) if file.is_confirmed else f"{delta.days}d{hour}h{minute:02}m{second:02}s"
 
 
 # Register your models here.
