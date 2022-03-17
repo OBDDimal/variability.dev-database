@@ -28,7 +28,8 @@ services:
       - "80:80"
       - "443:443"
     volumes:
-      - certbot:/var/www/certbot/:ro
+      - ./data/certbot/conf:/etc/letsencrypt
+      - ./data/certbot/www:/var/www/certbot
     depends_on:
       - backend
     command: nginx -g 'daemon off;'
@@ -36,7 +37,9 @@ services:
   certbot:
     image: certbot/certbot:latest
     volumes:
-      - certbot:/var/www/certbot/:rw  
+      - ./data/certbot/conf:/etc/letsencrypt
+      - ./data/certbot/www:/var/www/certbot
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
 
 volumes:
   postgresdata:
