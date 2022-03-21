@@ -96,9 +96,51 @@ export default function Dsgvo() {
           Schutz unserer technischen Infrastruktur speichern wir jedoch (ohne Personenbezug) Ihre
           Zugriffsdaten auf diese Website. Zu diesen Zugriffsdaten gehören z. B. die von Ihnen
           angeforderte Datei oder der Name Ihres Internet-Providers. Durch die Anonymisierung der
-          Daten sind Rückschlüsse auf Ihre Person nicht möglich.
+          Daten sind Rückschlüsse auf Ihre Person nicht möglich. Wir sammeln personenbezogene
+          Daten nur im Falle einer Registrierung auf unserer Website.
         </p>
-        <p>angeben welche, wie und warum personenbezogene daten...</p>
+        <p>Im Falle einer Registrierung sammeln wir folgende personendbezogene Daten:</p>
+        <p>
+          <table>
+            <tr>
+              <th>Art der Daten</th>
+              <th>Art der Sammlung</th>
+              <th>Zweck</th>
+            </tr>
+            <tr>
+              <td>E-Mail-Adresse</td>
+              <td>
+                Muss beim Registrieren auf der Website angegeben werden.
+              </td>
+              <td>
+                Zusendung der Authentifizierungs-Mail, zusendung weiterer Bestätigungs-Mails
+                beim Hochladen von Dateien.
+              </td>
+            </tr>
+            <tr>
+              <td>Datum der Registrierung</td>
+              <td>
+                Wird beim Registrieren auf der Website erfasst.
+              </td>
+              <td>
+                Rückverfolgung bei Missbrauch.
+              </td>
+            </tr>
+            <tr>
+              <td>Institut</td>
+              <td>
+                Wenn der Nutzer Mitglied eines Universitäts-Instituts ist,
+                kann er dies freiwillig angeben.
+              </td>
+              <td>Präsentation der eigenen Person</td>
+            </tr>
+            <tr>
+              <td>Mitarbeiter-Flag</td>
+              <td>Wenn der Nutzer Mitarbeiter der Website ist, wird dies angezeigt</td>
+              <td>Kennzeichnung von Administratoren</td>
+            </tr>
+          </table>
+        </p>
         <h2>Umgang mit Kontaktdaten</h2>
         <p>
           Nehmen Sie mit uns als Websitebetreiber durch die angebotenen Kontaktmöglichkeiten
