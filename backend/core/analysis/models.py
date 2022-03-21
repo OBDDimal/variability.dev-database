@@ -23,6 +23,8 @@ class DockerProcess(models.Model):
     resources = models.CharField(max_length=20, choices=RESOURCE_OPTIONS, default='4-1')
     owner = models.ForeignKey(User, on_delete=models.RESTRICT)
     library = models.CharField(max_length=25, choices=LIBRARIES)
+    working = models.BooleanField(default=False)  # indicates if there should be a process running this analysis
+
 
     class Meta:
         verbose_name = 'dockerProcess'
@@ -39,6 +41,7 @@ class Analysis(models.Model):
     """
     report = models.TextField(blank=True)
     order = models.TextField(blank=True)
+    # TODO: delete process field
     process = models.OneToOneField(DockerProcess, on_delete=models.CASCADE)
 
     class Meta:

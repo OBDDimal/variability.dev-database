@@ -160,7 +160,7 @@ class AnalysisAdmin(ModelAdmin):
     model = Analysis
     list_display = ('id', 'order', 'process')
     fieldsets = [
-        (None, {'fields': ['order', 'process']}),
+        (None, {'fields': ['process', 'order', 'report']}),
     ]
     search_fields = ('id', 'process')
     ordering = ('id',)

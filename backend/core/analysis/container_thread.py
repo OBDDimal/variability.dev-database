@@ -33,7 +33,6 @@ class MonitorContainerThread(threading.Thread):
         """
         Starts the process that actively monitors the running containers
         """
-        global containerManagerThread
         self.running = True
         while self.running:
             # check for any processes that might have ended
@@ -46,8 +45,6 @@ class MonitorContainerThread(threading.Thread):
                     time.sleep(1)
                     continue
                 self.running = False
-                # replace the containerManager thread
-                containerManagerThread = MonitorContainerThread()
                 return
             container = self.queued_containers[0]
             # get process to the container

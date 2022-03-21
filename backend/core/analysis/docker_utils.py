@@ -5,11 +5,10 @@ from transpiler.utils import write_to_file
 
 logger = logging.getLogger(__name__)
 
-# ------------------------------- Image Management -------------------------------
 client = docker.from_env()
 
 
-
+# ------------------------------- Image Management -------------------------------
 def create_or_reuse_image(work_dir):
     """
     Creates new ddueruem image or find present image.
@@ -46,7 +45,8 @@ def _create_image(work_dir):
     Returns created image
         Details:
     """
-    folder_content = os.listdir(work_dir)
+    # assure that work_dir always ends with path seperator
+    folder_content = os.listdir(work_dir if work_dir[-1] == os.path.sep else f"{work_dir}{os.path.sep}")
     if 'Dockerfile' not in folder_content:
         write_to_file(_create_dockerfile('ddueruem'), f'{work_dir}{os.path.sep}Dockerfile')
         logger.warning('Dockerfile created')
@@ -75,5 +75,16 @@ def _create_entrypoint():
     return '#!/bin/bash\n' \
            './ddueruem.py -h &&' \
            './setup.py buddy cudd &&' \
-           './ddueruem.py examples/sandwich.dimacs --lib buddy &&' \
            './ddueruem.py examples/berkeleydb.dimacs'
+
+
+# ------------------------------- Container Management -------------------------------
+def get_containers():
+    """
+    Returns a list of all present containers starting with 'p-'
+    """
+    out = []
+    for container in client.containers.list():
+        if container.name.startswith('p-'):
+            out.append(container)
+    return out
