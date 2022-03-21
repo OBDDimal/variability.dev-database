@@ -102,6 +102,15 @@ export default class SiteNavbar extends Component<Props, State> {
                 DSGVO
               </Nav.Link>
 
+              {this.state.loggedIn && (
+                <Nav.Link
+                  href="/families"
+                  className={this.props.url === '/families' ? 'active' : ''}
+                >
+                  Families
+                </Nav.Link>
+              )}
+
               <NavDropdown title="Dropdown" id="basic-nav-dropdown">
                 <NavDropdown.Item href="#action/3.1">Dummy</NavDropdown.Item>
                 <NavDropdown.Item href="#action/3.2">

@@ -6,7 +6,9 @@ from django.test import TestCase, Client
 from django.utils import timezone
 
 from core.fileupload.models import Tag
+from core.fileupload.models.family import Family
 from core.fileupload.models.file import File
+from core.fileupload.models.license import License
 from core.user.models import User
 from ddueruemweb.settings import PASSWORD_RESET_TIMEOUT_DAYS
 from core.jobs.hourly.check_user_activation_period_expired import Job as InactiveUserJob
@@ -182,7 +184,7 @@ class UserModelTests(TestCase):
     @staticmethod
     def create_user_with_date_joined(user_email, date_joined):
         """
-        Creates user with an given join date and returns the created user
+        Creates user with a given join date and returns the created user
         """
         expected_pw = "12345678!"
         user = User.objects.create_user(email=user_email, password=expected_pw)
@@ -260,9 +262,14 @@ class FileAdminPanelTests(TestCase):
     Tests for the admin panel. These tests require a working User and File model.
     """
     client = Client()
+    family_label = 'myTestFamily'
+    license_label = License._default_license
 
     def setUp(self):
-        User.objects.create_superuser(email="ad@m.in", password="12345678!")  # is_active per default
+        License.objects.create(label=self.license_label)  # there should only be 1 license present
+        o = User.objects.create_superuser(email="ad@m.in", password="12345678!")  # is_active per default
+        Family.objects.create(owner=o, label=self.family_label,
+                              description='some description')  # there should only be 1 family present
         self.assertIs(len(User.objects.all()), 1)
         # if login was successful, admin panel does a redirect (302) otherwise it returns 200
         self.assertEqual(self.client.post('/admin/login/?next=/admin/',
@@ -275,14 +282,17 @@ class FileAdminPanelTests(TestCase):
         expected_owner = User.objects.get(email='ad@m.in')
         expected_description = 'A binary test file'
         f.owner = expected_owner
+        f.family = Family.objects.get(pk=1)
         f.description = expected_description
-        f.license = File.LICENSES[0]
+        f.license = License.objects.get(pk=1)
         f.local_file = SimpleUploadedFile("a/pathTo/ulFile.txt", b"File content needs to be in bytes!")
         f.save()
         self.assertIs(len(File.objects.all()), 1)
         f = File.objects.get(id=1)
         self.assertEqual(f.owner, expected_owner)
         self.assertEqual(f.description, expected_description)
+        self.assertEqual(f.license.label, self.license_label)
+        self.assertEqual(f.family.label, self.family_label)
         # None because blank=True AND null=True
         self.assertIsNone(f.new_version_of)
         # how many tags are there ?
@@ -310,7 +320,8 @@ class FileAdminPanelTests(TestCase):
         f = File()
         f.owner = User.objects.get(email='ad@m.in')
         f.description = 'A binary test file'
-        f.license = File.LICENSES[0]
+        f.license = License.objects.get(pk=1)
+        f.family = Family.objects.get(pk=1)
         f.local_file = SimpleUploadedFile("a/pathTo/ulFile.txt", b"File content needs to be in bytes!")
         f.save()
         # try to change the only file which is uploaded
@@ -324,9 +335,14 @@ class TagAdminPanelTests(TestCase):
     Tests for the admin panel. These tests require a working User, File and Tag model.
     """
     client = Client()
+    family_label = 'myTestFamily'
+    license_label = License._default_license
 
     def setUp(self):
-        superuser = User.objects.create_superuser(email="ad@m.in", password="12345678!")  # is_active per default
+        License.objects.create(label=self.license_label)  # there should only be 1 license present
+        o = User.objects.create_superuser(email="ad@m.in", password="12345678!")  # is_active per default
+        Family.objects.create(owner=o, label=self.family_label,
+                              description='some description')  # there should only be 1 family present
         User.objects.create_staffuser(email="st@a.ff", password="12345678!")
         User.objects.create_user(email="du@s.er", password="12345678!")
         active_user = User.objects.create_user(email="au@s.er", password="12345678!")
@@ -393,7 +409,8 @@ class TagAdminPanelTests(TestCase):
         expected_description = 'A binary test file'
         f.owner = user
         f.description = expected_description
-        f.license = File.LICENSES[0]
+        f.license = License.objects.get(pk=1)
+        f.family = Family.objects.get(pk=1)
         f.local_file = SimpleUploadedFile("a/pathTo/ulFile.txt", b"File content needs to be in bytes!")
         f.save()
         self.assertIs(len(File.objects.all()), 1)

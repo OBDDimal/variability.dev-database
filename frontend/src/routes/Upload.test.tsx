@@ -54,7 +54,7 @@ describe('<FileCreate />', () => {
     expect(uploadButton.disabled).toBeTruthy();
   });
 
-  test('button should enable after label, description, file, legalShare, userData and openSource have been entered', async () => {
+  test('button should enable after label, description, file, license, newVersionOf, tags, legalShare, userData and openSource have been entered', async () => {
     mockedApi.get.mockResolvedValue(
       new Promise((resolve) => {
         const mockedResponse = {
@@ -86,6 +86,21 @@ describe('<FileCreate />', () => {
       target: { files: ['testfile content'] },
     });
 
+    // select license
+    const licenseFormSelect = await screen.findByTestId('license');
+    fireEvent.change(licenseFormSelect, {
+      target: { value: '1337' },
+    });
+
+    // select newVersionOf
+    const versionFormSelect = await screen.findByTestId('version');
+    fireEvent.change(versionFormSelect, {
+      target: { value: '1337' },
+    });
+
+    // click tags
+    await selectEvent.select(screen.getByLabelText('Tags'), 'testlabel');
+
     // click legal share checkbox
     const legalShareCheckbox = await screen.findByTestId('legal-share');
     fireEvent.click(legalShareCheckbox);
@@ -98,8 +113,64 @@ describe('<FileCreate />', () => {
     const openSourceCheckbox = await screen.findByTestId('open-source');
     fireEvent.click(openSourceCheckbox);
 
+    expect(uploadButton.disabled).toBeFalsy();
+  });
+
+  test('button should enable after label, description, file, license, family, tags, legalShare, userData and openSource have been entered', async () => {
+    mockedApi.get.mockResolvedValue(
+      new Promise((resolve) => {
+        const mockedResponse = {
+          data: [{ id: 1337, label: 'testlabel' }],
+        };
+        resolve(mockedResponse);
+      }),
+    );
+    render(<FileCreate />);
+
+    const uploadButton = screen.getByText(/Upload!/i) as HTMLButtonElement;
+    expect(uploadButton.disabled).toBeTruthy();
+
+    // type label
+    const labelFormControl = await screen.findByTestId('label');
+    fireEvent.change(labelFormControl, {
+      target: { value: 'test label' },
+    });
+
+    // type description
+    const descriptionFormControl = await screen.findByTestId('description');
+    fireEvent.change(descriptionFormControl, {
+      target: { value: 'test description' },
+    });
+
+    // select file
+    const fileUploadFormControl = await screen.findByTestId('file-upload');
+    fireEvent.change(fileUploadFormControl, {
+      target: { files: ['testfile content'] },
+    });
+
+    // select license
+    const licenseFormSelect = await screen.findByTestId('license');
+    fireEvent.change(licenseFormSelect, {
+      target: { value: '1337' },
+    });
+
+    // select feature model family
+    await selectEvent.select(screen.getByLabelText('Feature model family'), 'testlabel');
+
     // click tags
     await selectEvent.select(screen.getByLabelText('Tags'), 'testlabel');
+
+    // click legal share checkbox
+    const legalShareCheckbox = await screen.findByTestId('legal-share');
+    fireEvent.click(legalShareCheckbox);
+
+    // click user data checkbox
+    const userDataCheckbox = await screen.findByTestId('user-data');
+    fireEvent.click(userDataCheckbox);
+
+    // click open source checkbox
+    const openSourceCheckbox = await screen.findByTestId('open-source');
+    fireEvent.click(openSourceCheckbox);
 
     expect(uploadButton.disabled).toBeFalsy();
   });
@@ -207,6 +278,21 @@ describe('<FileCreate />', () => {
       target: { files: ['testfile content'] },
     });
 
+    // select license
+    const licenseFormSelect = await screen.findByTestId('license');
+    fireEvent.change(licenseFormSelect, {
+      target: { value: '1337' },
+    });
+
+    // select newVersionOf
+    const versionFormSelect = await screen.findByTestId('version');
+    fireEvent.change(versionFormSelect, {
+      target: { value: '1337' },
+    });
+
+    // click tags
+    await selectEvent.select(screen.getByLabelText('Tags'), 'testlabel');
+
     // click legal share checkbox
     const legalShareCheckbox = (await screen.findByTestId(
       'legal-share',
@@ -224,9 +310,6 @@ describe('<FileCreate />', () => {
       'open-source',
     )) as HTMLInputElement;
     fireEvent.click(openSourceCheckbox);
-
-    // click tags
-    await selectEvent.select(screen.getByLabelText('Tags'), 'testlabel');
 
     // click Upload!
     const uploadButton = screen.getByText(/Upload!/i) as HTMLButtonElement;
@@ -250,7 +333,7 @@ describe('<FileCreate />', () => {
 
     expect(mockedApi.get).toHaveBeenCalled();
     expect(mockedApi.post).toHaveBeenCalled();
-    //expect(MockedModal.fire).toHaveBeenCalled();
+    // expect(MockedModal.fire).toHaveBeenCalled();
 
     // TODO: Somehow reset the form after modal fire
     // expect(labelFormControl.value).toBeUndefined();

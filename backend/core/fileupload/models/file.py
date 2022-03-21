@@ -1,5 +1,7 @@
 from django.db import models
 from .tag import Tag
+from .family import Family
+from .license import License
 from core.user.models import User
 from django.core.files.base import ContentFile
 
@@ -11,6 +13,8 @@ class FileManager(models.Manager):
         """
         Saves a file with the given attributes to the database
         """
+        if kwargs.get('owner', None) is None:
+            raise TypeError('File owner is not set')
         if kwargs.get('label', None) is None:
             raise TypeError('File name is not set')
         if local_file is None:
@@ -18,9 +22,20 @@ class FileManager(models.Manager):
         tags = kwargs.pop('tags')
         if tags is None:
             raise TypeError('Tags is not set')
+        family = kwargs.get('family', None)
+        if family is None:
+            raise TypeError('Feature Model Family is not set')
+        else:
+            family_id = family.split(':')[0]
+            kwargs.update({'family': Family.objects.get(id=int(family_id))})
         # get file from id
         if kwargs.get('new_version_of', None) is not None:
             kwargs.update({'new_version_of': File.objects.get(id=kwargs['new_version_of'])})
+        # get license from id
+        if kwargs.get('license', None) is None:
+            raise TypeError('License not set!')
+        else:
+            kwargs.update({'license': License.objects.get(id=kwargs['license'])})
         file = self.model(**kwargs)
         file.save()
         file.tags.set(tags)
@@ -41,6 +56,7 @@ class FileManager(models.Manager):
         """
         Creates a file
         """
+
         return self.save_file(kwargs.pop('local_file'), **kwargs)
 
 
@@ -51,20 +67,20 @@ class File(models.Model):
     objects = FileManager()
 
     relative_upload_dir = 'files/'
-    LICENSES = [
-        ('CC BY - Mention', 'CC BY - Mention'),
-        ('CC BY-NC - Mention - Non-commercial', 'CC BY-NC - Mention - Non-commercial')
-    ]
 
     owner = models.ForeignKey(User, on_delete=models.RESTRICT)
+    family = models.ForeignKey(Family, on_delete=models.CASCADE)
     label = models.CharField(blank=False, max_length=255)
     description = models.TextField(blank=True)
     local_file = models.FileField(upload_to=relative_upload_dir)
     uploaded_at = models.DateTimeField(auto_now_add=True)
-    license = models.CharField(choices=LICENSES, max_length=255, default='CC BY - Mention')
+    license = models.ForeignKey(License, on_delete=models.CASCADE)
     tags = models.ManyToManyField(Tag)
     new_version_of = models.ForeignKey('self', null=True, blank=True, on_delete=models.RESTRICT)
     transpiled_file = models.FileField(null=True, blank=True, upload_to=relative_upload_dir)
+    mirrored = models.BooleanField(default=False)  # indicates if the file was already mirrored to GitHub
+    is_confirmed = models.BooleanField(default=False)  # indicates if the user confirmed the upload
 
     def __str__(self):
+        # do not change that
         return f"{self.id}"

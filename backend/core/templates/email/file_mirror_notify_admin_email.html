@@ -1,0 +1,8 @@
+{% extends "email/email_template.html" %}
+{% block greeting %}Hello,{% endblock %}
+{% block upper_text %}New file mirroring was started by {{ user }}. Click one the link to see the pull request {% endblock %}
+{% block call_to_action_link %}{{ link }}{% endblock %}
+{% block call_to_action_text %}Goto GitHub{% endblock %}
+{% block lower_text %}If clicking the button above doesn't work, you
+    can copy the plain link here: {{ link }} {% endblock %}
+{% block salutation %}Thank you for maintaining a high level of quality.{% endblock %}

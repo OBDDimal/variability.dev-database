@@ -81,6 +81,29 @@ class User(AbstractBaseUser, PermissionsMixin):
         verbose_name = 'user'
         verbose_name_plural = 'users'
 
+    def send_link_to_file(self, data):
+        """
+        Send predefined email with link to File after successful upload.
+        """
+        token = {
+            'file_id': data.get('id', None),
+            'timestamp': str(timezone.now()),
+            'purpose': 'upload_confirm',
+        }
+        protocol = 'http'
+        user = self
+        html_message = render_to_string('email/user_upload_email.html', {
+            'user': str(user.email),
+            'protocol': protocol,
+            'file_domain': str(data.get('local_file')),
+            'file_name': str(data.get('local_file')).split('/')[-1],
+            'confirm_link': f"{protocol}://{env('FRONTEND_URL')}/files/uploaded/unconfirmed/confirm/{encode_user_to_token(token)}",
+            'delete_link': f"{protocol}://{env('FRONTEND_URL')}/files/uploaded/unconfirmed/{data.get('id')}",
+        })
+        plain_message = strip_tags(html_message)
+
+        user._email_user('DDueruem File Upload', plain_message, html_message=html_message)
+
     def send_activation_link(self):
         """
         Send predefined activation email this user.

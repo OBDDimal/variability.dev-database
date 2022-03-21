@@ -16,6 +16,10 @@ import TagCreate from './routes/Tags/TagCreate';
 import FileEdit from './routes/Files/FileEdit';
 import RegisterConfirmation from './routes/RegisterConfirmation';
 import Dsgvo from './routes/Dsgvo';
+import FamilyCreate from './routes/Families/FamilyCreate';
+import FamilyIndex from './routes/Families/FamilyIndex';
+import FileUploadConfirmation from './routes/Files/FileUploadConfirmation';
+import FileDelete from './routes/Files/FileDelete';
 
 interface AuthChildren {
   // Maybe there is a way to define this
@@ -30,6 +34,7 @@ interface AuthChildren {
  */
 function RequireAuth({ children }: AuthChildren) {
   const authenticated = authService.getCurrentUser() ?? undefined;
+  localStorage.setItem('previousURL', `${window.location.protocol}//${window.location.host}${window.location.pathname}${window.location.search}`);
   return authenticated ? children : <Navigate to="/login" replace />;
 }
 
@@ -50,6 +55,14 @@ function App() {
         <Route
           path="/register/:confirmationCode"
           element={<RegisterConfirmation />}
+        />
+        <Route
+          path="/files/uploaded/unconfirmed/confirm/:confirmationCode"
+          element={<FileUploadConfirmation />}
+        />
+        <Route
+          path="/files/uploaded/unconfirmed/:id"
+          element={<FileDelete />}
         />
         <Route
           path="/files/create"
@@ -103,6 +116,22 @@ function App() {
           element={(
             <RequireAuth>
               <TagCreate />
+            </RequireAuth>
+          )}
+        />
+        <Route
+          path="/families"
+          element={(
+            <RequireAuth>
+              <FamilyIndex />
+            </RequireAuth>
+          )}
+        />
+        <Route
+          path="/families/create"
+          element={(
+            <RequireAuth>
+              <FamilyCreate />
             </RequireAuth>
           )}
         />
