@@ -1,3 +1,4 @@
+import logging
 from collections import OrderedDict
 from django.utils import timezone, dateparse
 from datetime import timedelta
@@ -15,12 +16,13 @@ from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 from rest_framework.permissions import AllowAny
 from rest_framework.mixins import CreateModelMixin
-from ddueruemweb.settings import PASSWORD_RESET_TIMEOUT_DAYS
+from ddueruemweb.settings import PASSWORD_RESET_TIMEOUT_DAYS, DEBUG
 from .models.license import License
 from ..auth.tokens import decode_token_to_user
 import core.fileupload.githubmirror.github_manager as gm
 from multiprocessing import Process
 
+logger = logging.getLogger(__name__)
 
 class ConfirmFileUploadViewSet(GenericViewSet, CreateModelMixin):
     """
@@ -47,10 +49,13 @@ class ConfirmFileUploadViewSet(GenericViewSet, CreateModelMixin):
                     raise BadSignature('File upload is already confirmed!')
                 file_from_db.is_confirmed = True
                 if not file_from_db.mirrored:
-                    # async start mirror. Details: https://docs.python.org/3/library/multiprocessing.html
-                    mirror_process = Process(target=gm.mirror_to_github, args=(file_from_db,))
-                    mirror_process.start()
-                    file_from_db.mirrored = True
+                    if not DEBUG:
+                        # async start mirror. Details: https://docs.python.org/3/library/multiprocessing.html
+                        mirror_process = Process(target=gm.mirror_to_github, args=(file_from_db,))
+                        mirror_process.start()
+                        file_from_db.mirrored = True
+                    else:
+                        logger.debug(" MODE: File mirror is disabled")
                 file_from_db.save()
                 return Response({'file': FilesSerializer(file_from_db).data}, HTTP_200_OK)
         except ObjectDoesNotExist as error:

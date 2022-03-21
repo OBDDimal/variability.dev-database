@@ -1,12 +1,17 @@
 import docker
-import threading
-import time
 import logging
-from .models import DockerProcess, Analysis
+
+from transpiler.utils import write_to_file
+from .container_thread import MonitorContainerThread
+from .models import DockerProcess
 import os
 from pathlib import Path
 
+logging.basicConfig(level=logging.DEBUG,
+                    format='[%(levelname)s] (%(threadName)-10s) %(message)s',
+                    )
 logger = logging.getLogger(__name__)
+
 work_dir = f'{Path(__file__).resolve().parent}{os.path.sep}newAnalysis'
 report_path = f'{work_dir}{os.path.sep}nreports'
 log_path = f'{work_dir}{os.path.sep}nlogs'
@@ -14,117 +19,31 @@ client = docker.from_env()
 
 MAX_RAM = 32
 MAX_CPU = 16
-
-
-# -----------------------------Code taken from 'deprecated' branch and slightly modified --------------------------
-class MonitorContainerThread(threading.Thread):
-    """
-    Run container and write report to database when finished
-    """
-
-    def __init__(self):
-        threading.Thread.__init__(self)
-        self.running = False
-        self.queued_containers = []
-        # Note: only stores the process ids, not the actual containers
-        self.started_containers = []
-
-    def run(self):
-        """
-        Starts the process that actively monitors the running containers
-        """
-        global containerManagerThread
-        self.running = True
-        while self.running:
-            # check for any processes that might have ended
-            print('running')
-            self.update_finished_processes()
-            # stop the thread if there are no more processes to queue
-            if len(self.queued_containers) == 0:
-                # but only if all started processes already finished
-                if len(self.started_containers) > 0:
-                    time.sleep(1)
-                    continue
-                self.running = False
-                # replace the containerManager thread
-                containerManagerThread = MonitorContainerThread()
-                return
-            container = self.queued_containers[0]
-            # get process to the container
-            container_id = int(container.name.split('-')[1])
-            process = DockerProcess.objects.get(pk=container_id)
-            if start_process(container, process):
-                self.queued_containers = self.queued_containers[1:]
-            else:
-                # wait a second then check again
-                time.sleep(1)
-
-    def update_finished_processes(self):
-        """
-        Checks the output directories for output files of running processes,
-        and if all of them are available, adds them to the
-        database and confirms that the process was stopped
-        """
-        # dictionary to keep track of all new files
-        print('update_finished')
-        new_analysis = dict([(id, {'report': '', 'order': '', 'changed': False})
-                             for id in self.started_containers])
-        # all files in the output directory
-        reports = [file for file in os.listdir(
-            report_path) if os.path.isfile(f'{report_path}/{file}')]
-        for report in reports:
-            # check if the file name is valid
-            if '-' not in report or '.' not in report:
-                continue
-
-            # get process id
-            id = report.split('-')[0]
-            if not id.isdigit():
-                continue
-            id = int(id)
-            # check if the process with that id is currently running
-            if id in self.started_containers:
-                file_ending = report.split('.')[-1]
-                if file_ending == 'order':
-                    new_analysis[id]['order'] = report
-                    new_analysis[id]['changed'] = True
-                else:
-                    new_analysis[id]['report'] = report
-                    new_analysis[id]['changed'] = True
-        # check for every element in the dictionary if both expected files were found
-        for id in new_analysis:
-            analysis_data = new_analysis[id]
-            if not analysis_data['changed'] or analysis_data['report'] == '' or analysis_data['order'] == '':
-                continue
-            # update finished process
-            self.started_containers.remove(id)
-            process = DockerProcess.objects.filter(id=id)
-            # check if there exists a matching process object
-            if len(process) == 0:
-                continue
-            process = process.first()
-
-            def get_file_content(path):
-                """Reads an entire file and returns its content as a UTF-8 string"""
-                if os.path.exists(path):
-                    with open(path, 'r', encoding='utf-8') as file:
-                        return file.read()
-                else:
-                    return ''
-
-            order_content = get_file_content(
-                report_path + '/' + analysis_data['order'])
-            report_content = get_file_content(
-                report_path + '/' + analysis_data['report'])
-            # save finished object to the database
-            Analysis.objects.create(
-                process=process, report=report_content, order=order_content).save()
-
-    def is_started(self):
-        return self.running
-
-
 containerManagerThread = MonitorContainerThread()
+
+
+def create_workspace(process, absolut_path):
+    """
+    Create relevant folders for analysis
+    of a Feature Model.
+    Generated structure:
+    file_id:file_label
+        logs/
+        reports/
+        file/
+
+    Args:
+        absolut_path path to folder where analysis folders are stored. Ending with no / or \
+    """
+    print(absolut_path)
+    ws_name = f"{process.file_to_analyse.id}_{process.file_to_analyse.label}"
+    ws_dir = f"{absolut_path}{os.pathsep}{ws_name}"
+    # create if not exist
+    Path(ws_dir).mkdir(parents=True, exist_ok=True)
+    Path(f"{ws_dir}{os.pathsep}logs").mkdir(parents=True, exist_ok=True)
+    Path(f"{ws_dir}{os.pathsep}reports").mkdir(parents=True, exist_ok=True)
+    Path(f"{ws_dir}{os.pathsep}files").mkdir(parents=True, exist_ok=True)
+    return ws_dir
 
 
 def get_running_process_ids():
@@ -135,9 +54,10 @@ def get_running_process_ids():
     return containerManagerThread.started_containers
 
 
-def create_container(process):
+def create_container(process, wdir):
     """
     Creates a new Docker Container from the specified image
+    and creates all files and folders necessary for the analysis.
 
     Args:
         process: The process the container is based on
@@ -146,20 +66,22 @@ def create_container(process):
         The created container. The container has to be started manually
     """
     # copy selected file into /files directory
+    # write file to analyse in folder
+    with process.file_to_analyse.open('r') as f:
+        write_to_file(f.readlines(), f'{wdir}{os.pathsep}files{os.pathsep}fileToAnalyse.xml')
     file = process.file_to_analyse
     repo_name = 'ddueruem'
     ram, cpu = get_ram_and_cpu(process)
     container = client.containers.create(
         'ddueruem:latest',  # tag of image to use
-        # command='./entrypoint.sh',
         detach=True,
         cpu_count=cpu,
         mem_limit=f'{ram}g',
         name=f'p-{process.id}',
         volumes={
-            log_path: {'bind': '/ddueruem/_log', 'mode': 'rw'},
-            report_path: {'bind': '/ddueruem/_reports', 'mode': 'rw'},
-            # f'{absolute_path}/../ddueruem/files': {'bind': '/ddueruem/files', 'mode': 'rw'},
+            f"{wdir}{os.pathsep}logs": {'bind': '/ddueruem/_log', 'mode': 'rw'},
+            f"{wdir}{os.pathsep}reports": {'bind': '/ddueruem/_reports', 'mode': 'rw'},
+            f"{wdir}{os.pathsep}files": {'bind': '/ddueruem/files', 'mode': 'rw'},
         },
     )
     return container
@@ -177,14 +99,15 @@ def get_ram_and_cpu(process):
     return int(resources[0]), int(resources[1])
 
 
-def start_or_queue_process(process):
+def start_or_queue_process(process, path_to_wdir):
     """
     Creates a new docker container based on the database process
 
     If there are enough resources available to start the container, it
     """
+    wdir = create_workspace(process, path_to_wdir)
     ram, cpu = get_ram_and_cpu(process)
-    container = create_container(process)
+    container = create_container(process, wdir)
     print(ram, cpu, f'p-{process.id}', process.file_to_analyse, process.library)
     if not start_process(container, process):
         containerManagerThread.queued_containers.append((container, process))

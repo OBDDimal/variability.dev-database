@@ -32,7 +32,9 @@ class DockerProcessesViewSet(viewsets.ModelViewSet):
         # serializer.save(owner=self.request.user)
         dp_from_db = serializer.save(owner=User.objects.get(pk=1))
         logger.info('starting docker container...')
-        work_dir = f'{Path(__file__).resolve().parent}{os.path.sep}newAnalysis'
+        # should be /../ddueruem-web
+        work_dir = f'{Path(__file__).resolve().parent.parent.parent.parent}'
+        print(work_dir)
         logger.info('Deleting image ...')
         print(_delete_image())
         logger.info('done!')
@@ -40,5 +42,5 @@ class DockerProcessesViewSet(viewsets.ModelViewSet):
         create_or_reuse_image(work_dir)
         logger.info('done!')
         logger.info('Start Docker process ...')
-        start_or_queue_process(dp_from_db)
+        start_or_queue_process(dp_from_db, work_dir)
         logger.info('done!')
