@@ -175,6 +175,8 @@ def start_process(new_container, process, work_dir):
         new_container.start()
         # start monitoring progress
         monitor = Process(target=check_for_finished_container, args=(process, work_dir))
+        process.working = True
+        process.save()
         monitor.start()
         # containerManagerThread.started_containers.append(process.id)
         # make sure the manager thread is running

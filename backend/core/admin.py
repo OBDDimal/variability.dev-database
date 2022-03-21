@@ -73,6 +73,7 @@ class UserAdmin(BaseUserAdmin):
 
         return _boolean_icon(True) if user.is_active else f"{delta.days}d{hour}h{minute:02}m{second:02}s"
 
+
 class LicenseAdmin(ModelAdmin):
     """
     Class for defining the backend License admin panel.
@@ -125,7 +126,8 @@ class FileAdmin(ModelAdmin):
     Class for defining the backend file admin panel and which data should be displayed.
     """
     model = File
-    list_display = ('id', 'new_version_of', 'is_confirmed_ex', 'mirrored', 'family', 'local_file', 'owner', 'uploaded_at')
+    list_display = (
+    'id', 'new_version_of', 'is_confirmed_ex', 'mirrored', 'family', 'local_file', 'owner', 'uploaded_at')
     fieldsets = [
         (None, {'fields': ['owner']}),
         ('Information',
@@ -153,6 +155,7 @@ class FileAdmin(ModelAdmin):
 
         return _boolean_icon(True) if file.is_confirmed else f"{delta.days}d{hour}h{minute:02}m{second:02}s"
 
+
 class AnalysisAdmin(ModelAdmin):
     """
     Class for defining the backend Analysis admin panel.
@@ -172,9 +175,9 @@ class DockerProcessAdmin(ModelAdmin):
     Class for defining the backend DockerProcess admin panel.
     """
     model = DockerProcess
-    list_display = ('id', 'owner', 'library')
+    list_display = ('id', 'working', 'owner', 'library')
     fieldsets = [
-        (None, {'fields': ['owner', 'file_to_analyse', 'resources', 'library']}),
+        (None, {'fields': ['owner', 'working', 'file_to_analyse', 'resources', 'library']}),
     ]
     search_fields = ('id', 'owner', 'library')
     ordering = ('id',)
