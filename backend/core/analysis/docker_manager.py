@@ -1,25 +1,19 @@
 import time
-
 import docker
 import logging
-
 from transpiler.utils import write_to_file
-from .container_thread import MonitorContainerThread
 from .docker_utils import _delete_image, create_or_reuse_image, get_containers
 from .models import DockerProcess, Analysis
 import os
 from pathlib import Path
 from multiprocessing import Process
 
-logging.basicConfig(level=logging.INFO,
-                    format='[%(levelname)s] (%(threadName)-10s) %(message)s',
-                    )
+logging.basicConfig(level=logging.INFO, format='[%(levelname)s] (%(threadName)-10s) %(message)s', )
 logger = logging.getLogger(__name__)
 client = docker.from_env()
 
 MAX_RAM = 32
 MAX_CPU = 16
-containerManagerThread = MonitorContainerThread()
 
 
 def create_workspace(wdir):
@@ -42,15 +36,6 @@ def create_workspace(wdir):
     Path(f"{wdir}{os.path.sep}reports").mkdir(parents=True, exist_ok=True)
     Path(f"{wdir}{os.path.sep}files").mkdir(parents=True, exist_ok=True)
     pass
-
-
-def get_running_process_ids():
-    """
-    Returns:
-        A list of ids of all started container processes
-    """
-    return containerManagerThread.started_containers
-
 
 def create_container(process, work_dir):
     """
@@ -164,6 +149,7 @@ def start_process(new_container, process, work_dir):
     Args:
         new_container: The container object that should be started
         process: The Process object containing meta information to the container
+        work_dir: path to workspace ending with NO / or \
 
     Returns:
         True if a new container was started successfully
