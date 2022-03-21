@@ -2,6 +2,28 @@ version: "3"
 
 services:
 
+  reverse-proxy:
+    # The official v2 Traefik docker image
+    image: traefik:v2.6
+    # Enables the web UI and tells Traefik to listen to docker
+    command:
+    #- "--log.level=DEBUG"
+    - "--api.insecure=true"
+    - "--providers.docker=true"
+    - "--providers.docker.exposedbydefault=false"
+    - "--entrypoints.websecure.address=:443"
+    - "--certificatesresolvers.myresolver.acme.tlschallenge=true"
+    #- "--certificatesresolvers.myresolver.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory"
+    - "--certificatesresolvers.myresolver.acme.email=tobias.hess@uni-ulm.com"
+    - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
+    ports:
+      - "443:443"
+      # The Web UI (enabled by --api.insecure=true)
+      - "8080:8080"
+    volumes:
+      # So that Traefik can listen to the Docker events
+      - /var/run/docker.sock:/var/run/docker.sock
+
   db:
     image: postgres
     restart: always
@@ -24,21 +46,17 @@ services:
 
   frontend:
     build: ./frontend
-    ports:
-      - "80:80"
-      - "443:443"
     volumes:
       - certbot:/var/www/certbot/:ro
     depends_on:
       - backend
     command: nginx -g 'daemon off;'
-
-  certbot:
-    image: certbot/certbot:latest
-    volumes:
-      - certbot:/var/www/certbot/:rw  
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.whoami.rule=Host(`vm-154-210.bwcloud.uni-ulm.de`)"
+      - "traefik.http.routers.whoami.entrypoints=websecure"
+      - "traefik.http.routers.whoami.tls.certresolver=myresolver"
 
 volumes:
   postgresdata:
   djangomedia:
-  certbot:
