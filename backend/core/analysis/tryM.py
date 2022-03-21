@@ -13,8 +13,12 @@ logging.basicConfig(level=logging.DEBUG,
 logger = logging.getLogger(__name__)
 
 
-class MonitorContainerWorker(Thread):
+# -------------------WIP: Advanced Docker Manager--------------------------
 
+class MonitorContainerWorker(Thread):
+    """
+    instead of checking if container is running, this thread checks if the size of the files in reports folder increased over time
+   """
     def __init__(self, work_dir, process):
         Thread.__init__(self)
         self.running = False
@@ -52,7 +56,6 @@ class MonitorContainerWorker(Thread):
             process_containers = get_containers()
             logger.debug(process_containers)
             self.check_reports()
-
 
     def __str__(self):
         # do not change that
