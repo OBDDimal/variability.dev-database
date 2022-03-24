@@ -21,10 +21,10 @@ def create_workspace(wdir):
     Create relevant folders for analysis
     of a Feature Model.
     Generated structure:
-    file_id:file_label
+    <wdir>:
         logs/
         reports/
-        file/
+        files/
 
     Args:
         absolut_path path to folder where analysis folders are stored. Ending with no / or \
