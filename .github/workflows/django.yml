@@ -178,7 +178,7 @@ jobs:
       run: |
         slashreplace=$(echo "${{ github.ref }}" | sed -r 's/[\/]+/\\\//g') \
           minusreplace=$(echo "$slashreplace" | sed -r 's/[\-]+/\\\-/g') \
-          sed -ir "s/^[#]*\s*sonar\.projectKey=.*/sonar\.projectKey=ddueruem\-web\-backend\-$minusreplace/" sonar-project.properties
+          sed -ir "s/^[#]*\s*sonar\.projectKey=.*/sonar\.projectKey=ddueruem\-web\-backend\-$minusreplace/" ${{ github.workspace }}/backend/sonar-project.properties
         
     - name: SonarQube Scan
       uses: sonarsource/sonarqube-scan-action@master
