@@ -175,7 +175,7 @@ jobs:
         path: ${{ github.workspace }}/backend
         
     - name: Set Sonarqube Project Name
-      run: |
+      run: >
         slashreplace=$(echo "${{ github.ref }}" | sed -r 's/[\/]+/\\\//g') \
           minusreplace=$(echo "$slashreplace" | sed -r 's/[\-]+/\\\-/g') \
           sed -ir "s/^[#]*\s*sonar\.projectKey=.*/sonar\.projectKey=ddueruem\-web\-backend\-$minusreplace/" ${{ github.workspace }}/backend/sonar-project.properties

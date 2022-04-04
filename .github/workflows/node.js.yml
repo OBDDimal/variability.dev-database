@@ -166,7 +166,7 @@ jobs:
         sed -i 's/\/home\/runner\/work\/ddueruem-web\/ddueruem-web\//\/github\/workspace\//g' sonar-report.xml
         
     - name: Set Sonarqube Project Name
-      run: |
+      run: >
         slashreplace=$(echo "${{ github.ref }}" | sed -r 's/[\/]+/\\\//g') \
           minusreplace=$(echo "$slashreplace" | sed -r 's/[\-]+/\\\-/g') \
           sed -ir "s/^[#]*\s*sonar\.projectKey=.*/sonar\.projectKey=ddueruem\-web\-fronted\-$minusreplace/" ${{ github.workspace }}/frontend/sonar-project.properties
