@@ -42,12 +42,17 @@ services:
   backend:
     build: ./backend
     ports:
-      - "8000:8000"
+      - "80:8000"
     volumes:
       - djangomedia:/api/media
     command: ./entrypoint.sh
     depends_on:
       - db
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.frontend.rule=Host(`doener.tobiasbetz.de`)"
+      - "traefik.http.routers.frontend.entrypoints=websecure"
+      - "traefik.http.routers.frontend.tls.certresolver=myresolver"
 
   frontend:
     build: ./frontend
