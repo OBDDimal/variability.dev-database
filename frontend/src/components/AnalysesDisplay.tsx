@@ -38,8 +38,12 @@ export default function AnalysesDisplay(props: Props) {
 
   function onClickHandler() {
     const rowDataId = props.cell?._cell.row.data.id;
-    api.post(`${API_URL}docker/`, { file_to_analyse: rowDataId, resources: '4-1', library: 'buddy' })
-      .then(() => window.location.reload());
+    if (props.cell?._cell.value === 'Not started') {
+      api.post(`${API_URL}docker/`, { file_to_analyse: rowDataId, resources: '4-1', library: 'buddy' })
+        .then(() => window.location.reload());
+    } else if (props.cell?._cell.value === 'Analyzed') {
+      // TODO: Do something fancy to display analysis
+    }
   }
 
   return (
