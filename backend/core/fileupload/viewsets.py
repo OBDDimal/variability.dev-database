@@ -25,6 +25,7 @@ from multiprocessing import Process
 
 logger = logging.getLogger(__name__)
 
+
 class ConfirmFileUploadViewSet(GenericViewSet, CreateModelMixin):
     """
     This view is called when the user tries to confirm  a file, via a link which contains a token.
@@ -122,7 +123,7 @@ class UnconfirmedFileViewSet(viewsets.ModelViewSet):
         indicating if the user which has sent the request is the owner.
         Returns only the unconfirmed files of a user.
         """
-        queryset = self.queryset
+        queryset = File.objects.filter(is_confirmed=False)
         files = FilesSerializer(queryset, many=True).data
         print(files)
         changed_files = []
@@ -189,14 +190,13 @@ class ConfirmedFileViewSet(viewsets.ModelViewSet):
                 return "Not started"
 
         return "Permission denied"
-        
 
     def list(self, request, **kwargs):
         """
         Replace email address of file owner with True or False,
         indicating if the user which has sent the request is the owner.
         """
-        queryset = self.queryset
+        queryset = File.objects.filter(is_confirmed=True)
         files = FilesSerializer(queryset, many=True).data
         changed_files = []
         for file in files:
