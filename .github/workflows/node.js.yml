@@ -5,9 +5,9 @@ name: Node.js CI
 
 on:
   push:
-    branches: [dev]
+    branches: [dev, issue-116-sonarqube-per-branch]
   pull_request:
-    branches: [dev]
+    branches: [dev, issue-116-sonarqube-per-branch]
 
 jobs:
 
@@ -164,6 +164,10 @@ jobs:
       run: |
         sed -i 's/\/home\/runner\/work\/ddueruem-web\/ddueruem-web\//\/github\/workspace\//g' coverage/lcov.info
         sed -i 's/\/home\/runner\/work\/ddueruem-web\/ddueruem-web\//\/github\/workspace\//g' sonar-report.xml
+        
+    - name: Set Sonarqube Project Name
+      run: |
+        sed -ir "s/^[#]*\s*sonar.projectKey=.*/sonar.projectKey=ddueruem-web-frontend-${{ github.ref }}/" sonar-project.properties
         
     - name: SonarQube Scan
       uses: sonarsource/sonarqube-scan-action@master
