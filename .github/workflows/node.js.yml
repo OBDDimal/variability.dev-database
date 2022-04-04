@@ -167,9 +167,9 @@ jobs:
         
     - name: Set Sonarqube Project Name
       run: |
-        slashreplace=$(echo "${{ github.ref }}" | sed -r 's/[\/]+/\\\//g')
-        minusreplace=$(echo "$slashreplace" | sed -r 's/[\-]+/\\\-/g')
-        sed -ir "s/^[#]*\s*sonar\.projectKey=.*/sonar\.projectKey=ddueruem\-web\-fronted\-$minusreplace/" sonar-project.properties
+        slashreplace=$(echo "${{ github.ref }}" | sed -r 's/[\/]+/\\\//g') \
+          minusreplace=$(echo "$slashreplace" | sed -r 's/[\-]+/\\\-/g') \
+          sed -ir "s/^[#]*\s*sonar\.projectKey=.*/sonar\.projectKey=ddueruem\-web\-fronted\-$minusreplace/" sonar-project.properties
         # sed -i "s/\(sonar\.projectKey=\).*\$/\1${ddueruem\-web\-frontend\-${{ github.ref }}}/" sonar-project.properties
         # sed -ir "s/^[#]*\s*sonar\.projectKey=.*/sonar\.projectKey=ddueruem-web-frontend-${{ github.ref }}/" sonar-project.properties
         
