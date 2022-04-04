@@ -4,6 +4,7 @@ from django.utils import timezone
 from datetime import timedelta
 from django.contrib.admin import ModelAdmin
 
+from core.analysis.models import Analysis, DockerProcess
 from core.fileupload.models.family import Family
 from core.fileupload.models.license import License
 from core.fileupload.models.tag import Tag
@@ -125,7 +126,8 @@ class FileAdmin(ModelAdmin):
     Class for defining the backend file admin panel and which data should be displayed.
     """
     model = File
-    list_display = ('id', 'new_version_of', 'is_confirmed_ex', 'mirrored', 'family', 'local_file', 'owner', 'uploaded_at')
+    list_display = (
+    'id', 'new_version_of', 'is_confirmed_ex', 'mirrored', 'family', 'local_file', 'owner', 'uploaded_at')
     fieldsets = [
         (None, {'fields': ['owner']}),
         ('Information',
@@ -154,9 +156,39 @@ class FileAdmin(ModelAdmin):
         return _boolean_icon(True) if file.is_confirmed else f"{delta.days}d{hour}h{minute:02}m{second:02}s"
 
 
+class AnalysisAdmin(ModelAdmin):
+    """
+    Class for defining the backend Analysis admin panel.
+    """
+    model = Analysis
+    list_display = ('id', 'order', 'process')
+    fieldsets = [
+        (None, {'fields': ['process', 'order', 'report']}),
+    ]
+    search_fields = ('id', 'process')
+    ordering = ('id',)
+    filter_horizontal = ()
+
+
+class DockerProcessAdmin(ModelAdmin):
+    """
+    Class for defining the backend DockerProcess admin panel.
+    """
+    model = DockerProcess
+    list_display = ('id', 'working', 'owner', 'library')
+    fieldsets = [
+        (None, {'fields': ['owner', 'working', 'file_to_analyse', 'resources', 'library']}),
+    ]
+    search_fields = ('id', 'owner', 'library')
+    ordering = ('id',)
+    filter_horizontal = ()
+
+
 # Register your models here.
 admin.site.register(License, LicenseAdmin)
 admin.site.register(User, UserAdmin)
 admin.site.register(Family, FamilyAdmin)
 admin.site.register(Tag, TagAdmin)
 admin.site.register(File, FileAdmin)
+admin.site.register(Analysis, AnalysisAdmin)
+admin.site.register(DockerProcess, DockerProcessAdmin)

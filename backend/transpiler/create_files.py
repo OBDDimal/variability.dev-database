@@ -3,8 +3,7 @@ import json
 from pathlib import Path
 import os
 from .g6_transpiler import xml_to_g6
-from utils import write_to_file
-from xml_parser import xml_to_json
+from core.utils import write_to_file
 
 # ---------------------------------MAIN----------------------------------------------
 

@@ -2,11 +2,14 @@ import React, { Component } from 'react';
 import { reactFormatter, ReactTabulator } from 'react-tabulator';
 import 'react-tabulator/lib/styles.css'; // default theme
 import 'react-tabulator/css/bootstrap/tabulator_bootstrap.min.css';
-import { faEye, faPen, faPlus } from '@fortawesome/free-solid-svg-icons';
+import {
+  faEye, faPen, faPlus,
+} from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Button, Container, Row } from 'react-bootstrap';
 import api from '../../services/api.service';
 import TableButton from '../../components/TableButton';
+import AnalysesDisplay from '../../components/AnalysesDisplay';
 
 const API_URL = process.env.REACT_APP_DOMAIN;
 
@@ -66,6 +69,15 @@ export default class FileIndex extends Component<Props, State> {
       width: 60,
       hozAlign: 'center',
     },
+    {
+      headerSort: false,
+      field: 'analysis',
+      formatter: reactFormatter(
+        <AnalysesDisplay />,
+      ),
+      width: 60,
+      hozAlign: 'center',
+    },
   ];
 
   constructor(props: Props | Readonly<Props>) {
@@ -94,7 +106,7 @@ export default class FileIndex extends Component<Props, State> {
   }
 
   getFiles = () => {
-    api.get(`${API_URL}files/`).then((response) => {
+    api.get(`${API_URL}files/uploaded/confirmed/`).then((response) => {
       this.setState({ files: response.data });
     });
   };

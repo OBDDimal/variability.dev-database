@@ -1,13 +1,13 @@
+import logging
 from collections import OrderedDict
-from django.template.loader import render_to_string
 from django.utils import timezone, dateparse
 from datetime import timedelta
+from core.analysis.models import DockerProcess, Analysis
 from rest_framework.status import HTTP_405_METHOD_NOT_ALLOWED, HTTP_403_FORBIDDEN, HTTP_200_OK
 from core.fileupload.models.family import Family
 from core.fileupload.models.tag import Tag
 from rest_framework import viewsets, permissions, mixins
 from rest_framework import status
-from django.utils.html import strip_tags
 from core.fileupload.models.file import File
 from core.fileupload.serializers import FilesSerializer, TagsSerializer, FamiliesSerializer, LicensesSerializer
 from django.core.exceptions import ObjectDoesNotExist
@@ -17,13 +17,13 @@ from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 from rest_framework.permissions import AllowAny
 from rest_framework.mixins import CreateModelMixin
-from ddueruemweb.settings import PASSWORD_RESET_TIMEOUT_DAYS
+from ddueruemweb.settings import PASSWORD_RESET_TIMEOUT_DAYS, DEBUG
 from .models.license import License
 from ..auth.tokens import decode_token_to_user
-from ..user.models import User
 import core.fileupload.githubmirror.github_manager as gm
-import datetime
 from multiprocessing import Process
+
+logger = logging.getLogger(__name__)
 
 
 class ConfirmFileUploadViewSet(GenericViewSet, CreateModelMixin):
@@ -51,10 +51,13 @@ class ConfirmFileUploadViewSet(GenericViewSet, CreateModelMixin):
                     raise BadSignature('File upload is already confirmed!')
                 file_from_db.is_confirmed = True
                 if not file_from_db.mirrored:
-                    start = datetime.datetime.now()
-                    mirror_process = Process(target=gm.mirror_to_github, args=(file_from_db,))
-                    mirror_process.start()
-                    file_from_db.mirrored = file_from_db.mirrored
+                    if not DEBUG:
+                        # async start mirror. Details: https://docs.python.org/3/library/multiprocessing.html
+                        mirror_process = Process(target=gm.mirror_to_github, args=(file_from_db,))
+                        mirror_process.start()
+                        file_from_db.mirrored = True
+                    else:
+                        logger.debug(" MODE: File mirror is disabled")
                 file_from_db.save()
                 return Response({'file': FilesSerializer(file_from_db).data}, HTTP_200_OK)
         except ObjectDoesNotExist as error:
@@ -102,6 +105,9 @@ class FileUploadViewSet(viewsets.ModelViewSet):
         return Response(changed_files)
 
     def perform_create(self, serializer):
+        """
+        Called within the create method to serializer for creation
+        """
         serializer.save(owner=self.request.user)
         self.request.user.send_link_to_file(serializer.data)
 
@@ -117,7 +123,7 @@ class UnconfirmedFileViewSet(viewsets.ModelViewSet):
         indicating if the user which has sent the request is the owner.
         Returns only the unconfirmed files of a user.
         """
-        queryset = self.queryset
+        queryset = File.objects.filter(is_confirmed=False)
         files = FilesSerializer(queryset, many=True).data
         print(files)
         changed_files = []
@@ -170,12 +176,27 @@ class ConfirmedFileViewSet(viewsets.ModelViewSet):
     serializer_class = FilesSerializer
     permission_classes = [permissions.AllowAny]
 
+    def _get_analysis_state(self, file):
+        if file['owner']:
+            if DockerProcess.objects.filter(file_to_analyse_id=file['id']).exists():
+                docker_process = DockerProcess.objects.get(file_to_analyse_id=file['id'])
+                if Analysis.objects.filter(process=docker_process):
+                    return "Analyzed"
+                elif docker_process.working:
+                    return "Working"
+                else:
+                    return "Queued"
+            else:
+                return "Not started"
+
+        return "Permission denied"
+
     def list(self, request, **kwargs):
         """
         Replace email address of file owner with True or False,
         indicating if the user which has sent the request is the owner.
         """
-        queryset = self.queryset
+        queryset = File.objects.filter(is_confirmed=True)
         files = FilesSerializer(queryset, many=True).data
         changed_files = []
         for file in files:
@@ -203,6 +224,8 @@ class ConfirmedFileViewSet(viewsets.ModelViewSet):
                     changed_file[tuple[0]] = new_family
                 else:
                     changed_file[tuple[0]] = tuple[1]
+            analysis_state = self._get_analysis_state(changed_file)
+            changed_file['analysis'] = analysis_state
             changed_files.append(changed_file)
         return Response(changed_files)
 
