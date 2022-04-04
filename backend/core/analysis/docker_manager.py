@@ -4,7 +4,7 @@ import logging
 
 from docker.errors import DockerException
 
-from transpiler.utils import write_to_file
+from core.utils import write_to_file
 from .workspace_utils import _create_dockerfile, _create_entrypoint
 from .models import DockerProcess, Analysis
 import os
