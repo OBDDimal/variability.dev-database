@@ -1,11 +1,78 @@
 from django.db import models
-from .tag import Tag
-from .family import Family
-from .license import License
 from core.user.models import User
 from django.core.files.base import ContentFile
 
 
+# -------------------------------------------------- Family Model --------------------------------------------------
+class Family(models.Model):
+    """
+    Data Model for a Feature Model Family in the backend.
+    A Feature Model Family consists of 1 to n Feature Models.
+    """
+
+    owner = models.ForeignKey(User, on_delete=models.RESTRICT)
+    label = models.CharField(blank=False, max_length=255)
+    description = models.TextField(blank=True)
+
+    class Meta:
+        verbose_name = 'family'
+        verbose_name_plural = 'families'
+
+    def __str__(self):
+        # do not change that
+        return f"{self.id}:{self.label}"
+
+
+# -------------------------------------------------- Tag Model --------------------------------------------------
+class Tag(models.Model):
+    """
+    Data Model for a file tag.
+    A file can be related to many tags and a single tag can be related to many files.
+    """
+
+    owner = models.ForeignKey(User, on_delete=models.RESTRICT)  # TODO: Remove on_delete=CASCADE
+    label = models.CharField(max_length=30, unique=False, blank=False)
+    description = models.TextField(blank=True)
+    is_public = models.BooleanField(default=False)
+    date_created = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        # do not change that
+        return f"{self.id}:{self.label}"
+
+
+# -------------------------------------------------- License Model --------------------------------------------------
+class LicenseManager(models.Manager):
+    use_in_migrations = True
+
+    def create(self, **kwargs):
+        """
+        Creates a license. Only admins/staff should be allowed to that.
+        Since checking staff_required here is difficult, the serializer
+        checks the permissions.
+        """
+        if kwargs.get('label', None) is None:
+            raise TypeError('License label is not set')
+        lic = self.model(**kwargs)
+        lic.save()
+        return lic
+
+
+class License(models.Model):
+    """
+    Data Model for a license in the backend
+    """
+    objects = LicenseManager()
+    _default_license = 'CC BY - Mention'
+
+    label = models.TextField(blank=False, default=_default_license)
+
+    def __str__(self):
+        # do not change that
+        return f"{self.id}"
+
+
+# -------------------------------------------------- File Model --------------------------------------------------
 class FileManager(models.Manager):
     use_in_migrations = True
 
@@ -56,7 +123,6 @@ class FileManager(models.Manager):
         """
         Creates a file
         """
-
         return self.save_file(kwargs.pop('local_file'), **kwargs)
 
 

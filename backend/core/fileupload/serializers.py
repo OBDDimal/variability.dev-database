@@ -1,8 +1,6 @@
 import json
 from django.core.files.base import ContentFile
-from core.fileupload.models.family import Family
-from core.fileupload.models.file import File, Tag
-from core.fileupload.models.license import License
+from core.fileupload.models import Family, Tag, License, File
 from rest_framework import serializers
 from django.http import QueryDict
 from transpiler.g6_transpiler import xml_to_g6
