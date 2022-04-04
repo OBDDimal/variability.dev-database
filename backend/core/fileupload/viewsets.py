@@ -2,6 +2,7 @@ import logging
 from collections import OrderedDict
 from django.utils import timezone, dateparse
 from datetime import timedelta
+from core.analysis.models import DockerProcess, Analysis
 from rest_framework.status import HTTP_405_METHOD_NOT_ALLOWED, HTTP_403_FORBIDDEN, HTTP_200_OK
 from core.fileupload.models.family import Family
 from core.fileupload.models.tag import Tag
@@ -174,6 +175,22 @@ class ConfirmedFileViewSet(viewsets.ModelViewSet):
     serializer_class = FilesSerializer
     permission_classes = [permissions.AllowAny]
 
+    def _get_analysis_state(self, file):
+        if file['owner']:
+            if DockerProcess.objects.filter(file_to_analyse_id=file['id']).exists():
+                docker_process = DockerProcess.objects.get(file_to_analyse_id=file['id'])
+                if Analysis.objects.filter(process=docker_process):
+                    return "Analyzed"
+                elif docker_process.working:
+                    return "Working"
+                else:
+                    return "Queued"
+            else:
+                return "Not started"
+
+        return "Permission denied"
+        
+
     def list(self, request, **kwargs):
         """
         Replace email address of file owner with True or False,
@@ -207,6 +224,8 @@ class ConfirmedFileViewSet(viewsets.ModelViewSet):
                     changed_file[tuple[0]] = new_family
                 else:
                     changed_file[tuple[0]] = tuple[1]
+            analysis_state = self._get_analysis_state(changed_file)
+            changed_file['analysis'] = analysis_state
             changed_files.append(changed_file)
         return Response(changed_files)
 
