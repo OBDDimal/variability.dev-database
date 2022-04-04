@@ -176,7 +176,7 @@ jobs:
         
     - name: Set Sonarqube Project Name
       run: |
-        sed -ir "s/^[#]*\s*sonar\.projectKey=.*/sonar\.projectKey=ddueruem\-web\-backend\-$(echo "${{ github.ref }}" | sed -r 's/[\/]+/\\\//g' | sed -r 's/[-]+/\\\-/g')/" ${{ github.workspace }}/backend/sonar-project.properties
+        sed -ir "s/^[#]*\s*sonar\.projectKey=.*/sonar\.projectKey=ddueruem\-web\-backend\-$(echo "${{ github.ref_name }}" | sed -r 's/[\/]+/_/g' | sed -r 's/[-]+/\\\-/g')/" ${{ github.workspace }}/backend/sonar-project.properties
         
     - name: SonarQube Scan
       uses: sonarsource/sonarqube-scan-action@master
