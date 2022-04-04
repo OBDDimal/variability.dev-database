@@ -2,6 +2,9 @@
 
 DDueruem-web backend readme
 
+## Start Docker!
+Before doing anything with the backend, make sure docker is running (e.g. `sudo dockerd`)
+
 ## Useful commands
 
 List of useful commands

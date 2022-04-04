@@ -1,5 +1,6 @@
 asgiref==3.4.1
 coverage==6.2
+docker==5.0.3
 Django==3.2.8
 django-cors-headers==3.10.0
 django-coverage-plugin==2.0.2
