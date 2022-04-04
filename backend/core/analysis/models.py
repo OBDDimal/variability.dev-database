@@ -24,7 +24,7 @@ class DockerProcess(models.Model):
     owner = models.ForeignKey(User, on_delete=models.RESTRICT)
     library = models.CharField(max_length=25, choices=LIBRARIES)
     working = models.BooleanField(default=False)  # indicates if there should be a process running this analysis
-
+    working_directory = models.TextField(default='')  # if working is True then this field should not be empty
 
     class Meta:
         verbose_name = 'dockerProcess'

@@ -5,20 +5,22 @@ import time
 from pathlib import Path
 from threading import Thread
 
-from core.analysis.docker_utils import get_containers
+from core.analysis.docker_manager import get_containers
 
 logging.basicConfig(level=logging.DEBUG,
                     format='[%(levelname)s] (%(threadName)-10s) %(message)s',
                     )
 logger = logging.getLogger(__name__)
 
+# -------------------WIP: Advanced Container Monitoring--------------------------
+"""
+Idea: instead of checking if container is running, 
+this thread checks if the size of the files in reports folder increased over time
+"""
 
-# -------------------WIP: Advanced Docker Manager--------------------------
 
 class MonitorContainerWorker(Thread):
-    """
-    instead of checking if container is running, this thread checks if the size of the files in reports folder increased over time
-   """
+
     def __init__(self, work_dir, process):
         Thread.__init__(self)
         self.running = False
