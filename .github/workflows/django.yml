@@ -1,10 +1,6 @@
 name: Django CI
 
-on:
-  push:
-    branches: [dev]
-  pull_request:
-    branches: [dev]
+on: [push, pull_request]
 
 jobs:
 
@@ -173,6 +169,10 @@ jobs:
       with:
         name: sonar-coverage-backend
         path: ${{ github.workspace }}/backend
+        
+    - name: Set Sonarqube Project Name
+      run: |
+        sed -ir "s/^[#]*\s*sonar\.projectKey=.*/sonar\.projectKey=ddueruem\-web\-backend\-$(echo "${{ github.ref_name }}" | sed -r 's/[\/]+/_/g' | sed -r 's/[-]+/\\\-/g')/" ${{ github.workspace }}/backend/sonar-project.properties
         
     - name: SonarQube Scan
       uses: sonarsource/sonarqube-scan-action@master
