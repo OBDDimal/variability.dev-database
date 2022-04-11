@@ -137,12 +137,8 @@ jobs:
         run: |
           python manage.py makemigrations
           python manage.py migrate --run-syncdb
-
-      - name: Run Tests
-        run: |
-          python manage.py test
           
-      - name: Run Coverage
+      - name: Run Tests & Create Coverage
         run: |
           coverage erase
           coverage run manage.py test
