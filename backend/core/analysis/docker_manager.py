@@ -237,4 +237,9 @@ def check_for_finished_container(process):
     else:
         # DockerProcess.objects.get(id=process.id).delete()
         Analysis.objects.create(report=report_content, order=order_content, process=process)
+    logger.debug('Pruning stopped containers')
+    client.containers.prune()
     logger.debug('done!')
+
+
+
