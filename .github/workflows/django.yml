@@ -20,6 +20,11 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
+      - name: make env
+        run: |
+          mv './ddueruemweb/.env.testing' './ddueruemweb/.env'
+          cat ./ddueruemweb/.env
+
       - name: Install Dependencies
         run: |
           python -m pip install --upgrade pip
