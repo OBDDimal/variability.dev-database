@@ -1,4 +1,6 @@
 import json
+
+from django.core.exceptions import ObjectDoesNotExist
 from django.core.files.base import ContentFile
 from core.fileupload.models.family import Family
 from core.fileupload.models.file import File, Tag
@@ -52,31 +54,36 @@ class FilesSerializer(serializers.ModelSerializer):
     tags = TagsSerializer(many=True)
     family = FamiliesSerializer()
     license = LicensesSerializer()
-    analysis = serializers.SerializerMethodField(method_name='get_analysis_state')  
+    analysis = serializers.SerializerMethodField(method_name='get_analysis_state')
     new_version_of = 'self'
 
     def get_analysis_state(self, file):
-      """
-      Return Analysis belonging to this file or None
-      """
-      if not file:
-        return None
-      if not file.is_confirmed:
-        return None
-      dp = DockerProcess.objects.filter(file_to_analyse=file).get()
-      if dp is None:
-        return None
-      analysis = Analysis.objects.filter(process=dp).get() 
-      if analysis is None:
-        return None
-      else:
-        return AnalysesSerializer(analysis).data
-
+        """
+        Return Analysis belonging to this file or None
+        """
+        if not file:
+            return None
+        if not file.is_confirmed:
+            return None
+        dp = None
+        try:
+            dp = DockerProcess.objects.filter(file_to_analyse=file).get()
+        except ObjectDoesNotExist:
+            return None
+        analysis = None
+        try:
+            analysis = Analysis.objects.filter(process=dp).get()
+        except ObjectDoesNotExist:
+            return None
+        if dp is None or analysis is None:
+            return None
+        else:
+            return AnalysesSerializer(analysis).data
 
     class Meta:
         model = File
         fields = ['id', 'label', 'description', 'local_file', 'family', 'license', 'tags', 'owner', 'uploaded_at',
-                  'new_version_of', 'transpiled_file','analysis']
+                  'new_version_of', 'transpiled_file', 'analysis']
         read_only_fields = ['mirrored', 'is_confirmed']
 
     def create(self, validated_data):
@@ -92,7 +99,6 @@ class FilesSerializer(serializers.ModelSerializer):
         transpiled = json.dumps(xml_to_g6(file_content, is_file_path=False), indent=2)
         file.transpiled_file = ContentFile(bytes(transpiled, encoding='utf8'), f"{file.label}_as_g6.json")
         file.save()
-        file.analysis = self.analysis
         return file
 
     def update(self, instance, validated_data):
