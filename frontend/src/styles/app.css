@@ -12,6 +12,10 @@ code {
     monospace;
 }
 
+textarea {
+  resize: none;
+}
+
 .tabulator {
   padding: 0;
 }

@@ -1,10 +1,11 @@
 import {
-  faSlash, faClock, faSpinner, faCheck, faTimes, faExclamationTriangle,
+  faClock, faSpinner, faTimes, faExclamationTriangle, faFileAlt, faPlay,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React from 'react';
 import { Button } from 'react-bootstrap';
 import api from '../services/api.service';
+import { default as Modal } from './Modal';
 
 const API_URL = process.env.REACT_APP_DOMAIN;
 
@@ -21,7 +22,7 @@ export default function AnalysesDisplay(props: Props) {
       permissionDenied = true;
       break;
     case 'Not started':
-      icon = faSlash;
+      icon = faPlay;
       break;
     case 'Queued':
       icon = faClock;
@@ -30,7 +31,7 @@ export default function AnalysesDisplay(props: Props) {
       icon = faSpinner;
       break;
     case 'Analyzed':
-      icon = faCheck;
+      icon = faFileAlt;
       break;
     default:
       icon = faTimes;
@@ -42,14 +43,19 @@ export default function AnalysesDisplay(props: Props) {
       api.post(`${API_URL}docker/`, { file_to_analyse: rowDataId, resources: '4-1', library: 'buddy' })
         .then(() => window.location.reload());
     } else if (props.cell?._cell.value === 'Analyzed') {
-      // TODO: Do something fancy to display analysis
+      api.get(`${API_URL}files/uploaded/confirmed/${rowDataId}/`)
+        .then((response) => {
+          Modal.fire({
+            html: `<div><h2>Order</h2><textarea readonly rows="8" cols="35">${response.data.analysis.order}</textarea></div><div><h2>Report</h2><textarea readonly rows="8" cols="35">${response.data.analysis.report}</textarea></div>`,
+          });
+        });
     }
   }
 
   return (
     <Button
       onClick={onClickHandler}
-      disabled={props.cell?._cell.value === 'Not started' ? undefined : true}
+      disabled={(props.cell?._cell.value === 'Not started') || (props.cell?._cell.value === 'Analyzed') ? undefined : true}
       type="button"
       variant={permissionDenied ? 'secondary' : 'success'}
     >
