@@ -5,7 +5,7 @@ from django.db import migrations
 
 def create_lic(apps, schema_editor):
     License = apps.get_model('core_fileupload', 'License')
-    default_label = 'CC By - Mention'
+    default_label = 'CC BY - Mention'
     try:
         License.objects.get(label=default_label)
     except ObjectDoesNotExist:
