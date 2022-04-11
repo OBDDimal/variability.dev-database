@@ -4,7 +4,7 @@ from pathlib import Path
 from rest_framework import viewsets, permissions
 from .models import Analysis, DockerProcess
 from .serializers import AnalysesSerializer, DockerProcessesSerializer
-from ..user.models import User
+from core.user.models import User
 from .docker_manager import start_analysis
 from multiprocessing import Process
 

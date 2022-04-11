@@ -1,16 +1,12 @@
+from core.fileupload.models import Family, License, Tag, File
+from core.analysis.models import Analysis, DockerProcess
+from core.user.forms import AdminUserChangeForm, AdminUserCreationForm
+from core.user.models import User
 from django.contrib import admin
 from django.http import HttpResponseRedirect
 from django.utils import timezone
 from datetime import timedelta
 from django.contrib.admin import ModelAdmin
-
-from core.analysis.models import Analysis, DockerProcess
-from core.fileupload.models.family import Family
-from core.fileupload.models.license import License
-from core.fileupload.models.tag import Tag
-from core.fileupload.models.file import File
-from core.user.forms import AdminUserChangeForm, AdminUserCreationForm
-from core.user.models import User
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.admin.templatetags.admin_list import _boolean_icon
 from ddueruemweb.settings import PASSWORD_RESET_TIMEOUT_DAYS

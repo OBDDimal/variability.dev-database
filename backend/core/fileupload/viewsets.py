@@ -1,15 +1,13 @@
-import logging
+from core.analysis.models import DockerProcess, Analysis
+from core.fileupload.models import Family, Tag, License, File
+from core.fileupload.serializers import FilesSerializer, TagsSerializer, FamiliesSerializer, LicensesSerializer
 from collections import OrderedDict
+import logging
 from django.utils import timezone, dateparse
 from datetime import timedelta
-from core.analysis.models import DockerProcess, Analysis
 from rest_framework.status import HTTP_405_METHOD_NOT_ALLOWED, HTTP_403_FORBIDDEN, HTTP_200_OK
-from core.fileupload.models.family import Family
-from core.fileupload.models.tag import Tag
 from rest_framework import viewsets, permissions, mixins
 from rest_framework import status
-from core.fileupload.models.file import File
-from core.fileupload.serializers import FilesSerializer, TagsSerializer, FamiliesSerializer, LicensesSerializer
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.signing import BadSignature
 from django.utils.encoding import DjangoUnicodeDecodeError
@@ -18,7 +16,6 @@ from rest_framework.viewsets import GenericViewSet
 from rest_framework.permissions import AllowAny
 from rest_framework.mixins import CreateModelMixin
 from ddueruemweb.settings import PASSWORD_RESET_TIMEOUT_DAYS, DEBUG
-from .models.license import License
 from ..auth.tokens import decode_token_to_user
 import core.fileupload.githubmirror.github_manager as gm
 from multiprocessing import Process

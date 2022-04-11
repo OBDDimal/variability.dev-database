@@ -6,9 +6,9 @@ from django.test import TestCase, Client
 from django.utils import timezone
 
 from core.fileupload.models import Tag
-from core.fileupload.models.family import Family
-from core.fileupload.models.file import File
-from core.fileupload.models.license import License
+from core.fileupload.models import Family
+from core.fileupload.models import File
+from core.fileupload.models import License
 from core.user.models import User
 from ddueruemweb.settings import PASSWORD_RESET_TIMEOUT_DAYS
 from core.jobs.hourly.check_user_activation_period_expired import Job as InactiveUserJob
