@@ -30,7 +30,7 @@ export default function Dsgvo() {
           speichern diese als „Server-Logfiles“ auf dem Server der Website ab.
           Folgende Daten werden so protokolliert:
         </p>
-        <p>
+        <div>
           <ul>
             <li>Besuchte Website</li>
             <li>Uhrzeit zum Zeitpunkt des Zugriffes</li>
@@ -40,7 +40,7 @@ export default function Dsgvo() {
             <li>Verwendetes Betriebssystem</li>
             <li>Verwendete IP-Adresse</li>
           </ul>
-        </p>
+        </div>
         <p>
           Die Server-Logfiles werden für maximal 7 Tage gespeichert und anschließend gelöscht. Die
           Speicherung der Daten erfolgt aus Sicherheitsgründen, um z. B. Missbrauchsfälle aufklären
@@ -61,28 +61,32 @@ export default function Dsgvo() {
           zugreifen können, wenn Sie entsprechende Einstellungen vornehmen.
         </p>
         <p>Diese Webseite verwendet folgende cookies:</p>
-        <p>
+        <div>
           <table>
-            <tr>
-              <th>Name</th>
-              <th>Zweck</th>
-              <th>Vorhaltedauer</th>
-            </tr>
-            <tr>
-              <td>sessionid</td>
-              <td>
-                Verbessert die Nutzererfahrung, sodass der Nutzer sich bei erneutem Besuch
-                der Website nicht neu anmelden muss.
-              </td>
-              <td>14 Tage</td>
-            </tr>
-            <tr>
-              <td>csrftoken</td>
-              <td>Schützt den Nutzer vor Cross-site request forgery (CSRF) Angriffen.</td>
-              <td>1 Jahr</td>
-            </tr>
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Zweck</th>
+                <th>Vorhaltedauer</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>sessionid</td>
+                <td>
+                  Verbessert die Nutzererfahrung, sodass der Nutzer sich bei erneutem Besuch
+                  der Website nicht neu anmelden muss.
+                </td>
+                <td>14 Tage</td>
+              </tr>
+              <tr>
+                <td>csrftoken</td>
+                <td>Schützt den Nutzer vor Cross-site request forgery (CSRF) Angriffen.</td>
+                <td>1 Jahr</td>
+              </tr>
+            </tbody>
           </table>
-        </p>
+        </div>
         <h2>Erfassung und Verarbeitung personenbezogener Daten</h2>
         <p>
           Der Websitebetreiber erhebt, nutzt und gibt Ihre personenbezogenen Daten nur dann weiter,
@@ -100,47 +104,51 @@ export default function Dsgvo() {
           Daten nur im Falle einer Registrierung auf unserer Website.
         </p>
         <p>Im Falle einer Registrierung sammeln wir folgende personendbezogene Daten:</p>
-        <p>
+        <div>
           <table>
-            <tr>
-              <th>Art der Daten</th>
-              <th>Art der Sammlung</th>
-              <th>Zweck</th>
-            </tr>
-            <tr>
-              <td>E-Mail-Adresse</td>
-              <td>
-                Muss beim Registrieren auf der Website angegeben werden.
-              </td>
-              <td>
-                Zusendung der Authentifizierungs-Mail, zusendung weiterer Bestätigungs-Mails
-                beim Hochladen von Dateien.
-              </td>
-            </tr>
-            <tr>
-              <td>Datum der Registrierung</td>
-              <td>
-                Wird beim Registrieren auf der Website erfasst.
-              </td>
-              <td>
-                Rückverfolgung bei Missbrauch.
-              </td>
-            </tr>
-            <tr>
-              <td>Institut</td>
-              <td>
-                Wenn der Nutzer Mitglied eines Universitäts-Instituts ist,
-                kann er dies freiwillig angeben.
-              </td>
-              <td>Präsentation der eigenen Person</td>
-            </tr>
-            <tr>
-              <td>Mitarbeiter-Flag</td>
-              <td>Wenn der Nutzer Mitarbeiter der Website ist, wird dies angezeigt</td>
-              <td>Kennzeichnung von Administratoren</td>
-            </tr>
+            <thead>
+              <tr>
+                <th>Art der Daten</th>
+                <th>Art der Sammlung</th>
+                <th>Zweck</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>E-Mail-Adresse</td>
+                <td>
+                  Muss beim Registrieren auf der Website angegeben werden.
+                </td>
+                <td>
+                  Zusendung der Authentifizierungs-Mail, zusendung weiterer Bestätigungs-Mails
+                  beim Hochladen von Dateien.
+                </td>
+              </tr>
+              <tr>
+                <td>Datum der Registrierung</td>
+                <td>
+                  Wird beim Registrieren auf der Website erfasst.
+                </td>
+                <td>
+                  Rückverfolgung bei Missbrauch.
+                </td>
+              </tr>
+              <tr>
+                <td>Institut</td>
+                <td>
+                  Wenn der Nutzer Mitglied eines Universitäts-Instituts ist,
+                  kann er dies freiwillig angeben.
+                </td>
+                <td>Präsentation der eigenen Person</td>
+              </tr>
+              <tr>
+                <td>Mitarbeiter-Flag</td>
+                <td>Wenn der Nutzer Mitarbeiter der Website ist, wird dies angezeigt</td>
+                <td>Kennzeichnung von Administratoren</td>
+              </tr>
+            </tbody>
           </table>
-        </p>
+        </div>
         <h2>Umgang mit Kontaktdaten</h2>
         <p>
           Nehmen Sie mit uns als Websitebetreiber durch die angebotenen Kontaktmöglichkeiten

@@ -37,32 +37,30 @@ export default class Profile extends Component<Props, State> {
     return (
       <Container>
         <Row>
-          <div>
-            <header className="jumbotron">
-              <h3>
-                <strong>{currentUser.email}</strong>
-                {' '}
-                Profile
-              </h3>
-            </header>
-            <p>
-              <strong>Token:</strong>
+          <header>
+            <h1>
+              <strong>{currentUser.email}</strong>
               {' '}
+              Profile
+            </h1>
+          </header>
+          <main>
+            <h4 className="text-decoration-underline">Token</h4>
+            <p className="text-break">
               {AuthService.getAccessToken()}
             </p>
+            <h4 className="text-decoration-underline">Id</h4>
             <p>
-              <strong>Id:</strong>
-              {' '}
               {currentUser.id}
             </p>
-            <strong>Authorities:</strong>
+            <h4 className="text-decoration-underline">Authorities</h4>
             <ul>
               {currentUser.roles
                 && currentUser.roles.map((role, index) => (
                   <li key={index}>{role}</li>
                 ))}
             </ul>
-          </div>
+          </main>
         </Row>
       </Container>
     );
