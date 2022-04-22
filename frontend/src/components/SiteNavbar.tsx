@@ -1,6 +1,13 @@
+import {
+  faBalanceScaleLeft,
+  faEdit,
+  faFile,
+  faHome, faPeopleArrows, faSignInAlt, faSignOutAlt, faTags, faUser,
+} from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { Component } from 'react';
 import {
-  Container, Nav, Navbar, NavDropdown,
+  Container, Nav, Navbar,
 } from 'react-bootstrap';
 import authService from '../services/auth.service';
 
@@ -38,42 +45,17 @@ export default class SiteNavbar extends Component<Props, State> {
                 className={this.props.url === '/' ? 'active' : ''}
                 href="/"
               >
-                Home
+                <FontAwesomeIcon icon={faHome} />
+                &nbsp;Home
               </Nav.Link>
-              {!this.state.loggedIn && (
-                <Nav.Link
-                  href="/register"
-                  className={this.props.url === '/register' ? 'active' : ''}
-                >
-                  Register
-                </Nav.Link>
-              )}
-
-              {!this.state.loggedIn && (
-                <Nav.Link
-                  href="/login"
-                  className={this.props.url === '/login' ? 'active' : ''}
-                >
-                  Login
-                </Nav.Link>
-              )}
 
               {this.state.loggedIn && (
                 <Nav.Link
                   href="/profile"
                   className={this.props.url === '/profile' ? 'active' : ''}
                 >
-                  Profile
-                </Nav.Link>
-              )}
-
-              {this.state.loggedIn && (
-                <Nav.Link
-                  href="/logout"
-                  className={this.props.url === '/logout' ? 'active' : ''}
-                  onClick={this.logout}
-                >
-                  Logout
+                  <FontAwesomeIcon icon={faUser} />
+                  &nbsp;Profile
                 </Nav.Link>
               )}
 
@@ -82,7 +64,8 @@ export default class SiteNavbar extends Component<Props, State> {
                   href="/files"
                   className={this.props.url === '/files' ? 'active' : ''}
                 >
-                  Files
+                  <FontAwesomeIcon icon={faFile} />
+                  &nbsp;Files
                 </Nav.Link>
               )}
 
@@ -91,7 +74,8 @@ export default class SiteNavbar extends Component<Props, State> {
                   href="/tags"
                   className={this.props.url === '/tags' ? 'active' : ''}
                 >
-                  Tags
+                  <FontAwesomeIcon icon={faTags} />
+                  &nbsp;Tags
                 </Nav.Link>
               )}
 
@@ -100,11 +84,20 @@ export default class SiteNavbar extends Component<Props, State> {
                   href="/families"
                   className={this.props.url === '/families' ? 'active' : ''}
                 >
-                  Families
+                  <FontAwesomeIcon icon={faPeopleArrows} />
+                  &nbsp;Families
                 </Nav.Link>
               )}
 
-              <NavDropdown title="Dropdown" id="basic-nav-dropdown">
+              <Nav.Link
+                href="/dsgvo"
+                className={`justify-content-end ${this.props.url === '/dsgvo' ? 'active' : ''}`}
+              >
+                <FontAwesomeIcon icon={faBalanceScaleLeft} />
+                  &nbsp;DSGVO
+              </Nav.Link>
+
+              {/* <NavDropdown title="Dropdown" id="basic-nav-dropdown">
                 <NavDropdown.Item href="#action/3.1">Dummy</NavDropdown.Item>
                 <NavDropdown.Item href="#action/3.2">
                   Another action
@@ -116,14 +109,40 @@ export default class SiteNavbar extends Component<Props, State> {
                 <NavDropdown.Item href="#action/3.4">
                   Separated link
                 </NavDropdown.Item>
-              </NavDropdown>
+              </NavDropdown> */}
 
-              <Nav.Link
-                href="/dsgvo"
-                className={this.props.url === '/dsgvo' ? 'active' : ''}
-              >
-                DSGVO
-              </Nav.Link>
+            </Nav>
+            <Nav>
+              {!this.state.loggedIn && (
+                <Nav.Link
+                  href="/register"
+                  className={this.props.url === '/register' ? 'active' : ''}
+                >
+                  <FontAwesomeIcon icon={faEdit} />
+                  &nbsp;Register
+                </Nav.Link>
+              )}
+
+              {!this.state.loggedIn && (
+                <Nav.Link
+                  href="/login"
+                  className={this.props.url === '/login' ? 'active' : ''}
+                >
+                  <FontAwesomeIcon icon={faSignInAlt} />
+                  &nbsp;Login
+                </Nav.Link>
+              )}
+
+              {this.state.loggedIn && (
+                <Nav.Link
+                  href="/logout"
+                  className={this.props.url === '/logout' ? 'active' : ''}
+                  onClick={this.logout}
+                >
+                  <FontAwesomeIcon icon={faSignOutAlt} />
+                  &nbsp;Logout
+                </Nav.Link>
+              )}
             </Nav>
           </Navbar.Collapse>
         </Container>

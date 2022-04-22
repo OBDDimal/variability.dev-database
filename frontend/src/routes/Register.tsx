@@ -110,9 +110,9 @@ export default class Register extends Component<Props, State> {
               />
             </Form.Group>
             <p>
-              Durch das Registrieren stimmen Sie unserer&nbsp;
+              By registering you accept our&nbsp;
               <Link to="/dsgvo" target="_blank">DSGVO</Link>
-              &nbsp;zu.
+              &nbsp;(german language).
             </p>
             <Button
               variant="primary"
