@@ -5,34 +5,17 @@
             A web service for sharing feature model instances and collaborative
             benchmarking
         </h5>
-        <v-data-table
-            :headers="headers"
-            :items="desserts"
-            class="elevation-1"
-            :search="search"
-        >
+        <v-data-table :headers="headers" :items="desserts" class="elevation-1" :search="search">
             <template v-slot:top>
                 <v-toolbar flat>
                     <v-toolbar-title>All Feature Models</v-toolbar-title>
                     <v-divider class="mx-4" inset vertical></v-divider>
                     <v-spacer></v-spacer>
-                    <v-text-field
-                        v-model="search"
-                        append-icon="mdi-magnify"
-                        label="Search"
-                        single-line
-                        hide-details
-                    ></v-text-field>
+                    <v-text-field v-model="search" append-icon="mdi-magnify" label="Search" single-line hide-details>
+                    </v-text-field>
                     <v-dialog v-model="dialog" max-width="700px">
                         <template v-slot:activator="{ on, attrs }">
-                            <v-btn
-                                color="primary"
-                                dark
-                                rounded
-                                class="mb-2 ml-4"
-                                v-bind="attrs"
-                                v-on="on"
-                            >
+                            <v-btn color="primary" dark rounded class="mb-2 ml-4" v-bind="attrs" v-on="on">
                                 <v-icon left> mdi-plus </v-icon>
                                 Upload Model
                             </v-btn>
@@ -46,87 +29,48 @@
                                 <v-container>
                                     <v-row>
                                         <v-col cols="12" md="6">
-                                            <v-text-field
-                                                v-model="editedItem.label"
-                                                label="Label"
-                                            ></v-text-field>
+                                            <v-text-field v-model="editedItem.label" label="Label"></v-text-field>
                                         </v-col>
                                         <v-col cols="12" md="6">
-                                            <v-text-field
-                                                v-model="editedItem.description"
-                                                label="Description"
-                                            ></v-text-field>
+                                            <v-text-field v-model="editedItem.description" label="Description">
+                                            </v-text-field>
                                         </v-col>
                                         <v-col cols="12" md="6">
-                                            <v-file-input
-                                                chips
-                                                multiple
-                                                label="File Upload"
-                                                show-size
-                                            ></v-file-input>
+                                            <v-file-input chips multiple label="File Upload" show-size></v-file-input>
                                         </v-col>
                                         <v-col cols="12" md="6">
-                                            <v-autocomplete
-                                                v-model="editedItem.license"
-                                                :items="licenses"
-                                                label="License"
-                                            ></v-autocomplete>
+                                            <v-autocomplete v-model="editedItem.license" :items="licenses"
+                                                label="License"></v-autocomplete>
                                         </v-col>
                                         <v-col cols="12" md="6">
-                                            <v-autocomplete
-                                                :disabled="newFamily != ''"
-                                                v-model="family"
-                                                :items="existingFamilies"
-                                                label="New version of"
-                                            ></v-autocomplete>
+                                            <v-autocomplete :disabled="newFamily != ''" v-model="family"
+                                                :items="existingFamilies" label="New version of"></v-autocomplete>
                                         </v-col>
                                         <v-col cols="12" md="6">
-                                            <v-text-field
-                                                :disabled="family != null"
-                                                v-model="newFamily"
-                                                label="New family"
-                                            ></v-text-field>
+                                            <v-text-field :disabled="family != null" v-model="newFamily"
+                                                label="New family"></v-text-field>
                                         </v-col>
                                         <v-col cols="12">
-                                            <v-combobox
-                                                v-model="editedItem.tags"
-                                                :items="tags"
-                                                label="Tags"
-                                                multiple
-                                                chips
-                                            ></v-combobox>
+                                            <v-combobox v-model="editedItem.tags" :items="tags" label="Tags" multiple
+                                                chips></v-combobox>
                                         </v-col>
                                         <v-col cols="12">
-                                            <v-checkbox
-                                                v-model="check1"
-                                                label="Lorem Ipsum"
-                                                hide-details
-                                            ></v-checkbox>
+                                            <v-checkbox v-model="check1" label="Lorem Ipsum" hide-details></v-checkbox>
                                         </v-col>
                                         <v-col cols="12">
-                                            <v-checkbox
-                                                v-model="check2"
-                                                label="Lorem Ipsum 2"
-                                                hide-details
-                                            ></v-checkbox>
+                                            <v-checkbox v-model="check2" label="Lorem Ipsum 2" hide-details>
+                                            </v-checkbox>
                                         </v-col>
                                         <v-col cols="12">
-                                            <v-checkbox
-                                                v-model="check3"
-                                                label="Lorem Ipsum 3"
-                                                hide-details
-                                            ></v-checkbox>
+                                            <v-checkbox v-model="check3" label="Lorem Ipsum 3" hide-details>
+                                            </v-checkbox>
                                         </v-col>
                                         <v-col cols="12">
-                                            <v-btn
-                                                color="primary"
-                                                :disabled="
-                                                    !check1 ||
-                                                    !check2 ||
-                                                    !check3
-                                                "
-                                                >Upload</v-btn
-                                            >
+                                            <v-btn color="primary" :disabled="
+                                                !check1 ||
+                                                !check2 ||
+                                                !check3
+                                            ">Upload</v-btn>
                                         </v-col>
                                     </v-row>
                                 </v-container>
@@ -134,11 +78,7 @@
 
                             <v-card-actions>
                                 <v-spacer></v-spacer>
-                                <v-btn
-                                    color="blue darken-1"
-                                    text
-                                    @click="close"
-                                >
+                                <v-btn color="blue darken-1" text @click="close">
                                     Cancel
                                 </v-btn>
                                 <v-btn color="blue darken-1" text @click="save">
@@ -149,19 +89,13 @@
                     </v-dialog>
                 </v-toolbar>
             </template>
-            <template v-slot:item.actions="{  }">
-                <v-btn
-                    small
-                    rounded
-                    color="primary"
-                    class="mr-2"
-                    to="/ViewModel"
-                >
-                    <v-icon>mdi-eye</v-icon></v-btn
-                >
+            <template v-slot:item.actions="{}">
+                <v-btn small rounded color="primary" class="mr-2" to="/ViewModel">
+                    <v-icon>mdi-eye</v-icon>
+                </v-btn>
                 <v-btn small rounded color="success" class="mr-2">
-                    <v-icon>mdi-play</v-icon></v-btn
-                >
+                    <v-icon>mdi-play</v-icon>
+                </v-btn>
                 <!-- <v-btn small rounded color="error" class="mr-2"> <v-icon>mdi-delete</v-icon></v-btn> -->
             </template>
             <template v-slot:item.id="{ index }">
@@ -171,20 +105,10 @@
                 <v-btn color="primary"> Reset </v-btn>
             </template>
         </v-data-table>
-        <v-btn
-            color="success"
-            class="my-5"
-            :loading="loading"
-            @click="fetchAPI()"
-        >
+        <v-btn color="success" class="my-5" :loading="loading" @click="fetchAPI()">
             Fetch Data from API
         </v-btn>
-        <v-data-table
-            :headers="headersAPI"
-            :items="itemsAPI"
-            :loading="loading"
-            class="elevation-2"
-        >
+        <v-data-table :headers="headersAPI" :items="itemsAPI" :loading="loading" class="elevation-2">
             <template v-slot:item.logo="{ item }">
                 <img :src="item.airline[0].logo" style="width: 10%" />
             </template>
@@ -192,17 +116,21 @@
                 <a :href="item.airline[0].website">{{ item.airline[0].website }}</a>
             </template>
         </v-data-table>
+        <!-- <TableCRUD headline="Test" :add="false" :headers="headers" :items="desserts" /> -->
     </div>
 </template>
 
 <script>
 import Vue from "vue"
-import axios from "axios";
+import axios from "axios"
+/* import TableCRUD from "../components/TableCRUD.vue" */
 
 export default Vue.extend({
     name: "HomeView",
 
-    components: {},
+    components: {
+        /* TableCRUD, */
+    },
 
     props: {},
 
