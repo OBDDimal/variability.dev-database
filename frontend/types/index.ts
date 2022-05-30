@@ -4,3 +4,9 @@ export interface Register {
     passwordConfirmation?: string;
     loading: boolean;
 }
+
+export interface Login {
+    email?: string;
+    password?: string;
+    loading: boolean;
+}

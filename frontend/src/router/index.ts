@@ -8,6 +8,7 @@ import Tags from '../views/Tags.vue'
 import Families from '../views/Families.vue'
 import DSGVO from '../views/DSGVO.vue'
 import Register from '../views/Register.vue'
+import Login from '../views/Login.vue'
 
 Vue.use(VueRouter)
 
@@ -56,6 +57,11 @@ const routes: Array<RouteConfig> = [
     path: '/register',
     name: 'Register',
     component: Register
+  },
+  {
+    path: '/login',
+    name: 'Login',
+    component: Login
   },
 ]
 

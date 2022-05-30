@@ -1,8 +1,8 @@
 <template>
     <div>
-        <h3 class="text-h3 mb-2 mt-8 text-center">Register</h3>
+        <h3 class="text-h3 mb-2 mt-8 text-center">Login</h3>
         <h5 class="text-h5 mb-4 text-center">
-            Create an account for ddueruem-web
+            Or <router-link to="/register">create an account</router-link> instead
         </h5>
         <v-row justify="center" align="center">
             <v-col cols="12" sm="5">
@@ -14,19 +14,8 @@
                         hint="At least 8 characters" counter @click:append="show1 = !show1">
                     </v-text-field>
 
-                    <v-text-field v-model="passwordConfirmation" :append-icon="show2 ? 'mdi-eye' : 'mdi-eye-off'"
-                        :rules="passwordRules" :type="show2 ? 'text' : 'password'" name="input-10-1" label="Password"
-                        hint="At least 8 characters" counter @click:append="show2 = !show2">
-                    </v-text-field>
-
-                    <p>
-                        By registering you accept our <router-link to="/dsgvo" target="_blank">DSGVO</router-link>
-                        (german
-                        language).
-                    </p>
-
                     <v-btn :disabled="!isReady" color="primary" class="mr-4">
-                        Register
+                        Login
                     </v-btn>
                 </v-form>
             </v-col>
@@ -38,20 +27,19 @@
 
 <script lang="ts">
 import Vue from "vue"
-import { Register } from '../../types'
+import { Login } from '../../types'
 
 export default Vue.extend({
-    name: 'Register',
+    name: 'Login',
 
     components: {},
 
     props: {},
 
     data: () => ({
-        email: "" as Register["email"],
-        password: "" as Register["password"],
-        passwordConfirmation: "" as Register["passwordConfirmation"],
-        loading: false as Register["loading"],
+        email: "" as Login["email"],
+        password: "" as Login["password"],
+        loading: false as Login["loading"],
 
         valid: false,
         emailRules: [
@@ -65,12 +53,11 @@ export default Vue.extend({
             /* emailMatch: () => (`The email and password you entered don't match`), */
         ],
         show1: false,
-        show2: false
     }),
 
     computed: {
         isReady(): boolean {
-            return this.valid && this.email != "" && this.password != "" && this.passwordConfirmation != ""
+            return this.valid && this.email != "" && this.password != ""
         }
     },
 
