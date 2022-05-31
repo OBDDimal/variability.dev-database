@@ -9,6 +9,7 @@ import Families from '../views/Families.vue'
 import DSGVO from '../views/DSGVO.vue'
 import Register from '../views/Register.vue'
 import Login from '../views/Login.vue'
+import FileCreate from '../views/FileCreate.vue'
 
 Vue.use(VueRouter)
 
@@ -62,6 +63,11 @@ const routes: Array<RouteConfig> = [
     path: '/login',
     name: 'Login',
     component: Login
+  },
+  {
+    path: '/upload',
+    name: 'FileCreate',
+    component: FileCreate
   },
 ]
 
