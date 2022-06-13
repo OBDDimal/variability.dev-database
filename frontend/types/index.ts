@@ -30,3 +30,15 @@ export interface NewFile {
     newVersionOfSelection: boolean;
     featureModelFamilySelection: boolean;
 }
+
+export interface Cookie {
+    name: string;
+    purpose: string;
+    retentionPeriod: string;
+}
+
+export interface PersonalData {
+    typeOfData: string;
+    typeOfCollection: string;
+    purpose: string;
+}
