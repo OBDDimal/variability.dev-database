@@ -6,7 +6,7 @@
         </h5>
         <v-data-table
             :headers="headers"
-            :items="desserts"
+            :items="tags"
             class="elevation-1"
             :search="search"
         >
@@ -114,6 +114,7 @@
                     color="primary"
                     class="mr-2"
                     @click="editItem(item)"
+                    :disabled="item.owner === false"
                 >
                     <v-icon>mdi-pencil</v-icon></v-btn
                 >
@@ -123,6 +124,7 @@
                     color="error"
                     class="mr-2"
                     @click="deleteItem(item)"
+                    :disabled="item.owner === false"
                 >
                     <v-icon>mdi-delete</v-icon></v-btn
                 >
@@ -135,12 +137,17 @@
                 <v-icon v-if="item.public" color="success"> mdi-check </v-icon>
                 <v-icon v-else color="error"> mdi-cancel </v-icon>
             </template>
+             <template v-slot:item.owner="{ item }">
+                <v-icon v-if="item.owner" color="success"> mdi-check </v-icon>
+                <v-icon v-else color="error"> mdi-cancel </v-icon>
+            </template>
         </v-data-table>
     </div>
 </template>
 
-<script>
+<script lang="ts">
 import Vue from "vue"
+import { Tag } from '../../types'
 
 export default Vue.extend({
     name: "Tags",
@@ -163,7 +170,9 @@ export default Vue.extend({
             },
             { text: "Label", value: "label" },
             { text: "Description", value: "description" },
+            { text: "Owner", value: "owner" },
             { text: "Public", value: "public" },
+            { text: "Date Created", value: "dateCreated" },
             {
                 text: "Actions",
                 align: "center",
@@ -172,13 +181,13 @@ export default Vue.extend({
             },
         ],
         editedItem: {
-            name: "",
-            calories: 0,
-            fat: 0,
-            carbs: 0,
-            protein: 0,
-        },
-        desserts: [],
+            label: "",
+            owner: false,
+            description: "",
+            dateCreated: new Date(),
+            public: false
+        } as Tag,
+        tags: [] as Tag[],
     }),
 
     created() {
@@ -202,38 +211,59 @@ export default Vue.extend({
 
     methods: {
         initialize() {
-            this.desserts = [
+            this.tags = [
                 {
-                    label: "Frozen Yogurt",
-                    description: "Test model for demonstration",
-                    public: "true",
+                    label: "My first public tag",
+                    description: "Test tag 1 for demonstration",
+                    owner: true,
+                    dateCreated: new Date(),
+                    public: true
                 },
                 {
-                    label: "Frozen Yogurt",
-                    description: "Test model for demonstration",
-                    public: "true",
+                    label: "My second private tag",
+                    description: "Test tag 2 for demonstration",
+                    owner: true,
+                    dateCreated: new Date(),
+                    public: false
                 },
                 {
-                    label: "Frozen Yogurt",
-                    description: "Test model for demonstration",
-                    public: "true",
+                    label: "Not my public tag",
+                    description: "Test tag 3 for demonstration",
+                    owner: false,
+                    dateCreated: new Date(),
+                    public: true
+                },
+                // {   private tags from other users should not be fetched from the server!
+                //     label: "Not my private tag",
+                //     description: "Test tag 4 for demonstration",
+                //     owner: false,
+                //     dateCreated: new Date(),
+                //     public: false
+                // },   
+                {
+                    label: "Not my public tag 2",
+                    description: "Test tag 4 for demonstration",
+                    owner: false,
+                    dateCreated: new Date(),
+                    public: true
                 },
             ];
         },
         editItem(item) {
-            this.editedIndex = this.desserts.indexOf(item);
+            this.editedIndex = this.tags.indexOf(item);
             this.editedItem = Object.assign({}, item);
             this.dialog = true;
         },
 
         deleteItem(item) {
-            this.editedIndex = this.desserts.indexOf(item);
+            this.editedIndex = this.tags.indexOf(item);
             this.editedItem = Object.assign({}, item);
             this.dialogDelete = true;
         },
 
         deleteItemConfirm() {
-            this.desserts.splice(this.editedIndex, 1);
+            this.tags.splice(this.editedIndex, 1);
+            // TODO: call a service to delete the tag from the server
             this.closeDelete();
         },
         close() {
@@ -252,10 +282,11 @@ export default Vue.extend({
         },
         save() {
             if (this.editedIndex > -1) {
-                Object.assign(this.desserts[this.editedIndex], this.editedItem);
+                Object.assign(this.tags[this.editedIndex], this.editedItem);
             } else {
-                this.desserts.push(this.editedItem);
+                this.tags.push(this.editedItem);
             }
+            // TODO: call a service to push new tag / edited tag to the server
             this.close();
         },
     },
