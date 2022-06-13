@@ -195,7 +195,7 @@ export default Vue.extend({
     },
 
     computed: {
-        formTitle() {
+        formTitle():string {
             return this.editedIndex === -1 ? "Create New Tag" : "Edit Tag";
         },
     },
@@ -249,13 +249,13 @@ export default Vue.extend({
                 },
             ];
         },
-        editItem(item) {
+        editItem(item:Tag) {
             this.editedIndex = this.tags.indexOf(item);
             this.editedItem = Object.assign({}, item);
             this.dialog = true;
         },
 
-        deleteItem(item) {
+        deleteItem(item:Tag) {
             this.editedIndex = this.tags.indexOf(item);
             this.editedItem = Object.assign({}, item);
             this.dialogDelete = true;
@@ -269,14 +269,14 @@ export default Vue.extend({
         close() {
             this.dialog = false;
             this.$nextTick(() => {
-                this.editedItem = Object.assign({}, this.defaultItem);
+                //this.editedItem = Object.assign({}, this.defaultItem);
                 this.editedIndex = -1;
             });
         },
         closeDelete() {
             this.dialogDelete = false;
             this.$nextTick(() => {
-                this.editedItem = Object.assign({}, this.defaultItem);
+                //this.editedItem = Object.assign({}, this.defaultItem);
                 this.editedIndex = -1;
             });
         },

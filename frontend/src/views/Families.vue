@@ -144,7 +144,7 @@ export default Vue.extend({
     },
 
     computed: {
-        formTitle() {
+        formTitle():string {
             return this.editedIndex === -1
                 ? "Create New Family"
                 : "Edit Family";
@@ -187,7 +187,7 @@ export default Vue.extend({
                 },
             ];
         },
-        editItem(item) {
+        editItem(item:Family) {
             this.editedIndex = this.families.indexOf(item);
             this.editedItem = Object.assign({}, item);
             this.dialog = true;
@@ -195,7 +195,7 @@ export default Vue.extend({
         close() {
             this.dialog = false;
             this.$nextTick(() => {
-                this.editedItem = Object.assign({}, this.defaultItem);
+                //this.editedItem = Object.assign({}, this.defaultItem);
                 this.editedIndex = -1;
             });
         },

@@ -64,7 +64,9 @@ export default Vue.extend({
 
     methods: {
         logoutAndRedirect() {
-            this.$route.path != "/" ?? this.$router.push("/")
+            if(this.$route.path !== "/") {
+                this.$router.push("/")
+            }
             this.$store.dispatch('logout')
         }
     }
