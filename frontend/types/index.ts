@@ -50,6 +50,7 @@ export interface Family {
 }
 
 export interface Tag {
+    id: number,
     label: string;
     owner: boolean;     //TODO: the owner that comes from the server is an email string like 'bla@blub.de'. Somehow verify if logged in user is the owner, then set this boolean accordingly.
     description: string;
