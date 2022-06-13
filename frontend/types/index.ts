@@ -56,3 +56,7 @@ export interface Tag {
     dateCreated: Date;
     public: boolean;
 }
+
+export interface FeatureModel {
+    
+}
