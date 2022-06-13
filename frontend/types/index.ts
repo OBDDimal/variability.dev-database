@@ -42,3 +42,9 @@ export interface PersonalData {
     typeOfCollection: string;
     purpose: string;
 }
+
+export interface Family {
+    label: string;
+    description: string;
+    owner: boolean;
+}

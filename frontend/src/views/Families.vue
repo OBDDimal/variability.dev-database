@@ -4,7 +4,7 @@
         <h5 class="text-h5 mb-4">Here you can add new families</h5>
         <v-data-table
             :headers="headers"
-            :items="desserts"
+            :items="families"
             class="elevation-1"
             :search="search"
         >
@@ -54,12 +54,6 @@
                                                 label="Description"
                                             ></v-text-field>
                                         </v-col>
-                                        <v-col cols="12">
-                                            <v-checkbox
-                                                v-model="editedItem.public"
-                                                label="Public"
-                                            ></v-checkbox>
-                                        </v-col>
                                     </v-row>
                                 </v-container>
                             </v-card-text>
@@ -88,6 +82,7 @@
                     color="primary"
                     class="mr-2"
                     @click="editItem(item)"
+                    :disabled="item.owner === false"
                 >
                     <v-icon>mdi-pencil</v-icon>
                 </v-btn>
@@ -96,16 +91,17 @@
             <template v-slot:item.id="{ index }">
                 {{ index + 1 }}
             </template>
-            <template v-slot:item.public="{ item }">
-                <v-icon v-if="item.public" color="success"> mdi-check </v-icon>
+            <template v-slot:item.owner="{ item }">
+                <v-icon v-if="item.owner" color="success"> mdi-check </v-icon>
                 <v-icon v-else color="error"> mdi-cancel </v-icon>
             </template>
         </v-data-table>
     </div>
 </template>
 
-<script>
+<script lang="ts">
 import Vue from "vue"
+import { Family } from '../../types'
 
 export default Vue.extend({
     name: "Families",
@@ -127,7 +123,7 @@ export default Vue.extend({
             },
             { text: "Label", value: "label" },
             { text: "Description", value: "description" },
-            { text: "Public", value: "public" },
+            { text: "Owner", value: "owner" },
             {
                 text: "Actions",
                 align: "center",
@@ -136,13 +132,11 @@ export default Vue.extend({
             },
         ],
         editedItem: {
-            name: "",
-            calories: 0,
-            fat: 0,
-            carbs: 0,
-            protein: 0,
-        },
-        desserts: [],
+            label: "",
+            description: "",
+            owner: false,
+        } as Family,
+        families: [] as Family[],
     }),
 
     created() {
@@ -165,26 +159,36 @@ export default Vue.extend({
 
     methods: {
         initialize() {
-            this.desserts = [
+            this.families = [
                 {
-                    label: "Frozen Yogurt",
-                    description: "Test model for demonstration",
-                    public: "true",
+                    label: "My first family",
+                    description: "Test family 1 for demonstration",
+                    owner: true,
                 },
                 {
-                    label: "Frozen Yogurt",
-                    description: "Test model for demonstration",
-                    public: "true",
+                    label: "My second family",
+                    description: "Test family 2 for demonstration",
+                    owner: true,
                 },
                 {
-                    label: "Frozen Yogurt",
-                    description: "Test model for demonstration",
-                    public: "true",
+                    label: "Not my family",
+                    description: "Test family 3 for demonstration",
+                    owner: false,
+                },
+                {
+                    label: "Not my family 2",
+                    description: "Test family 4 for demonstration",
+                    owner: false,
+                },
+                {
+                    label: "Not my family 3",
+                    description: "Test family 5 for demonstration",
+                    owner: false,
                 },
             ];
         },
         editItem(item) {
-            this.editedIndex = this.desserts.indexOf(item);
+            this.editedIndex = this.families.indexOf(item);
             this.editedItem = Object.assign({}, item);
             this.dialog = true;
         },
@@ -197,10 +201,11 @@ export default Vue.extend({
         },
         save() {
             if (this.editedIndex > -1) {
-                Object.assign(this.desserts[this.editedIndex], this.editedItem);
+                Object.assign(this.families[this.editedIndex], this.editedItem);
             } else {
-                this.desserts.push(this.editedItem);
+                this.families.push(this.editedItem);
             }
+            // TODO: call a service to push new family / edited family to the server
             this.close();
         },
     },
