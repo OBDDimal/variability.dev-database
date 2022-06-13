@@ -42,3 +42,17 @@ export interface PersonalData {
     typeOfCollection: string;
     purpose: string;
 }
+
+export interface Family {
+    label: string;
+    description: string;
+    owner: boolean;     //TODO: the owner that comes from the server is an email string like 'bla@blub.de'. Somehow verify if logged in user is the owner, then set this boolean accordingly.
+}
+
+export interface Tag {
+    label: string;
+    owner: boolean;     //TODO: the owner that comes from the server is an email string like 'bla@blub.de'. Somehow verify if logged in user is the owner, then set this boolean accordingly.
+    description: string;
+    dateCreated: Date;
+    public: boolean;
+}
