@@ -27,8 +27,16 @@
                 DSGVO
             </v-btn>
             <v-spacer></v-spacer>
+            <v-btn text to="/register">
+                <v-icon left> mdi-account-plus </v-icon>
+                Register
+            </v-btn>
+            <v-btn text to="/login">
+                <v-icon left> mdi-login-variant </v-icon>
+                Login
+            </v-btn>
             <v-btn text>
-                <v-icon left> mdi-exit-to-app </v-icon>
+                <v-icon left> mdi-logout-variant </v-icon>
                 Logout
             </v-btn>
         </v-app-bar>

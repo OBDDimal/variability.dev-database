@@ -64,11 +64,13 @@ export default Vue.extend({
 
     components: {},
 
-    props: {},
+    props: {
+        title: String,
+    },
 
     data: () => ({
         valid: false,
-        label: "" as NewFile["label"],
+        label: "",
         description: "" as NewFile["description"],
         descriptionRules: [(v: any) => v.length <= 250 || 'Max 250 characters please'],
         file: undefined as NewFile["file"],

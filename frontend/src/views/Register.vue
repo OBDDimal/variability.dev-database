@@ -6,7 +6,9 @@
         </h5>
         <v-row justify="center" align="center">
             <v-col cols="12" sm="5">
-                <v-form ref="form" v-model="valid" lazy-validation>
+                <v-alert v-model="error.isError" v-if="error.isError" dismissible dense outlined type="error">Error: {{ error.msg }}
+                </v-alert>
+                <v-form ref="form" v-model="valid" lazy-validation v-on:submit="onSubmit">
                     <v-text-field v-model="email" :rules="emailRules" label="E-mail" required></v-text-field>
 
                     <v-text-field v-model="password" :append-icon="show1 ? 'mdi-eye' : 'mdi-eye-off'"
@@ -25,7 +27,7 @@
                         language).
                     </p>
 
-                    <v-btn :disabled="!isReady" color="primary" class="mr-4">
+                    <v-btn :disabled="!isReady" color="primary" class="mr-4" :loading="loading" type="submit">
                         Register
                     </v-btn>
                 </v-form>
@@ -39,6 +41,7 @@
 <script lang="ts">
 import Vue from "vue"
 import { Register } from '../../types'
+import AuthService from "@/services/auth.service";
 
 export default Vue.extend({
     name: 'Register',
@@ -55,7 +58,6 @@ export default Vue.extend({
 
         valid: false,
         emailRules: [
-            (v: string) => v.length > 0,
             (v: string) => !!v || 'E-mail is required',
             (v: string) => /.+@.+\..+/.test(v) || 'E-mail must be valid',
         ],
@@ -65,7 +67,8 @@ export default Vue.extend({
             /* emailMatch: () => (`The email and password you entered don't match`), */
         ],
         show1: false,
-        show2: false
+        show2: false,
+        error: { isError: false, msg: "" }
     }),
 
     computed: {
@@ -75,7 +78,49 @@ export default Vue.extend({
     },
 
     methods: {
-
+        onSubmit(e: { preventDefault: () => void }) {
+            e.preventDefault();
+            if (
+                this.email != ""
+                && this.password != ""
+                && this.passwordConfirmation != ""
+                && this.password === this.passwordConfirmation
+            ) {
+                this.loading = true;
+                AuthService.register(
+                    this.email,
+                    this.password,
+                    this.passwordConfirmation,
+                ).then(
+                    () => {
+                        /* Modal.fire({
+                            icon: 'success',
+                            title: 'Register successful, please check your mail',
+                            toast: true,
+                            position: 'top-right',
+                            showConfirmButton: false,
+                            timer: 1500,
+                            timerProgressBar: true,
+                        }).then(() => {
+                            window.location.replace('/login');
+                        }); */
+                        this.error = { isError: false, msg: "" }
+                        this.loading = false;
+                        console.log("Success")
+                    },
+                    (error) => {
+                        /* Modal.fire({
+                            icon: 'error',
+                            title: 'Error!!',
+                            text: `Something went wrong while registering! ${error.toString()}`,
+                        }); */
+                        this.error = { isError: true, msg: error.response.data }
+                        this.loading = false;
+                        console.log(error.response.data)
+                    },
+                );
+            }
+        }
     },
 });
 </script>

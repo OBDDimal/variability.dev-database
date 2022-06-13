@@ -10,6 +10,7 @@ import DSGVO from '../views/DSGVO.vue'
 import Register from '../views/Register.vue'
 import Login from '../views/Login.vue'
 import FileCreate from '../views/FileCreate.vue'
+import RegisterConfirmation from '../views/RegisterConfirmation.vue'
 
 Vue.use(VueRouter)
 
@@ -60,6 +61,11 @@ const routes: Array<RouteConfig> = [
     component: Register
   },
   {
+    path: '/register/:confirmationCode',
+    name: 'RegisterConfirmation',
+    component: RegisterConfirmation
+  },
+  {
     path: '/login',
     name: 'Login',
     component: Login
@@ -72,6 +78,7 @@ const routes: Array<RouteConfig> = [
 ]
 
 const router = new VueRouter({
+  mode: "history",
   routes
 })
 

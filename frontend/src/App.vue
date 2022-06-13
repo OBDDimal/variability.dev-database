@@ -1,14 +1,27 @@
 <template>
     <v-app>
         <navigation title="ddueruem" />
-        
-        <v-main>
-            <router-view />
+
+        <v-main style="position: relative">
+            <div class="mainView">
+                <router-view />
+            </div>
+            <v-snackbar absolute v-model="$store.state.snackbar.show" elevation="8" :multi-line="true" :right="true"
+                :top="true" :timeout="5000" :color="$store.state.snackbar.variant">
+                {{ $store.state.snackbar.message }}
+                <template v-slot:action="{ attrs }">
+                    <v-btn dark text v-bind="attrs" @click="$store.commit('updateSnackbar', { show: false })">
+                        &#10005;
+                    </v-btn>
+                </template>
+            </v-snackbar>
         </v-main>
+
+
     </v-app>
 </template>
 
-<script>
+<script lang="ts">
 import Vue from "vue"
 import Navigation from "./components/Navigation.vue"
 
@@ -37,7 +50,7 @@ export default Vue.extend({
 </script>
 
 <style>
-.v-main__wrap {
+.mainView {
     margin-left: auto;
     margin-right: auto;
     padding-left: 30px;
