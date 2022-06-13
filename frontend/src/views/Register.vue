@@ -6,8 +6,6 @@
         </h5>
         <v-row justify="center" align="center">
             <v-col cols="12" sm="5">
-                <v-alert v-model="error.isError" v-if="error.isError" dismissible dense outlined type="error">Error: {{ error.msg }}
-                </v-alert>
                 <v-form ref="form" v-model="valid" lazy-validation v-on:submit="onSubmit">
                     <v-text-field v-model="email" :rules="emailRules" label="E-mail" required></v-text-field>
 
@@ -68,7 +66,6 @@ export default Vue.extend({
         ],
         show1: false,
         show2: false,
-        error: { isError: false, msg: "" }
     }),
 
     computed: {
@@ -104,8 +101,8 @@ export default Vue.extend({
                         }).then(() => {
                             window.location.replace('/login');
                         }); */
-                        this.error = { isError: false, msg: "" }
                         this.loading = false;
+                        this.$store.commit('updateSnackbar', { message: "Please verify your mail address.", variant: "info", timeout: -1, show: true })
                         console.log("Success")
                     },
                     (error) => {
@@ -114,14 +111,23 @@ export default Vue.extend({
                             title: 'Error!!',
                             text: `Something went wrong while registering! ${error.toString()}`,
                         }); */
-                        this.error = { isError: true, msg: error.response.data }
+                        this.$store.commit('updateSnackbar', { message: "Error! " + error.response.data.email, variant: "error", show: true })
                         this.loading = false;
                         console.log(error.response.data)
                     },
                 );
+            } else {
+                this.$store.commit('updateSnackbar', { message: "Passwords don't match!", variant: "warning", timeout: 5000, show: true })
             }
         }
     },
+
+    mounted() {
+        if (this.$store.state.loggedIn && this.$store.state.currentUser) {
+            this.$store.commit('updateSnackbar', { message: "User is already logged in", variant: "info", timeout: 5000, show: true })
+            this.$router.push("/")
+        }
+    }
 });
 </script>
 

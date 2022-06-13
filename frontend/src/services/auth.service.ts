@@ -28,8 +28,6 @@ class AuthService {
     localStorage.removeItem('access');
     localStorage.removeItem('refresh');
     localStorage.removeItem('user');
-
-    window.location.replace('/');
   }
 
   register(email: string, password1: string, password2: string) {

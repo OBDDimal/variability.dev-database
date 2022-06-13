@@ -39,8 +39,8 @@ export default Vue.extend({
                             window.location.replace('/login');
                         }); */
                         console.log("Success")
-                        this.$store.commit('updateSnackbar', { message: "Register successful!", variant: "success", show: true })
-                        window.location.replace('/login');
+                        this.$store.commit('updateSnackbar', { message: "Register successful!", variant: "success", timeout: 5000, show: true })
+                        this.$router.push("/")
                     } else if (response.data.message === 'User is already activated!') {
                         /* Modal.fire({
                             icon: 'warning',
@@ -50,8 +50,8 @@ export default Vue.extend({
                             window.location.replace('/login');
                         }); */
                         console.log("Unsuccess")
-                        this.$store.commit('updateSnackbar', { message: "Your code was already used!", variant: "warning", show: true })
-                        window.location.replace('/login');
+                        this.$store.commit('updateSnackbar', { message: "Your code was already used!", variant: "warning", timeout: 5000, show: true })
+                        this.$router.push("/")
                     } else {
                         /* Modal.fire({
                             icon: 'error',
@@ -61,8 +61,8 @@ export default Vue.extend({
                             window.location.replace('/login');
                         }); */
                         console.log("Unsuccess2")
-                        this.$store.commit('updateSnackbar', { message: "Your code is not valid", variant: "error", show: true })
-                        window.location.replace('/login');
+                        this.$store.commit('updateSnackbar', { message: "Your code is not valid", variant: "error", timeout: 5000, show: true })
+                        this.$router.push("/")
                     }
                 })
                 .catch(() => {
@@ -74,8 +74,8 @@ export default Vue.extend({
                         window.location.replace('/login');
                     }); */
                     console.log("Unsuccess3")
-                    this.$store.commit('updateSnackbar', { message: "Your code is not valid", variant: "error", show: true })
-                    window.location.replace('/login');
+                    this.$store.commit('updateSnackbar', { message: "Your code is not valid", variant: "error", timeout: 5000, show: true })
+                    window.location.replace('/');
                 });
         }
     },

@@ -53,13 +53,20 @@ export default Vue.extend({
             (v: string) => v.length >= 8 || 'Min 8 characters',
             /* emailMatch: () => (`The email and password you entered don't match`), */
         ],
-        show1: false
+        show1: false,
+        prevRoute: "/",
     }),
 
     computed: {
         isReady(): boolean {
             return this.valid && this.email != "" && this.password != ""
         }
+    },
+
+    beforeRouteEnter(to, from, next) {
+        next((vm:any) => {
+            vm.prevRoute = from.path
+        });
     },
 
     methods: {
@@ -89,27 +96,27 @@ export default Vue.extend({
                                 window.location.replace('/');
                             }
                         }); */
-                        this.$store.commit('updateSnackbar', { message: "Login successful!", variant: "success", show: true })
-                        // Check for saved URLS, relocate and wipe them
-                        const newUrl = localStorage.getItem('previousURL');
-                        if (newUrl) {
-                            localStorage.removeItem('previousURL');
-                            this.$router.go(-1)
-                        } else {
-                            this.$router.push("/")
-                        }
-
+                        console.log(this.prevRoute)
+                        this.$store.dispatch('login')
+                        this.$router.push(this.prevRoute)
                         this.loading = false;
                     },
                     (error) => {
                         console.log(error.response.data)
-                        this.$store.commit('updateSnackbar', { message: "Login not successful: " + error.response.data.detail, variant: "error", show: true })
+                        this.$store.commit('updateSnackbar', { message: "Login not successful: " + error.response.data.detail, variant: "error", timeout: 5000, show: true })
                         this.loading = false;
                     },
                 );
             }
         }
     },
+
+    mounted() {
+        if (this.$store.state.loggedIn && this.$store.state.currentUser) {
+            this.$store.commit('updateSnackbar', { message: "User is already logged in", variant: "info", timeout: 5000, show: true })
+            this.$router.push("/")
+        }
+    }
 });
 </script>
 

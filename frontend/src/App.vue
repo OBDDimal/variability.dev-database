@@ -7,10 +7,10 @@
                 <router-view />
             </div>
             <v-snackbar absolute v-model="$store.state.snackbar.show" elevation="8" :multi-line="true" :right="true"
-                :top="true" :timeout="5000" :color="$store.state.snackbar.variant">
+                :top="true" :timeout="$store.state.snackbar.timeout" :color="$store.state.snackbar.variant">
                 {{ $store.state.snackbar.message }}
                 <template v-slot:action="{ attrs }">
-                    <v-btn dark text v-bind="attrs" @click="$store.commit('updateSnackbar', { show: false })">
+                    <v-btn dark plain v-bind="attrs" @click="$store.commit('updateSnackbar', { show: false })">
                         &#10005;
                     </v-btn>
                 </template>
