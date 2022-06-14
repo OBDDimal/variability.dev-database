@@ -19,6 +19,7 @@ export default new Vuex.Store({
     currentUser: authService.getCurrentUser(),
     accessToken: authService.getAccessToken(),
     tags: [],
+    families: [],
   },
   actions: {
     logout({ commit }) {
@@ -37,6 +38,11 @@ export default new Vuex.Store({
     fetchTags({ commit }) {
       api.get(`${API_URL}tags/`).then((response) => {
         commit('setTags', { tags: response.data });
+      });
+    },
+    fetchFamilies({ commit }) {
+      api.get(`${API_URL}families/`).then((response) => {
+        commit('setFamilies', { families: response.data });
       });
     },
   },
@@ -60,6 +66,10 @@ export default new Vuex.Store({
     setTags(state, payload) {
       const { tags } = payload
       state.tags = tags
+    },
+    setFamilies(state, payload) {
+      const { families } = payload
+      state.families = families
     }
   },
   modules: {
