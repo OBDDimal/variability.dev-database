@@ -132,7 +132,7 @@
 <script>
 import Vue from "vue"
 
-export default Vue.extend{
+export default Vue.extend({
     name: "",
 
     components: {},
@@ -149,7 +149,7 @@ export default Vue.extend{
     computed: {},
 
     methods: {},
-};
+});
 </script>
 
 <style scoped>
