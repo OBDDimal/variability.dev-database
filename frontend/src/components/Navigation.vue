@@ -39,6 +39,19 @@
                 <v-icon left> mdi-logout-variant </v-icon>
                 Logout
             </v-btn>
+            <v-divider vertical class="mx-5"></v-divider>
+            <v-btn
+                icon
+                class="mr-3"
+                @click="$vuetify.theme.dark = !$vuetify.theme.dark"
+            >
+                <v-icon v-if="$vuetify.theme.dark">
+                    mdi-brightness-7
+                </v-icon>
+                <v-icon v-else>
+                    mdi-brightness-4
+                </v-icon>
+            </v-btn>
         </v-app-bar>
     </div>
 </template>
