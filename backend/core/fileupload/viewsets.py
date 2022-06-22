@@ -1,6 +1,7 @@
 from core.analysis.models import DockerProcess, Analysis
 from core.fileupload.models import Family, Tag, License, File
 from core.fileupload.serializers import FilesSerializer, TagsSerializer, FamiliesSerializer, LicensesSerializer
+from core.fileupload.permissions import IsOwnerOrReadOnly
 from collections import OrderedDict
 import logging
 from django.utils import timezone, dateparse
@@ -13,7 +14,7 @@ from django.core.signing import BadSignature
 from django.utils.encoding import DjangoUnicodeDecodeError
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticatedOrReadOnly
 from rest_framework.mixins import CreateModelMixin
 from ddueruemweb.settings import PASSWORD_RESET_TIMEOUT_DAYS, DEBUG
 from ..auth.tokens import decode_token_to_user
@@ -68,7 +69,7 @@ class ConfirmFileUploadViewSet(GenericViewSet, CreateModelMixin):
 class FileUploadViewSet(viewsets.ModelViewSet):
     queryset = File.objects.all()
     serializer_class = FilesSerializer
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [AllowAny]
 
     def list(self, request, **kwargs):
         """
@@ -109,7 +110,7 @@ class FileUploadViewSet(viewsets.ModelViewSet):
         self.request.user.send_link_to_file(serializer.data)
 
 
-class UnconfirmedFileViewSet(viewsets.ModelViewSet):
+class UnconfirmedFileViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin, mixins.UpdateModelMixin, mixins.DestroyModelMixin, mixins.ListModelMixin):
     queryset = File.objects.filter(is_confirmed=False)
     serializer_class = FilesSerializer
     permission_classes = [permissions.IsAuthenticated]
@@ -149,12 +150,6 @@ class UnconfirmedFileViewSet(viewsets.ModelViewSet):
             changed_files.append(changed_file)
         return Response(changed_files)
 
-    def create(self, request, *args, **kwargs):
-        return Response({'message': 'Create is prohibited'}, HTTP_405_METHOD_NOT_ALLOWED)
-
-    def update(self, request, *args, **kwargs):
-        return Response({'message': 'Update is prohibited'}, HTTP_405_METHOD_NOT_ALLOWED)
-
     def destroy(self, request, *args, **kwargs):
         try:
             file = File.objects.get(pk=kwargs['pk'])
@@ -168,10 +163,10 @@ class UnconfirmedFileViewSet(viewsets.ModelViewSet):
         return Response(status=HTTP_200_OK)
 
 
-class ConfirmedFileViewSet(viewsets.ModelViewSet):
+class ConfirmedFileViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin, mixins.UpdateModelMixin, mixins.DestroyModelMixin, mixins.ListModelMixin):
     queryset = File.objects.filter(is_confirmed=True)
     serializer_class = FilesSerializer
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [AllowAny]
 
     def _get_analysis_state(self, file):
         if file['owner']:
@@ -226,17 +221,11 @@ class ConfirmedFileViewSet(viewsets.ModelViewSet):
             changed_files.append(changed_file)
         return Response(changed_files)
 
-    def create(self, request, *args, **kwargs):
-        return Response({'message': 'Create is prohibited'}, HTTP_405_METHOD_NOT_ALLOWED)
 
-    def update(self, request, *args, **kwargs):
-        return Response({'message': 'Update is prohibited'}, HTTP_405_METHOD_NOT_ALLOWED)
-
-
-class FamiliesViewSet(viewsets.ModelViewSet):
+class FamiliesViewSet(viewsets.GenericViewSet, mixins.ListModelMixin, mixins.CreateModelMixin, mixins.RetrieveModelMixin, mixins.UpdateModelMixin):
     queryset = Family.objects.all()
     serializer_class = FamiliesSerializer
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
 
     def list(self, request, **kwargs):
         """
@@ -259,32 +248,23 @@ class FamiliesViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
+        
 
-    """ def perform_update(self, serializer):
-        serializer.save(owner=self.request.user) """
-
-
-class LicensesViewSet(viewsets.ModelViewSet, mixins.ListModelMixin):
+class LicensesViewSet(viewsets.GenericViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin):
     queryset = License.objects.all()
     serializer_class = LicensesSerializer
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [AllowAny]
 
     def list(self, request, **kwargs):
         queryset = License.objects.all()
         licenses = LicensesSerializer(queryset, many=True).data
         return Response(licenses)
 
-    def create(self, request, *args, **kwargs):
-        return Response({'message': 'Create is prohibited'}, HTTP_405_METHOD_NOT_ALLOWED)
 
-    def update(self, request, *args, **kwargs):
-        return Response({'message': 'Update is prohibited'}, HTTP_405_METHOD_NOT_ALLOWED)
-
-
-class TagsViewSet(viewsets.ModelViewSet):
+class TagsViewSet(viewsets.GenericViewSet, mixins.ListModelMixin, mixins.CreateModelMixin, mixins.RetrieveModelMixin, mixins.DestroyModelMixin):
     queryset = Tag.objects.all()
     serializer_class = TagsSerializer
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
 
     def list(self, request, **kwargs):
         """
