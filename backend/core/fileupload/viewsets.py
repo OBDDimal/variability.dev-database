@@ -308,7 +308,3 @@ class TagsViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
 
-    def delete(self, pk):
-        tag = self.get_object(pk)
-        tag.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
