@@ -1,5 +1,5 @@
 import Constraint from "@/classes/constraint";
-import { FeatureNode, GroupType } from "@/classes/featureNode";
+import { FeatureNode, GroupType, PseudoNode } from "@/classes/featureNode";
 
 const littleModel = `
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
@@ -58,7 +58,9 @@ const littleModel = `
 const currentModel = littleModel; // Choose between littleModel and hugeModel.
 let featureMap: { [key: string]: FeatureNode } = {};
 
-function xmlToJson() {
+function xmlToJson():
+  | { rootNode: FeatureNode; constraints: Constraint[] }
+  | { rootNode: undefined; constraints: undefined } {
   const start = performance.now();
 
   // To remove the <?xml...?> line
@@ -125,4 +127,7 @@ function getConstraints(constraints: Element) {
   return toReturn;
 }
 
-const { rootNode: featureModelRawData, constraints: constraints } = xmlToJson();
+export const { rootNode: featureModelRawData, constraints: constraints } =
+  xmlToJson();
+
+export const rootNode: FeatureNode = featureModelRawData as FeatureNode;

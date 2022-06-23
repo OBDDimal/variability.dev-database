@@ -1,5 +1,6 @@
 import { FeatureNode } from "@/classes/featureNode";
 import * as constants from "@/classes/constants";
+import { updateCollapsing } from "@/classes/updates";
 
 enum Operator {
   imp = "⇒",

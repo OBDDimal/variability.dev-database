@@ -1,4 +1,5 @@
 import {
+  CHILDREN_COUNT_LETTERS_TO_RADIUS,
   DISPLAY_NAME_LENGTH,
   NODE_ABSTRACT_COLOR,
   NODE_COLOR,
@@ -25,6 +26,7 @@ export class FeatureNode {
   constraintsHighlighted: Constraint[];
   isCollapsed: boolean;
   isHidden: boolean;
+  allD3Children: d3.HierarchyNode<FeatureNode | PseudoNode>[];
 
   constructor(
     name: string,
@@ -46,6 +48,7 @@ export class FeatureNode {
     this.constraintsHighlighted = [];
     this.isCollapsed = true;
     this.isHidden = false;
+    this.allD3Children = [];
   }
 
   childrenCount() {
@@ -165,12 +168,14 @@ export class FeatureNode {
 }
 
 export class PseudoNode {
-  hiddenD3Children: any[];
+  hiddenD3Children: d3.HierarchyNode<FeatureNode>[];
   constructor(d3Node: any) {
     this.hiddenD3Children = [d3Node];
   }
 
   unhideHiddenNodes() {
-    this.hiddenD3Children.forEach((d3Node) => d3Node.data.unhide());
+    for (const child of this.hiddenD3Children) {
+      child.data.unhide();
+    }
   }
 }
