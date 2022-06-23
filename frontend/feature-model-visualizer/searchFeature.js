@@ -46,5 +46,5 @@ function findD3Node(search) {
 
   // TODO: If levenshtein distance is above a good value dont display anything?
 
-  return d3Node;
+  return d3node;
 }

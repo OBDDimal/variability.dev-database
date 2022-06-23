@@ -2,7 +2,6 @@ import axios from 'axios';
 
 const API_URL = `${process.env.VUE_APP_DOMAIN}auth/`;
 
-/* eslint-disable class-methods-use-this */
 class AuthService {
   login(email, password) {
     return axios

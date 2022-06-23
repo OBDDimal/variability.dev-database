@@ -11,6 +11,7 @@ import Register from '../views/Register.vue'
 import Login from '../views/Login.vue'
 import FileCreate from '../views/FileCreate.vue'
 import RegisterConfirmation from '../views/RegisterConfirmation.vue'
+import FeatureModel from '../views/FeatureModel.vue'
 
 Vue.use(VueRouter)
 
@@ -74,6 +75,11 @@ const routes = [
     path: '/upload',
     name: 'FileCreate',
     component: FileCreate
+  },
+  {
+    path: '/feature-model',
+    name: 'FeatureModel',
+    component: FeatureModel
   },
 ]
 
