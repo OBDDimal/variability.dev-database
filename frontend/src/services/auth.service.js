@@ -4,7 +4,7 @@ const API_URL = `${process.env.VUE_APP_DOMAIN}auth/`;
 
 /* eslint-disable class-methods-use-this */
 class AuthService {
-  login(email: string, password: string) {
+  login(email, password) {
     return axios
       .post(`${API_URL}login/`, {
         email,
@@ -30,7 +30,7 @@ class AuthService {
     localStorage.removeItem('user');
   }
 
-  register(email: string, password1: string, password2: string) {
+  register(email, password1, password2) {
     return axios.post(`${API_URL}register/`, {
       email,
       password1,

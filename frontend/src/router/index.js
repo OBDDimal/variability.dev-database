@@ -1,5 +1,5 @@
 import Vue from 'vue'
-import VueRouter, { RouteConfig } from 'vue-router'
+import VueRouter from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 import ViewModel from '../views/ViewModel.vue'
 import Profile from '../views/Profile.vue'
@@ -14,7 +14,7 @@ import RegisterConfirmation from '../views/RegisterConfirmation.vue'
 
 Vue.use(VueRouter)
 
-const routes: Array<RouteConfig> = [
+const routes = [
   {
     path: '/',
     name: 'HomeView',
