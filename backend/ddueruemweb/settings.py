@@ -133,6 +133,7 @@ REST_FRAMEWORK = {
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
     'DEFAULT_RENDERER_CLASSES': (
+        'rest_framework.authentication.SessionAuthentication',
         'rest_framework.renderers.JSONRenderer',
         # enable django rest framework rendering in browser
         'rest_framework.renderers.BrowsableAPIRenderer',
