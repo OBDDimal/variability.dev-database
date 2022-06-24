@@ -20,6 +20,7 @@ export default new Vuex.Store({
     accessToken: authService.getAccessToken(),
     tags: [],
     families: [],
+    files: [],
   },
   actions: {
     logout({ commit }) {
@@ -43,6 +44,11 @@ export default new Vuex.Store({
     fetchFamilies({ commit }) {
       api.get(`${API_URL}families/`).then((response) => {
         commit('setFamilies', { families: response.data });
+      });
+    },
+    fetchFiles({ commit }) {
+      api.get(`${API_URL}files/uploaded/confirmed/`).then((response) => {
+        commit('setFiles', { files: response.data });
       });
     },
   },
@@ -70,6 +76,10 @@ export default new Vuex.Store({
     setFamilies(state, payload) {
       const { families } = payload
       state.families = families
+    },
+    setFiles(state, payload) {
+      const { files } = payload
+      state.files = files
     }
   },
   modules: {
