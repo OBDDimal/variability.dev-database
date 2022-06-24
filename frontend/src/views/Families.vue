@@ -101,9 +101,8 @@
   </div>
 </template>
 
-<script lang="ts">
+<script>
 import Vue from "vue";
-import { Family } from "../../types";
 import api from "@/services/api.service";
 
 const API_URL = process.env.VUE_APP_DOMAIN;
@@ -146,13 +145,13 @@ export default Vue.extend({
       description: "",
       owner: false,
     },
-    families: [] as Family[],
+    families: [],
     loading: false,
     addLoading: false,
   }),
 
   computed: {
-    formTitle(): string {
+    formTitle() {
       return this.editedIndex === -1 ? "Create New Family" : "Edit Family";
     },
   },
@@ -193,7 +192,7 @@ export default Vue.extend({
                     },
                 ]; */
     },
-    editItem(item: Family) {
+    editItem(item) {
       this.editedIndex = item.id;
       this.editedItem = Object.assign({}, item);
       this.dialog = true;

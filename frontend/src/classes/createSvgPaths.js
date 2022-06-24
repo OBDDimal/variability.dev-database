@@ -1,5 +1,7 @@
+import * as CONSTANTS from "./constants"
+
 // Helper functions for drawing alternative-group and and-group paths
-const MOVE = 'M', LINE = 'L', CURVE = 'C', ARC = 'A', CLOSE = 'Z';
+const MOVE = 'M', LINE = 'L', ARC = 'A', CLOSE = 'Z';
 
 function polarToCartesian(point, radius, degrees) {
     const rad = degrees * Math.PI / 180.0;
@@ -37,10 +39,10 @@ export function createGroupSegment(d3Node, radius) {
         const firstChild = d3Node.children[0].isPseudoElement ? d3Node.children[1] : d3Node.children[0];
         const lastChild = d3Node.children[d3Node.children.length - 1].isPseudoElement ? d3Node.children[d3Node.children.length - 2] : d3Node.children[d3Node.children.length - 1];
 
-        const bottom_rect = {x: d3Node.x, y: d3Node.y + RECT_HEIGHT };
+        const bottom_rect = {x: d3Node.x, y: d3Node.y + CONSTANTS.RECT_HEIGHT };
         const startAngle = cartesianToAngle(bottom_rect, firstChild);
         const endAngle = cartesianToAngle(bottom_rect, lastChild);
-        return createPathDOfSegment({x: 0, y: RECT_HEIGHT}, radius, startAngle, endAngle);
+        return createPathDOfSegment({x: 0, y: CONSTANTS.RECT_HEIGHT}, radius, startAngle, endAngle);
     }
 
     return null;
@@ -48,6 +50,6 @@ export function createGroupSegment(d3Node, radius) {
 
 
 export function createLink(src, dest) {
-    const src_y = src.y + RECT_HEIGHT;
+    const src_y = src.y + CONSTANTS.RECT_HEIGHT;
     return `M ${src.x} ${src_y} L ${dest.x} ${dest.y}`;
 }

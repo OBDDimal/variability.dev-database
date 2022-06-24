@@ -1,5 +1,5 @@
 import Vue from 'vue'
-import VueRouter, { RouteConfig } from 'vue-router'
+import VueRouter from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 import ViewModel from '../views/ViewModel.vue'
 import Profile from '../views/Profile.vue'
@@ -11,10 +11,11 @@ import Register from '../views/Register.vue'
 import Login from '../views/Login.vue'
 import FileCreate from '../views/FileCreate.vue'
 import RegisterConfirmation from '../views/RegisterConfirmation.vue'
+import FeatureModel from '../views/FeatureModel.vue'
 
 Vue.use(VueRouter)
 
-const routes: Array<RouteConfig> = [
+const routes = [
   {
     path: '/',
     name: 'HomeView',
@@ -74,6 +75,11 @@ const routes: Array<RouteConfig> = [
     path: '/upload',
     name: 'FileCreate',
     component: FileCreate
+  },
+  {
+    path: '/feature-model',
+    name: 'FeatureModel',
+    component: FeatureModel
   },
 ]
 

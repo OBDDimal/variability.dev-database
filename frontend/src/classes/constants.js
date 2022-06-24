@@ -12,8 +12,7 @@ export const RECT_HEIGHT = 35;
 export const MONOSPACE_HEIGHT_WIDTH_FACTOR = 0.6;
 export const MANDATORY_CIRCLE_RADIUS = 6;
 export const GROUP_SEGMENT_RADIUS = 40; // Radius of the segment that represents the 'alt' and 'and' groups.
-export const CHILDREN_COUNT_LETTERS_TO_RADIUS =
-  11.5 * MONOSPACE_HEIGHT_WIDTH_FACTOR;
+export const CHILDREN_COUNT_LETTERS_TO_RADIUS = 11.5 * MONOSPACE_HEIGHT_WIDTH_FACTOR;
 
 export const FEATURE_FONT_SIZE = 16;
 export const CHILREN_COUNT_FONT_SIZE = 7;
@@ -56,3 +55,10 @@ export const NODE_COLOR = "#ccccff";
 export const NODE_ABSTRACT_COLOR = "#ebebff";
 
 export const DISPLAY_NAME_LENGTH = 8;
+export const operators = {
+    imp: "⇒",
+    conj: "∧",
+    disj: "∨",
+    eq: "⇔",
+    not: "¬",
+}
