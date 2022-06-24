@@ -189,12 +189,11 @@
   </div>
 </template>
 
-<script lang="ts">
+<script>
 import Vue from "vue";
-import { File, License, Tag, Family } from "../../types";
 //import api from "@/services/api.service";
 
-const API_URL = process.env.VUE_APP_DOMAIN;
+//const API_URL = process.env.VUE_APP_DOMAIN;
 
 export default Vue.extend({
   name: "HomeView",
@@ -242,10 +241,10 @@ export default Vue.extend({
       tags: null,
       uploaded: "Today",
     },
-    files: [] as File[],
-    licenses: [] as License[],
-    families: [] as Family[],
-    tags: [] as Tag[],
+    files: [],
+    licenses: [],
+    families: [],
+    tags: [],
     check1: false,
     check2: false,
     check3: false,
@@ -254,7 +253,7 @@ export default Vue.extend({
   }),
 
   computed: {
-    formTitle(): string {
+    formTitle() {
       return this.editedIndex === -1 ? "Upload New Model" : "Edit Model";
     } /* 
     existingFamilies() {
