@@ -1,9 +1,8 @@
 <template>
     <div>
-        <h3 class="text-h3 mb-2 mt-8">Welcome to Ddueruem</h3>
+        <h3 class="text-h3 mb-2 mt-8">My Feature Models</h3>
         <h5 class="text-h5 mb-4">
-            A web service for sharing feature model instances and collaborative
-            benchmarking
+            Here you can add new Feature Models
         </h5>
         <v-data-table :headers="headers" :items="featureModels" class="elevation-1" :search="search">
             <template v-slot:top>
@@ -87,11 +86,44 @@
                             </v-card-actions>
                         </v-card>
                     </v-dialog>
+                    <v-dialog v-model="dialogDelete" max-width="500px">
+                        <v-card>
+                            <v-card-title class="text-h5"
+                                >Are you sure you want to delete this
+                                feature model?</v-card-title
+                            >
+                            <v-card-actions>
+                                <v-spacer></v-spacer>
+                                <v-btn color="primary" text @click="closeDelete"
+                                    >Cancel</v-btn
+                                >
+                                <v-spacer></v-spacer>
+                                <v-btn
+                                    color="primary"
+                                    text
+                                    @click="deleteItemConfirm"
+                                    :loading="removeLoading"
+                                    >Delete
+                                </v-btn>
+                                <v-spacer></v-spacer>
+                            </v-card-actions>
+                        </v-card>
+                    </v-dialog>
                 </v-toolbar>
             </template>
-            <template v-slot:item.actions="{}">
+            <template v-slot:item.actions="{ item }">
                 <v-btn small rounded color="primary" class="mr-2" to="/ViewModel">
                     <v-icon>mdi-eye</v-icon>
+                </v-btn>
+                <v-btn
+                    small
+                    rounded
+                    color="error"
+                    class="mr-2"
+                    @click="deleteItem(item)"
+                    :disabled="item.owner === false"
+                >
+                    <v-icon>mdi-delete</v-icon>
                 </v-btn>
                 <v-btn small rounded color="success" class="mr-2">
                     <v-icon>mdi-play</v-icon>
@@ -103,6 +135,10 @@
             </template>
             <template v-slot:no-data>
                 <v-btn color="primary"> Reset </v-btn>
+            </template>
+            <template v-slot:item.owner="{ item }">
+                <v-icon v-if="item.owner" color="success"> mdi-check </v-icon>
+                <v-icon v-else color="error"> mdi-cancel </v-icon>
             </template>
         </v-data-table>
     </div>
@@ -122,6 +158,7 @@ export default Vue.extend({
     data: () => ({
         search: "",
         dialog: false,
+        dialogDelete: false,
         editedIndex: -1,
         family: "",
         newFamily: "",
@@ -136,7 +173,9 @@ export default Vue.extend({
             { text: "Description", value: "description" },
             { text: "License", value: "license" },
             { text: "Tags", value: "tags" },
-            { text: "Uploaded on", value: "uploaded" },
+            { text: "Uploaded on", value: "dateCreated" },
+            { text: "Owner", value: "owner" },
+            { text: "Family", value: "family" },
             {
                 text: "Actions",
                 align: "center",
@@ -147,11 +186,22 @@ export default Vue.extend({
         editedItem: {
             label: "",
             description: "",
-            license: "CC-BY Mention",
-            tags: null,
-            uploaded: "Today",
+            license: "",
+            tags: [""],
+            dateCreated: new Date(),
+            owner: true,
+            family: ""
         },
-        featureModels: [],
+        defaultItem: {
+            label: "",
+            description: "",
+            license: "",
+            tags: [""],
+            dateCreated: new Date(),
+            owner: true,
+            family: ""
+        },
+        featureModels: [] as FeatureModel[],
         licenses: [
             "CC-BY Mention",
             "CC-BY-NC Mention Non-Commercial",
@@ -161,7 +211,8 @@ export default Vue.extend({
         tags: ["Test", "Auto", "Tagger"],
         check1: false,
         check2: false,
-        check3: false
+        check3: false,
+        removeLoading: false,
     }),
 
     created() {
@@ -181,6 +232,9 @@ export default Vue.extend({
         dialog(val) {
             val || this.close();
         },
+        dialogDelete(val) {
+            val || this.closeDelete();
+        },
     },
 
     methods: {
@@ -190,46 +244,93 @@ export default Vue.extend({
                     label: "NPC Model",
                     description: "Test model for demonstration",
                     license: "CC-BY-SA",
-                    tags: 4.0,
-                    uploaded: "13.05.2022",
+                    tags: ["test tag", "exampletag"],
+                    dateCreated: new Date(),
+                    owner: true,
+                    family: "NPC Family"
                 },
                 {
                     label: "Cars",
                     description: "Test model for demonstration",
                     license: "CC-BY-SA",
-                    tags: 4.0,
-                    uploaded: "13.05.2022",
+                    tags: ["test tag", "exampletag"],
+                    dateCreated: new Date(),
+                    owner: true,
+                    family: "Cars Family"
                 },
                 {
                     label: "Model",
                     description: "Test model for demonstration",
                     license: "CC-BY-SA",
-                    tags: 4.0,
-                    uploaded: "13.05.2022",
+                    tags: ["test tag", "exampletag"],
+                    dateCreated: new Date(),
+                    owner: true,
+                    family: "Model Family"
                 },
                 {
                     label: "Berkshire",
                     description: "Test model for demonstration",
                     license: "CC-BY-SA",
-                    tags: 4.0,
-                    uploaded: "13.05.2022",
+                    tags: ["test tag", "exampletag"],
+                    dateCreated: new Date(),
+                    owner: true,
+                    family: "Berkshire Family"
                 },
                 {
                     label: "MyModel",
                     description: "Test model for demonstration",
                     license: "CC-BY-SA",
-                    tags: 4.0,
-                    uploaded: "13.05.2022",
+                    tags: ["test tag", "exampletag"],
+                    dateCreated: new Date(),
+                    owner: true,
+                    family: "My Family"
                 },
                 {
                     label: "Pete",
                     description: "Test model for demonstration",
                     license: "CC-BY-SA",
-                    tags: 4.0,
-                    uploaded: "13.05.2022",
+                    tags: ["test tag", "exampletag"],
+                    dateCreated: new Date(),
+                    owner: true,
+                    family: "Petes Family"
                 },
-            ];
+            ] as FeatureModel[];
         },
+        deleteItemConfirm() {
+                this.removeLoading = true;
+
+                //TODO: actually delete the feature model
+                // api.delete(`${API_URL}tags/${this.editedID}/`)
+                //     .then(() => {
+                //         this.$store.commit("updateSnackbar", {
+                //             message: "Tag deleted successfully!",
+                //             variant: "success",
+                //             timeout: 5000,
+                //             show: true,
+                //         });
+                //         this.$store.dispatch("fetchTags");
+                //         this.removeLoading = false;
+                //     })
+                //     .catch((error) => {
+                //         this.$store.commit("updateSnackbar", {
+                //             message: "Error: " + error.message,
+                //             variant: "error",
+                //             timeout: 5000,
+                //             show: true,
+                //         });
+                //         this.removeLoading = false;
+                //     });
+
+                this.$store.commit("updateSnackbar", {
+                    message: "Error: " + "deletion of feature models is not yet implemented!",
+                    variant: "error",
+                    timeout: 5000,
+                    show: true,
+                });
+                this.removeLoading = false;
+
+                this.closeDelete();
+            },
         close() {
             this.dialog = false;
             this.$nextTick(() => {
@@ -237,7 +338,18 @@ export default Vue.extend({
                 this.editedIndex = -1;
             });
         },
-
+        closeDelete() {
+            this.dialogDelete = false;
+            this.$nextTick(() => {
+                this.editedItem = Object.assign({}, this.defaultItem);
+                this.editedIndex = -1;
+            });
+        },
+        deleteItem(item: FeatureModel) {
+                this.editedIndex = this.featureModels.indexOf(item);
+                this.editedItem = Object.assign({}, item);
+                this.dialogDelete = true;
+            },
         save() {
             if (this.editedIndex > -1) {
                 Object.assign(this.featureModels[this.editedIndex], this.editedItem);

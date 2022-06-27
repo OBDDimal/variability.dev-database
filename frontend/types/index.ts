@@ -59,5 +59,11 @@ export interface Tag {
 }
 
 export interface FeatureModel {
-    
+    label: string;
+    description: string;
+    license: string;
+    tags: string[];
+    dateCreated: Date;
+    owner: boolean;
+    family: string;
 }
