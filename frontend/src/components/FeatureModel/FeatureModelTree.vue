@@ -15,6 +15,16 @@
       :selectedD3Node="selectedD3Node"
       :selectedD3NodeEvent="selectedD3NodeEvent"
       :showMenu="selectedD3Node != null"
+      @collapse="
+        (d3Node) => {
+          d3Node.data.toggleCollapse();
+          updateCollapsing();
+          updateSvg();
+        }
+      "
+      @hideLeftSiblings="(d3Node) => hideLeftSiblings(d3Node)"
+      @hideRightSiblings="(d3Node) => hideRightSiblings(d3Node)"
+      @hideCurrentNode="(d3Node) => hideCurrentNode(d3Node)"
     ></feature-model-tree-context-menu>
   </div>
 </template>
@@ -432,7 +442,7 @@ export default Vue.extend({
       console.log("Rendertime", performance.now() - start);
     },
 
-    // Collapses all children of the specifed node with shortcut CTRL + left-click.
+    // Collapses all children of the specifed node with shortcut ALT + left-click.
     collapseShortcut(event, d3Node) {
       if (event.getModifierState("Alt")) {
         d3Node.data.toggleCollapse();
@@ -700,6 +710,38 @@ export default Vue.extend({
     onChangeVerticalSpacing(verticalSpacing) {
       this.verticalSpacing = verticalSpacing;
       this.updateSvg();
+    },
+
+    hideLeftSiblings(d3Node) {
+      if (d3Node.data.getLeftSibling().isHidden) {
+        d3Node.data.unhideLeftSiblings();
+      } else {
+        d3Node.data.hideLeftSiblings();
+      }
+
+      this.updateHiding(d3Node.parent);
+      this.updateSvg();
+      this.focusNode(d3Node);
+    },
+
+    hideRightSiblings(d3Node) {
+      if (d3Node.data.getRightSibling().isHidden) {
+        d3Node.data.unhideRightSiblings();
+      } else {
+        d3Node.data.hideRightSiblings();
+      }
+
+      this.updateHiding(d3Node.parent);
+      this.updateSvg();
+      this.focusNode(d3Node);
+    },
+
+    hideCurrentNode(d3Node) {
+      d3Node.data.hide();
+
+      this.updateHiding(d3Node.parent);
+      this.updateSvg();
+      this.focusNode(d3Node);
     },
   },
 });

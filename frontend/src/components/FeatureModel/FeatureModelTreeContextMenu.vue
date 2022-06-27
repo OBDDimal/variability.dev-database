@@ -1,36 +1,97 @@
 <template>
-  <div
-    v-if="showMenu"
-    class="context-menu"
-    :style="`top: ${selectedD3NodeEvent.pageY}px; left: ${selectedD3NodeEvent.pageX}px`"
+  <v-menu
+    v-model="showMenu"
+    transition="scroll-y-transition"
+    :position-x="selectedD3NodeEvent ? selectedD3NodeEvent.pageX : 0"
+    :position-y="selectedD3NodeEvent ? selectedD3NodeEvent.pageY : 0"
+    absolute
+    offset-y
   >
     <v-list>
+      <v-list-item
+        :disabled="
+          selectedD3Node &&
+          !selectedD3Node.children &&
+          !selectedD3Node.collapsedChildren
+        "
+        @click="$emit('collapse', selectedD3Node)"
+      >
+        <v-list-item-icon>
+          <v-icon>mdi-arrow-collapse-all</v-icon>
+        </v-list-item-icon>
+        <v-list-item-content>
+          <v-list-item-title>Collapse</v-list-item-title>
+        </v-list-item-content>
+      </v-list-item>
+
+      <v-divider></v-divider>
+
+      <v-list-item
+        :disabled="
+          !(
+            selectedD3Node &&
+            selectedD3Node.parent &&
+            selectedD3Node.parent.children &&
+            selectedD3Node.parent.children.length > 1 &&
+            selectedD3Node.parent.children[0].data.name !==
+              selectedD3Node.data.name
+          )
+        "
+        @click="$emit('hideLeftSiblings', selectedD3Node)"
+      >
+        <v-list-item-content>
+          <v-list-item-title>Hide left siblings</v-list-item-title>
+        </v-list-item-content>
+      </v-list-item>
+
+      <v-list-item
+        :disabled="
+          !(
+            selectedD3Node &&
+            selectedD3Node.parent &&
+            selectedD3Node.parent.children &&
+            selectedD3Node.parent.children.length > 1 &&
+            selectedD3Node.parent.children[
+              selectedD3Node.parent.children.length - 1
+            ].data.name !== selectedD3Node.data.name
+          )
+        "
+        @click="$emit('hideRightSiblings', selectedD3Node)"
+      >
+        <v-list-item-content>
+          <v-list-item-title>Hide right siblings</v-list-item-title>
+        </v-list-item-content>
+      </v-list-item>
+
+      <v-list-item @click="$emit('hideCurrentNode', selectedD3Node)">
+        <v-list-item-content>
+          <v-list-item-title>Hide current node</v-list-item-title>
+        </v-list-item-content>
+      </v-list-item>
+
+      <v-divider></v-divider>
+
+      <v-list-item
+        :disabled="
+          !(
+            selectedD3Node &&
+            selectedD3Node.data.constraints &&
+            selectedD3Node.data.constraints.length
+          )
+        "
+      >
+        <v-list-item-content>
+          <v-list-item-title>Highlight constraints</v-list-item-title>
+        </v-list-item-content>
+      </v-list-item>
+
       <v-list-item>
         <v-list-item-content>
-          <v-list-item-title>Single-line item</v-list-item-title>
-        </v-list-item-content>
-      </v-list-item>
-
-      <v-list-item two-line>
-        <v-list-item-content>
-          <v-list-item-title>Two-line item</v-list-item-title>
-          <v-list-item-subtitle>Secondary text</v-list-item-subtitle>
-        </v-list-item-content>
-      </v-list-item>
-
-      <v-list-item three-line>
-        <v-list-item-content>
-          <v-list-item-title>Three-line item</v-list-item-title>
-          <v-list-item-subtitle>
-            Secondary line text Lorem ipsum dolor sit amet,
-          </v-list-item-subtitle>
-          <v-list-item-subtitle>
-            consectetur adipiscing elit.
-          </v-list-item-subtitle>
+          <v-list-item-title>Edit</v-list-item-title>
         </v-list-item-content>
       </v-list-item>
     </v-list>
-  </div>
+  </v-menu>
 </template>
 
 <script>
@@ -44,47 +105,11 @@ export default Vue.extend({
     selectedD3NodeEvent: undefined,
     showMenu: Boolean,
   },
-
-  methods: {},
 });
 </script>
 
 <style scoped>
-.context-menu {
-  position: absolute;
-  background-color: white;
-  border: 1px solid grey;
-  border-radius: 3px;
-  z-index: 10;
-}
-
-.context-menu > ul {
-  padding: 0;
-  margin: 0;
-  list-style: none;
-}
-
-.context-menu > ul > li {
-  padding: 0.5rem;
+.v-list-item:not(.v-list-item--disabled) {
   cursor: pointer;
-}
-
-.context-menu > ul > .deactivated {
-  color: grey;
-  cursor: initial;
-}
-
-.context-menu > ul > .deactivated:hover {
-  background-color: lightgrey;
-}
-
-.context-menu > ul > li:hover {
-  background-color: lightblue;
-}
-
-.context-menu-active {
-  display: block;
-  transition: all 1s;
-  min-width: 200px;
 }
 </style>
