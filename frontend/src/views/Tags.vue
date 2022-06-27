@@ -6,7 +6,8 @@
         </h5>
         <v-data-table
             :headers="headers"
-            :items="tags"
+            :items="$store.state.tags"
+            :loading="loading"
             class="elevation-1"
             :search="search"
         >
@@ -21,7 +22,8 @@
                         label="Search"
                         single-line
                         hide-details
-                    ></v-text-field>
+                    >
+                    </v-text-field>
                     <v-dialog v-model="dialog" max-width="500px">
                         <template v-slot:activator="{ on, attrs }">
                             <v-btn
@@ -54,7 +56,8 @@
                                             <v-text-field
                                                 v-model="editedItem.description"
                                                 label="Description"
-                                            ></v-text-field>
+                                            >
+                                            </v-text-field>
                                         </v-col>
                                         <v-col cols="12">
                                             <v-checkbox
@@ -75,7 +78,12 @@
                                 >
                                     Cancel
                                 </v-btn>
-                                <v-btn color="blue darken-1" text @click="save">
+                                <v-btn
+                                    color="blue darken-1"
+                                    text
+                                    @click="save"
+                                    :loading="addLoading"
+                                >
                                     Save
                                 </v-btn>
                             </v-card-actions>
@@ -89,18 +97,17 @@
                             >
                             <v-card-actions>
                                 <v-spacer></v-spacer>
-                                <v-btn
-                                    color="blue darken-1"
-                                    text
-                                    @click="closeDelete"
+                                <v-btn color="primary" text @click="closeDelete"
                                     >Cancel</v-btn
                                 >
+                                <v-spacer></v-spacer>
                                 <v-btn
-                                    color="blue darken-1"
+                                    color="primary"
                                     text
                                     @click="deleteItemConfirm"
-                                    >OK</v-btn
-                                >
+                                    :loading="removeLoading"
+                                    >Delete
+                                </v-btn>
                                 <v-spacer></v-spacer>
                             </v-card-actions>
                         </v-card>
@@ -108,16 +115,10 @@
                 </v-toolbar>
             </template>
             <template v-slot:item.actions="{ item }">
-                <v-btn
-                    small
-                    rounded
-                    color="primary"
-                    class="mr-2"
-                    @click="editItem(item)"
-                    :disabled="item.owner === false"
-                >
-                    <v-icon>mdi-pencil</v-icon></v-btn
-                >
+                <!-- <v-btn small rounded color="primary" class="mr-2" @click="editItem(item)"
+                    :disabled="item.owner === false">
+                    <v-icon>mdi-pencil</v-icon>
+                </v-btn> -->
                 <v-btn
                     small
                     rounded
@@ -126,18 +127,23 @@
                     @click="deleteItem(item)"
                     :disabled="item.owner === false"
                 >
-                    <v-icon>mdi-delete</v-icon></v-btn
-                >
+                    <v-icon>mdi-delete</v-icon>
+                </v-btn>
                 <!-- <v-btn small rounded color="error" class="mr-2"> <v-icon>mdi-delete</v-icon></v-btn> -->
+            </template>
+            <template v-slot:item.is_public="{ item }">
+                <v-icon v-if="item.is_public" color="success">
+                    mdi-check
+                </v-icon>
+                <v-icon v-else color="error"> mdi-cancel </v-icon>
+            </template>
+            <template v-slot:item.date_created="{ item }">
+                {{ new Date(item.date_created).toLocaleString("en-US") }}
             </template>
             <template v-slot:item.id="{ index }">
                 {{ index + 1 }}
             </template>
-            <template v-slot:item.public="{ item }">
-                <v-icon v-if="item.public" color="success"> mdi-check </v-icon>
-                <v-icon v-else color="error"> mdi-cancel </v-icon>
-            </template>
-             <template v-slot:item.owner="{ item }">
+            <template v-slot:item.owner="{ item }">
                 <v-icon v-if="item.owner" color="success"> mdi-check </v-icon>
                 <v-icon v-else color="error"> mdi-cancel </v-icon>
             </template>
@@ -146,158 +152,223 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue"
-import { Tag } from '../../types'
+    import Vue from "vue";
+    import { Tag } from "../../types";
+    import api from "@/services/api.service";
 
-export default Vue.extend({
-    name: "Tags",
+    const API_URL = process.env.VUE_APP_DOMAIN;
 
-    components: {},
+    export default Vue.extend({
+        name: "Tags",
 
-    props: {},
+        components: {},
 
-    data: () => ({
-        search: "",
-        dialog: false,
-        dialogDelete: false,
-        editedIndex: -1,
-        headers: [
-            {
-                text: "ID",
-                align: "start",
-                sortable: false,
-                value: "id",
+        props: {},
+
+        data: () => ({
+            search: "",
+            dialog: false,
+            dialogDelete: false,
+            editedIndex: -1,
+            headers: [
+                {
+                    text: "ID",
+                    align: "start",
+                    sortable: false,
+                    value: "id",
+                },
+                { text: "Label", value: "label" },
+                { text: "Description", value: "description" },
+                { text: "Owner", value: "owner" },
+                { text: "Public", value: "is_public" },
+                { text: "Date Created", value: "date_created" },
+                {
+                    text: "Actions",
+                    align: "center",
+                    value: "actions",
+                    sortable: false,
+                },
+            ],
+            editedItem: {
+                label: "",
+                description: "",
+                public: false,
             },
-            { text: "Label", value: "label" },
-            { text: "Description", value: "description" },
-            { text: "Owner", value: "owner" },
-            { text: "Public", value: "public" },
-            { text: "Date Created", value: "dateCreated" },
-            {
-                text: "Actions",
-                align: "center",
-                value: "actions",
-                sortable: false,
+            defaultItem: {
+                label: "",
+                description: "",
+                public: false,
             },
-        ],
-        editedItem: {
-            label: "",
-            owner: false,
-            description: "",
-            dateCreated: new Date(),
-            public: false
-        } as Tag,
-        tags: [] as Tag[],
-    }),
+            editedID: -1,
+            tags: [] as Tag[],
+            loading: false,
+            addLoading: false,
+            removeLoading: false,
+        }),
 
-    created() {
-        this.initialize();
-    },
-
-    computed: {
-        formTitle() {
-            return this.editedIndex === -1 ? "Create New Tag" : "Edit Tag";
-        },
-    },
-
-    watch: {
-        dialog(val) {
-            val || this.close();
-        },
-        dialogDelete(val) {
-            val || this.closeDelete();
-        },
-    },
-
-    methods: {
-        initialize() {
-            this.tags = [
-                {
-                    label: "My first public tag",
-                    description: "Test tag 1 for demonstration",
-                    owner: true,
-                    dateCreated: new Date(),
-                    public: true
-                },
-                {
-                    label: "My second private tag",
-                    description: "Test tag 2 for demonstration",
-                    owner: true,
-                    dateCreated: new Date(),
-                    public: false
-                },
-                {
-                    label: "Not my public tag",
-                    description: "Test tag 3 for demonstration",
-                    owner: false,
-                    dateCreated: new Date(),
-                    public: true
-                },
-                // {   private tags from other users should not be fetched from the server!
-                //     label: "Not my private tag",
-                //     description: "Test tag 4 for demonstration",
-                //     owner: false,
-                //     dateCreated: new Date(),
-                //     public: false
-                // },   
-                {
-                    label: "Not my public tag 2",
-                    description: "Test tag 4 for demonstration",
-                    owner: false,
-                    dateCreated: new Date(),
-                    public: true
-                },
-            ];
-        },
-        editItem(item) {
-            this.editedIndex = this.tags.indexOf(item);
-            this.editedItem = Object.assign({}, item);
-            this.dialog = true;
+        computed: {
+            formTitle(): string {
+                return this.editedIndex === -1 ? "Create New Tag" : "Edit Tag";
+            },
         },
 
-        deleteItem(item) {
-            this.editedIndex = this.tags.indexOf(item);
-            this.editedItem = Object.assign({}, item);
-            this.dialogDelete = true;
+        watch: {
+            dialog(val) {
+                val || this.close();
+            },
+            dialogDelete(val) {
+                val || this.closeDelete();
+            },
         },
 
-        deleteItemConfirm() {
-            this.tags.splice(this.editedIndex, 1);
-            // TODO: call a service to delete the tag from the server
-            this.closeDelete();
+        methods: {
+            initialize() {
+                /* this.tags = [
+                            {
+                                label: "My first public tag",
+                                description: "Test tag 1 for demonstration",
+                                owner: true,
+                                dateCreated: new Date(),
+                                public: true
+                            },
+                            {
+                                label: "My second private tag",
+                                description: "Test tag 2 for demonstration",
+                                owner: true,
+                                dateCreated: new Date(),
+                                public: false
+                            },
+                            {
+                                label: "Not my public tag",
+                                description: "Test tag 3 for demonstration",
+                                owner: false,
+                                dateCreated: new Date(),
+                                public: true
+                            },
+                            // {   private tags from other users should not be fetched from the server!
+                            //     label: "Not my private tag",
+                            //     description: "Test tag 4 for demonstration",
+                            //     owner: false,
+                            //     dateCreated: new Date(),
+                            //     public: false
+                            // },   
+                            {
+                                label: "Not my public tag 2",
+                                description: "Test tag 4 for demonstration",
+                                owner: false,
+                                dateCreated: new Date(),
+                                public: true
+                            },
+                        ]; */
+            },
+            /* editItem(item: Tag) {
+                        this.editedIndex = this.tags.indexOf(item);
+                        this.editedItem = Object.assign({}, item);
+                        this.dialog = true;
+                    }, */
+
+            deleteItem(item: Tag) {
+                this.editedIndex = this.tags.indexOf(item);
+                this.editedItem = Object.assign({}, item);
+                this.editedID = item.id;
+                this.dialogDelete = true;
+            },
+
+            deleteItemConfirm() {
+                this.removeLoading = true;
+
+                api.delete(`${API_URL}tags/${this.editedID}/`)
+                    .then(() => {
+                        this.$store.commit("updateSnackbar", {
+                            message: "Tag deleted successfully!",
+                            variant: "success",
+                            timeout: 5000,
+                            show: true,
+                        });
+                        this.$store.dispatch("fetchTags");
+                        this.removeLoading = false;
+                    })
+                    .catch((error) => {
+                        this.$store.commit("updateSnackbar", {
+                            message: "Error: " + error.message,
+                            variant: "error",
+                            timeout: 5000,
+                            show: true,
+                        });
+                        this.removeLoading = false;
+                    });
+                this.closeDelete();
+            },
+            close() {
+                this.dialog = false;
+                this.$nextTick(() => {
+                    this.editedItem = Object.assign({}, this.defaultItem);
+                    this.editedIndex = -1;
+                });
+            },
+            closeDelete() {
+                this.dialogDelete = false;
+                this.$nextTick(() => {
+                    this.editedItem = Object.assign({}, this.defaultItem);
+                    this.editedIndex = -1;
+                    this.editedID = -1;
+                });
+            },
+
+            addTag() {
+                this.addLoading = true;
+                api.post(`${API_URL}tags/`, this.editedItem)
+                    .then(() => {
+                        this.$store.commit("updateSnackbar", {
+                            message: "Tag added successfully!",
+                            variant: "success",
+                            timeout: 5000,
+                            show: true,
+                        });
+                        this.$store.dispatch("fetchTags");
+                        this.addLoading = false;
+                    })
+                    .catch((error) => {
+                        this.$store.commit("updateSnackbar", {
+                            message: "Error: " + error.message,
+                            variant: "error",
+                            timeout: 5000,
+                            show: true,
+                        });
+                        this.addLoading = false;
+                    });
+            },
+
+            save() {
+                if (this.editedIndex > -1) {
+                    //Object.assign(this.tags[this.editedIndex], this.editedItem);
+                    //this.addTag();
+                    //UPDATE call to service
+                } else {
+                    this.addTag();
+                }
+                // TODO: call a service to push new tag / edited tag to the server
+                this.close();
+            },
         },
-        close() {
-            this.dialog = false;
-            this.$nextTick(() => {
-                this.editedItem = Object.assign({}, this.defaultItem);
-                this.editedIndex = -1;
-            });
-        },
-        closeDelete() {
-            this.dialogDelete = false;
-            this.$nextTick(() => {
-                this.editedItem = Object.assign({}, this.defaultItem);
-                this.editedIndex = -1;
-            });
-        },
-        save() {
-            if (this.editedIndex > -1) {
-                Object.assign(this.tags[this.editedIndex], this.editedItem);
+
+        mounted() {
+            if (!this.$store.state.loggedIn || !this.$store.state.currentUser) {
+                this.$store.commit("updateSnackbar", {
+                    message: "Please log in to view this page",
+                    variant: "info",
+                    timeout: 5000,
+                    show: true,
+                });
+                this.$router.push("/login");
             } else {
-                this.tags.push(this.editedItem);
+                this.loading = true;
+                this.$store.dispatch("fetchTags");
+                this.tags = this.$store.state.tags;
+                this.loading = false;
             }
-            // TODO: call a service to push new tag / edited tag to the server
-            this.close();
         },
-    },
-
-    mounted() {
-        if (!this.$store.state.loggedIn || !this.$store.state.currentUser) {
-            this.$store.commit('updateSnackbar', { message: "Please log in to view this page", variant: "info", timeout: 5000, show: true })
-            this.$router.push("/login")
-        }
-    }
-});
+    });
 </script>
 
 <style scoped>

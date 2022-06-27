@@ -4,7 +4,8 @@
         <h5 class="text-h5 mb-4">Here you can add new families</h5>
         <v-data-table
             :headers="headers"
-            :items="families"
+            :loading="loading"
+            :items="$store.state.families"
             class="elevation-1"
             :search="search"
         >
@@ -67,7 +68,12 @@
                                 >
                                     Cancel
                                 </v-btn>
-                                <v-btn color="blue darken-1" text @click="save">
+                                <v-btn
+                                    color="blue darken-1"
+                                    text
+                                    @click="save"
+                                    :loading="addLoading"
+                                >
                                     Save
                                 </v-btn>
                             </v-card-actions>
@@ -100,123 +106,164 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue"
-import { Family } from '../../types'
+    import Vue from "vue";
+    import { Family } from "../../types";
+    import api from "@/services/api.service";
 
-export default Vue.extend({
-    name: "Families",
+    const API_URL = process.env.VUE_APP_DOMAIN;
 
-    components: {},
+    export default Vue.extend({
+        name: "Families",
 
-    props: {},
+        components: {},
 
-    data: () => ({
-        search: "",
-        dialog: false,
-        editedIndex: -1,
-        headers: [
-            {
-                text: "ID",
-                align: "start",
-                sortable: false,
-                value: "id",
+        props: {},
+
+        data: () => ({
+            search: "",
+            dialog: false,
+            editedIndex: -1,
+            headers: [
+                {
+                    text: "ID",
+                    align: "start",
+                    sortable: false,
+                    value: "id",
+                },
+                { text: "Label", value: "label" },
+                { text: "Description", value: "description" },
+                { text: "Owner", value: "owner" },
+                {
+                    text: "Actions",
+                    align: "center",
+                    value: "actions",
+                    sortable: false,
+                },
+            ],
+            editedItem: {
+                label: "",
+                description: "",
+                owner: false,
             },
-            { text: "Label", value: "label" },
-            { text: "Description", value: "description" },
-            { text: "Owner", value: "owner" },
-            {
-                text: "Actions",
-                align: "center",
-                value: "actions",
-                sortable: false,
+            defaultItem: {
+                label: "",
+                description: "",
+                owner: false,
             },
-        ],
-        editedItem: {
-            label: "",
-            description: "",
-            owner: false,
-        } as Family,
-        families: [] as Family[],
-    }),
+            editedID: -1,
+            families: [] as Family[],
+            loading: false,
+            addLoading: false
+        }),
 
-    created() {
-        this.initialize();
-    },
+        computed: {
+            formTitle(): string {
+                return this.editedIndex === -1
+                    ? "Create New Family"
+                    : "Edit Family";
+            },
+        },
 
-    computed: {
-        formTitle() {
-            return this.editedIndex === -1
-                ? "Create New Family"
-                : "Edit Family";
+        watch: {
+            dialog(val) {
+                val || this.close();
+            },
         },
-    },
 
-    watch: {
-        dialog(val) {
-            val || this.close();
-        },
-    },
+        methods: {
+            initialize() {
+                /* this.families = [
+                    {
+                        label: "My first family",
+                        description: "Test family 1 for demonstration",
+                        owner: true,
+                    },
+                    {
+                        label: "My second family",
+                        description: "Test family 2 for demonstration",
+                        owner: true,
+                    },
+                    {
+                        label: "Not my family",
+                        description: "Test family 3 for demonstration",
+                        owner: false,
+                    },
+                    {
+                        label: "Not my family 2",
+                        description: "Test family 4 for demonstration",
+                        owner: false,
+                    },
+                    {
+                        label: "Not my family 3",
+                        description: "Test family 5 for demonstration",
+                        owner: false,
+                    },
+                ]; */
+            },
+            editItem(item: Family) {
+                this.editedIndex = this.families.indexOf(item);
+                this.editedItem = Object.assign({}, item);
+                this.dialog = true;
+            },
+            close() {
+                this.dialog = false;
+                this.$nextTick(() => {
+                    //this.editedItem = Object.assign({}, this.defaultItem);
+                    this.editedIndex = -1;
+                });
+            },
 
-    methods: {
-        initialize() {
-            this.families = [
-                {
-                    label: "My first family",
-                    description: "Test family 1 for demonstration",
-                    owner: true,
-                },
-                {
-                    label: "My second family",
-                    description: "Test family 2 for demonstration",
-                    owner: true,
-                },
-                {
-                    label: "Not my family",
-                    description: "Test family 3 for demonstration",
-                    owner: false,
-                },
-                {
-                    label: "Not my family 2",
-                    description: "Test family 4 for demonstration",
-                    owner: false,
-                },
-                {
-                    label: "Not my family 3",
-                    description: "Test family 5 for demonstration",
-                    owner: false,
-                },
-            ];
+            addFamily() {
+                this.addLoading = true;
+                api.post(`${API_URL}families/`, this.editedItem)
+                    .then(() => {
+                        this.$store.commit("updateSnackbar", {
+                            message: "Family added successfully!",
+                            variant: "success",
+                            timeout: 5000,
+                            show: true,
+                        });
+                        this.$store.dispatch("fetchFamilies");
+                        this.addLoading = false;
+                    })
+                    .catch((error) => {
+                        this.$store.commit("updateSnackbar", {
+                            message: "Error: " + error.message,
+                            variant: "error",
+                            timeout: 5000,
+                            show: true,
+                        });
+                        this.addLoading = false;
+                    });
+            },
+
+            save() {
+                if (this.editedIndex > -1) {
+                    //UPDATE call to service
+                } else {
+                    this.addFamily();
+                }
+                this.close();
+            },
         },
-        editItem(item) {
-            this.editedIndex = this.families.indexOf(item);
-            this.editedItem = Object.assign({}, item);
-            this.dialog = true;
-        },
-        close() {
-            this.dialog = false;
-            this.$nextTick(() => {
-                this.editedItem = Object.assign({}, this.defaultItem);
-                this.editedIndex = -1;
-            });
-        },
-        save() {
-            if (this.editedIndex > -1) {
-                Object.assign(this.families[this.editedIndex], this.editedItem);
+
+        mounted() {
+            if (!this.$store.state.loggedIn || !this.$store.state.currentUser) {
+                this.$store.commit("updateSnackbar", {
+                    message: "Please log in to view this page",
+                    variant: "info",
+                    timeout: 5000,
+                    show: true,
+                });
+                this.$router.push("/login");
             } else {
-                this.families.push(this.editedItem);
+                this.loading = true;
+                this.$store.dispatch("fetchFamilies");
+                this.families = this.$store.state.families;
+                this.loading = false;
             }
-            // TODO: call a service to push new family / edited family to the server
-            this.close();
         },
-    },
-
-    mounted() {
-        if (!this.$store.state.loggedIn || !this.$store.state.currentUser) {
-            this.$store.commit('updateSnackbar', { message: "Please log in to view this page", variant: "info", timeout: 5000, show: true })
-            this.$router.push("/login")
-        }
-    }
-});
+    });
 </script>
 
 <style scoped>
