@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="mainView">
     <h3 class="text-h3 mb-2 mt-8 text-center">Register</h3>
     <h5 class="text-h5 mb-4 text-center">Create an account for ddueruem-web</h5>
     <v-row justify="center" align="center">

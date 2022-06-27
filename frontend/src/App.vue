@@ -3,7 +3,7 @@
     <navigation title="ddueruem" />
 
     <v-main style="position: relative">
-      <div class="mainView">
+      <div>
         <router-view />
       </div>
       <v-snackbar
@@ -58,10 +58,10 @@ export default Vue.extend({
 
 <style>
 .mainView {
-    margin-left: auto;
-    margin-right: auto;
-    padding-left: 30px;
-    padding-right: 30px;
-    max-width: 90% !important;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 30px;
+  padding-right: 30px;
+  max-width: 90% !important;
 }
 </style>

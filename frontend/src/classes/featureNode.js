@@ -10,6 +10,7 @@ export class FeatureNode {
     this.isRoot = parent === null;
     this.isMandatory = mandatory;
     this.isAbstract = abstract;
+    this.textColor = "black";
     this.color = this.isAbstract ? CONSTANTS.NODE_ABSTRACT_COLOR : CONSTANTS.NODE_COLOR;
     this.constraints = [];
     this.constraintsHighlighted = [];

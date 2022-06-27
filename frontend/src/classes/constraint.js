@@ -32,8 +32,8 @@ export class Constraint {
     }
 
     toString() {
-        if (this.operator === this.operators.not) {
-            return this.operators.not + "(" + this.children.map((child) => child.toString()) + ")";
+        if (this.operator === CONSTANTS.operators.not) {
+            return CONSTANTS.operators.not + "(" + this.children.map((child) => child.toString()) + ")";
         } else {
             return "(" + this.children.map((child) => child.toString()).join(` ${this.operator} `) + ")";
         }

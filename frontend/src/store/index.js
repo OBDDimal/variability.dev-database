@@ -21,6 +21,7 @@ export default new Vuex.Store({
     tags: [],
     families: [],
     files: [],
+    searchedNodes: "",
   },
   actions: {
     logout({ commit }) {

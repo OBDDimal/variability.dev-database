@@ -1,22 +1,38 @@
 <template>
-  <div class="svg-container" style="width: 100%; height: 95vh"></div>
+  <div>
+    <feature-model-tree-toolbar
+      @search="onChangeSearch"
+      @coloring="onChangeColoring"
+      @fitToView="zoomFit"
+      @resetView="(levels, maxChilds) => resetView(levels, maxChilds)"
+      @shortName="onChangeShortName"
+      @verticalSpacing="onChangeVerticalSpacing"
+      @export="$emit('exportToXML')"
+    ></feature-model-tree-toolbar>
+    <div id="svg-container"></div>
+  </div>
 </template>
 
 <script>
 import Vue from "vue";
 import * as d3 from "d3";
+import levenshtein from "js-levenshtein";
 import { flextree } from "d3-flextree";
 import * as CONSTANTS from "../classes/constants";
 import { FeatureNode, PseudoNode } from "../classes/featureNode";
-import { featureModelRawData } from "../services/transpiler.service";
 import { createGroupSegment, createLink } from "../classes/createSvgPaths";
+import FeatureModelTreeToolbar from "../components/FeatureModelTreeToolbar.vue";
 
 export default Vue.extend({
   name: "FeatureModelTree",
 
-  components: {},
+  components: {
+    FeatureModelTreeToolbar,
+  },
 
-  props: {},
+  props: {
+    rootNode: undefined,
+  },
 
   data: () => ({
     flexLayout: undefined,
@@ -27,12 +43,15 @@ export default Vue.extend({
     linksContainer: undefined,
     segmentsContainer: undefined,
     featureNodesContainer: undefined,
-    isShortenedName: true,
+    isShortenedName: false,
+    nodeIdCounter: 0,
+    isColorCoded: false,
+    verticalSpacing: 75,
   }),
 
   computed: {},
 
-  created() {
+  mounted() {
     this.initialize();
   },
 
@@ -43,13 +62,13 @@ export default Vue.extend({
         .nodeSize((d3Node) => [
           this.calcRectWidth(d3Node) +
             CONSTANTS.SPACE_BETWEEN_NODES_HORIZONTALLY,
-          CONSTANTS.RECT_HEIGHT + CONSTANTS.SPACE_BETWEEN_NODES_VERTICALLY,
+          CONSTANTS.RECT_HEIGHT + this.verticalSpacing,
         ])
         .spacing((d3NodeA, d3NodeB) => d3NodeA.path(d3NodeB).length);
 
       // Create root-feature-node with d3 and the data of the feature-model.
       this.rootD3Node = d3.hierarchy(
-        featureModelRawData,
+        this.rootNode,
         (d3Node) => d3Node.children
       );
       this.allD3Nodes = this.rootD3Node.descendants();
@@ -62,11 +81,9 @@ export default Vue.extend({
         //.scaleExtent([0.1, 8])
         .on("zoom", (event) => svgContent.attr("transform", event.transform));
 
-      console.log(d3.select(".svg-container"));
-
       // Create svg-container.
       const svg = d3
-        .select(".svg-container")
+        .select("#svg-container")
         .append("svg")
         .attr("preserveAspectRatio", "xMidYMid meet")
         .attr(
@@ -107,8 +124,7 @@ export default Vue.extend({
     updateFeatureNodes(visibleD3Nodes) {
       const featureNode = this.featureNodesContainer.selectAll("g.node").data(
         visibleD3Nodes.filter((d3Node) => d3Node.data instanceof FeatureNode),
-        (d3Node) =>
-          d3Node.id || (d3Node.id = ++CONSTANTS.CONSTANTS.nodeIdCounter)
+        (d3Node) => d3Node.id || (d3Node.id = ++this.nodeIdCounter)
       );
 
       // Enter new nodes
@@ -160,7 +176,7 @@ export default Vue.extend({
         .selectAll("g.pseudo-node")
         .data(
           visibleD3Nodes.filter((d3Node) => d3Node.data instanceof PseudoNode),
-          (d3Node) => d3Node.id || (d3Node.id = ++CONSTANTS.nodeIdCounter)
+          (d3Node) => d3Node.id || (d3Node.id = ++this.nodeIdCounter)
         );
       const pseudoNodeEnter = pseudoNode
         .enter()
@@ -218,6 +234,14 @@ export default Vue.extend({
         .attr("font-style", (d3Node) =>
           d3Node.data.isAbstract ? "italic" : "normal"
         )
+        .attr("class", (d3Node) => {
+          const rgb = d3Node.data.color.replace(/[^\d,]/g, "").split(",");
+          if (rgb[0] * 0.299 + rgb[1] * 0.587 + rgb[2] * 0.114 > 186) {
+            return "blackText";
+          } else {
+            return "whiteText";
+          }
+        })
         .text((d3Node) =>
           this.isShortenedName ? d3Node.data.displayName : d3Node.data.name
         );
@@ -260,7 +284,7 @@ export default Vue.extend({
               d3Node.data instanceof FeatureNode &&
               d3Node.data.constraintsHighlighted.length
           ),
-          (d3Node) => d3Node.id || (d3Node.id = ++CONSTANTS.nodeIdCounter)
+          (d3Node) => d3Node.id || (d3Node.id = ++this.nodeIdCounter)
         );
 
       const highlightedConstraintNodesEnter = highlightedConstraintNodes
@@ -350,7 +374,7 @@ export default Vue.extend({
             d3Node.data instanceof FeatureNode &&
             (d3Node.data.isAlt() || d3Node.data.isOr())
         ),
-        (d3Node) => d3Node.id || (d3Node.id = ++CONSTANTS.nodeIdCounter)
+        (d3Node) => d3Node.id || (d3Node.id = ++this.nodeIdCounter)
       );
 
       const segmentEnter = segment
@@ -390,7 +414,7 @@ export default Vue.extend({
 
     // Collapses all children of the specifed node with shortcut CTRL + left-click.
     collapseShortcut(event, d3Node) {
-      if (event.getModifierState("Control")) {
+      if (event.getModifierState("Alt")) {
         d3Node.data.toggleCollapse();
         this.updateCollapsing();
         this.updateSvg();
@@ -511,8 +535,264 @@ export default Vue.extend({
         isPreviousNodeHidden = d3Child.data.isHidden;
       });
     },
+
+    onChangeSearch(search) {
+      this.allD3Nodes.forEach((d3Node) => {
+        d3Node.data.isSearched = false;
+      });
+
+      if (search !== "") {
+        const foundD3Node = this.findD3Node(search);
+        const paths = foundD3Node.data.getAllNodesToRoot();
+
+        paths.forEach((node) => (node.isSearched = true));
+        this.allD3Nodes.forEach((d3Node) => d3Node.data.collapse());
+
+        foundD3Node.data.uncollapse(true);
+        this.updateCollapsing();
+        this.updateSvg();
+        this.focusNode(foundD3Node);
+      } else {
+        this.updateSvg();
+      }
+    },
+
+    findD3Node(search) {
+      const [, d3Node] = this.allD3Nodes.reduce(
+        ([previousDistance, previousD3Node], currentD3Node) => {
+          const currentNodeName = currentD3Node.data.name.toLowerCase();
+          if (
+            currentNodeName !== search.toLowerCase() &&
+            currentNodeName.includes(search.toLowerCase())
+          ) {
+            return [1, currentD3Node];
+          }
+
+          const currentDistance = levenshtein(
+            currentD3Node.data.name.toLowerCase(),
+            search.toLowerCase()
+          );
+
+          if (previousDistance <= currentDistance) {
+            return [previousDistance, previousD3Node];
+          } else {
+            return [currentDistance, currentD3Node];
+          }
+        }
+      );
+
+      // TODO: If levenshtein distance is above a good value dont display anything?
+      return d3Node;
+    },
+
+    onChangeColoring(coloringIndex) {
+      console.log(coloringIndex);
+      switch (coloringIndex) {
+        case 0:
+          this.colorNodes(this.countNodes);
+          break;
+        case 1:
+          this.colorNodes(this.countDirectChildren);
+          break;
+        case 2:
+          this.colorNodes(this.countTotalChildren);
+          break;
+        default:
+          this.resetColorNodes();
+          break;
+      }
+    },
+
+    resetColorNodes() {
+      for (const d3Node of this.allD3Nodes) {
+        d3Node.data.color = d3Node.data.isAbstract
+          ? CONSTANTS.NODE_ABSTRACT_COLOR
+          : CONSTANTS.NODE_COLOR;
+      }
+      this.updateSvg();
+    },
+
+    colorNodes(coloringFunction) {
+      const [count, max] = coloringFunction(); // Must return {"nodeName": integer}
+      const colors = d3
+        .scaleLinear()
+        .domain(d3.ticks(1, max, CONSTANTS.COLORING_MAP.length))
+        .range(CONSTANTS.COLORING_MAP);
+
+      for (const d3Node of this.allD3Nodes) {
+        if (count[d3Node.data.name] !== undefined && !d3Node.data.isAbstract) {
+          d3Node.data.color = colors(count[d3Node.data.name]);
+        }
+      }
+
+      this.updateSvg();
+    },
+
+    /**
+     * Counts all nodes
+     * @returns [{"nodeName": integer}, maxAmount]
+     */
+    countNodes() {
+      let count = {};
+      let max = 0;
+      for (const d3Node of this.allD3Nodes) {
+        if (count[d3Node.data.name]) {
+          count[d3Node.data.name] += 1;
+          max = max < count[d3Node.data.name] ? count[d3Node.data.name] : max;
+        } else {
+          count[d3Node.data.name] = 1;
+          max = max < count[d3Node.data.name] ? count[d3Node.data.name] : max;
+        }
+      }
+
+      return [count, max];
+    },
+
+    countDirectChildren() {
+      let count = {};
+      let max = 0;
+
+      for (const d3Node of this.allD3Nodes) {
+        count[d3Node.data.name] = d3Node.data.childrenCount();
+        max = max < count[d3Node.data.name] ? count[d3Node.data.name] : max;
+      }
+
+      return [count, max];
+    },
+
+    countTotalChildren() {
+      let count = {};
+      let max = 0;
+
+      for (const d3Node of this.allD3Nodes) {
+        count[d3Node.data.name] = d3Node.data.totalSubnodesCount();
+        max = max < count[d3Node.data.name] ? count[d3Node.data.name] : max;
+      }
+
+      return [count, max];
+    },
+
+    onChangeShortName(isShortName) {
+      this.isShortenedName = isShortName;
+      this.updateSvg();
+    },
+
+    onChangeVerticalSpacing(verticalSpacing) {
+      this.verticalSpacing = verticalSpacing;
+      this.updateSvg();
+    },
   },
 });
 </script>
 
-<style scoped></style>
+<style lang="scss">
+#svg-container {
+  width: 100%;
+  height: calc(100vh - 64px);
+}
+
+.node {
+  cursor: pointer;
+  vertical-align: middle;
+
+  .is-searched-feature {
+    fill: lightcoral;
+  }
+
+  rect {
+    stroke: #888;
+    stroke-width: 1px;
+  }
+
+  text {
+    /* fill: black; */
+    font-family: monospace;
+    text-anchor: middle;
+  }
+}
+
+.and-group-circle {
+  stroke: #888;
+  stroke-width: 1.5px;
+  opacity: 0;
+}
+
+.optional-and-group-circle {
+  fill: white;
+  opacity: 1;
+}
+
+.mandatory-and-group-circle {
+  fill: rgb(136, 136, 136);
+  opacity: 1;
+}
+
+.alt-group {
+  fill: white;
+  stroke: #888;
+  stroke-width: 1.5px;
+}
+
+.or-group {
+  fill: #888;
+  stroke: #888;
+  stroke-width: 1.5px;
+}
+
+.link {
+  fill: none;
+  stroke: #888;
+  stroke-width: 1.5px;
+}
+
+.is-searched-link {
+  fill: none;
+  stroke: lightcoral;
+  stroke-width: 1.5px;
+}
+
+.children-count > circle {
+  fill: white;
+  stroke: #888;
+  stroke-width: 1.5px;
+}
+
+.pseudo-node {
+  cursor: pointer;
+  vertical-align: middle;
+
+  > circle {
+    fill: white;
+    stroke: #888;
+    stroke-width: 1.5px;
+  }
+}
+
+.feature-model-constraints {
+  position: absolute;
+  background-color: white;
+  bottom: 0;
+  width: 100%;
+  box-shadow: 0px 10px 10px #888, 0px -10px 10px #888;
+  padding: 2rem;
+  min-height: 10%;
+  max-height: 20%;
+  overflow: scroll;
+}
+
+polygon {
+  stroke: #888;
+}
+
+.children-count-text {
+  fill: black !important;
+}
+
+.blackText {
+  fill: black !important;
+}
+
+.whiteText {
+  fill: white !important;
+}
+</style>

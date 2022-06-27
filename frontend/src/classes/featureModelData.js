@@ -52,6 +52,320 @@ export const littleModel = `
     </constraints>
 </featureModel>`
 
+export const berkeley = `
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<featureModel>
+    <properties/>
+    <struct>
+        <alt  mandatory="true" name="BerkeleyDb">
+            <and  name="BerkeleyDB">
+                <alt  name="FLogging">
+                    <and  name="Logging">
+                        <feature name="featureLoggingFile"/>
+                        <feature name="featureLoggingConsole"/>
+                        <feature name="featureLoggingDbLog"/>
+                        <feature name="featureLoggingFinest"/>
+                        <feature name="featureLoggingFiner"/>
+                        <feature name="featureLoggingFine"/>
+                        <feature name="featureLoggingInfo"/>
+                        <feature name="featureLoggingConfig"/>
+                        <feature name="featureLoggingSevere"/>
+                        <feature mandatory="true" name="featureLoggingBase"/>
+                    </and>
+                </alt>
+                <alt  mandatory="true" name="FPersistency">
+                    <and  name="Persistency">
+                        <or  name="FPersistencyFeatures">
+                            <feature name="featureChecksum"/>
+                            <feature name="featureFileHandleCache"/>
+                            <feature name="featureHandleFullDiscError"/>
+                            <feature name="featureEnvironmentLock"/>
+                            <and  name="Checkpointer">
+                                <feature name="featureCustomizableCheckpointerTime"/>
+                                <feature name="featureCustomizableCheckpointerBytes"/>
+                                <feature name="featureCheckpointerDaemon"/>
+                            </and>
+                            <and  name="Cleaner">
+                                <feature name="featureLookAheadCache"/>
+                                <feature name="featureCleanerDaemon"/>
+                            </and>
+                        </or>
+                        <alt  mandatory="true" name="FIOFeature">
+                            <and  name="NIO">
+                                <feature name="featureDirectNIO"/>
+                                <alt  mandatory="true" name="FNIOType">
+                                    <feature name="featureNIO"/>
+                                    <feature name="featureChunkedNIO"/>
+                                </alt>
+                            </and>
+                            <and  name="IO">
+                                <feature name="featureSynchronizedIO"/>
+                                <feature mandatory="true" name="featureIO"/>
+                            </and>
+                        </alt>
+                    </and>
+                </alt>
+                <alt  name="FStatistics">
+                    <and  name="Statistics">
+                        <or  mandatory="true" name="FStatisticsFeatures">
+                            <and  name="EnvStats">
+                                <feature name="featureStatisticsEnvLog"/>
+                                <feature name="featureStatisticsEnvINCompressor"/>
+                                <feature name="featureStatisticsEnvFSync"/>
+                                <feature name="featureStatisticsEnvEvictor"/>
+                                <feature name="featureStatisticsEnvCleaner"/>
+                                <feature name="featureStatisticsEnvCheckpointer"/>
+                                <feature name="featureStatisticsEnvCaching"/>
+                                <feature mandatory="true" name="featureStatisticsEnvBase"/>
+                            </and>
+                            <feature name="featureStatisticsDatabase"/>
+                            <feature name="featureStatisticsLock"/>
+                            <feature name="featureStatisticsPreload"/>
+                            <feature name="featureStatisticsSequence"/>
+                            <feature name="featureStatisticsTransaction"/>
+                        </or>
+                        <feature mandatory="true" name="featureStatisticsBase"/>
+                    </and>
+                </alt>
+                <feature name="featureMemoryBudget"/>
+                <or  name="FConcurrency">
+                    <feature name="featureLatch"/>
+                    <feature name="featureFSync"/>
+                    <feature name="featureTransaction"/>
+                    <feature name="dummyFeatureLocking"/>
+                    <feature name="featureCheckLeaks"/>
+                </or>
+                <or  name="FDbOperation">
+                    <feature name="featureDeleteDb"/>
+                    <feature name="featureTruncateDb"/>
+                </or>
+                <alt  mandatory="true" name="FBtree">
+                    <and  name="BTree">
+                        <feature name="featureVerifier"/>
+                        <feature name="featureTreeVisitor"/>
+                        <feature name="featureINCompressor"/>
+                        <alt  name="FEvictor">
+                            <and  name="Evictor">
+                                <feature name="featureCriticalEviction"/>
+                                <feature name="featureEvictorDaemon"/>
+                                <feature mandatory="true" name="featureEvictor"/>
+                            </and>
+                        </alt>
+                    </and>
+                </alt>
+                <feature mandatory="true" name="BASE"/>
+            </and>
+        </alt>
+    </struct>
+    <constraints>
+        <rule>
+            <imp>
+                <disj>
+                    <var>featureEvictor</var>
+                    <disj>
+                        <var>featureEvictorDaemon</var>
+                        <disj>
+                            <var>featureLookAheadCache</var>
+                            <var>featureStatisticsEnvCaching</var>
+                        </disj>
+                    </disj>
+                </disj>
+                <var>featureMemoryBudget</var>
+            </imp>
+        </rule>
+        <rule>
+            <imp>
+                <var>featureCheckLeaks</var>
+                <var>featureStatisticsLock</var>
+            </imp>
+        </rule>
+        <rule>
+            <imp>
+                <var>featureCriticalEviction</var>
+                <var>featureINCompressor</var>
+            </imp>
+        </rule>
+        <rule>
+            <imp>
+                <var>featureCustomizableCheckpointerBytes</var>
+                <var>featureCustomizableCheckpointerTime</var>
+            </imp>
+        </rule>
+        <rule>
+            <imp>
+                <var>featureDeleteDb</var>
+                <conj>
+                    <var>dummyFeatureLocking</var>
+                    <conj>
+                        <var>featureEvictor</var>
+                        <conj>
+                            <var>featureINCompressor</var>
+                            <var>featureMemoryBudget</var>
+                        </conj>
+                    </conj>
+                </conj>
+            </imp>
+        </rule>
+        <rule>
+            <imp>
+                <var>featureLatch</var>
+                <conj>
+                    <var>dummyFeatureLocking</var>
+                    <conj>
+                        <var>featureCheckLeaks</var>
+                        <conj>
+                            <var>featureDeleteDb</var>
+                            <conj>
+                                <var>featureEvictor</var>
+                                <conj>
+                                    <var>featureFileHandleCache</var>
+                                    <conj>
+                                        <var>featureFSync</var>
+                                        <conj>
+                                            <var>featureINCompressor</var>
+                                            <conj>
+                                                <var>featureMemoryBudget</var>
+                                                <conj>
+                                                    <var>featureStatisticsLock</var>
+                                                    <conj>
+                                                        <var>featureTreeVisitor</var>
+                                                        <conj>
+                                                            <var>featureTruncateDb</var>
+                                                            <var>featureVerifier</var>
+                                                        </conj>
+                                                    </conj>
+                                                </conj>
+                                            </conj>
+                                        </conj>
+                                    </conj>
+                                </conj>
+                            </conj>
+                        </conj>
+                    </conj>
+                </conj>
+            </imp>
+        </rule>
+        <rule>
+            <imp>
+                <var>featureLoggingSevere</var>
+                <var>featureEnvironmentLock</var>
+            </imp>
+        </rule>
+        <rule>
+            <imp>
+                <var>featureLoggingFine</var>
+                <conj>
+                    <var>dummyFeatureLocking</var>
+                    <conj>
+                        <var>featureEvictor</var>
+                        <var>featureINCompressor</var>
+                    </conj>
+                </conj>
+            </imp>
+        </rule>
+        <rule>
+            <imp>
+                <var>featureLoggingInfo</var>
+                <conj>
+                    <var>featureChecksum</var>
+                    <var>featureMemoryBudget</var>
+                </conj>
+            </imp>
+        </rule>
+        <rule>
+            <imp>
+                <disj>
+                    <var>featureLoggingBase</var>
+                    <var>featureLoggingFinest</var>
+                </disj>
+                <var>featureTransaction</var>
+            </imp>
+        </rule>
+        <rule>
+            <imp>
+                <var>featureMemoryBudget</var>
+                <conj>
+                    <var>featureEvictor</var>
+                    <var>featureLatch</var>
+                </conj>
+            </imp>
+        </rule>
+        <rule>
+            <imp>
+                <disj>
+                    <var>featureStatisticsLock</var>
+                    <var>featureStatisticsTransaction</var>
+                </disj>
+                <var>dummyFeatureLocking</var>
+            </imp>
+        </rule>
+        <rule>
+            <imp>
+                <var>featureStatisticsEnvEvictor</var>
+                <var>featureEvictor</var>
+            </imp>
+        </rule>
+        <rule>
+            <imp>
+                <var>featureStatisticsEnvFSync</var>
+                <var>featureFSync</var>
+            </imp>
+        </rule>
+        <rule>
+            <imp>
+                <var>featureStatisticsEnvINCompressor</var>
+                <var>featureINCompressor</var>
+            </imp>
+        </rule>
+        <rule>
+            <imp>
+                <var>featureStatisticsTransaction</var>
+                <var>featureTransaction</var>
+            </imp>
+        </rule>
+        <rule>
+            <imp>
+                <var>featureStatisticsDatabase</var>
+                <var>featureTreeVisitor</var>
+            </imp>
+        </rule>
+        <rule>
+            <imp>
+                <var>featureTransaction</var>
+                <conj>
+                    <var>dummyFeatureLocking</var>
+                    <conj>
+                        <var>featureDeleteDb</var>
+                        <var>featureTruncateDb</var>
+                    </conj>
+                </conj>
+            </imp>
+        </rule>
+        <rule>
+            <imp>
+                <var>featureTruncateDb</var>
+                <var>featureDeleteDb</var>
+            </imp>
+        </rule>
+        <rule>
+            <imp>
+                <var>featureVerifier</var>
+                <conj>
+                    <var>featureINCompressor</var>
+                    <var>featureTreeVisitor</var>
+                </conj>
+            </imp>
+        </rule>
+    </constraints>
+    <calculations Auto="true" Constraints="true" Features="true" Redundant="true" Tautology="true"/>
+    <comments>
+        <c>Semantic Dependencies</c>
+    </comments>
+    <featureOrder userDefined="false"/>
+</featureModel>
+
+`
+
 export const hugeModel = `
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <featureModel>

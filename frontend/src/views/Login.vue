@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="mainView">
     <h3 class="text-h3 mb-2 mt-8 text-center">Login</h3>
     <h5 class="text-h5 mb-4 text-center">
       Or <router-link to="/register">create an account</router-link> instead

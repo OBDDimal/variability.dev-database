@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="mainView">
     <h3 class="text-h3 mb-2 mt-8">Upload new File</h3>
     <h5 class="text-h5 mb-4">
       Use this form to upload a new Feature Model publicly

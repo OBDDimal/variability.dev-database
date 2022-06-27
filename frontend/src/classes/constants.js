@@ -18,7 +18,6 @@ export const FEATURE_FONT_SIZE = 16;
 export const CHILREN_COUNT_FONT_SIZE = 7;
 
 export const SPACE_BETWEEN_NODES_HORIZONTALLY = 20;
-export let SPACE_BETWEEN_NODES_VERTICALLY = 75;
 
 export let nodeIdCounter = 0;
 
@@ -51,7 +50,7 @@ export const COLORING_MAP = [
 
 export const STROKE_WIDTH_CONSTANT = 4;
 
-export const NODE_COLOR = "#ccccff";
+export const NODE_COLOR = "rgb(204, 204, 255)";
 export const NODE_ABSTRACT_COLOR = "#ebebff";
 
 export const DISPLAY_NAME_LENGTH = 8;

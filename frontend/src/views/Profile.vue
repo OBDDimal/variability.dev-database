@@ -1,5 +1,9 @@
 <template>
-  <div v-if="$store.state.currentUser" style="word-break: break-all">
+  <div
+    class="mainView"
+    v-if="$store.state.currentUser"
+    style="word-break: break-all"
+  >
     <h3 class="text-h3 mb-2 mt-8">Profile</h3>
     <h5 class="text-h5 mb-4">{{ $store.state.currentUser.email }}</h5>
     <v-divider></v-divider>
