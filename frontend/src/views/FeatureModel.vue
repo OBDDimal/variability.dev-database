@@ -10,7 +10,7 @@
 
 <script>
 import Vue from "vue";
-import FeatureModelTree from "../components/FeatureModelTree.vue";
+import FeatureModelTree from "../components/FeatureModel/FeatureModelTree.vue";
 import Constraints from "../components/Constraints.vue";
 import { Constraint, VarConstraint } from "../classes/constraint";
 import { berkeley } from "../classes/featureModelData";

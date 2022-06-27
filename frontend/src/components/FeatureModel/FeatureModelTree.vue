@@ -10,6 +10,12 @@
       @export="$emit('exportToXML')"
     ></feature-model-tree-toolbar>
     <div id="svg-container"></div>
+
+    <feature-model-tree-context-menu
+      :selectedD3Node="selectedD3Node"
+      :selectedD3NodeEvent="selectedD3NodeEvent"
+      :showMenu="selectedD3Node != null"
+    ></feature-model-tree-context-menu>
   </div>
 </template>
 
@@ -18,16 +24,18 @@ import Vue from "vue";
 import * as d3 from "d3";
 import levenshtein from "js-levenshtein";
 import { flextree } from "d3-flextree";
-import * as CONSTANTS from "../classes/constants";
-import { FeatureNode, PseudoNode } from "../classes/featureNode";
-import { createGroupSegment, createLink } from "../classes/createSvgPaths";
-import FeatureModelTreeToolbar from "../components/FeatureModelTreeToolbar.vue";
+import * as CONSTANTS from "../../classes/constants";
+import { FeatureNode, PseudoNode } from "../../classes/featureNode";
+import { createGroupSegment, createLink } from "../../classes/createSvgPaths";
+import FeatureModelTreeToolbar from "./FeatureModelTreeToolbar.vue";
+import FeatureModelTreeContextMenu from "./FeatureModelTreeContextMenu.vue";
 
 export default Vue.extend({
   name: "FeatureModelTree",
 
   components: {
     FeatureModelTreeToolbar,
+    FeatureModelTreeContextMenu,
   },
 
   props: {
@@ -47,12 +55,20 @@ export default Vue.extend({
     nodeIdCounter: 0,
     isColorCoded: false,
     verticalSpacing: 75,
+    selectedD3Node: undefined,
+    selectedD3NodeEvent: undefined,
   }),
 
   computed: {},
 
   mounted() {
     this.initialize();
+  },
+
+  watch: {
+    selectedD3Node: function (newValue) {
+      console.log(newValue);
+    },
   },
 
   methods: {
@@ -96,7 +112,7 @@ export default Vue.extend({
             " " +
             CONSTANTS.SVG_HEIGHT
         )
-        .on("click", this.closeContextMenu) // Click listener for closing all context-menus.
+        .on("click", () => (this.selectedD3Node = null)) // Click listener for closing all context-menus.
         .call(this.zoom); // Zooming and penning.
 
       const svgContent = svg.append("g");
@@ -132,7 +148,11 @@ export default Vue.extend({
         .enter()
         .append("g")
         .classed("node", true)
-        .on("contextmenu", (event, d3Node) => this.contextMenu(event, d3Node)) // Open contextmenu with right-click on d3Node.
+        .on("contextmenu", (event, d3Node) => {
+          event.preventDefault();
+          this.selectedD3Node = d3Node;
+          this.selectedD3NodeEvent = event;
+        }) // Open contextmenu with right-click on d3Node.
         .on("click", (event, d3Node) => this.collapseShortcut(event, d3Node)); // Collapse d3Node with Ctrl + left-click on d3Node.
 
       const rectAndTextEnter = featureNodeEnter
