@@ -24,7 +24,7 @@ jobs:
         run: npm install
 
       - name: Build dependencies
-        run: vue-cli-service build
+        run: npm build
 
       # - name: Test & create coverage
         # run: yarn test:ci
