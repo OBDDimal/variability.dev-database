@@ -57,7 +57,7 @@ export const berkeley = `
 <featureModel>
     <properties/>
     <struct>
-        <alt  mandatory="true" name="BerkeleyDb">
+        <alt  mandatory="true" name="BerkeleyDbRoot">
             <and  name="BerkeleyDB">
                 <alt  name="FLogging">
                     <and  name="Logging">

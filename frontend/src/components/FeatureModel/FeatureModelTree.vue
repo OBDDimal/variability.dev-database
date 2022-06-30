@@ -4,7 +4,7 @@
       @search="onChangeSearch"
       @coloring="onChangeColoring"
       @fitToView="zoomFit"
-      @resetView="(levels, maxChilds) => resetView(levels, maxChilds)"
+      @resetView="(levels, maxChildren) => resetView(levels, maxChildren)"
       @shortName="onChangeShortName"
       @verticalSpacing="onChangeVerticalSpacing"
       @export="$emit('exportToXML')"
@@ -35,8 +35,8 @@ import * as d3 from "d3";
 import levenshtein from "js-levenshtein";
 import { flextree } from "d3-flextree";
 import * as CONSTANTS from "../../classes/constants";
-import { FeatureNode, PseudoNode } from "../../classes/featureNode";
-import { createGroupSegment, createLink } from "../../classes/createSvgPaths";
+import { FeatureNode, PseudoNode } from "@/classes/featureNode";
+import { createGroupSegment, createLink } from "@/classes/createSvgPaths";
 import FeatureModelTreeToolbar from "./FeatureModelTreeToolbar.vue";
 import FeatureModelTreeContextMenu from "./FeatureModelTreeContextMenu.vue";
 
@@ -73,12 +73,6 @@ export default Vue.extend({
 
   mounted() {
     this.initialize();
-  },
-
-  watch: {
-    selectedD3Node: function (newValue) {
-      console.log(newValue);
-    },
   },
 
   methods: {
@@ -616,7 +610,6 @@ export default Vue.extend({
     },
 
     onChangeColoring(coloringIndex) {
-      console.log(coloringIndex);
       switch (coloringIndex) {
         case 0:
           this.colorNodes(this.countNodes);

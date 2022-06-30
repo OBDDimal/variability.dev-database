@@ -1,12 +1,12 @@
-export const SVG_MARGIN = { top: 20, right: 90, bottom: 20, left: 90 };
+export const SVG_MARGIN = {top: 20, right: 90, bottom: 20, left: 90};
 export const SVG_WIDTH = window.innerWidth - SVG_MARGIN.left - SVG_MARGIN.right;
 export const SVG_HEIGHT =
-  window.innerHeight -
-  SVG_MARGIN.top -
-  SVG_MARGIN.bottom -
-  window.innerHeight / 10; // To compensate for the footer
+    window.innerHeight -
+    SVG_MARGIN.top -
+    SVG_MARGIN.bottom -
+    window.innerHeight / 10; // To compensate for the footer
 
-export const RECT_MARGIN = { right: 8, left: 8 };
+export const RECT_MARGIN = {right: 8, left: 8};
 export const RECT_HEIGHT = 35;
 
 export const MONOSPACE_HEIGHT_WIDTH_FACTOR = 0.6;
@@ -23,29 +23,31 @@ export let nodeIdCounter = 0;
 
 export const PSEUDO_NODE_SIZE = 20;
 
+//TODO: Add more colors. Also for black font
 export let CONSTRAINT_HIGHLIGHT_COLORS = [
-  "aqua",
-  "blueviolet",
-  "chartreuse",
-  "crimson",
-  "darkorange",
-  "forestgreen",
-  "red",
-  "yellow",
-  "indigo",
+    '#B762D9',
+    '#FFB17A',
+    '#AEE7C2',
+    '#E2FBC5',
+    '#F3C969',
+    '#37FF8B',
+    '#51D6FF',
+    '#A0AECF',
+    '#F4743B',
+    '#F45B69',
 ];
 
 export const COLORING_MAP = [
-  "#4e78b5",
-  "#6694c1",
-  "#80b1cc",
-  "#9dced6",
-  "#c0eade",
-  "#ffffe0",
-  "#eb6574",
-  "#d5405e",
-  "#b81b4a",
-  "#93003a",
+    "#4e78b5",
+    "#6694c1",
+    "#80b1cc",
+    "#9dced6",
+    "#c0eade",
+    "#ffffe0",
+    "#eb6574",
+    "#d5405e",
+    "#b81b4a",
+    "#93003a",
 ];
 
 export const STROKE_WIDTH_CONSTANT = 4;

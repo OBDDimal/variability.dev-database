@@ -3,8 +3,9 @@
     <feature-model-tree
       :rootNode="rootNode"
       @exportToXML="exportToXML"
+      ref="featureModelTree"
     ></feature-model-tree>
-    <constraints :constraints="constraints"></constraints>
+    <constraints :constraints="constraints" @update-feature-model="updateFeatureModel"></constraints>
   </div>
 </template>
 
@@ -12,9 +13,9 @@
 import Vue from "vue";
 import FeatureModelTree from "../components/FeatureModel/FeatureModelTree.vue";
 import Constraints from "../components/Constraints.vue";
-import { Constraint, VarConstraint } from "../classes/constraint";
-import { berkeley } from "../classes/featureModelData";
-import { FeatureNode } from "../classes/featureNode";
+import { Constraint, VarConstraint } from "@/classes/constraint";
+import { hugeModel } from "@/classes/featureModelData";
+import { FeatureNode } from "@/classes/featureNode";
 
 export default Vue.extend({
   name: "FeatureModel",
@@ -35,7 +36,7 @@ export default Vue.extend({
   created() {
     // TODO: Axios request for xml
 
-    const [rootNode, constraints] = this.xmlToJson(berkeley);
+    const [rootNode, constraints] = this.xmlToJson(hugeModel);
     this.rootNode = rootNode;
     this.constraints = constraints;
   },
@@ -43,6 +44,11 @@ export default Vue.extend({
   computed: {},
 
   methods: {
+    updateFeatureModel() {
+      this.$refs.featureModelTree.updateCollapsing();
+      this.$refs.featureModelTree.updateSvg();
+    },
+
     xmlToJson(currentModel) {
       const start = performance.now();
 

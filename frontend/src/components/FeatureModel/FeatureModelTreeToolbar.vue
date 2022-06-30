@@ -117,6 +117,7 @@
               class="mt-0 pt-0"
               type="number"
               min="0"
+              @change="$emit('resetView', levels, maxChilds)"
             ></v-text-field>
           </v-list-item>
           <v-subheader>Adjust Max Children</v-subheader>
@@ -127,6 +128,7 @@
               class="mt-0 pt-0"
               type="number"
               min="0"
+              @change="$emit('resetView', levels, maxChilds)"
             ></v-text-field>
           </v-list-item>
         </v-list>
