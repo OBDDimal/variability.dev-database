@@ -20,6 +20,7 @@ export default new Vuex.Store({
     accessToken: authService.getAccessToken(),
     tags: [],
     families: [],
+    licenses: [],
     files: [],
     searchedNodes: "",
   },
@@ -62,6 +63,11 @@ export default new Vuex.Store({
         commit('setFiles', { files: response.data });
       });
     },
+    fetchLicenses({ commit }) {
+      api.get(`${API_URL}licenses/`).then((response) => {
+        commit('setLicenses', { licenses: response.data });
+      });
+    },
   },
   mutations: {
     updateSnackbar(state, payload) {
@@ -87,6 +93,12 @@ export default new Vuex.Store({
     setFamilies(state, payload) {
       const { families } = payload;
       state.families = families;
+    },
+    setLicenses(state, payload) {
+      const { licenses } = payload;
+      console.log("fetch")
+      console.log(licenses)
+      state.licenses = licenses;
     },
     setFiles(state, payload) {
       const { files } = payload
