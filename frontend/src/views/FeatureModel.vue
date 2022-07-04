@@ -5,6 +5,7 @@
       @exportToXML="exportToXML"
       ref="featureModelTree"
     ></feature-model-tree>
+    <v-btn icon x-large elevation="2" style="background-color: var(--v-primary-base)" dark absolute bottom right @click="$store.commit('openConstraints', true)"><v-icon>mdi-format-list-checks</v-icon></v-btn>
     <constraints :constraints="constraints" @update-feature-model="updateFeatureModel"></constraints>
   </div>
 </template>
@@ -14,7 +15,7 @@ import Vue from "vue";
 import FeatureModelTree from "../components/FeatureModel/FeatureModelTree.vue";
 import Constraints from "../components/Constraints.vue";
 import { Constraint, VarConstraint } from "@/classes/constraint";
-import { hugeModel } from "@/classes/featureModelData";
+import { berkeley } from "@/classes/featureModelData";
 import { FeatureNode } from "@/classes/featureNode";
 
 export default Vue.extend({
@@ -36,7 +37,7 @@ export default Vue.extend({
   created() {
     // TODO: Axios request for xml
 
-    const [rootNode, constraints] = this.xmlToJson(hugeModel);
+    const [rootNode, constraints] = this.xmlToJson(berkeley);
     this.rootNode = rootNode;
     this.constraints = constraints;
   },

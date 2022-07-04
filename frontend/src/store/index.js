@@ -22,6 +22,7 @@ export default new Vuex.Store({
     families: [],
     files: [],
     searchedNodes: "",
+    openConstraints: false,
   },
   actions: {
     logout({ commit }) {
@@ -91,6 +92,9 @@ export default new Vuex.Store({
     setFiles(state, payload) {
       const { files } = payload
       state.files = files
+    },
+    openConstraints(state, open) {
+      state.openConstraints = open
     }
   },
   modules: {},

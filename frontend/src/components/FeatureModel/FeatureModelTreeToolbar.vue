@@ -59,6 +59,11 @@
               <v-list-item-title>Reset view</v-list-item-title>
             </v-list-item-content>
           </v-list-item>
+          <v-list-item @click="$store.commit('openConstraints', true)" class="clickable">
+            <v-list-item-content>
+              <v-list-item-title>Show Constraints</v-list-item-title>
+            </v-list-item-content>
+          </v-list-item>
           <v-list-item>
             <template v-slot:default="{ active }">
               <v-list-item-action>
