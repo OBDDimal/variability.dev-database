@@ -1,177 +1,166 @@
 <template>
-  <div>
-    <feature-model-tree
-      :rootNode="rootNode"
-      @exportToXML="exportToXML"
-      ref="featureModelTree"
-    ></feature-model-tree>
-    <constraints :constraints="constraints" @update-feature-model="updateFeatureModel"></constraints>
-  </div>
+	<div>
+		<feature-model-tree :rootNode="rootNode" @exportToXML="exportToXML" ref="featureModelTree"></feature-model-tree>
+		<constraints :constraints="constraints" @update-feature-model="updateFeatureModel"></constraints>
+	</div>
 </template>
 
 <script>
-import Vue from "vue";
-import FeatureModelTree from "../components/FeatureModel/FeatureModelTree.vue";
-import Constraints from "../components/Constraints.vue";
-import { Constraint, VarConstraint } from "@/classes/constraint";
-import { hugeModel } from "@/classes/featureModelData";
-import { FeatureNode } from "@/classes/featureNode";
+import Vue from 'vue';
+import FeatureModelTree from '../components/FeatureModel/FeatureModelTree.vue';
+import Constraints from '../components/Constraints.vue';
+import { Constraint, VarConstraint } from '@/classes/constraint';
+import { littleModel } from '@/classes/featureModelData';
+import { FeatureNode } from '@/classes/featureNode';
 
 export default Vue.extend({
-  name: "FeatureModel",
+	name: 'FeatureModel',
 
-  components: {
-    FeatureModelTree,
-    Constraints,
-  },
+	components: {
+		FeatureModelTree,
+		Constraints,
+	},
 
-  props: {},
+	props: {},
 
-  data: () => ({
-    featureMap: [],
-    constraints: [],
-    rootNode: undefined,
-  }),
+	data: () => ({
+		featureMap: [],
+		constraints: [],
+		rootNode: undefined,
+	}),
 
-  created() {
-    // TODO: Axios request for xml
+	created() {
+		// TODO: Axios request for xml
 
-    const [rootNode, constraints] = this.xmlToJson(hugeModel);
-    this.rootNode = rootNode;
-    this.constraints = constraints;
-  },
+		const [rootNode, constraints] = this.xmlToJson(littleModel);
+		this.rootNode = rootNode;
+		this.constraints = constraints;
+	},
 
-  computed: {},
+	computed: {},
 
-  methods: {
-    updateFeatureModel() {
-      this.$refs.featureModelTree.updateCollapsing();
-      this.$refs.featureModelTree.updateSvg();
-    },
+	methods: {
+		updateFeatureModel() {
+			this.$refs.featureModelTree.updateCollapsing();
+			this.$refs.featureModelTree.updateSvg();
+			this.$refs.featureModelTree.zoomFit();
+		},
 
-    xmlToJson(currentModel) {
-      const start = performance.now();
+		xmlToJson(currentModel) {
+			const start = performance.now();
 
-      // To remove the <?xml...?> line
-      let m = currentModel.split("\n").splice(1).join("\n");
+			// To remove the <?xml...?> line
+			let m = currentModel.split('\n').splice(1).join('\n');
 
-      const parser = new DOMParser();
-      const xmlDocument = parser.parseFromString(m, "text/xml");
+			const parser = new DOMParser();
+			const xmlDocument = parser.parseFromString(m, 'text/xml');
 
-      const struct = xmlDocument.querySelector("struct");
-      const constraints = xmlDocument.querySelector("constraints");
+			const struct = xmlDocument.querySelector('struct');
+			const constraints = xmlDocument.querySelector('constraints');
 
-      const featuresToReturn = this.getChildrenOfFeature(struct, null);
-      const constraintsToReturn = this.getConstraints(constraints);
-      console.log("Parsertime", performance.now() - start);
-      return [featuresToReturn[0], constraintsToReturn];
-    },
+			const featuresToReturn = this.getChildrenOfFeature(struct, null);
+			const constraintsToReturn = this.getConstraints(constraints);
+			console.log('Parsertime', performance.now() - start);
+			return [featuresToReturn[0], constraintsToReturn];
+		},
 
-    getChildrenOfFeature(struct, parent) {
-      let toReturn = [];
+		getChildrenOfFeature(struct, parent) {
+			let toReturn = [];
 
-      for (const child of struct.childNodes) {
-        // To remove #text nodes, as they don't have a tagName
-        if (child.tagName) {
-          let toAppend = new FeatureNode(
-            parent,
-            child.getAttribute("name"),
-            child.tagName,
-            child.getAttribute("mandatory") === "true",
-            child.getAttribute("abstract") === "true"
-          );
-          toAppend.children = this.getChildrenOfFeature(child, toAppend);
+			for (const child of struct.childNodes) {
+				// To remove #text nodes, as they don't have a tagName
+				if (child.tagName) {
+					let toAppend = new FeatureNode(
+						parent,
+						child.getAttribute('name'),
+						child.tagName,
+						child.getAttribute('mandatory') === 'true',
+						child.getAttribute('abstract') === 'true'
+					);
+					toAppend.children = this.getChildrenOfFeature(child, toAppend);
 
-          this.featureMap[toAppend.name] = toAppend;
-          toReturn.push(toAppend);
-        }
-      }
+					this.featureMap[toAppend.name] = toAppend;
+					toReturn.push(toAppend);
+				}
+			}
 
-      return toReturn;
-    },
+			return toReturn;
+		},
 
-    getConstraints(constraints) {
-      let toReturn = [];
+		getConstraints(constraints) {
+			let toReturn = [];
 
-      for (const rule of constraints.childNodes) {
-        // To remove #text nodes, as they don't have a tagName
-        if (rule.tagName) {
-          const constraint = new Constraint(
-            [...rule.childNodes].filter((e) => e.tagName)[0],
-            this.featureMap
-          );
-          toReturn.push(constraint);
-        }
-      }
-      return toReturn;
-    },
+			for (const rule of constraints.childNodes) {
+				// To remove #text nodes, as they don't have a tagName
+				if (rule.tagName) {
+					const constraint = new Constraint([...rule.childNodes].filter((e) => e.tagName)[0], this.featureMap);
+					toReturn.push(constraint);
+				}
+			}
+			return toReturn;
+		},
 
-    exportToXML() {
-      let root = {};
+		exportToXML() {
+			let root = {};
 
-      Object.entries(this.featureMap).forEach(([, node]) => {
-        if (node.isRoot) {
-          root = node;
-        }
-      });
+			Object.entries(this.featureMap).forEach(([, node]) => {
+				if (node.isRoot) {
+					root = node;
+				}
+			});
 
-      let xml = `<?xml version="1.0" encoding="UTF-8" standalone="no"?><featureModel>`;
-      xml += `<struct>${this.nodeToXML(root)}</struct>`;
-      xml += `<constraints>${this.constraints.reduce(
-        (prev, constraint) =>
-          prev + "<rule>" + this.constraintToXML(constraint) + "</rule>",
-        ""
-      )}</constraints>`;
-      xml += `</featureModel>`;
+			let xml = `<?xml version="1.0" encoding="UTF-8" standalone="no"?><featureModel>`;
+			xml += `<struct>${this.nodeToXML(root)}</struct>`;
+			xml += `<constraints>${this.constraints.reduce(
+				(prev, constraint) => prev + '<rule>' + this.constraintToXML(constraint) + '</rule>',
+				''
+			)}</constraints>`;
+			xml += `</featureModel>`;
 
-      const filename = "featureModel.xml";
-      const pom = document.createElement("a");
-      const bb = new Blob([xml], { type: "application/xml" });
+			const filename = 'featureModel.xml';
+			const pom = document.createElement('a');
+			const bb = new Blob([xml], { type: 'application/xml' });
 
-      pom.setAttribute("href", window.URL.createObjectURL(bb));
-      pom.setAttribute("download", filename);
+			pom.setAttribute('href', window.URL.createObjectURL(bb));
+			pom.setAttribute('download', filename);
 
-      pom.dataset.downloadurl = [
-        "application/xml",
-        pom.download,
-        pom.href,
-      ].join(":");
+			pom.dataset.downloadurl = ['application/xml', pom.download, pom.href].join(':');
 
-      pom.click();
-    },
+			pom.click();
+		},
 
-    nodeToXML(node) {
-      if (node.isLeaf()) {
-        return `<feature ${node.isAbstract ? 'abstract="true" ' : ""}${
-          node.isMandatory ? 'mandatory="true" ' : ""
-        }name="${node.name}"/>`;
-      } else {
-        let toReturn = `<${node.groupType} ${
-          node.isAbstract ? 'abstract="true" ' : ""
-        }${node.isMandatory ? 'mandatory="true" ' : ""}name="${node.name}">`;
+		nodeToXML(node) {
+			if (node.isLeaf()) {
+				return `<feature ${node.isAbstract ? 'abstract="true" ' : ''}${node.isMandatory ? 'mandatory="true" ' : ''}name="${
+					node.name
+				}"/>`;
+			} else {
+				let toReturn = `<${node.groupType} ${node.isAbstract ? 'abstract="true" ' : ''}${
+					node.isMandatory ? 'mandatory="true" ' : ''
+				}name="${node.name}">`;
 
-        node.children.forEach((childNode) => {
-          toReturn += this.nodeToXML(childNode);
-        });
+				node.children.forEach((childNode) => {
+					toReturn += this.nodeToXML(childNode);
+				});
 
-        toReturn += `</${node.groupType}>`;
-        return toReturn;
-      }
-    },
+				toReturn += `</${node.groupType}>`;
+				return toReturn;
+			}
+		},
 
-    constraintToXML(constraint) {
-      if (constraint instanceof VarConstraint) {
-        return `<var>${constraint.featureNode.name}</var>`;
-      } else if (constraint instanceof Constraint) {
-        let toReturn = `<${constraint.xmlOperator}>`;
-        constraint.children.forEach((childConstraint) => {
-          toReturn += this.constraintToXML(childConstraint);
-        });
-        toReturn += `</${constraint.xmlOperator}>`;
-        return toReturn;
-      }
-    },
-  },
+		constraintToXML(constraint) {
+			if (constraint instanceof VarConstraint) {
+				return `<var>${constraint.featureNode.name}</var>`;
+			} else if (constraint instanceof Constraint) {
+				let toReturn = `<${constraint.xmlOperator}>`;
+				constraint.children.forEach((childConstraint) => {
+					toReturn += this.constraintToXML(childConstraint);
+				});
+				toReturn += `</${constraint.xmlOperator}>`;
+				return toReturn;
+			}
+		},
+	},
 });
 </script>
 
