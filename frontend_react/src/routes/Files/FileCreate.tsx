@@ -260,16 +260,30 @@ export default class FileCreate extends Component<Props, State> {
       const data = new FormData();
 
       data.append('label', this.state.label);
+      console.log('LABEL');
+      console.log(this.state.label);
       data.append('description', this.state.description);
+      console.log('DESCRIPTION');
+      console.log(this.state.description);
       data.append('local_file', this.state.file);
+      console.log('FILE');
+      console.log(this.state.file);
       data.append('license', this.state.license);
+      console.log('LICENSE');
+      console.log(this.state.license);
       if (this.state.newVersionOf !== '---') {
         data.append('new_version_of', this.state.newVersionOf);
+        console.log('NEW VERSION OF');
+        console.log(this.state.newVersionOf);
       }
       if (this.state.featureFamily !== '---') {
         data.append('family', this.state.featureFamily);
+        console.log('FEATURE FAMILY');
+        console.log(this.state.featureFamily);
       }
       data.append('tags', JSON.stringify(this.state.tags));
+      console.log('TAGS');
+      console.log(this.state.tags);
 
       api
         .post(`${API_URL}files/`, data, {
