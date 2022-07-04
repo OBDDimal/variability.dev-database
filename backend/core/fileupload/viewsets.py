@@ -227,24 +227,33 @@ class FamiliesViewSet(viewsets.GenericViewSet, mixins.ListModelMixin, mixins.Cre
     serializer_class = FamiliesSerializer
     permission_classes = [IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
 
-    def list(self, request, **kwargs):
+    def anonymize_family(self, family, request):
         """
         Replace email address of family owner with True or False,
         indicating if the user which has sent the request is the owner.
         """
+        anonymized_family = OrderedDict()
+        for (key, value) in family.items():
+            if key == 'owner':
+                user_mail = "" if request.user.is_anonymous else request.user.email
+                anonymized_family[key] = value == user_mail
+            else:
+                anonymized_family[key] = value
+        return anonymized_family
+
+    def list(self, request, **kwargs):
         queryset = Family.objects.all()
         families = FamiliesSerializer(queryset, many=True).data
-        changed_families = []
+        anonymized_families = []
         for family in families:
-            changed_family = OrderedDict()
-            for item in family.items():
-                if item[0] == 'owner':
-                    user_mail = "" if request.user.is_anonymous else request.user.email
-                    changed_family[item[0]] = item[1] == user_mail
-                else:
-                    changed_family[item[0]] = item[1]
-            changed_families.append(changed_family)
-        return Response(changed_families)
+            anonymized_families.append(self.anonymize_family(family, request))
+        return Response(anonymized_families)
+
+    def retrieve(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer = self.get_serializer(instance)
+        anonymized_family = self.anonymize_family(serializer.data, request)
+        return Response(anonymized_family)
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
@@ -266,25 +275,33 @@ class TagsViewSet(viewsets.GenericViewSet, mixins.ListModelMixin, mixins.CreateM
     serializer_class = TagsSerializer
     permission_classes = [IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
 
-    def list(self, request, **kwargs):
+    def anonymize_tag(self, family, request):
         """
         Replace email address of tag owner with True or False,
         indicating if the user which has sent the request is the owner.
         """
+        anonymized_tag = OrderedDict()
+        for (key, value) in family.items():
+            if key == 'owner':
+                user_mail = "" if request.user.is_anonymous else request.user.email
+                anonymized_tag[key] = value == user_mail
+            else:
+                anonymized_tag[key] = value
+        return anonymized_tag
+
+    def list(self, request, **kwargs):
         queryset = Tag.objects.all()
         tags = TagsSerializer(queryset, many=True).data
-        changed_tags = []
+        anonymized_tags = []
         for tag in tags:
-            changed_tag = OrderedDict()
-            for tuple in tag.items():
-                if tuple[0] == 'owner':
-                    user_mail = "" if request.user.is_anonymous else request.user.email
-                    changed_tag[tuple[0]] = tuple[1] == user_mail
-                else:
-                    changed_tag[tuple[0]] = tuple[1]
-            changed_tags.append(changed_tag)
-        return Response(changed_tags)
+            anonymized_tags.append(self.anonymize_tag(tag, request))
+        return Response(anonymized_tags)
+
+    def retrieve(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer = self.get_serializer(instance)
+        anonymized_tag = self.anonymize_tag(serializer.data, request)
+        return Response(anonymized_tag)
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
-
