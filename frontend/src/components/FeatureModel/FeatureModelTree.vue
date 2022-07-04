@@ -66,6 +66,8 @@ export default Vue.extend({
 		rootD3Node: undefined,
 		allD3Nodes: undefined,
 		zoom: undefined,
+    dragListener: undefined,
+    dragSelectedNode: undefined,
 		highlightedConstraintsContainer: undefined,
 		linksContainer: undefined,
 		segmentsContainer: undefined,
@@ -127,6 +129,36 @@ export default Vue.extend({
 
 			this.featureNodesContainer = svgContent.append('g').classed('feature-node-container', true);
 
+      // Source: https://embed.plnkr.co/pCE9Ih/
+      this.dragListener = d3
+          .drag()
+          .on('start', (event, d3Node) => {
+            if (d3Node === this.rootD3Node) return;
+            event.sourceEvent.stopPropagation();
+            const nodeSelection = this.featureNodesContainer.selectAll('g.node').data([d3Node], (d3Node) => d3Node.id);
+            nodeSelection.select('g.rect-and-text').attr('pointer-events', 'none');
+
+            const nodes = d3Node.descendants();
+            this.featureNodesContainer.selectAll('g.node').data(nodes.slice(1), (d3Node) => d3Node.id).remove();
+            //nodeSelection.select('g.children-count').remove();
+            this.linksContainer.selectAll('path.link').data(nodes, (d3Node) => d3Node.id).remove();
+            this.segmentsContainer.selectAll('path').data(nodes, (d3Node) => d3Node.id).remove();
+          })
+          .on('drag', (event, d3Node) => {
+            if (d3Node === this.rootD3Node) return;
+            const nodeSelection = this.featureNodesContainer.selectAll('g.node').data([d3Node], (d3Node) => d3Node.id);
+            nodeSelection.attr('transform', `translate(${event.x}, ${event.y})`)
+          })
+          .on('end', (_, d3Node) =>  {
+            if (d3Node === this.rootD3Node) return;
+            const nodeSelection = this.featureNodesContainer.selectAll('g.node').data([d3Node], (d3Node) => d3Node.id);
+            nodeSelection.select('g.rect-and-text').attr('pointer-events', 'mouseover');
+
+            //d3Node.parent.children = d3Node.parent.children.filter((d3N) => d3N !== d3Node);
+
+            this.updateSvg();
+          });
+
 			this.resetView();
 			this.updateSvg();
 		},
@@ -142,6 +174,7 @@ export default Vue.extend({
 				.enter()
 				.append('g')
 				.classed('node', true)
+        .call(this.dragListener)
 				.on('contextmenu', (event, d3Node) => {
 					event.preventDefault();
 					this.contextMenuD3Node = d3Node;
@@ -149,8 +182,15 @@ export default Vue.extend({
 				}) // Open contextmenu with right-click on d3Node.
 				.on('click', (event, d3Node) => this.collapseShortcut(event, d3Node)); // Collapse d3Node with Ctrl + left-click on d3Node.
 
-			const rectAndTextEnter = featureNodeEnter.append('g').classed('rect-and-text', true);
-			rectAndTextEnter.append('rect').attr('height', CONSTANTS.RECT_HEIGHT);
+			const rectAndTextEnter = featureNodeEnter
+          .append('g')
+          .classed('rect-and-text', true)
+          .attr('pointer-events', 'mouseover')
+          .on('mouseover', (_, d3Node) => this.overFeatureNode(d3Node))
+          .on('mouseout', (_, d3Node) => this.outFeatureNode(d3Node));
+			rectAndTextEnter
+          .append('rect')
+          .attr('height', CONSTANTS.RECT_HEIGHT);
 			rectAndTextEnter
 				.append('text')
 				.attr('dy', CONSTANTS.RECT_HEIGHT / 2 + 5.5)
@@ -614,11 +654,26 @@ export default Vue.extend({
 			this.updateSvg();
 			this.focusNode(d3Node);
 		},
+
+    overFeatureNode(d3Node) {
+      this.dragSelectedNode = d3Node;
+      console.log('over', d3Node.data.name);
+    },
+
+    outFeatureNode(d3Node) {
+      this.dragSelectedNode = undefined;
+      console.log('out', d3Node.data.name);
+    },
 	},
 });
 </script>
 
 <style lang="scss">
+
+.ghost {
+  fill: red;
+}
+
 #svg-container {
 	width: 100%;
 	height: calc(100vh - 64px);
