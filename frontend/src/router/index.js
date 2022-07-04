@@ -19,7 +19,12 @@ const routes = [
   {
     path: '/',
     name: 'HomeView',
-    component: HomeView
+    component: HomeView,
+    children: [
+      {
+        path: ':modal',
+      },
+    ],
   },
   {
     path: '/ViewModel',
