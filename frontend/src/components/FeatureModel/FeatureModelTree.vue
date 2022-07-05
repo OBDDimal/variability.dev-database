@@ -68,8 +68,7 @@ export default Vue.extend({
 		zoom: undefined,
     dragListener: undefined,
     dragStarted: false,
-    dragNodes: undefined,
-    dragChildren: undefined,
+    dragSelectedNode: undefined,
     dragSelectedGhostNode: undefined,
 		highlightedConstraintsContainer: undefined,
 		linksContainer: undefined,
@@ -135,57 +134,26 @@ export default Vue.extend({
 
       this.dragContainer = svgContent.append('g').classed('drag-container', true);
 
-      // Source: https://embed.plnkr.co/pCE9Ih/
       this.dragListener = d3
           .drag()
           .on('start', (event, d3Node) => {
             if (d3Node === this.rootD3Node) return;
-            console.log('start');
+            this.dragSelectedNode = d3Node;
             this.dragStarted = true;
-
-            this.dragChildren = d3Node.descendants();
-            const allOtherNodes = this.rootD3Node.descendants().slice(1).filter((node) => !this.dragChildren.includes(node));
-            const rightGhostNodes = allOtherNodes.map((node) => ({ d3Node: node, side: 1 }));
-            const leftGhostNodes = allOtherNodes.filter((node) => node === node.parent.children[0]).map((node) => ({ d3Node: node, side: -1 }));
-            this.dragNodes = [...rightGhostNodes, ...leftGhostNodes];
           })
           .on('drag', (event, d3Node) => {
             if (d3Node === this.rootD3Node) return;
-            console.log('drag');
-            const nodeSelection = this.featureNodesContainer.selectAll('g.node').data([d3Node], (d3Node) => d3Node.id);
 
             if (this.dragStarted) {
-              // Remove all events from current node.
-              event.sourceEvent.stopPropagation();
-              nodeSelection.select('g.rect-and-text').attr('pointer-events', 'none');
-
-              // Remove all children nodes under the current node and also the links between them.
-              this.featureNodesContainer.selectAll('g.node').data(this.dragChildren.slice(1), (d3Node) => d3Node.id).remove();
-              //nodeSelection.select('g.children-count').remove();
-              this.linksContainer.selectAll('path.link').data(this.dragChildren, (d3Node) => d3Node.id).remove();
-              this.segmentsContainer.selectAll('path').data(this.dragChildren, (d3Node) => d3Node.id).remove();
-
-              // Add ghost circles right to all nodes
-              this.dragContainer
-                  .selectAll('circle.ghost-circle')
-                  .data(this.dragNodes, (ghostNode) => ghostNode.id || (ghostNode.id = ++this.nodeIdCounter))
-                  .enter()
-                  .append('circle')
-                  .classed('ghost-circle', true)
-                  .attr('transform', (ghostNode) => `translate(${ghostNode.d3Node.x + ghostNode.side * (this.calcRectWidth(ghostNode.d3Node) / 2 + CONSTANTS.SPACE_BETWEEN_NODES_HORIZONTALLY / 2) }, ${ghostNode.d3Node.y + CONSTANTS.RECT_HEIGHT / 2})`)
-                  .attr('pointer-events', 'mouseover')
-                  .on('mouseover', (_, ghostNode) => this.overFeatureNode(ghostNode))
-                  .on('mouseout', (_, ghostNode) => this.outFeatureNode(ghostNode));
-
+              this.updateGhostCircles();
               this.dragStarted = false;
             }
 
             // Transform current node.
-            nodeSelection.attr('transform', `translate(${event.x}, ${event.y})`)
+            this.featureNodesContainer.selectAll('g.node').data([d3Node], (d3Node) => d3Node.id).attr('transform', `translate(${event.x}, ${event.y})`)
           })
           .on('end', (_, d3Node) =>  {
             if (d3Node === this.rootD3Node) return;
-            console.log('end');
             const nodeSelection = this.featureNodesContainer.selectAll('g.node').data([d3Node], (d3Node) => d3Node.id);
             nodeSelection.select('g.rect-and-text').attr('pointer-events', 'mouseover');
 
@@ -198,17 +166,30 @@ export default Vue.extend({
               d3Node.data.parent.children = d3Node.data.parent.children.filter((node) => d3Node.data !== node);
 
               // Insert dragged node as neighbour of selected node.
-              const d3Index = this.dragSelectedGhostNode.d3Node.parent.allChildren.indexOf(this.dragSelectedGhostNode.d3Node) + (this.dragSelectedGhostNode.side === 1 ? 1 : 0);
-              console.log('d3Index', d3Index);
-              this.dragSelectedGhostNode.d3Node.parent.allChildren.splice(d3Index, 0, d3Node);
-              const index = this.dragSelectedGhostNode.d3Node.data.parent.children.indexOf(this.dragSelectedGhostNode.d3Node.data) + (this.dragSelectedGhostNode.side === 1 ? 1 : 0);
-              this.dragSelectedGhostNode.d3Node.data.parent.children.splice(index, 0, d3Node.data);
+              if (this.dragSelectedGhostNode.side === 'l' || this.dragSelectedGhostNode.side === 'r') {
+                // Insert as new child.
+                const dIndex = this.dragSelectedGhostNode.side === 'l' ? 0 : 1;
+                let d3Index = this.dragSelectedGhostNode.d3Node.parent.allChildren.indexOf(this.dragSelectedGhostNode.d3Node) + dIndex;
+                let index = this.dragSelectedGhostNode.d3Node.data.parent.children.indexOf(this.dragSelectedGhostNode.d3Node.data) + dIndex;
+                this.dragSelectedGhostNode.d3Node.parent.allChildren.splice(d3Index, 0, d3Node);
+                this.dragSelectedGhostNode.d3Node.data.parent.children.splice(index, 0, d3Node.data);
 
-              // Update member variables of nodes.
-              this.dragSelectedGhostNode.d3Node.parent.children = this.dragSelectedGhostNode.d3Node.parent.allChildren;
-              d3Node.parent.children = d3Node.parent.allChildren;
-              d3Node.data.parent = this.dragSelectedGhostNode.d3Node.data.parent;
-              d3Node.parent = this.dragSelectedGhostNode.d3Node.parent;
+                // Update member variables of nodes.
+                d3Node.parent.children = d3Node.parent.allChildren;
+                this.dragSelectedGhostNode.d3Node.parent.children = this.dragSelectedGhostNode.d3Node.parent.allChildren;
+                d3Node.data.parent = this.dragSelectedGhostNode.d3Node.data.parent;
+                d3Node.parent = this.dragSelectedGhostNode.d3Node.parent;
+              } else if (this.dragSelectedGhostNode.side === 'b') {
+                if (this.dragSelectedGhostNode.d3Node.data.isLeaf()) {
+                  d3Node.parent.children = d3Node.parent.allChildren;
+                  d3Node.parent = this.dragSelectedGhostNode.d3Node;
+                  this.dragSelectedGhostNode.d3Node.allChildren = [d3Node];
+                  this.dragSelectedGhostNode.d3Node.children = this.dragSelectedGhostNode.d3Node.allChildren;
+
+                  d3Node.data.parent = this.dragSelectedGhostNode.d3Node.data;
+                  this.dragSelectedGhostNode.d3Node.data.children = [d3Node.data];
+                }
+              }
 
               this.dragSelectedGhostNode = undefined;
             }
@@ -219,6 +200,63 @@ export default Vue.extend({
 			this.resetView();
 			this.updateSvg();
 		},
+
+    updateGhostCircles() {
+      const dragChildren = this.dragSelectedNode.descendants();
+      const allOtherNodes = this.rootD3Node.descendants().slice(1).filter((node) => !dragChildren.includes(node));
+      const rightGhostNodes = allOtherNodes.map((node) => ({ d3Node: node, side: 'r' }));
+      const leftGhostNodes = allOtherNodes.filter((node) => node === node.parent.children[0]).map((node) => ({ d3Node: node, side: 'l' }));
+      const bottomGhostNodes = allOtherNodes.filter((node) => node.data.isLeaf() || node.data.isCollapsed).map((node) => ({ d3Node: node, side: 'b'}))
+      const dragNodes = [...rightGhostNodes, ...leftGhostNodes, ...bottomGhostNodes];
+
+      // Remove all children nodes under the current node and also the links between them.
+      this.featureNodesContainer.selectAll('g.node').data(dragChildren.slice(1), (d3Node) => d3Node.id).remove();
+      this.linksContainer.selectAll('path.link').data(dragChildren, (d3Node) => d3Node.id).remove();
+      this.segmentsContainer.selectAll('path').data(dragChildren, (d3Node) => d3Node.id).remove();
+
+      // Add ghost circles left and right to all nodes
+      const ghostCircles = this.dragContainer
+          .selectAll('circle.ghost-circle')
+          .data(dragNodes, (ghostNode) => ghostNode.d3Node.id + ghostNode.side);
+
+      const ghostCirclesEnter = ghostCircles
+          .enter()
+          .append('circle')
+          .classed('ghost-circle', true)
+          .on('mouseover', (_, ghostNode) => this.overGhostNode(ghostNode))
+          .on('mouseout', () => this.outGhostNode());
+
+      ghostCirclesEnter.merge(ghostCircles)
+          .attr('transform', (ghostNode) => this.calcGhostCircleTransform(ghostNode));
+
+      ghostCircles.exit().remove();
+    },
+
+    calcGhostCircleTransform(ghostNode) {
+      const y = ghostNode.d3Node.y;
+      let dx = 0;
+
+      const x = ghostNode.d3Node.x;
+      let dy = 0;
+
+      switch (ghostNode.side) {
+        case 'l':
+          dx += this.calcRectWidth(ghostNode.d3Node) / 2 + CONSTANTS.SPACE_BETWEEN_NODES_HORIZONTALLY / 2;
+          dx *= -1;
+          dy = CONSTANTS.RECT_HEIGHT / 2;
+          break;
+        case 'r':
+          dx += this.calcRectWidth(ghostNode.d3Node) / 2 + CONSTANTS.SPACE_BETWEEN_NODES_HORIZONTALLY / 2;
+          dx *= 1;
+          dy = CONSTANTS.RECT_HEIGHT / 2;
+          break;
+        case 'b':
+          dy = CONSTANTS.RECT_HEIGHT;
+          dx = 0;
+          break;
+      }
+      return `translate(${x + dx}, ${y + dy})`;
+    },
 
 		updateFeatureNodes(visibleD3Nodes) {
 			const featureNode = this.featureNodesContainer.selectAll('g.node').data(
@@ -720,14 +758,20 @@ export default Vue.extend({
 			this.focusNode(d3Node);
 		},
 
-    overFeatureNode(ghostNode) {
+    overGhostNode(ghostNode) {
       this.dragSelectedGhostNode = ghostNode;
-      console.log('over', ghostNode.d3Node.data.name);
+
+      // Uncollapse features.
+      if (ghostNode.side === 'b' && !ghostNode.d3Node.data.isLeaf()) {
+        ghostNode.d3Node.data.uncollapse();
+        this.updateCollapsing();
+        this.updateSvg();
+        this.updateGhostCircles();
+      }
     },
 
-    outFeatureNode(ghostNode) {
+    outGhostNode() {
       this.dragSelectedGhostNode = undefined;
-      console.log('out', ghostNode.d3Node.data.name);
     },
 	},
 });
@@ -738,7 +782,7 @@ export default Vue.extend({
 .ghost-circle {
   fill: red;
   fill-opacity: 0.2;
-  r: 30px;
+  r: 25px;
 }
 
 .ghost-circle:hover {
