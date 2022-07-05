@@ -67,11 +67,13 @@ export default Vue.extend({
 		allD3Nodes: undefined,
 		zoom: undefined,
     dragListener: undefined,
+    dragStarted: false,
     dragSelectedNode: undefined,
 		highlightedConstraintsContainer: undefined,
 		linksContainer: undefined,
 		segmentsContainer: undefined,
 		featureNodesContainer: undefined,
+    dragContainer: undefined,
 		isShortenedName: false,
 		nodeIdCounter: 0,
 		isColorCoded: false,
@@ -129,30 +131,85 @@ export default Vue.extend({
 
 			this.featureNodesContainer = svgContent.append('g').classed('feature-node-container', true);
 
+      this.dragContainer = svgContent.append('g').classed('drag-container', true);
+
       // Source: https://embed.plnkr.co/pCE9Ih/
       this.dragListener = d3
           .drag()
           .on('start', (event, d3Node) => {
             if (d3Node === this.rootD3Node) return;
-            event.sourceEvent.stopPropagation();
-            const nodeSelection = this.featureNodesContainer.selectAll('g.node').data([d3Node], (d3Node) => d3Node.id);
-            nodeSelection.select('g.rect-and-text').attr('pointer-events', 'none');
+            console.log('start');
+            this.dragStarted = true;
 
-            const nodes = d3Node.descendants();
-            this.featureNodesContainer.selectAll('g.node').data(nodes.slice(1), (d3Node) => d3Node.id).remove();
-            //nodeSelection.select('g.children-count').remove();
-            this.linksContainer.selectAll('path.link').data(nodes, (d3Node) => d3Node.id).remove();
-            this.segmentsContainer.selectAll('path').data(nodes, (d3Node) => d3Node.id).remove();
+            this.dragChildren = d3Node.descendants();
+            this.dragNodes = this.rootD3Node.descendants().slice(1).filter((node) => !this.dragChildren.includes(node));
           })
           .on('drag', (event, d3Node) => {
             if (d3Node === this.rootD3Node) return;
+            console.log('drag');
             const nodeSelection = this.featureNodesContainer.selectAll('g.node').data([d3Node], (d3Node) => d3Node.id);
+
+            if (this.dragStarted) {
+              // Remove all events from current node.
+              event.sourceEvent.stopPropagation();
+              nodeSelection.select('g.rect-and-text').attr('pointer-events', 'none');
+
+              // Remove all children nodes under the current node and also the links between them.
+              this.featureNodesContainer.selectAll('g.node').data(this.dragChildren.slice(1), (d3Node) => d3Node.id).remove();
+              //nodeSelection.select('g.children-count').remove();
+              this.linksContainer.selectAll('path.link').data(this.dragChildren, (d3Node) => d3Node.id).remove();
+              this.segmentsContainer.selectAll('path').data(this.dragChildren, (d3Node) => d3Node.id).remove();
+
+              // Add ghost circles right to all nodes.
+              this.dragContainer
+                  .selectAll('circle.ghost-circle')
+                  .data(this.dragNodes, (d3Node) => d3Node.id)
+                  .enter()
+                  .append('circle')
+                  .classed('ghost-circle', true)
+                  .attr('transform', (d3Node) => `translate(${d3Node.x + this.calcRectWidth(d3Node) / 2 + CONSTANTS.SPACE_BETWEEN_NODES_HORIZONTALLY / 2 }, ${d3Node.y + CONSTANTS.RECT_HEIGHT / 2})`)
+                  .attr('pointer-events', 'mouseover')
+                  .on('mouseover', (_, d3Node) => this.overFeatureNode(d3Node))
+                  .on('mouseout', (_, d3Node) => this.outFeatureNode(d3Node));
+
+              // Add ghost rect around the current hovered node.
+              // nodeSelection.append('rect').classed('ghost-rect', true);
+
+              this.dragStarted = false;
+            }
+
+            // Transform current node.
             nodeSelection.attr('transform', `translate(${event.x}, ${event.y})`)
           })
           .on('end', (_, d3Node) =>  {
             if (d3Node === this.rootD3Node) return;
+            console.log('end');
             const nodeSelection = this.featureNodesContainer.selectAll('g.node').data([d3Node], (d3Node) => d3Node.id);
             nodeSelection.select('g.rect-and-text').attr('pointer-events', 'mouseover');
+
+            // Remove ghost circles.
+            this.dragContainer.selectAll('circle.ghost-circle').remove();
+
+            if (this.dragSelectedNode) {
+              // Remove dragged node from tree.
+              d3Node.parent.allChildren = d3Node.parent.allChildren.filter((node) => d3Node !== node);
+              d3Node.data.parent.children = d3Node.data.parent.children.filter((node) => d3Node.data !== node);
+
+              // Insert dragged node as neighbour of selected node.
+              this.dragSelectedNode.parent.allChildren.splice(this.dragSelectedNode.parent.allChildren.indexOf(this.dragSelectedNode) + 1, 0, d3Node);
+              this.dragSelectedNode.data.parent.children.splice(this.dragSelectedNode.data.parent.children.indexOf(this.dragSelectedNode.data) + 1, 0, d3Node.data);
+
+              // Update member variables of nodes.
+              this.dragSelectedNode.parent.children = this.dragSelectedNode.parent.allChildren;
+              d3Node.parent.children = d3Node.parent.allChildren;
+              d3Node.data.parent = this.dragSelectedNode.data.parent;
+              d3Node.parent = this.dragSelectedNode.parent;
+
+              this.dragSelectedNode = undefined;
+            }
+
+            // Remove ghost rect from current hovered node.
+            // nodeSelection.selectAll('rect.ghost-rect').remove();
 
             //d3Node.parent.children = d3Node.parent.children.filter((d3N) => d3N !== d3Node);
 
@@ -184,10 +241,7 @@ export default Vue.extend({
 
 			const rectAndTextEnter = featureNodeEnter
           .append('g')
-          .classed('rect-and-text', true)
-          .attr('pointer-events', 'mouseover')
-          .on('mouseover', (_, d3Node) => this.overFeatureNode(d3Node))
-          .on('mouseout', (_, d3Node) => this.outFeatureNode(d3Node));
+          .classed('rect-and-text', true);
 			rectAndTextEnter
           .append('rect')
           .attr('height', CONSTANTS.RECT_HEIGHT);
@@ -670,8 +724,14 @@ export default Vue.extend({
 
 <style lang="scss">
 
-.ghost {
+.ghost-circle {
   fill: red;
+  fill-opacity: 0.2;
+  r: 30px;
+}
+
+.ghost-circle:hover {
+  fill-opacity: 0.8;
 }
 
 #svg-container {
