@@ -68,7 +68,9 @@ export default Vue.extend({
 		zoom: undefined,
     dragListener: undefined,
     dragStarted: false,
-    dragSelectedNode: undefined,
+    dragNodes: undefined,
+    dragChildren: undefined,
+    dragSelectedGhostNode: undefined,
 		highlightedConstraintsContainer: undefined,
 		linksContainer: undefined,
 		segmentsContainer: undefined,
@@ -142,7 +144,10 @@ export default Vue.extend({
             this.dragStarted = true;
 
             this.dragChildren = d3Node.descendants();
-            this.dragNodes = this.rootD3Node.descendants().slice(1).filter((node) => !this.dragChildren.includes(node));
+            const allOtherNodes = this.rootD3Node.descendants().slice(1).filter((node) => !this.dragChildren.includes(node));
+            const rightGhostNodes = allOtherNodes.map((node) => ({ d3Node: node, side: 1 }));
+            const leftGhostNodes = allOtherNodes.filter((node) => node === node.parent.children[0]).map((node) => ({ d3Node: node, side: -1 }));
+            this.dragNodes = [...rightGhostNodes, ...leftGhostNodes];
           })
           .on('drag', (event, d3Node) => {
             if (d3Node === this.rootD3Node) return;
@@ -160,20 +165,17 @@ export default Vue.extend({
               this.linksContainer.selectAll('path.link').data(this.dragChildren, (d3Node) => d3Node.id).remove();
               this.segmentsContainer.selectAll('path').data(this.dragChildren, (d3Node) => d3Node.id).remove();
 
-              // Add ghost circles right to all nodes.
+              // Add ghost circles right to all nodes
               this.dragContainer
                   .selectAll('circle.ghost-circle')
-                  .data(this.dragNodes, (d3Node) => d3Node.id)
+                  .data(this.dragNodes, (ghostNode) => ghostNode.id || (ghostNode.id = ++this.nodeIdCounter))
                   .enter()
                   .append('circle')
                   .classed('ghost-circle', true)
-                  .attr('transform', (d3Node) => `translate(${d3Node.x + this.calcRectWidth(d3Node) / 2 + CONSTANTS.SPACE_BETWEEN_NODES_HORIZONTALLY / 2 }, ${d3Node.y + CONSTANTS.RECT_HEIGHT / 2})`)
+                  .attr('transform', (ghostNode) => `translate(${ghostNode.d3Node.x + ghostNode.side * (this.calcRectWidth(ghostNode.d3Node) / 2 + CONSTANTS.SPACE_BETWEEN_NODES_HORIZONTALLY / 2) }, ${ghostNode.d3Node.y + CONSTANTS.RECT_HEIGHT / 2})`)
                   .attr('pointer-events', 'mouseover')
-                  .on('mouseover', (_, d3Node) => this.overFeatureNode(d3Node))
-                  .on('mouseout', (_, d3Node) => this.outFeatureNode(d3Node));
-
-              // Add ghost rect around the current hovered node.
-              // nodeSelection.append('rect').classed('ghost-rect', true);
+                  .on('mouseover', (_, ghostNode) => this.overFeatureNode(ghostNode))
+                  .on('mouseout', (_, ghostNode) => this.outFeatureNode(ghostNode));
 
               this.dragStarted = false;
             }
@@ -190,28 +192,26 @@ export default Vue.extend({
             // Remove ghost circles.
             this.dragContainer.selectAll('circle.ghost-circle').remove();
 
-            if (this.dragSelectedNode) {
+            if (this.dragSelectedGhostNode) {
               // Remove dragged node from tree.
               d3Node.parent.allChildren = d3Node.parent.allChildren.filter((node) => d3Node !== node);
               d3Node.data.parent.children = d3Node.data.parent.children.filter((node) => d3Node.data !== node);
 
               // Insert dragged node as neighbour of selected node.
-              this.dragSelectedNode.parent.allChildren.splice(this.dragSelectedNode.parent.allChildren.indexOf(this.dragSelectedNode) + 1, 0, d3Node);
-              this.dragSelectedNode.data.parent.children.splice(this.dragSelectedNode.data.parent.children.indexOf(this.dragSelectedNode.data) + 1, 0, d3Node.data);
+              const d3Index = this.dragSelectedGhostNode.d3Node.parent.allChildren.indexOf(this.dragSelectedGhostNode.d3Node) + (this.dragSelectedGhostNode.side === 1 ? 1 : 0);
+              console.log('d3Index', d3Index);
+              this.dragSelectedGhostNode.d3Node.parent.allChildren.splice(d3Index, 0, d3Node);
+              const index = this.dragSelectedGhostNode.d3Node.data.parent.children.indexOf(this.dragSelectedGhostNode.d3Node.data) + (this.dragSelectedGhostNode.side === 1 ? 1 : 0);
+              this.dragSelectedGhostNode.d3Node.data.parent.children.splice(index, 0, d3Node.data);
 
               // Update member variables of nodes.
-              this.dragSelectedNode.parent.children = this.dragSelectedNode.parent.allChildren;
+              this.dragSelectedGhostNode.d3Node.parent.children = this.dragSelectedGhostNode.d3Node.parent.allChildren;
               d3Node.parent.children = d3Node.parent.allChildren;
-              d3Node.data.parent = this.dragSelectedNode.data.parent;
-              d3Node.parent = this.dragSelectedNode.parent;
+              d3Node.data.parent = this.dragSelectedGhostNode.d3Node.data.parent;
+              d3Node.parent = this.dragSelectedGhostNode.d3Node.parent;
 
-              this.dragSelectedNode = undefined;
+              this.dragSelectedGhostNode = undefined;
             }
-
-            // Remove ghost rect from current hovered node.
-            // nodeSelection.selectAll('rect.ghost-rect').remove();
-
-            //d3Node.parent.children = d3Node.parent.children.filter((d3N) => d3N !== d3Node);
 
             this.updateSvg();
           });
@@ -251,28 +251,6 @@ export default Vue.extend({
 				.attr('font-size', CONSTANTS.FEATURE_FONT_SIZE);
 
 			featureNodeEnter.append('circle').classed('and-group-circle', true).attr('r', CONSTANTS.MANDATORY_CIRCLE_RADIUS);
-
-			// Enter circle with number of direct and total children.
-			const childrenCountEnter = featureNodeEnter
-				.filter((d3Node) => !d3Node.data.isLeaf())
-				.append('g')
-				.classed('children-count', true);
-			childrenCountEnter
-				.append('polygon')
-				.attr('fill', 'white')
-				.attr('points', () => this.calculateTriangle());
-			childrenCountEnter
-				.append('text')
-				.classed('children-count-text', true)
-				.attr('dy', 5)
-				.attr('font-size', CONSTANTS.CHILREN_COUNT_FONT_SIZE)
-				.text((d3Node) => d3Node.data.childrenCount());
-			childrenCountEnter
-				.append('text')
-				.classed('children-count-text', true)
-				.attr('dy', 15)
-				.attr('font-size', CONSTANTS.CHILREN_COUNT_FONT_SIZE)
-				.text((d3Node) => d3Node.data.totalSubnodesCount());
 
 			const pseudoNode = this.featureNodesContainer.selectAll('g.pseudo-node').data(
 				visibleD3Nodes.filter((d3Node) => d3Node.data instanceof PseudoNode),
@@ -318,12 +296,45 @@ export default Vue.extend({
 				})
 				.text((d3Node) => (this.isShortenedName ? d3Node.data.displayName : d3Node.data.name));
 
-			// Children count update
-			featureNodeUpdate
-				.select('g.children-count')
-				.attr('transform', (d3Node) => 'translate(' + this.calcRectWidth(d3Node) / 2 + ', ' + CONSTANTS.RECT_HEIGHT + ')');
+      // Enter triangle with number of direct and total children.
+      const childrenCount = featureNodeUpdate
+          .selectAll('g.children-count')
+          .data((d) => d.data.isLeaf() ? [] : [d], (d) => d.id);
 
-			const pseudoNodeUpdate = pseudoNodeEnter.merge(pseudoNode);
+      const childrenCountEnter = childrenCount
+          .enter()
+          .append('g')
+          .classed('children-count', true);
+      childrenCountEnter
+          .append('polygon')
+          .attr('fill', 'white')
+          .attr('points', this.calculateTriangle());
+      childrenCountEnter
+          .append('text')
+          .classed('children-count-text', true)
+          .classed('direct-children', true)
+          .attr('dy', 5)
+          .attr('font-size', CONSTANTS.CHILREN_COUNT_FONT_SIZE);
+      childrenCountEnter
+          .append('text')
+          .classed('children-count-text', true)
+          .classed('total-children', true)
+          .attr('dy', 15)
+          .attr('font-size', CONSTANTS.CHILREN_COUNT_FONT_SIZE);
+
+      const childrenCountUpdate = childrenCountEnter.merge(childrenCount);
+      childrenCountUpdate
+          .attr('transform', (d3Node) => 'translate(' + this.calcRectWidth(d3Node) / 2 + ', ' + CONSTANTS.RECT_HEIGHT + ')');
+      childrenCountUpdate
+          .selectAll('text.direct-children')
+          .text((d3Node) => d3Node.data.childrenCount());
+      childrenCountUpdate
+          .selectAll('text.total-children')
+          .text((d3Node) => d3Node.data.totalSubnodesCount());
+
+      childrenCount.exit().remove();
+
+      const pseudoNodeUpdate = pseudoNodeEnter.merge(pseudoNode);
 			pseudoNodeUpdate.attr('transform', (d3Node) => 'translate(' + d3Node.x + ', ' + (d3Node.y + CONSTANTS.RECT_HEIGHT / 2) + ')');
 
 			// Remove old/invisible nodes.
@@ -709,14 +720,14 @@ export default Vue.extend({
 			this.focusNode(d3Node);
 		},
 
-    overFeatureNode(d3Node) {
-      this.dragSelectedNode = d3Node;
-      console.log('over', d3Node.data.name);
+    overFeatureNode(ghostNode) {
+      this.dragSelectedGhostNode = ghostNode;
+      console.log('over', ghostNode.d3Node.data.name);
     },
 
-    outFeatureNode(d3Node) {
-      this.dragSelectedNode = undefined;
-      console.log('out', d3Node.data.name);
+    outFeatureNode(ghostNode) {
+      this.dragSelectedGhostNode = undefined;
+      console.log('out', ghostNode.d3Node.data.name);
     },
 	},
 });
