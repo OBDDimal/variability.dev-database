@@ -554,10 +554,9 @@ export default Vue.extend({
 				}
 			}
 
-			// TODO: Reset zoom and translation
-
 			this.updateCollapsing();
 			this.updateSvg();
+      this.zoomFit();
 		},
 
 		zoomFit(padding = 0.75) {
