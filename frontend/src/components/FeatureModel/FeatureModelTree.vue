@@ -794,7 +794,7 @@ export default Vue.extend({
         },
 
         addNode(newNode) {
-            this.d3ParentOfAddNode.data.collapse();
+            this.d3ParentOfAddNode.data.uncollapse();
             this.updateCollapsing();
 
             this.d3ParentOfAddNode.data.unhideChildren();
@@ -807,6 +807,7 @@ export default Vue.extend({
             this.d3ParentOfAddNode.allChildren.push(d3NewNode);
             this.d3ParentOfAddNode.children = this.d3ParentOfAddNode.allChildren;
 
+            console.log(this.d3ParentOfAddNode);
             this.d3ParentOfAddNode = undefined;
             this.updateSvg();
         },
