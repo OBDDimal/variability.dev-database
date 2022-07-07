@@ -122,6 +122,12 @@ export class FeatureNode {
 	unhide() {
 		this.isHidden = false;
 	}
+
+	unhideChildren() {
+		if (this.children) {
+			this.children.forEach((node) => node.unhide());
+		}
+	}
 }
 
 export class PseudoNode {
