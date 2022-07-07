@@ -26,6 +26,7 @@
             @hideCurrentNode="(d3Node) => hideCurrentNode(d3Node)"
             @edit="(d3Node) => (editD3Node = d3Node)"
             @close="contextMenuD3Node = undefined"
+            @add="(d3Node) => (d3ParentOfAddNode = d3Node)"
         ></feature-model-tree-context-menu>
 
         <feature-model-tree-edit-dialog
@@ -33,6 +34,12 @@
             @close="editD3Node = undefined"
             @update="updateSvg"
         ></feature-model-tree-edit-dialog>
+
+        <feature-model-tree-add-dialog
+            :parent="d3ParentOfAddNode ? d3ParentOfAddNode.data : undefined"
+            @close="d3ParentOfAddNode = undefined"
+            @add="(newNode) => addNode(newNode)"
+        ></feature-model-tree-add-dialog>
     </div>
 </template>
 
@@ -47,6 +54,7 @@ import {createGroupSegment, createLink} from '@/classes/createSvgPaths';
 import FeatureModelTreeToolbar from './FeatureModelTreeToolbar.vue';
 import FeatureModelTreeContextMenu from './FeatureModelTreeContextMenu.vue';
 import FeatureModelTreeEditDialog from './FeatureModelTreeEditDialog.vue';
+import FeatureModelTreeAddDialog from "@/components/FeatureModel/FeatureModelTreeAddDialog";
 
 export default Vue.extend({
     name: 'FeatureModelTree',
@@ -55,6 +63,7 @@ export default Vue.extend({
         FeatureModelTreeToolbar,
         FeatureModelTreeContextMenu,
         FeatureModelTreeEditDialog,
+        FeatureModelTreeAddDialog,
     },
 
     props: {
@@ -82,6 +91,7 @@ export default Vue.extend({
         contextMenuD3Node: undefined,
         contextMenuD3NodeEvent: undefined,
         editD3Node: undefined,
+        d3ParentOfAddNode: undefined,
     }),
 
     computed: {},
@@ -781,6 +791,24 @@ export default Vue.extend({
 
         outGhostNode() {
             this.dragSelectedGhostNode = undefined;
+        },
+
+        addNode(newNode) {
+            this.d3ParentOfAddNode.data.collapse();
+            this.updateCollapsing();
+
+            this.d3ParentOfAddNode.data.unhideChildren();
+            this.updateHiding(this.d3ParentOfAddNode);
+
+            newNode.parent.children.push(newNode);
+
+            const d3NewNode = d3.hierarchy(newNode);
+            d3NewNode.parent = this.d3ParentOfAddNode;
+            this.d3ParentOfAddNode.allChildren.push(d3NewNode);
+            this.d3ParentOfAddNode.children = this.d3ParentOfAddNode.allChildren;
+
+            this.d3ParentOfAddNode = undefined;
+            this.updateSvg();
         },
     },
 });
