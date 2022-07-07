@@ -1,11 +1,21 @@
 <template>
   <div>
-    <v-toolbar class="mt-5 ml-5" elevation="12" absolute left top floating shaped style="border: 2px solid white">
+    <v-toolbar
+      class="mt-5 ml-5"
+      elevation="12"
+      absolute
+      left
+      top
+      floating
+      shaped
+      style="border: 2px solid white"
+    >
       <v-text-field
         hide-details
         placeholder="Search Features"
         prepend-icon="mdi-magnify"
         single-line
+        v-model="searchText"
       ></v-text-field>
 
       <v-menu offset-y>
@@ -36,37 +46,46 @@
         <v-list>
           <v-subheader>View</v-subheader>
 
-          <v-list-item-group color="primary">
-            <v-list-item>
-              <v-list-item-content>
-                <v-list-item-title>Fit to view</v-list-item-title>
-              </v-list-item-content>
-            </v-list-item>
-            <v-list-item>
-              <v-list-item-content>
-                <v-list-item-title>Reset view</v-list-item-title>
-              </v-list-item-content>
-            </v-list-item>
-            <v-list-item>
-              <template v-slot:default="{ active }">
-                <v-list-item-action>
-                  <v-checkbox
-                    :input-value="active"
-                    color="primary"
-                  ></v-checkbox>
-                </v-list-item-action>
+          <v-list-item @click="$emit('fitToView')" class="clickable">
+            <v-list-item-content>
+              <v-list-item-title>Fit to view</v-list-item-title>
+            </v-list-item-content>
+          </v-list-item>
+          <v-list-item
+            @click="$emit('resetView', levels, maxChilds)"
+            class="clickable"
+          >
+            <v-list-item-content>
+              <v-list-item-title>Reset view</v-list-item-title>
+            </v-list-item-content>
+          </v-list-item>
+          <v-list-item @click="$store.commit('openConstraints', true)" class="clickable">
+            <v-list-item-content>
+              <v-list-item-title>Show Constraints</v-list-item-title>
+            </v-list-item-content>
+          </v-list-item>
+          <v-list-item>
+            <template v-slot:default="{ active }">
+              <v-list-item-action>
+                <v-checkbox
+                  :input-value="active"
+                  color="primary"
+                  v-model="isShortName"
+                ></v-checkbox>
+              </v-list-item-action>
 
-                <v-list-item-content>
-                  <v-list-item-title>Short Name</v-list-item-title>
-                </v-list-item-content>
-              </template>
-            </v-list-item>
-          </v-list-item-group>
+              <v-list-item-content>
+                <v-list-item-title>Short Name</v-list-item-title>
+              </v-list-item-content>
+            </template>
+          </v-list-item>
           <v-subheader>Spacing</v-subheader>
           <v-list-item>
             <v-slider
               style="width: 200px"
               hide-details
+              min="40"
+              max="300"
               v-model="verticalSpacing"
             ></v-slider>
           </v-list-item>
@@ -82,7 +101,9 @@
         <v-list>
           <v-subheader>Export</v-subheader>
 
-          <v-btn text color="primary" rounded>Export as XML</v-btn>
+          <v-btn text color="primary" rounded @click="$emit('export')"
+            >Export as XML</v-btn
+          >
         </v-list>
       </v-menu>
 
@@ -100,6 +121,8 @@
               v-model="levels"
               class="mt-0 pt-0"
               type="number"
+              min="0"
+              @change="$emit('resetView', levels, maxChilds)"
             ></v-text-field>
           </v-list-item>
           <v-subheader>Adjust Max Children</v-subheader>
@@ -109,6 +132,8 @@
               v-model="maxChilds"
               class="mt-0 pt-0"
               type="number"
+              min="0"
+              @change="$emit('resetView', levels, maxChilds)"
             ></v-text-field>
           </v-list-item>
         </v-list>
@@ -117,7 +142,7 @@
   </div>
 </template>
 
-<script lang="ts">
+<script>
 import Vue from "vue";
 
 export default Vue.extend({
@@ -128,13 +153,36 @@ export default Vue.extend({
   props: {},
 
   data: () => ({
-    selectedColoring: -1,
-    selectedView: -1,
+    selectedColoring: undefined,
+    selectedView: undefined,
     levels: 4,
-    maxChilds: 2,
-    verticalSpacing: 10,
+    maxChilds: 3,
+    verticalSpacing: 75,
     itemsColoring: ["Count", "Direct Children", "Total Children"],
+    searchText: "",
+    isShortName: false,
   }),
+
+  watch: {
+    searchText: function (newValue) {
+      this.$emit("search", newValue);
+    },
+    selectedColoring: function (newValue) {
+      this.$emit("coloring", newValue);
+    },
+    isShortName: function (newValue) {
+      this.$emit("shortName", newValue);
+    },
+    verticalSpacing: function (newValue) {
+      this.$emit("verticalSpacing", newValue);
+    },
+    levels: function (newValue) {
+      this.$emit("levels", newValue);
+    },
+    maxChilds: function (newValue) {
+      this.$emit("maxChilds", newValue);
+    },
+  },
 
   computed: {},
 
@@ -143,4 +191,7 @@ export default Vue.extend({
 </script>
 
 <style scoped>
+.clickable {
+  cursor: pointer;
+}
 </style>
