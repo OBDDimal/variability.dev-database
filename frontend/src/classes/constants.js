@@ -2,9 +2,7 @@ export const SVG_MARGIN = {top: 20, right: 90, bottom: 20, left: 90};
 export const SVG_WIDTH = window.innerWidth - SVG_MARGIN.left - SVG_MARGIN.right;
 export const SVG_HEIGHT =
     window.innerHeight -
-    SVG_MARGIN.top -
-    SVG_MARGIN.bottom -
-    window.innerHeight / 10; // To compensate for the footer
+    SVG_MARGIN.top
 
 export const RECT_MARGIN = {right: 8, left: 8};
 export const RECT_HEIGHT = 35;

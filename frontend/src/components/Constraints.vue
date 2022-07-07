@@ -1,34 +1,36 @@
 <template>
+  <v-bottom-sheet v-model="$store.state.openConstraints" hide-overlay>
     <v-data-table
-        :headers="headers"
-        :items="tableConstraints"
-        :items-per-page="5"
-        :search="search"
-        class="feature-model-constraints"
-        hide-default-header
+      :headers="headers"
+      :items="tableConstraints"
+      :items-per-page="5"
+      :search="search"
+      style="padding: 10px"
+      @click:row="highlightConstraint"
+      hide-default-header
     >
       <template v-slot:top>
-        <v-text-field
+        <div class="d-flex justify-center align-center">
+          <v-text-field
+            prepend-inner-icon="mdi-magnify"
             v-model="search"
             label="Search"
             class="mx-4"
-        ></v-text-field>
-      </template>
-      <template v-slot:item.checked="{ item }">
-        <v-simple-checkbox
-            v-ripple
-            v-model="item.checked"
-            @click="highlightConstraint(item.constraint)"
-        ></v-simple-checkbox>
+          ></v-text-field>
+          <v-btn icon @click="$store.commit('openConstraints', false)"><v-icon>mdi-close</v-icon></v-btn>
+        </div>
       </template>
       <template v-slot:item.formula="{ item }">
         <v-chip
-            :color="item.constraint.color"
+          v-model="item.checked"
+          :color="item.constraint.color"
+          :style="`color: ${computeColor(item.constraint.color)}`"
         >
           {{ item.formula }}
         </v-chip>
       </template>
     </v-data-table>
+  </v-bottom-sheet>
 </template>
 
 <script>
@@ -44,21 +46,50 @@ export default Vue.extend({
   },
 
   data: () => ({
-    headers: [{text: 'Constraint', value: 'formula'}, {text: 'checked', value: "checked"}],
-    search: '',
+    headers: [{ text: "Constraint", value: "formula" }],
+    search: "",
   }),
 
   computed: {
     tableConstraints() {
-      return this.constraints.map(e => ({constraint: e, formula: e.toString(), checked: false}))
-    }
+      return this.constraints.map((e) => ({
+        constraint: e,
+        formula: e.toString(),
+        checked: false,
+      }));
+    },
   },
 
   methods: {
-    highlightConstraint(constraint) {
+    highlightConstraint(item) {
       //TODO: Table row color
-      constraint.toggleHighlighted();
-      this.$emit('update-feature-model');
+      console.log(this.tableConstraints);
+      item.checked = !item.checked;
+      item.constraint.toggleHighlighted();
+      this.$emit("update-feature-model");
+      console.log(item.constraint.color);
+    },
+    computeColor(bg) {
+      var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(bg);
+      var rgb = result
+        ? [
+            parseInt(result[1], 16),
+            parseInt(result[2], 16),
+            parseInt(result[3], 16),
+          ]
+        : null;
+      if (rgb) {
+        if (rgb[0] * 0.299 + rgb[1] * 0.587 + rgb[2] * 0.114 > 170) {
+          return "#000";
+        } else {
+          return "#fff";
+        }
+      } else {
+        if (this.$vuetify.theme.dark) {
+          return "#fff"
+        }
+        return "#000"
+      }
     },
   },
 });
@@ -67,10 +98,8 @@ export default Vue.extend({
 <style lang="scss" scoped>
 .feature-model-constraints {
   position: absolute;
-  background-color: white;
   bottom: 0;
   width: 100%;
-  box-shadow: 0px 10px 10px #888, 0px -10px 10px #888;
   padding: 2rem;
   min-height: 10%;
   max-height: 40%;
