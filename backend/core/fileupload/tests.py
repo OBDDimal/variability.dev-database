@@ -42,20 +42,17 @@ class AuthenticationTest(APITestCase):
         self.assertIn("access", json)
         self.assertIn("refresh", json)
 
-
     def test_wrong_login(self):
         res = self.client.post("/auth/login/", {"email": "ad@m.in", "password": "123456"})
         json = res.json()
         self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
         self.assertIn("detail", json)
 
-
     def test_login_inactive(self):
         res = self.client.post("/auth/login/", {"email": "in@acti.ve", "password": "!87654321"})
         json = res.json()
         self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
         self.assertIn("detail", json)
-
 
     def test_refresh(self):
         res = self.client.post("/auth/login/", {"email": "ad@m.in", "password": "12345678!"})
@@ -74,14 +71,84 @@ class AuthenticationTest(APITestCase):
 
 
 class TagTest(APITestCase):
-    family_label = ''
-    license_label = License._default_license
+    tag_label = "Tag label"
+    tag_description = "Tag description"
+    other_tag_label = "Other tag label"
+    other_tag_description = "Other tag description"
 
     def setUp(self):
-        User.objects.create_superuser(email="ad@m.in", password="12345678!")
+        admin = User.objects.create_superuser(email="ad@m.in", password="12345678!")
         User.objects.create_superuser(email="u@s.er", password="!87654321")
+        Tag.objects.create(label=self.tag_label, description=self.tag_description, owner=admin, is_public=True)
+        Tag.objects.create(label=self.other_tag_label, description=self.other_tag_description, owner=admin, is_public=False)
 
-    def test_tag_creation(self):
+    def test_tag_list(self):
+        # Licenses are listable when logged in
+        self.client.login(email="ad@m.in", password="12345678!")
+        res = self.client.get("/tags/")
+        json = res.json()
+        self.assertEqual(len(json), 2)
+
+        # Licenses are listable when logged out
+        self.client.logout()
+        res = self.client.get("/tags/")
+        json = res.json()
+        self.assertEqual(len(json), 2)
+
+    def test_tag_retrieve(self):
+        # Tags are retrievable as owner
+        self.client.login(email="ad@m.in", password="12345678!")
+
+        res = self.client.get("/tags/1/")
+        json = res.json()
+        self.assertEqual(json["label"], self.tag_label)
+        self.assertEqual(json["description"], self.tag_description)
+        self.assertEqual(json["owner"], True)
+        self.assertEqual(json["is_public"], True)
+
+        res = self.client.get("/tags/2/")
+        json = res.json()
+        self.assertEqual(json["label"], self.other_tag_label)
+        self.assertEqual(json["description"], self.other_tag_description)
+        self.assertEqual(json["owner"], True)
+        self.assertEqual(json["is_public"], False)
+
+        # Tags are retrievable as other authenticated user
+        self.client.logout()
+        self.client.login(email="u@s.er", password="!87654321")
+
+        res = self.client.get("/tags/1/")
+        json = res.json()
+        self.assertEqual(json["label"], self.tag_label)
+        self.assertEqual(json["description"], self.tag_description)
+        self.assertEqual(json["owner"], False)
+        self.assertEqual(json["is_public"], True)
+
+        res = self.client.get("/tags/2/")
+        json = res.json()
+        self.assertEqual(json["label"], self.other_tag_label)
+        self.assertEqual(json["description"], self.other_tag_description)
+        self.assertEqual(json["owner"], False)
+        self.assertEqual(json["is_public"], False)
+
+        # Tags are retrievable as unauthenticated user
+        self.client.logout()
+
+        res = self.client.get("/tags/1/")
+        json = res.json()
+        self.assertEqual(json["label"], self.tag_label)
+        self.assertEqual(json["description"], self.tag_description)
+        self.assertEqual(json["owner"], False)
+        self.assertEqual(json["is_public"], True)
+
+        res = self.client.get("/tags/2/")
+        json = res.json()
+        self.assertEqual(json["label"], self.other_tag_label)
+        self.assertEqual(json["description"], self.other_tag_description)
+        self.assertEqual(json["owner"], False)
+        self.assertEqual(json["is_public"], False)
+
+    def test_tag_create(self):
         self.client.login(email="ad@m.in", password="12345678!")
 
         res = self.client.post("/tags/", {"label": "testlabel", "description": "testdescription", "is_public": True})
@@ -123,15 +190,75 @@ class TagTest(APITestCase):
         #self.assertEqual(json["owner"], False)
         #self.assertEqual(json["is_public"], False)
 
+    def test_tag_destroy(self):
+        # Tags are not destroyable by an unauthenticated user
+        res = self.client.delete("/tags/1/")
+        self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
+        res = self.client.get("/tags/1/")
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+
+        # Tags are not destroyable by an authenticated user that is not the owner
+        self.client.logout()
+        self.client.login(email="u@s.er", password="!87654321")
+
+        res = self.client.delete("/tags/1/")
+        self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
+        res = self.client.get("/tags/1/")
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+
+        # Tags are destroyable by the owner
+        self.client.logout()
+        self.client.login(email="ad@m.in", password="12345678!")
+
+        res = self.client.delete("/tags/1/")
+        self.assertEqual(res.status_code, status.HTTP_204_NO_CONTENT)
+        res = self.client.get("/tags/1/")
+        self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
+
 
 class FamilyTest(APITestCase):
-    family_label = ''
-    license_label = License._default_license
+    family_label = "Family label"
+    family_description = "Family description"
+    other_family_label = "Other family label"
+    other_family_description = "Other family description"
 
     def setUp(self):
-        User.objects.create_superuser(email="ad@m.in", password="12345678!")
+        admin = User.objects.create_superuser(email="ad@m.in", password="12345678!")
+        User.objects.create_superuser(email="u@s.er", password="!87654321")
+        Family.objects.create(label=self.family_label, description=self.family_description, owner=admin)
+        Family.objects.create(label=self.other_family_label, description=self.other_family_description, owner=admin)
 
-    def test_family_creation(self):
+    def test_family_list(self):
+        # Families are listable when logged in
+        self.client.login(email="ad@m.in", password="12345678!")
+        res = self.client.get("/families/")
+        json = res.json()
+        self.assertEqual(len(json), 2)
+
+        # Families are listable when logged out
+        self.client.logout()
+        res = self.client.get("/families/")
+        json = res.json()
+        self.assertEqual(len(json), 2)
+
+    def test_family_retrieve(self):
+        # Families are retrievable when logged in
+        self.client.login(email="ad@m.in", password="12345678!")
+        res = self.client.get("/families/1/")
+        json = res.json()
+        self.assertEqual(json["label"], self.family_label)
+        self.assertEqual(json["description"], self.family_description)
+        self.assertEqual(json["owner"], True)
+
+        # Families are retrievable when logged out
+        self.client.logout()
+        res = self.client.get("/families/1/")
+        json = res.json()
+        self.assertEqual(json["label"], self.family_label)
+        self.assertEqual(json["description"], self.family_description)
+        self.assertEqual(json["owner"], False)
+
+    def test_family_create(self):
         self.client.login(email="ad@m.in", password="12345678!")
 
         res = self.client.post("/families/", {"label": "testfamily", "description": "testdescription"})
@@ -162,6 +289,58 @@ class FamilyTest(APITestCase):
         self.assertEqual(json["label"], "testfamily")
         self.assertEqual(json["description"], "testdescription")
         self.assertEqual(json["owner"], False)
+
+    def test_family_update(self):
+        # Families are not updateable by an unauthenticated user
+        res = self.client.put("/families/1/", {"label": self.other_family_label, "description": self.other_family_description})
+        self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
+
+        # Families are not updateable by another user
+        self.client.login(email="u@s.er", password="!87654321")
+        res = self.client.put("/families/1/", {"label": self.other_family_label, "description": self.other_family_description})
+        self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
+
+        # Families are updatable by owner
+        self.client.logout()
+        self.client.login(email="ad@m.in", password="12345678!")
+        res = self.client.put("/families/1/", {"label": self.other_family_label, "description": self.other_family_description})
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+
+
+class LicenseTest(APITestCase):
+    license_label = License._default_license
+    other_license_label = "Test license"
+
+    def setUp(self):
+        User.objects.create_superuser(email="ad@m.in", password="12345678!")
+        License.objects.create(label=self.license_label)
+        License.objects.create(label=self.other_license_label)
+
+    def test_license_list(self):
+        # Licenses are listable when logged in
+        self.client.login(email="ad@m.in", password="12345678!")
+        res = self.client.get("/licenses/")
+        json = res.json()
+        self.assertEqual(len(json), 2)
+
+        # Licenses are listable when logged out
+        self.client.logout()
+        res = self.client.get("/licenses/")
+        json = res.json()
+        self.assertEqual(len(json), 2)
+
+    def test_license_retrieve(self):
+        # License is retrievable when logged in
+        self.client.login(email="ad@m.in", password="12345678!")
+        res = self.client.get("/licenses/1/")
+        json = res.json()
+        self.assertEqual(json["label"], self.license_label)
+
+        # License is also retrievable when logged out
+        self.client.logout()
+        res = self.client.get("/licenses/1/")
+        json = res.json()
+        self.assertEqual(json["label"], self.license_label)
 
 
 class FileUploadWithTagsTests(APITestCase):
