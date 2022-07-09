@@ -54,14 +54,16 @@
                 </v-list-item-content>
             </v-list-item>
 
-            <v-list-item @click="$emit('hideCurrentNode', d3Node)">
+            <v-list-item @click="$emit('hideCurrentNode', d3Node)" :disabled="d3Node && d3Node.data && d3Node.data.isRoot">
                 <v-list-item-content>
-                    <v-list-item-title>Hide current node</v-list-item-title>
+                    <v-list-item-title>Hide current node
+                    </v-list-item-title>
                 </v-list-item-content>
             </v-list-item>
 
             <v-divider></v-divider>
 
+            <!-- TODO: Emit event to highlight -->
             <v-list-item :disabled="!(d3Node && d3Node.data.constraints && d3Node.data.constraints.length)">
                 <v-list-item-content>
                     <v-list-item-title>Highlight constraints</v-list-item-title>

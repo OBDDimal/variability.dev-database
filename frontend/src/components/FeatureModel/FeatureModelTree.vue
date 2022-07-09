@@ -794,6 +794,10 @@ export default Vue.extend({
         },
 
         addNode(newNode) {
+            if (this.d3ParentOfAddNode.data.isLeaf()) {
+                this.d3ParentOfAddNode.allChildren = [];
+            }
+
             this.d3ParentOfAddNode.data.collapse();
             this.updateCollapsing();
 

@@ -80,7 +80,6 @@ export default Vue.extend({
 
     methods: {
         discard() {
-            this.close();
             this.name = "";
             this.mandatory = false;
             this.abstract = false;
