@@ -1,6 +1,7 @@
 from core.analysis.models import DockerProcess, Analysis
 from core.fileupload.models import Family, Tag, License, File
 from core.fileupload.serializers import FilesSerializer, TagsSerializer, FamiliesSerializer, LicensesSerializer
+from core.fileupload.permissions import IsOwnerOrReadOnly
 from collections import OrderedDict
 import logging
 from django.utils import timezone, dateparse
@@ -13,7 +14,7 @@ from django.core.signing import BadSignature
 from django.utils.encoding import DjangoUnicodeDecodeError
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticatedOrReadOnly
 from rest_framework.mixins import CreateModelMixin
 from ddueruemweb.settings import PASSWORD_RESET_TIMEOUT_DAYS, DEBUG
 from ..auth.tokens import decode_token_to_user
@@ -21,6 +22,36 @@ import core.fileupload.githubmirror.github_manager as gm
 from multiprocessing import Process
 
 logger = logging.getLogger(__name__)
+
+
+    
+def anonymize_file(file, request):
+    """
+    Replace email address of file owner with True or False,
+    indicating whether the user which has sent the request is the owner.
+    """
+    anonymized_file = OrderedDict()
+    for (file_key, file_value) in file.items():
+        if file_key == 'owner':
+            anonymized_file[file_key] = file_value == request.user.email
+        elif file_key == 'tags':
+            tags = []
+            for tag in list(file_value):
+                new_tag = OrderedDict()
+                for (tag_key, tag_value) in tag.items():
+                    if tag_key == 'owner':
+                        new_tag[tag_key] = tag_value == request.user.email
+                    else:
+                        new_tag[tag_key] = tag_value
+                tags.append(new_tag)
+            anonymized_file[file_key] = tags
+        elif file_key == 'family':
+            new_family = file_value
+            new_family.update({'owner': new_family['owner'] == request.user.email})
+            anonymized_file[file_key] = new_family
+        else:
+            anonymized_file[file_key] = file_value
+    return anonymized_file
 
 
 class ConfirmFileUploadViewSet(GenericViewSet, CreateModelMixin):
@@ -77,29 +108,16 @@ class FileUploadViewSet(viewsets.ModelViewSet):
         """
         queryset = File.objects.all()
         files = FilesSerializer(queryset, many=True).data
-        changed_files = []
+        anonymized_files = []
         for file in files:
-            changed_file = OrderedDict()
-            for tuple in file.items():
-                if tuple[0] == 'owner':
-                    user_mail = "" if request.user.is_anonymous else request.user.email
-                    changed_file[tuple[0]] = tuple[1] == user_mail
-                elif tuple[0] == 'tags':
-                    tags = []
-                    for tag in list(tuple[1]):
-                        new_tag = OrderedDict()
-                        for tagTuple in tag.items():
-                            if tagTuple[0] == 'owner':
-                                user_mail = "" if request.user.is_anonymous else request.user.email
-                                new_tag[tagTuple[0]] = tagTuple[1] == user_mail
-                            else:
-                                new_tag[tagTuple[0]] = tagTuple[1]
-                        tags.append(new_tag)
-                    changed_file[tuple[0]] = tags
-                else:
-                    changed_file[tuple[0]] = tuple[1]
-            changed_files.append(changed_file)
-        return Response(changed_files)
+            anonymized_files.append(anonymize_file(file, request))
+        return Response(anonymized_files)
+
+    def retrieve(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer = self.get_serializer(instance)
+        anonymized_file = anonymize_file(serializer.data, request)
+        return Response(anonymized_file)
 
     def perform_create(self, serializer):
         """
@@ -109,66 +127,40 @@ class FileUploadViewSet(viewsets.ModelViewSet):
         self.request.user.send_link_to_file(serializer.data)
 
 
-class UnconfirmedFileViewSet(viewsets.ModelViewSet):
+class UnconfirmedFileViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin, mixins.DestroyModelMixin, mixins.ListModelMixin):
     queryset = File.objects.filter(is_confirmed=False)
     serializer_class = FilesSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated, IsOwnerOrReadOnly]
 
     def list(self, request, **kwargs):
         """
-        Replace email address of file owner with True or False,
-        indicating if the user which has sent the request is the owner.
         Returns only the unconfirmed files of a user.
         """
         queryset = File.objects.filter(is_confirmed=False)
         files = FilesSerializer(queryset, many=True).data
-        print(files)
-        changed_files = []
+        anonymized_files = []
         for file in files:
-            changed_file = OrderedDict()
-            for tuple in file.items():
-                if tuple[0] == 'owner':
-                    changed_file[tuple[0]] = tuple[1] == 'request.user.email'
-                elif tuple[0] == 'tags':
-                    tags = []
-                    for tag in list(tuple[1]):
-                        new_tag = OrderedDict()
-                        for tagTuple in tag.items():
-                            if tagTuple[0] == 'owner':
-                                new_tag[tagTuple[0]] = tagTuple[1] == 'request.user.email'
-                            else:
-                                new_tag[tagTuple[0]] = tagTuple[1]
-                        tags.append(new_tag)
-                    changed_file[tuple[0]] = tags
-                elif tuple[0] == 'family':
-                    new_family = tuple[1]
-                    new_family.update({'owner': new_family['owner'] == 'request.user.email'})
-                    changed_file[tuple[0]] = new_family
-                else:
-                    changed_file[tuple[0]] = tuple[1]
-            changed_files.append(changed_file)
-        return Response(changed_files)
+            anonymized_files.append(anonymize_file(file, request))
+        return Response(anonymized_files)
 
-    def create(self, request, *args, **kwargs):
-        return Response({'message': 'Create is prohibited'}, HTTP_405_METHOD_NOT_ALLOWED)
-
-    def update(self, request, *args, **kwargs):
-        return Response({'message': 'Update is prohibited'}, HTTP_405_METHOD_NOT_ALLOWED)
+    def retrieve(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer = self.get_serializer(instance)
+        anonymized_file = anonymize_file(serializer.data, request)
+        return Response(anonymized_file)
 
     def destroy(self, request, *args, **kwargs):
         try:
             file = File.objects.get(pk=kwargs['pk'])
             if file.is_confirmed:
                 return Response({'message': 'Cannot delete confirmed files.'}, HTTP_403_FORBIDDEN)
-            if file.owner.email != request.user.email:
-                return Response({'message': 'File owner does not match.'}, HTTP_403_FORBIDDEN)
             file.delete()
         except ObjectDoesNotExist as error:
             return Response({'message': str(error)})
         return Response(status=HTTP_200_OK)
 
 
-class ConfirmedFileViewSet(viewsets.ModelViewSet):
+class ConfirmedFileViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin, mixins.DestroyModelMixin, mixins.ListModelMixin):
     queryset = File.objects.filter(is_confirmed=True)
     serializer_class = FilesSerializer
     permission_classes = [permissions.AllowAny]
@@ -195,53 +187,32 @@ class ConfirmedFileViewSet(viewsets.ModelViewSet):
         """
         queryset = File.objects.filter(is_confirmed=True)
         files = FilesSerializer(queryset, many=True).data
-        changed_files = []
+        anonymized_files = []
         for file in files:
-            changed_file = OrderedDict()
-            for tuple in file.items():
-                if tuple[0] == 'owner':
-                    user_mail = "" if request.user.is_anonymous else request.user.email
-                    changed_file[tuple[0]] = tuple[1] == user_mail
-                elif tuple[0] == 'tags':
-                    tags = []
-                    for tag in list(tuple[1]):
-                        new_tag = OrderedDict()
-                        for tagTuple in tag.items():
-                            if tagTuple[0] == 'owner':
-                                user_mail = "" if request.user.is_anonymous else request.user.email
-                                new_tag[tagTuple[0]] = tagTuple[1] == user_mail
-                            else:
-                                new_tag[tagTuple[0]] = tagTuple[1]
-                        tags.append(new_tag)
-                    changed_file[tuple[0]] = tags
-                elif tuple[0] == 'family':
-                    new_family = tuple[1]
-                    user_mail = "" if request.user.is_anonymous else request.user.email
-                    new_family.update({'owner': new_family['owner'] == user_mail})
-                    changed_file[tuple[0]] = new_family
-                else:
-                    changed_file[tuple[0]] = tuple[1]
-            analysis_state = self._get_analysis_state(changed_file)
-            changed_file['analysis'] = analysis_state
-            changed_files.append(changed_file)
-        return Response(changed_files)
+            anonymized_file = anonymize_file(file, request)
+            analysis_state = self._get_analysis_state(anonymized_file)
+            anonymized_file['analysis'] = analysis_state
+            anonymized_files.append(anonymized_file)
+        return Response(anonymized_files)
 
-    def create(self, request, *args, **kwargs):
-        return Response({'message': 'Create is prohibited'}, HTTP_405_METHOD_NOT_ALLOWED)
-
-    def update(self, request, *args, **kwargs):
-        return Response({'message': 'Update is prohibited'}, HTTP_405_METHOD_NOT_ALLOWED)
+    def retrieve(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer = self.get_serializer(instance)
+        anonymized_file = anonymize_file(serializer.data, request)
+        analysis_state = self._get_analysis_state(anonymized_file)
+        anonymized_file['analysis'] = analysis_state
+        return Response(anonymized_file)
 
 
-class FamiliesViewSet(viewsets.ModelViewSet):
+class FamiliesViewSet(viewsets.GenericViewSet, mixins.ListModelMixin, mixins.CreateModelMixin, mixins.RetrieveModelMixin, mixins.UpdateModelMixin):
     queryset = Family.objects.all()
     serializer_class = FamiliesSerializer
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
 
     def anonymize_family(self, family, request):
         """
         Replace email address of family owner with True or False,
-        indicating if the user which has sent the request is the owner.
+        indicating whether the user which has sent the request is the owner.
         """
         anonymized_family = OrderedDict()
         for (key, value) in family.items():
@@ -269,11 +240,8 @@ class FamiliesViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
 
-    """ def perform_update(self, serializer):
-        serializer.save(owner=self.request.user) """
 
-
-class LicensesViewSet(viewsets.ModelViewSet, mixins.ListModelMixin):
+class LicensesViewSet(viewsets.GenericViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin):
     queryset = License.objects.all()
     serializer_class = LicensesSerializer
     permission_classes = [permissions.AllowAny]
@@ -283,22 +251,16 @@ class LicensesViewSet(viewsets.ModelViewSet, mixins.ListModelMixin):
         licenses = LicensesSerializer(queryset, many=True).data
         return Response(licenses)
 
-    def create(self, request, *args, **kwargs):
-        return Response({'message': 'Create is prohibited'}, HTTP_405_METHOD_NOT_ALLOWED)
 
-    def update(self, request, *args, **kwargs):
-        return Response({'message': 'Update is prohibited'}, HTTP_405_METHOD_NOT_ALLOWED)
-
-
-class TagsViewSet(viewsets.ModelViewSet):
+class TagsViewSet(viewsets.GenericViewSet, mixins.ListModelMixin, mixins.CreateModelMixin, mixins.RetrieveModelMixin, mixins.DestroyModelMixin):
     queryset = Tag.objects.all()
     serializer_class = TagsSerializer
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
 
     def anonymize_tag(self, family, request):
         """
         Replace email address of tag owner with True or False,
-        indicating if the user which has sent the request is the owner.
+        indicating whether the user which has sent the request is the owner.
         """
         anonymized_tag = OrderedDict()
         for (key, value) in family.items():
@@ -325,8 +287,3 @@ class TagsViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
-
-    def delete(self, pk):
-        tag = self.get_object(pk)
-        tag.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
