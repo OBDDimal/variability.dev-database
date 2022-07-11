@@ -12,7 +12,7 @@
         <v-container>
           <v-form ref="form" v-model="valid" lazy-validation>
             <v-row>
-              <v-col cols="12">
+              <v-col cols="12" class="py-0">
                 <v-text-field
                   outlined
                   dense
@@ -21,9 +21,10 @@
                   v-model="label"
                   label="File name"
                   placeholder="Leave a filename"
+                  hint="Name your feature model"
                 ></v-text-field>
               </v-col>
-              <v-col cols="12">
+              <v-col cols="12" class="py-0">
                 <v-textarea
                   outlined
                   dense
@@ -33,10 +34,11 @@
                   placeholder="Leave a comment here"
                   counter="250"
                   :rules="descriptionRules"
+                  hint="Add a description to your feature model"
                 >
                 </v-textarea>
               </v-col>
-              <v-col cols="12" md="6">
+              <v-col cols="12" md="6" class="py-0">
                 <v-file-input
                   outlined
                   chips
@@ -48,9 +50,10 @@
                   label="File Upload"
                   accept=".xml"
                   show-size
+                  hint="Select the file as .xml"
                 ></v-file-input>
               </v-col>
-              <v-col cols="12" md="6">
+              <v-col cols="12" md="6" class="py-0">
                 <v-select
                   outlined
                   required
@@ -59,31 +62,43 @@
                   :rules="licenseRules"
                   :items="getLicenses"
                   label="License"
+                  hint="Select the license of the feature model"
                 >
                 </v-select>
               </v-col>
-              <v-col cols="12" md="6">
+              <v-col cols="12" md="6" class="py-0">
                 <v-autocomplete
-                  :disabled="newFamily != ''"
+                  :disabled="family != null"
                   outlined
                   dense
-                  :required="newFamily == ''"
-                  v-model="family"
-                  :items="getFamilies"
+                  :required="family == null"
+                  v-model="newVersionOf"
+                  :items="gottenFiles"
                   label="New version of"
+                  hint="If your feature model is a new version of an existing one"
                 ></v-autocomplete>
               </v-col>
-              <v-col cols="12" md="6">
-                <v-text-field
-                  :disabled="family != null"
-                  :required="family == null"
+              <v-col cols="12" md="6" class="py-0">
+                <v-combobox
+                  :disabled="newVersionOf != null"
+                  :required="newVersionOf == null"
                   outlined
                   dense
-                  v-model="newFamily"
-                  label="New family"
+                  v-model="family"
+                  :items="gottenFamilies"
+                  label="Family"
+                  hint="Add to or create new family"
+                ></v-combobox>
+                <v-text-field
+                    v-if="isNewFamily"
+                    outlined
+                    dense
+                    v-model="newFamilyDescription"
+                    label="New Family Description"
+                    hint="Describe your new family"
                 ></v-text-field>
               </v-col>
-              <v-col cols="12">
+              <v-col cols="12" class="py-0">
                 <v-combobox
                   outlined
                   hide-details
@@ -94,9 +109,10 @@
                   chips
                   small-chips
                   dense
+                  hint="Choose or create tags for your feature model"
                 ></v-combobox>
               </v-col>
-              <v-col cols="12">
+              <v-col cols="12" class="pb-0">
                 <v-checkbox
                   outlined
                   required
@@ -107,7 +123,7 @@
                 >
                 </v-checkbox>
               </v-col>
-              <v-col cols="12">
+              <v-col cols="12" class="py-0">
                 <v-checkbox
                   outlined
                   required
@@ -119,7 +135,7 @@
                 >
                 </v-checkbox>
               </v-col>
-              <v-col cols="12">
+              <v-col cols="12" class="py-0">
                 <v-checkbox
                   outlined
                   required
@@ -131,7 +147,7 @@
                 >
                 </v-checkbox>
               </v-col>
-              <v-col cols="12">
+              <v-col cols="12" class="pb-0">
                 <div class="d-flex">
                   <v-spacer></v-spacer>
                   <v-btn color="primary" text @click="close"> Cancel </v-btn>
@@ -267,10 +283,12 @@ export default Vue.extend({
     licenseRules: [(v) => !!v || "License is required"],
 
     gottenFamilies: [],
-    family: null,
+    gottenFiles: [],
+    newVersionOf: null,
 
-    newFamily: "",
-    newFamilyRules: [],
+    family: null,
+    newFamilyDescription: "",
+    isNewFamily: false,
 
     gottenTags: [],
     tags: null,
@@ -300,11 +318,28 @@ export default Vue.extend({
     "$store.state.families": function () {
       this.gottenFamilies = this.$store.state.families;
     },
+    "$store.state.files": function () {
+      this.gottenFiles = this.$store.state.files;
+    },
+    family: function(newValue) {
+      console.log(newValue)
+      if (typeof(newValue) == "string") {
+        console.log("its a string")
+        console.log(!this.gottenFamilies.map(x => x.text).includes(newValue))
+        this.isNewFamily = !this.gottenFamilies.map(x => x.text).includes(newValue)
+      } else if (typeof(newValue) == "object" && newValue != null) {
+        console.log("its an object")
+        console.log(!this.gottenFamilies.map(x => x.text).includes(newValue.text))
+        this.isNewFamily = !this.gottenFamilies.map(x => x.text).includes(newValue.text)
+      } else {
+        this.isNewFamily = false
+      }
+    }
   },
 
   computed: {
     getLicenses() {
-      var licenses = [];
+      const licenses = [];
       for (let i = 0; i < this.gottenLicenses.length; i++) {
         const element = this.gottenLicenses[i];
         licenses.push({ text: element.label, value: element.id });
@@ -312,7 +347,7 @@ export default Vue.extend({
       return licenses;
     },
     getFamilies() {
-      var families = [];
+      const families = [];
       for (let i = 0; i < this.gottenFamilies.length; i++) {
         const element = this.gottenFamilies[i];
         if (!element.owner) {
@@ -322,8 +357,20 @@ export default Vue.extend({
       }
       return families;
     },
+    getFiles() {
+      const files = [];
+      for (let i = 0; i < this.gottenFiles.length; i++) {
+        console.log(this.gottenFiles)
+        const element = this.gottenFiles[i];
+        if (!element.owner) {
+          continue;
+        }
+        files.push({ text: element.label, value: element.id });
+      }
+      return files;
+    },
     getTags() {
-      var tags = [];
+      const tags = [];
       for (let i = 0; i < this.gottenTags.length; i++) {
         const element = this.gottenTags[i];
         tags.push({ text: element.label, value: element.id });
@@ -335,6 +382,17 @@ export default Vue.extend({
   methods: {
     close() {
       this.$emit("close");
+    },
+    transferToDropdown(objects) {
+      const temp = [];
+      for (let i = 0; i < objects.length; i++) {
+        const element = objects[i];
+        if (!element.owner) {
+          continue;
+        }
+        temp.push({ text: element.label, value: element.id });
+      }
+      return temp;
     },
     upload() {
       console.log("hi");
@@ -350,15 +408,15 @@ export default Vue.extend({
         data.append("license", this.license);
         console.log("LICENSE");
         console.log(this.license);
-        if (this.family !== null) {
-          data.append("new_version_of", this.family);
+        if (this.newVersionOf !== null) {
+          data.append("new_version_of", this.newVersionOf);
           console.log("NEW VERSION OF");
-          console.log(this.family);
+          console.log(this.newVersionOf);
         }
-        /* if (this.newFamily !== "") {
-          data.append("family", this.newFamily);
-        } */
-        for (var i = 0; i < this.tags.length; i++) {
+        /*if (this.family !== "") {
+          data.append("family", this.family);
+        }*/
+        for (let i = 0; i < this.tags.length; i++) {
           this.tags[i].label = this.tags[i]["text"];
           delete this.tags[i].text;
           this.tags[i].id = this.tags[i]["value"];
@@ -398,7 +456,20 @@ export default Vue.extend({
 
   mounted() {
     this.$store.dispatch("fetchLicenses");
-    this.$store.dispatch("fetchFamilies");
+    if (this.$store.state.families !== []) {
+      console.log("already there fam")
+      console.log(this.$store.state.families)
+      this.gottenFamilies = this.$store.state.families.map(x => {return {text: x.label, value: x.id}})
+    } else {
+      this.$store.dispatch("fetchFamilies");
+    }
+    if (this.$store.state.files !== []) {
+      console.log("already there file")
+      console.log(this.$store.state.files)
+      this.gottenFiles = this.$store.state.files.map(x => {return {text: x.label, value: x.id}})
+    } else {
+      this.$store.dispatch("fetchFiles");
+    }
     this.$store.dispatch("fetchTags");
   },
 });

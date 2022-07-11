@@ -96,8 +96,6 @@ export default new Vuex.Store({
     },
     setLicenses(state, payload) {
       const { licenses } = payload;
-      console.log("fetch")
-      console.log(licenses)
       state.licenses = licenses;
     },
     setFiles(state, payload) {
