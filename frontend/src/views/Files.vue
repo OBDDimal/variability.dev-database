@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="mainView">
         <h3 class="text-h3 mb-2 mt-8">My Feature Models</h3>
         <h5 class="text-h5 mb-4">
             Here you can add new Feature Models
@@ -38,7 +38,7 @@
                                             <v-file-input chips multiple label="File Upload" show-size></v-file-input>
                                         </v-col>
                                         <v-col cols="12" md="6">
-                                            <v-autocomplete v-model="editedItem.license" :items="licenses"
+                                            <v-autocomplete v-model="editedItem.license.label" :items="licenses"
                                                 label="License"></v-autocomplete>
                                         </v-col>
                                         <v-col cols="12" md="6">
@@ -109,10 +109,31 @@
                             </v-card-actions>
                         </v-card>
                     </v-dialog>
+                    <v-dialog v-if="editedItem.analysis" v-model="dialogAnalysis" max-width="80%">
+                        <v-card>
+                            <v-card-title class="text-h5">
+                                Order
+                            </v-card-title>
+                            <v-spacer></v-spacer>
+                            <div class="analysis-width" style="word-break: break-all">
+                                {{editedItem.analysis.order}}
+                            </div>
+                            <v-spacer></v-spacer>
+                            <v-divider></v-divider>
+                            <v-card-title class="text-h5">
+                                Report
+                            </v-card-title>
+                            <v-spacer></v-spacer>
+                            <div class="analysis-width" style="word-break: break-all">
+                                {{editedItem.analysis.report}}
+                            </div>
+                            <v-spacer></v-spacer>
+                        </v-card>
+                    </v-dialog>
                 </v-toolbar>
             </template>
             <template v-slot:item.actions="{ item }">
-                <v-btn small rounded color="primary" class="mr-2" to="/ViewModel">
+                <v-btn small rounded color="primary" class="mr-2" to="/feature-model">
                     <v-icon>mdi-eye</v-icon>
                 </v-btn>
                 <v-btn
@@ -125,7 +146,7 @@
                 >
                     <v-icon>mdi-delete</v-icon>
                 </v-btn>
-                <v-btn small rounded color="success" class="mr-2">
+                <v-btn small rounded color="success" class="mr-2" @click="showAnalysis(item)" :disabled="item.analysis === undefined">
                     <v-icon>mdi-play</v-icon>
                 </v-btn>
                 <!-- <v-btn small rounded color="error" class="mr-2"> <v-icon>mdi-delete</v-icon></v-btn> -->
@@ -136,20 +157,27 @@
             <template v-slot:no-data>
                 <v-btn color="primary"> Reset </v-btn>
             </template>
+            <template v-slot:item.tags="{ item }">
+                <v-chip class="mx-1" v-for="(tag, index) in item.tags" :key="index">
+                {{ tag.label }}
+                </v-chip>
+            </template>
             <template v-slot:item.owner="{ item }">
                 <v-icon v-if="item.owner" color="success"> mdi-check </v-icon>
                 <v-icon v-else color="error"> mdi-cancel </v-icon>
+            </template>
+            <template v-slot:item.uploaded="{ item }">
+                {{ new Date(item.uploaded_at).toLocaleString("en-US") }}
             </template>
         </v-data-table>
     </div>
 </template>
 
-<script lang="ts">
+<script>
 import Vue from "vue"
-import { FeatureModel } from '../../types'
 
 export default Vue.extend({
-    name: 'Files',
+    name: "Files",
 
     components: {},
 
@@ -159,6 +187,7 @@ export default Vue.extend({
         search: "",
         dialog: false,
         dialogDelete: false,
+        dialogAnalysis: false,
         editedIndex: -1,
         family: "",
         newFamily: "",
@@ -171,11 +200,11 @@ export default Vue.extend({
             },
             { text: "Label", value: "label" },
             { text: "Description", value: "description" },
-            { text: "License", value: "license" },
+            { text: "License", value: "license.label" },
             { text: "Tags", value: "tags" },
-            { text: "Uploaded on", value: "dateCreated" },
+            { text: "Uploaded on", value: "uploaded" },
             { text: "Owner", value: "owner" },
-            { text: "Family", value: "family" },
+            { text: "Family", value: "family.label" },
             {
                 text: "Actions",
                 align: "center",
@@ -201,7 +230,7 @@ export default Vue.extend({
             owner: true,
             family: ""
         },
-        featureModels: [] as FeatureModel[],
+        featureModels: [],
         licenses: [
             "CC-BY Mention",
             "CC-BY-NC Mention Non-Commercial",
@@ -235,11 +264,49 @@ export default Vue.extend({
         dialogDelete(val) {
             val || this.closeDelete();
         },
+        dialogAnalysis(val) {
+            val || this.closeDelete();
+        },
     },
 
     methods: {
         initialize() {
             this.featureModels = [
+                {
+                    id: 1,
+                    label: "npc",
+                    description: "desc",
+                    local_file: "/media/files/npc_7sRobIK.xml",
+                    family: {
+                        id: 1,
+                        owner: false,
+                        label: "npc family",
+                        description: ""
+                    },
+                    license: {
+                        id: 1,
+                        label: "CC BY - Mention"
+                    },
+                    tags: [
+                        {
+                            id: 1,
+                            label: "small model",
+                            owner: false,
+                            description: "",
+                            date_created: "2022-04-25T15:50:17.950262Z",
+                            is_public: false
+                        }
+                    ],
+                    owner: false,
+                    uploaded_at: "2022-04-25T15:50:23.094505Z",
+                    new_version_of: null,
+                    transpiled_file: "/media/files/npc_as_g6_OkXoI7q.json",
+                    analysis: {
+                        id: 1,
+                        report: "i am a report",
+                        order: "input-name:examples/berkeleydb.dimacs\r\ninput-hash:eb06505ad6e1c838cffc360a5f3940e2\r\norder:1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76"
+                    }
+                },
                 {
                     label: "NPC Model",
                     description: "Test model for demonstration",
@@ -294,7 +361,7 @@ export default Vue.extend({
                     owner: true,
                     family: "Petes Family"
                 },
-            ] as FeatureModel[];
+            ];
         },
         deleteItemConfirm() {
                 this.removeLoading = true;
@@ -345,10 +412,15 @@ export default Vue.extend({
                 this.editedIndex = -1;
             });
         },
-        deleteItem(item: FeatureModel) {
+        deleteItem(item) {
                 this.editedIndex = this.featureModels.indexOf(item);
                 this.editedItem = Object.assign({}, item);
                 this.dialogDelete = true;
+            },
+        showAnalysis(item) {
+                this.editedIndex = this.featureModels.indexOf(item);
+                this.editedItem = Object.assign({}, item);
+                this.dialogAnalysis = true;
             },
         save() {
             if (this.editedIndex > -1) {
@@ -364,10 +436,18 @@ export default Vue.extend({
         if (!this.$store.state.loggedIn || !this.$store.state.currentUser) {
             this.$store.commit('updateSnackbar', { message: "Please log in to view this page", variant: "info", timeout: 5000, show: true })
             this.$router.push("/login")
+        } else {
+            this.loading = true;
+            this.$store.dispatch("fetchFeatureModels");
+            this.featureModels = this.$store.state.featureModels;
+            console.log(this.featureModels);
+            this.loading = false;
         }
     }
 });
 </script>
-
 <style scoped>
+    .analysis-width {
+        margin: 0 2rem;
+    }
 </style>
