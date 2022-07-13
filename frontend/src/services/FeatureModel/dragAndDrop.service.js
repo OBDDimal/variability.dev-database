@@ -155,7 +155,7 @@ export function defineDragListener(d3Data) {
                 } else if (ghost.side === 'b') {
                     if (ghost.d3Node.data.isLeaf()) {
                         console.log(d3Data);
-                        d3Node.parent.children = ghost.d3Node.parent.allChildren;
+                        d3Node.parent.children = d3Node.parent.allChildren;
                         d3Node.parent = ghost.d3Node;
                         ghost.d3Node.allChildren = [d3Node];
                         ghost.d3Node.children = ghost.d3Node.allChildren;
