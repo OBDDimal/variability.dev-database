@@ -1,31 +1,32 @@
 import levenshtein from 'js-levenshtein';
+import * as view from "@/services/FeatureModel/view.service.js";
+import * as update from '@/services/FeatureModel/update.service.js';
+import * as collapse from "@/services/FeatureModel/collapse.service.js";
 
-let allD3Nodes = undefined;
 
-export function onChangeSearch(d3Data, search) {
-      allD3Nodes = d3Data.allNodes;
-      allD3Nodes.forEach((d3Node) => {
+export function onChangeSearch(d3Data, searchText) {
+      d3Data.allNodes.forEach((d3Node) => {
         d3Node.data.isSearched = false;
       });
 
-      if (search !== '') {
-        const foundD3Node = findD3Node(search);
+      if (searchText !== '') {
+        const foundD3Node = findD3Node(d3Data, searchText);
         const paths = foundD3Node.data.getAllNodesToRoot();
 
         paths.forEach((node) => (node.isSearched = true));
-        allD3Nodes.forEach((d3Node) => d3Node.data.collapse());
+        d3Data.allNodes.forEach((d3Node) => d3Node.data.collapse());
 
         foundD3Node.data.uncollapse(true);
-        this.updateCollapsing();
-        this.updateSvg();
-        this.focusNode(foundD3Node);
+        collapse.updateCollapsing(d3Data);
+        update.updateSvg(d3Data);
+        view.focusNode(d3Data, foundD3Node);
       } else {
-        this.updateSvg();
+        update.updateSvg(d3Data);
       }
     }
 
-function findD3Node(search) {
-      const [, d3Node] = allD3Nodes.reduce(([previousDistance, previousD3Node], currentD3Node) => {
+function findD3Node(d3Data, search) {
+      const [, d3Node] = d3Data.allNodes.reduce(([previousDistance, previousD3Node], currentD3Node) => {
         const currentNodeName = currentD3Node.data.name.toLowerCase();
         if (currentNodeName !== search.toLowerCase() && currentNodeName.includes(search.toLowerCase())) {
           return [1, currentD3Node];

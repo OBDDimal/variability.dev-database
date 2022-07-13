@@ -3,7 +3,7 @@
 		<feature-model-tree-toolbar
 			@search="(search) => onChangeSearch(search)"
 			@coloring="(coloringIndex) => coloring(coloringIndex)"
-			@fitToView="zoomFit"
+			@fitToView="fitToView"
 			@resetView="(levels, maxChildren) => resetView(levels, maxChildren)"
 			@shortName="onChangeShortName"
 			@verticalSpacing="onChangeVerticalSpacing"
@@ -12,29 +12,23 @@
 		<div id="svg-container"></div>
 
 		<feature-model-tree-context-menu
-			:d3Node="contextMenu.selectedD3Node"
-			:d3NodeEvent="contextMenu.event"
-			@collapse="
-				(d3Node) => {
-					d3Node.data.toggleCollapse();
-					updateCollapsing();
-					updateSvg();
-				}
-			"
+			:d3Node="d3Data.contextMenu.selectedD3Node"
+			:d3NodeEvent="d3Data.contextMenu.event"
+			@collapse="collapse"
 			@hideLeftSiblings="(d3Node) => hideLeftSiblings(d3Node)"
 			@hideRightSiblings="(d3Node) => hideRightSiblings(d3Node)"
 			@hideCurrentNode="(d3Node) => hideCurrentNode(d3Node)"
-			@edit="(d3Node) => (editD3Node = d3Node)"
-			@close="contextMenu.selectedD3Node = undefined"
-			@add="(d3Node) => (d3ParentOfAddNode = d3Node)"
+			@edit="(d3Node) => (d3Data.editD3Node = d3Node)"
+			@close="d3Data.contextMenu.selectedD3Node = undefined"
+			@add="(d3Node) => (d3Data.d3ParentOfAddNode = d3Node)"
 		></feature-model-tree-context-menu>
 
-		<feature-model-tree-edit-dialog :d3Node="editD3Node" @close="editD3Node = undefined" @update="updateSvg">
+		<feature-model-tree-edit-dialog :d3Node="d3Data.editD3Node" @close="d3Data.editD3Node = undefined" @update="updateSvg">
 		</feature-model-tree-edit-dialog>
 
 		<feature-model-tree-add-dialog
-			:parent="d3ParentOfAddNode ? d3ParentOfAddNode.data : undefined"
-			@close="d3ParentOfAddNode = undefined"
+			:parent="d3Data.d3ParentOfAddNode ? d3Data.d3ParentOfAddNode.data : undefined"
+			@close="d3Data.d3ParentOfAddNode = undefined"
 			@add="(newNode) => addNode(newNode)"
 		></feature-model-tree-add-dialog>
 	</div>
@@ -42,24 +36,21 @@
 
 <script>
 import Vue from 'vue';
-import * as d3 from 'd3';
-import { PseudoNode } from '@/classes/featureNode';
 import FeatureModelTreeToolbar from './FeatureModelTreeToolbar.vue';
 import FeatureModelTreeContextMenu from './FeatureModelTreeContextMenu.vue';
 import FeatureModelTreeEditDialog from './FeatureModelTreeEditDialog.vue';
 import FeatureModelTreeAddDialog from '@/components/FeatureModel/FeatureModelTreeAddDialog';
 
 // Import feature-model-services
-// import * as addFeature from "@/services/FeatureModel/addFeature.service.js";
-// import * as collapseFeatures from "@/services/FeatureModel/collapseFeatures.service.js";
-import * as countFeatures from '@/services/FeatureModel/countFeatures.service.js';
-// import * as dragAndDropFeatures from "@/services/FeatureModel/dragAndDropFeatures.service.js";
-// import * as editFeature from "@/services/FeatureModel/editFeature.service.js";
-// import * as hideFeature from "@/services/FeatureModel/hideFeature.service.js";
-import * as searchFeature from '@/services/FeatureModel/searchFeature.service.js';
-import * as updateSvg from '@/services/FeatureModel/updateSvg.service.js';
+import * as add from "@/services/FeatureModel/add.service.js";
+import * as collapse from "@/services/FeatureModel/collapse.service.js";
+import * as count from '@/services/FeatureModel/count.service.js';
+import * as dragAndDrop from "@/services/FeatureModel/dragAndDrop.service.js";
+import * as hide from "@/services/FeatureModel/hide.service.js";
+import * as update from '@/services/FeatureModel/update.service.js';
 import * as init from '@/services/FeatureModel/init.service.js';
-// import * as zoomSvg from "@/services/FeatureModel/zoomSvg.service.js";
+import * as view from "@/services/FeatureModel/view.service.js";
+import * as search from "@/services/FeatureModel/search.service.js";
 
 export default Vue.extend({
 	name: 'FeatureModelTree',
@@ -83,201 +74,87 @@ export default Vue.extend({
 			zoom: undefined,
 			nodeIdCounter: 0,
 			isShortenedName: false,
-			verticalSpacing: 75,
+      drag: {
+        listener: undefined,
+        hasStarted: false,
+        selectedD3Node: undefined,
+        selectedGhostNode: undefined,
+      },
+      contextMenu: {
+        selectedD3Node: undefined,
+        event: undefined,
+      },
+      container: {
+        highlightedConstraintsContainer: undefined,
+        linksContainer: undefined,
+        segmentsContainer: undefined,
+        featureNodesContainer: undefined,
+        dragContainer: undefined,
+      },
+      verticalSpacing: 75,
+      editD3Node: undefined,
+      d3ParentOfAddNode: undefined,
 		},
-		drag: {
-			listener: undefined,
-			hasStarted: false,
-			selectedD3Node: undefined,
-			selectedGhostNode: undefined,
-		},
-		contextMenu: {
-			selectedD3Node: undefined,
-			event: undefined,
-		},
-		editD3Node: undefined,
-		d3ParentOfAddNode: undefined,
-		container: {
-			highlightedConstraintsContainer: undefined,
-			linksContainer: undefined,
-			segmentsContainer: undefined,
-			featureNodesContainer: undefined,
-			dragContainer: undefined,
-		},
-	}),
-
-	computed: {},
+  }),
 
 	mounted() {
-		init.initialize(this.d3Data, this.container, this.drag, this.contextMenu, this.rootNode);
-    dragAndDropFeature.defineDragListener(this.d3Data, this.container);
-		this.resetView();
-		this.updateSvg();
+		init.initialize(this.d3Data, this.rootNode);
+    dragAndDrop.defineDragListener(this.d3Data);
+		view.resetView(this.d3Data);
+    update.updateSvg(this.d3Data);
 	},
 
 	methods: {
+    resetView(levels, maxChildren) {
+      view.resetView(this.d3Data, levels, maxChildren);
+    },
+
 		coloring(coloringIndex) {
-			countFeatures.onChangeColoring(this.d3Data.allNodes, coloringIndex);
+			count.onChangeColoring(this.d3Data, coloringIndex);
 		},
 
-		onChangeSearch(search) {
-			searchFeature.onChangeSearch(this.d3Data, search);
+		onChangeSearch(searchText) {
+			search.onChangeSearch(this.d3Data, searchText);
 		},
 
 		updateSvg() {
-			updateSvg.updateSvg(this.d3Data, this.container, this.drag, this.contextMenu);
+			update.updateSvg(this.d3Data);
 		},
 
+    fitToView() {
+      view.zoomFit(this.d3Data);
+    },
 
-		// Collapses all children of the specifed node with shortcut ALT + left-click.
-		collapseShortcut(event, d3Node) {
-			if (event.getModifierState('Alt')) {
-				d3Node.data.toggleCollapse();
-				this.updateCollapsing();
-				this.updateSvg();
-			}
-		},
+    hideCurrentNode(d3Node) {
+      hide.hideCurrentNode(this.d3Data, d3Node);
+    },
 
-		focusNode(d3Node) {
-			d3.select('svg').call(this.d3Data.zoom.translateTo, d3Node.x, d3Node.y);
-		},
+    hideRightSiblings(d3Node) {
+      hide.hideRightSiblings(this.d3Data, d3Node);
+    },
 
-		updateCollapsing() {
-			this.d3Data.allNodes.forEach((d3Node) => {
-				if (!d3Node.data.isLeaf()) {
-					if (d3Node.data.isCollapsed && !d3Node.collapsedChildren) {
-						d3Node.collapsedChildren = d3Node.children;
-						d3Node.children = null;
-					} else if (!d3Node.data.isCollapsed && !d3Node.children) {
-						d3Node.children = d3Node.collapsedChildren;
-						d3Node.collapsedChildren = null;
-					}
-				}
-			});
-		},
+    hideLeftSiblings(d3Node) {
+      hide.hideLeftSiblings(this.d3Data, d3Node);
+    },
 
-		resetView(uncollapsedLevels = 4, maxChildrenCount = 3) {
-			// Collapses all nodes after depth 1.
-			this.d3Data.allNodes.forEach((d3Node) => d3Node.data.collapse());
+    collapse(d3Node) {
+      d3Node.data.toggleCollapse();
+      collapse.updateCollapsing(this.d3Data);
+      update.updateSvg(this.d3Data);
+    },
 
-			let currentChildren = [this.d3Data.root.data];
-			for (let i = 1; i <= uncollapsedLevels; i++) {
-				currentChildren.forEach((child) => {
-					if (child.children.length <= maxChildrenCount) {
-						child.uncollapse(false);
-					}
-				});
-				currentChildren = currentChildren
-					.map((parent) => (parent.children.length <= maxChildrenCount ? parent.children : []))
-					.flat();
-
-				if (currentChildren.length === 0) {
-					break;
-				}
-			}
-
-			this.updateCollapsing();
-			this.updateSvg();
-			this.zoomFit();
-		},
-
-		zoomFit(padding = 0.75) {
-			let bounds = document.querySelector('svg > g').getBBox();
-			let fullWidth = document.querySelector('svg').getBoundingClientRect().width,
-				fullHeight = document.querySelector('svg').getBoundingClientRect().height;
-			let width = bounds.width,
-				height = bounds.height;
-			let midX = bounds.x + width / 2,
-				midY = bounds.y + height / 2;
-			if (width == 0 || height == 0) return; // nothing to fit
-			let scale = padding / Math.max(width / fullWidth, height / fullHeight);
-
-			d3.select('svg').call(this.d3Data.zoom.translateTo, midX, midY).call(this.d3Data.zoom.scaleTo, scale);
-		},
-
-		updateHiding(d3Parent) {
-			d3Parent.children = [];
-
-			let isPreviousNodeHidden = false;
-			let currentPseudoNode;
-			d3Parent.allChildren.forEach((d3Child) => {
-				if (d3Child.data.isHidden && !isPreviousNodeHidden) {
-					currentPseudoNode = new PseudoNode(d3Child);
-					const d3PseudoNode = d3.hierarchy(currentPseudoNode);
-					d3PseudoNode.parent = d3Parent;
-					d3Parent.children.push(d3PseudoNode);
-				} else if (d3Child.data.isHidden && isPreviousNodeHidden) {
-					currentPseudoNode.hiddenD3Children.push(d3Child);
-				} else {
-					d3Parent.children.push(d3Child);
-				}
-				isPreviousNodeHidden = d3Child.data.isHidden;
-			});
-		},
+    addNode(newNode) {
+      add.addNode(this.d3Data, newNode);
+    },
 
 		onChangeShortName(isShortName) {
-			this.isShortenedName = isShortName;
-			this.updateSvg();
+			this.d3Data.isShortenedName = isShortName;
+			update.updateSvg(this.d3Data);
 		},
 
 		onChangeVerticalSpacing(verticalSpacing) {
-			this.verticalSpacing = verticalSpacing;
-			this.updateSvg();
-		},
-
-		hideLeftSiblings(d3Node) {
-			if (d3Node.data.getLeftSibling().isHidden) {
-				d3Node.data.unhideLeftSiblings();
-			} else {
-				d3Node.data.hideLeftSiblings();
-			}
-
-			this.updateHiding(d3Node.parent);
-			this.updateSvg();
-			this.focusNode(d3Node);
-		},
-
-		hideRightSiblings(d3Node) {
-			if (d3Node.data.getRightSibling().isHidden) {
-				d3Node.data.unhideRightSiblings();
-			} else {
-				d3Node.data.hideRightSiblings();
-			}
-
-			this.updateHiding(d3Node.parent);
-			this.updateSvg();
-			this.focusNode(d3Node);
-		},
-
-		hideCurrentNode(d3Node) {
-			d3Node.data.hide();
-
-			this.updateHiding(d3Node.parent);
-			this.updateSvg();
-			this.focusNode(d3Node);
-		},
-
-		addNode(newNode) {
-			if (this.d3ParentOfAddNode.data.isLeaf()) {
-				this.d3ParentOfAddNode.allChildren = [];
-			}
-
-			this.d3ParentOfAddNode.data.collapse();
-			this.updateCollapsing();
-
-			this.d3ParentOfAddNode.data.unhideChildren();
-			this.updateHiding(this.d3ParentOfAddNode);
-
-			newNode.parent.children.push(newNode);
-
-			const d3NewNode = d3.hierarchy(newNode);
-			d3NewNode.parent = this.d3ParentOfAddNode;
-			this.d3ParentOfAddNode.allChildren.push(d3NewNode);
-			this.d3ParentOfAddNode.children = this.d3ParentOfAddNode.allChildren;
-
-			console.log(this.d3ParentOfAddNode);
-			this.d3ParentOfAddNode = undefined;
-			this.updateSvg();
+			this.d3Data.verticalSpacing = verticalSpacing;
+			update.updateSvg(this.d3Data);
 		},
 	},
 });
