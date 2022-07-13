@@ -1,4 +1,4 @@
-import * as CONSTANTS from "./constants"
+import * as CONSTANTS from "@/classes/constants"
 
 // Helper functions for drawing alternative-group and and-group paths
 const MOVE = 'M', LINE = 'L', ARC = 'A', CLOSE = 'Z';
@@ -48,8 +48,19 @@ export function createGroupSegment(d3Node, radius) {
     return null;
 }
 
-
 export function createLink(src, dest) {
     const src_y = src.y + CONSTANTS.RECT_HEIGHT;
     return `M ${src.x} ${src_y} L ${dest.x} ${dest.y}`;
+}
+
+export function calculateTriangle() {
+      const base = 35;
+
+      const h = Math.sin(60) * base;
+
+      const [ax, ay] = [-(base / 2), base / 2];
+      const [bx, by] = [base / 2, base / 2];
+      const [cx, cy] = [0, h];
+
+      return [`${ax},${ay}`, `${bx},${by}`, `${cx},${cy}`];
 }
