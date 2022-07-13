@@ -9,7 +9,7 @@ export function addNode(d3Data, newNode) {
     }
 
     d3Data.d3ParentOfAddNode.data.collapse();
-    collapse.updateCollapsing(d3Data);
+    collapse.update(d3Data);
 
     d3Data.d3ParentOfAddNode.data.unhideChildren();
     hide.updateHiding(d3Data.d3ParentOfAddNode);

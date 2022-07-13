@@ -4,7 +4,7 @@ import * as update from '@/services/FeatureModel/update.service.js';
 import * as collapse from "@/services/FeatureModel/collapse.service.js";
 
 
-export function onChangeSearch(d3Data, searchText) {
+export function search(d3Data, searchText) {
       d3Data.allNodes.forEach((d3Node) => {
         d3Node.data.isSearched = false;
       });
@@ -17,7 +17,7 @@ export function onChangeSearch(d3Data, searchText) {
         d3Data.allNodes.forEach((d3Node) => d3Node.data.collapse());
 
         foundD3Node.data.uncollapse(true);
-        collapse.updateCollapsing(d3Data);
+        collapse.update(d3Data);
         update.updateSvg(d3Data);
         view.focusNode(d3Data, foundD3Node);
       } else {

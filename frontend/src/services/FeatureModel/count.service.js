@@ -2,16 +2,16 @@ import * as d3 from 'd3';
 import * as CONSTANTS from '@/classes/constants';
 import * as update from "@/services/FeatureModel/update.service.js";
 
-export function onChangeColoring(d3Data, coloringIndex) {
+export function colorNodes(d3Data, coloringIndex) {
   switch (coloringIndex) {
     case 0:
-      colorNodes(d3Data.allNodes, countNodes);
+      coloring(d3Data.allNodes, countNodes);
       break;
     case 1:
-      colorNodes(d3Data.allNodes, countDirectChildren);
+      coloring(d3Data.allNodes, countDirectChildren);
       break;
     case 2:
-      colorNodes(d3Data.allNodes, countTotalChildren);
+      coloring(d3Data.allNodes, countTotalChildren);
       break;
     default:
       resetColorNodes(d3Data.allNodes);
@@ -26,7 +26,7 @@ function resetColorNodes(allD3Nodes) {
   }
 }
 
-function colorNodes(allD3Nodes, coloringFunction) {
+function coloring(allD3Nodes, coloringFunction) {
   const [count, max] = coloringFunction(allD3Nodes); // Must return {"nodeName": integer}
   const colors = d3.scaleLinear().domain(d3.ticks(1, max, CONSTANTS.COLORING_MAP.length)).range(CONSTANTS.COLORING_MAP);
 

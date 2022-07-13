@@ -45,5 +45,4 @@ export function initialize(d3Data, data) {
     d3Data.container.featureNodesContainer = svgContent.append('g').classed('feature-node-container', true);
 
     d3Data.container.dragContainer = svgContent.append('g').classed('drag-container', true);
-
 }

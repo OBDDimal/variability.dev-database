@@ -1,6 +1,6 @@
 <template>
 	<div class="text-center">
-		<v-dialog width="500" v-model="show" persistent>
+		<v-dialog width="500" v-model="showDialog" persistent>
 			<v-card>
 				<v-card-title class="text-h5 grey lighten-2"> Edit Feature </v-card-title>
 
@@ -68,31 +68,32 @@ export default Vue.extend({
 	}),
 
 	props: {
-		d3Node: Object,
+		node: Object,
+        show: Boolean,
 	},
 
 	watch: {
-		d3Node() {
-			if (this.d3Node) {
-				this.name = this.d3Node.data.name;
-				this.groupType = this.d3Node.data.groupType;
-				this.mandatory = this.d3Node.data.isMandatory;
-				this.abstract = this.d3Node.data.isAbstract;
+		show() {
+			if (this.node) {
+				this.name = this.node.name;
+				this.groupType = this.node.groupType;
+				this.mandatory = this.node.isMandatory;
+				this.abstract = this.node.isAbstract;
 			}
 		},
 	},
 
 	computed: {
-		show: {
+		showDialog: {
 			get() {
-				return !!this.d3Node;
+				return this.show;
 			},
 			set() {},
 		},
 
 		convertGroupType: {
 			get() {
-				if (this.d3Node) {
+				if (this.node) {
 					switch (this.groupType) {
 						case 'alt':
 							return 0;
@@ -125,15 +126,15 @@ export default Vue.extend({
 		},
 
 		showMandatorySelection() {
-			if (this.d3Node) {
-				return !this.d3Node.data.isRoot && this.d3Node.data.parent.isAnd();
+			if (this.node) {
+				return !this.node.isRoot && this.node.parent.isAnd();
 			}
 			return false;
 		},
 
 		showGroupTypeSelection() {
-			if (this.d3Node) {
-				return !this.d3Node.data.isLeaf();
+			if (this.node) {
+				return !this.node.isLeaf();
 			}
 			return false;
 		},
@@ -141,21 +142,20 @@ export default Vue.extend({
 
 	methods: {
 		discard() {
-			this.close();
-		},
+            this.name = "";
+            this.groupType = "";
+            this.mandatory = false;
+            this.abstract = false;
 
-		close() {
-			this.show = false;
-			this.$emit('close');
+            this.$emit('close');
 		},
 
 		save() {
-			this.d3Node.data.name = this.name;
-			this.d3Node.data.groupType = this.groupType;
-			this.d3Node.data.isMandatory = this.mandatory;
-			this.d3Node.data.isAbstract = this.abstract;
-			this.close();
-			this.$emit('update');
+			this.node.name = this.name;
+			this.node.groupType = this.groupType;
+			this.node.isMandatory = this.mandatory;
+			this.node.isAbstract = this.abstract;
+			this.$emit('edit');
 		},
 	},
 });

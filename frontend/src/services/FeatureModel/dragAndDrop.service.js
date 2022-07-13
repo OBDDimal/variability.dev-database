@@ -11,7 +11,7 @@ function overGhostNode(d3Data, ghostNode) {
         setTimeout(() => {
             if (d3Data.drag.selectedGhostNode === ghostNode) {
                 ghostNode.d3Node.data.uncollapse();
-                collapse.updateCollapsing(d3Data);
+                collapse.update(d3Data);
                 update.updateSvg(d3Data);
                 updateGhostCircles(d3Data);
             }
@@ -101,7 +101,7 @@ function calcGhostCircleTransform(d3Data, ghostNode) {
     return `translate(${x + dx}, ${y + dy})`;
 }
 
-export function defineDragListener(d3Data) {
+export function init(d3Data) {
     d3Data.drag.listener = d3
         .drag()
         .on('start', (_, d3Node) => {

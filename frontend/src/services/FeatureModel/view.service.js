@@ -2,7 +2,7 @@ import * as d3 from "d3";
 import * as update from '@/services/FeatureModel/update.service.js';
 import * as collapse from "@/services/FeatureModel/collapse.service.js";
 
-export function resetView(d3Data, uncollapsedLevels = 4, maxChildrenCount = 3) {
+export function reset(d3Data, uncollapsedLevels = 4, maxChildrenCount = 3) {
     // Collapses all nodes after depth 1.
     d3Data.allNodes.forEach((d3Node) => d3Node.data.collapse());
 
@@ -22,7 +22,7 @@ export function resetView(d3Data, uncollapsedLevels = 4, maxChildrenCount = 3) {
         }
     }
 
-    collapse.updateCollapsing(d3Data);
+    collapse.update(d3Data);
     update.updateSvg(d3Data);
     zoomFit(d3Data);
 }
