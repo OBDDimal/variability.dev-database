@@ -1,4 +1,4 @@
-import * as update from '@/services/FeatureModel/update.service.js';
+import * as update_service from '@/services/FeatureModel/update.service.js';
 import * as view from '@/services/FeatureModel/view.service.js';
 import {PseudoNode} from "@/classes/featureNode";
 import * as d3 from "d3";
@@ -10,8 +10,8 @@ export function hideLeftSiblings(d3Data, d3Node) {
         d3Node.data.hideLeftSiblings();
     }
 
-    updateHiding(d3Node.parent);
-    update.updateSvg(d3Data);
+    update(d3Node.parent);
+    update_service.updateSvg(d3Data);
     view.focusNode(d3Data, d3Node);
 }
 
@@ -22,20 +22,20 @@ export function hideRightSiblings(d3Data, d3Node) {
         d3Node.data.hideRightSiblings();
     }
 
-    updateHiding(d3Node.parent);
-    update.updateSvg(d3Data);
+    update(d3Node.parent);
+    update_service.updateSvg(d3Data);
     view.focusNode(d3Data, d3Node);
 }
 
 export function hideCurrentNode(d3Data, d3Node) {
     d3Node.data.hide();
 
-    updateHiding(d3Node.parent);
-    update.updateSvg(d3Data);
+    update(d3Node.parent);
+    update_service.updateSvg(d3Data);
     view.focusNode(d3Data, d3Node);
 }
 
-export function updateHiding(d3Parent) {
+export function update(d3Parent) {
     d3Parent.children = [];
 
     let isPreviousNodeHidden = false;

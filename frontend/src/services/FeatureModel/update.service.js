@@ -42,7 +42,7 @@ function updateFeatureNodes(d3Data, visibleD3Nodes) {
 		.classed('pseudo-node', true)
 		.on('click', (_, d3Node) => {
 			d3Node.data.unhideHiddenNodes();
-			hide.updateHiding(d3Node.parent);
+			hide.update(d3Node.parent);
 			updateSvg(d3Data);
 		});
 	pseudoNodeEnter.append('circle').attr('r', CONSTANTS.PSEUDO_NODE_SIZE);

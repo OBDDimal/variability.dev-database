@@ -12,7 +12,7 @@ export function addNode(d3Data, newNode) {
     collapse.update(d3Data);
 
     d3Data.d3ParentOfAddNode.data.unhideChildren();
-    hide.updateHiding(d3Data.d3ParentOfAddNode);
+    hide.update(d3Data.d3ParentOfAddNode);
 
     newNode.parent.children.push(newNode);
 
