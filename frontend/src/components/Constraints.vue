@@ -63,11 +63,9 @@ export default Vue.extend({
   methods: {
     highlightConstraint(item) {
       //TODO: Table row color
-      console.log(this.tableConstraints);
       item.checked = !item.checked;
       item.constraint.toggleHighlighted();
       this.$emit("update-feature-model");
-      console.log(item.constraint.color);
     },
     computeColor(bg) {
       var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(bg);

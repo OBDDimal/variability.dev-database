@@ -1,6 +1,6 @@
 <template>
     <div class="text-center">
-        <v-dialog width="500" v-model="show" persistent>
+        <v-dialog width="500" v-model="showDialog" persistent>
             <v-card>
                 <v-card-title class="text-h5 grey lighten-2"> Add Feature</v-card-title>
 
@@ -59,12 +59,13 @@ export default Vue.extend({
 
     props: {
         parent: Object,
+        show: Boolean,
     },
 
     computed: {
-        show: {
+        showDialog: {
             get() {
-                return !!this.parent;
+                return this.show;
             },
             set() {
             },
@@ -83,7 +84,6 @@ export default Vue.extend({
             this.name = "";
             this.mandatory = false;
             this.abstract = false;
-            this.show = false;
 
             this.$emit('close');
         },
@@ -93,7 +93,6 @@ export default Vue.extend({
             this.name = "";
             this.mandatory = false;
             this.abstract = false;
-            this.show = false;
 
             this.$emit('add', newNode, this.parent);
         },

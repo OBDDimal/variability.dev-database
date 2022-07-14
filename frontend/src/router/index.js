@@ -1,7 +1,6 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 import HomeView from '../views/HomeView.vue'
-import ViewModel from '../views/ViewModel.vue'
 import Profile from '../views/Profile.vue'
 import Files from '../views/Files.vue'
 import Tags from '../views/Tags.vue'
@@ -20,11 +19,6 @@ const routes = [
     path: '/',
     name: 'HomeView',
     component: HomeView
-  },
-  {
-    path: '/ViewModel',
-    name: 'ViewModel',
-    component: ViewModel
   },
   {
     path: '/profile',

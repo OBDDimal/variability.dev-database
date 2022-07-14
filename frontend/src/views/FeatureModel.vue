@@ -24,6 +24,8 @@ import Constraints from '../components/Constraints.vue';
 import { Constraint, VarConstraint } from '@/classes/constraint';
 import { berkeley } from '@/classes/featureModelData';
 import { FeatureNode } from '@/classes/featureNode';
+import * as update from "@/services/FeatureModel/update.service";
+import * as collapse from "@/services/FeatureModel/collapse.service";
 
 export default Vue.extend({
 	name: 'FeatureModel',
@@ -53,8 +55,8 @@ export default Vue.extend({
 
 	methods: {
 		updateFeatureModel() {
-			this.$refs.featureModelTree.updateCollapsing();
-			this.$refs.featureModelTree.updateSvg();
+			collapse.update(this.$refs.featureModelTree.d3Data);
+			update.updateSvg(this.$refs.featureModelTree.d3Data);
 		},
 
 		xmlToJson(currentModel) {
