@@ -19,6 +19,7 @@ export function search(d3Data, searchText) {
         foundD3Node.data.uncollapse(true);
         collapse.update(d3Data);
         update.updateSvg(d3Data);
+        view.zoomFit(d3Data);
         view.focusNode(d3Data, foundD3Node);
       } else {
         update.updateSvg(d3Data);

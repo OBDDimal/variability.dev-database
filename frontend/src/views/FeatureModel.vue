@@ -53,8 +53,8 @@ export default Vue.extend({
 
 	methods: {
 		updateFeatureModel() {
-			this.$refs.featureModelTree.updateCollapsing();
-			this.$refs.featureModelTree.updateSvg();
+			collapse.update(this.$refs.featureModelTree.d3Data);
+			update.updateSvg(this.$refs.featureModelTree.d3Data);
 		},
 
 		xmlToJson(currentModel) {

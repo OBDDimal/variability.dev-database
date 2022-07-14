@@ -147,7 +147,7 @@ function updateHighlightedConstraints(d3Data, visibleD3Nodes) {
 		.attr('height', (_, i) => CONSTANTS.RECT_HEIGHT + i * 2 * CONSTANTS.STROKE_WIDTH_CONSTANT + CONSTANTS.STROKE_WIDTH_CONSTANT)
 		.attr(
 			'width',
-			(d3Node, i) => calcRectWidth(d3Data, d3Node) + i * 2 * CONSTANTS.STROKE_WIDTH_CONSTANT + CONSTANTS.STROKE_WIDTH_CONSTANT
+			(constraint, i) => calcRectWidth(d3Data, constraint.d3Node) + i * 2 * CONSTANTS.STROKE_WIDTH_CONSTANT + CONSTANTS.STROKE_WIDTH_CONSTANT
 		)
 		.attr(
 			'transform',

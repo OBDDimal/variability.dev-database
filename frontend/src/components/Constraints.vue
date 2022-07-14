@@ -66,8 +66,7 @@ export default Vue.extend({
       console.log(this.tableConstraints);
       item.checked = !item.checked;
       item.constraint.toggleHighlighted();
-      this.$emit("update.service.js-feature-model");
-      console.log(item.constraint.color);
+      this.$emit("update-feature-model");
     },
     computeColor(bg) {
       var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(bg);
