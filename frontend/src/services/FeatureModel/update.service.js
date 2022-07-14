@@ -143,7 +143,7 @@ function updateHighlightedConstraints(d3Data, visibleD3Nodes) {
 	// Update highlighted constraint rects
 	highlightedConstraintNodeRectsEnter
 		.merge(highlightedConstraintNodeRects)
-		.attr('x', (d3Node) => -calcRectWidth(d3Data, d3Node) / 2)
+		.attr('x', (constraint) => -calcRectWidth(d3Data, constraint.d3Node) / 2)
 		.attr('height', (_, i) => CONSTANTS.RECT_HEIGHT + i * 2 * CONSTANTS.STROKE_WIDTH_CONSTANT + CONSTANTS.STROKE_WIDTH_CONSTANT)
 		.attr(
 			'width',

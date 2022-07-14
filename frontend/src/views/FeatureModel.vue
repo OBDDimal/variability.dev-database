@@ -24,6 +24,8 @@ import Constraints from '../components/Constraints.vue';
 import { Constraint, VarConstraint } from '@/classes/constraint';
 import { berkeley } from '@/classes/featureModelData';
 import { FeatureNode } from '@/classes/featureNode';
+import * as update from "@/services/FeatureModel/update.service";
+import * as collapse from "@/services/FeatureModel/collapse.service";
 
 export default Vue.extend({
 	name: 'FeatureModel',
