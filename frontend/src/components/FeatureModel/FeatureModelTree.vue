@@ -164,13 +164,14 @@ export default Vue.extend({
 
         add(newNode) {
             this.showAddDialog = false;
-            this.addType = "";
 
             if (this.addType === 'child') {
                 add.addAsChild(this.d3Data, newNode);
             } else {
                add.addAsSibling(this.d3Data, newNode);
             }
+
+            this.addType = "";
         },
 
         openAddAsChildDialog(d3Node) {
