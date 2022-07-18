@@ -45,6 +45,6 @@ export function initialize(d3Data, data) {
 
 
 	// Listen to window resize.
-	window.onresize = () => windowResize.update();
-	windowResize.update();
+	window.onresize = () => windowResize.update(d3Data);
+	windowResize.update(d3Data);
 }
