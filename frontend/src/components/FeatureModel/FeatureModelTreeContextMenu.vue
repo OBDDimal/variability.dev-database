@@ -62,6 +62,21 @@
                 </v-list-item-content>
             </v-list-item>
 
+            <v-list-item @click="$emit('hideAllOtherNodes', d3Node)">
+                <v-list-item-content>
+                    <v-list-item-title> Hide all other nodes
+                    </v-list-item-title>
+                </v-list-item-content>
+            </v-list-item>
+
+            <v-list-item :disabled="d3Node && d3Node.data && d3Node.data.isRoot"
+                         @click="$emit('hideAllNodesOnThisLevel', d3Node)">
+                <v-list-item-content>
+                    <v-list-item-title> Hide all nodes on this level
+                    </v-list-item-title>
+                </v-list-item-content>
+            </v-list-item>
+
             <v-divider></v-divider>
 
             <!-- TODO: Emit event to highlight -->

@@ -21,6 +21,8 @@
             @hideCurrentNode="(d3Node) => hideCurrentNode(d3Node)"
             @hideLeftSiblings="(d3Node) => hideLeftSiblings(d3Node)"
             @hideRightSiblings="(d3Node) => hideRightSiblings(d3Node)"
+            @hideAllNodesOnThisLevel="(d3Node) => hideAllNodesOnThisLevel(d3Node)"
+            @hideAllOtherNodes="(d3Node) => hideAllOtherNodes(d3Node)"
         ></feature-model-tree-context-menu>
 
         <feature-model-tree-edit-dialog
@@ -142,6 +144,14 @@ export default Vue.extend({
 
         hideLeftSiblings(d3Node) {
             hide.hideLeftSiblings(this.d3Data, d3Node);
+        },
+
+        hideAllOtherNodes(d3Node) {
+            hide.hideAllOtherNodes(this.d3Data, d3Node);
+        },
+
+        hideAllNodesOnThisLevel(d3Node) {
+            hide.hideAllNodesOnThisLevel(this.d3Data, d3Node);
         },
 
         collapse(d3Node) {
