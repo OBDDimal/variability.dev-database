@@ -2,6 +2,7 @@ import { flextree } from 'd3-flextree';
 import * as CONSTANTS from '@/classes/constants';
 import * as d3 from 'd3';
 import * as update from '@/services/FeatureModel/update.service.js';
+import * as windowResize from '@/services/FeatureModel/windowResize.service.js';
 
 export function initialize(d3Data, data) {
 	// Flexlayout belongs to a d3-plugin that calculates the width between all nodes dynamically.
@@ -27,10 +28,6 @@ export function initialize(d3Data, data) {
 		.select('#svg-container')
 		.append('svg')
 		.attr('preserveAspectRatio', 'xMidYMid meet')
-		.attr(
-			'viewBox',
-			-CONSTANTS.SVG_WIDTH / 2 + ' ' + -CONSTANTS.SVG_MARGIN.top + ' ' + CONSTANTS.SVG_WIDTH + ' ' + CONSTANTS.SVG_HEIGHT
-		)
 		.on('click', () => (d3Data.contextMenu.selectedD3Node = null)) // Click listener for closing all context-menus.
 		.call(d3Data.zoom); // Zooming and penning.
 
@@ -45,4 +42,9 @@ export function initialize(d3Data, data) {
     d3Data.container.featureNodesContainer = svgContent.append('g').classed('feature-node-container', true);
 
     d3Data.container.dragContainer = svgContent.append('g').classed('drag-container', true);
+
+
+	// Listen to window resize.
+	window.onresize = () => windowResize.update();
+	windowResize.update();
 }
