@@ -1,163 +1,174 @@
 <template>
-	<div class="text-center">
-		<v-dialog width="500" v-model="showDialog" persistent>
-			<v-card>
-				<v-card-title class="text-h5 grey lighten-2"> Edit Feature </v-card-title>
+    <div class="text-center">
+        <v-dialog width="500" v-model="showDialog" persistent>
+            <v-card>
+                <v-card-title class="text-h5 grey lighten-2"> Edit Feature</v-card-title>
 
-				<v-form @submit.prevent="save">
-					<v-card-text>
-						<v-row class="my-2">
-							<v-col cols="12" class="pt-0">
-								<template>
-									<v-text-field
-										v-model="name"
-										hide-details
-										label="Name"
-										:rules="[(value) => !!value || 'Required.']"
-									></v-text-field>
-								</template>
-							</v-col>
-						</v-row>
+                <v-form @submit.prevent="save">
+                    <v-card-text>
+                        <v-row class="my-2">
+                            <v-col cols="12" class="pt-0">
+                                <template>
+                                    <v-text-field
+                                        v-model="name"
+                                        hide-details
+                                        label="Name"
+                                        :rules="[(value) => !!value || 'Required.']"
+                                    ></v-text-field>
+                                </template>
+                            </v-col>
+                        </v-row>
 
-						<v-row class="my-2" v-if="showGroupTypeSelection">
-							<v-col cols="12">
-								<v-btn-toggle dense v-model="convertGroupType" mandatory>
-									<v-btn>⊻ alt </v-btn>
-									<v-btn>∨ or </v-btn>
-									<v-btn>∧ and </v-btn>
-								</v-btn-toggle>
-							</v-col>
-						</v-row>
+                        <v-row class="my-2" v-if="showGroupTypeSelection">
+                            <v-col cols="12">
+                                <v-btn-toggle dense v-model="convertGroupType" mandatory>
+                                    <v-btn>⊻ alt</v-btn>
+                                    <v-btn>∨ or</v-btn>
+                                    <v-btn>∧ and</v-btn>
+                                </v-btn-toggle>
+                            </v-col>
+                        </v-row>
 
-						<v-row class="my-2" v-if="showMandatorySelection">
-							<v-col cols="12">
-								<v-btn-toggle dense v-model="mandatory" mandatory>
-									<v-btn> mandatory </v-btn>
-									<v-btn> optional </v-btn>
-								</v-btn-toggle>
-							</v-col>
-						</v-row>
+                        <v-row class="my-2" v-if="showMandatorySelection">
+                            <v-col cols="12">
+                                <v-btn-toggle dense v-model="convertMandatory" mandatory>
+                                    <v-btn> mandatory</v-btn>
+                                    <v-btn> optional</v-btn>
+                                </v-btn-toggle>
+                            </v-col>
+                        </v-row>
 
-						<v-checkbox v-model="abstract" label="Abstract" hide-details></v-checkbox>
-					</v-card-text>
+                        <v-checkbox v-model="abstract" label="Abstract" hide-details></v-checkbox>
+                    </v-card-text>
 
-					<v-divider></v-divider>
+                    <v-divider></v-divider>
 
-					<v-card-actions>
-						<v-btn color="secondary" text @click="discard"> Discard </v-btn>
-						<v-spacer></v-spacer>
-						<v-btn color="primary" type="submit" text> Edit </v-btn>
-					</v-card-actions>
-				</v-form>
-			</v-card>
-		</v-dialog>
-	</div>
+                    <v-card-actions>
+                        <v-btn color="secondary" text @click="discard"> Discard</v-btn>
+                        <v-spacer></v-spacer>
+                        <v-btn color="primary" type="submit" text> Edit</v-btn>
+                    </v-card-actions>
+                </v-form>
+            </v-card>
+        </v-dialog>
+    </div>
 </template>
 
 <script>
 import Vue from 'vue';
 
 export default Vue.extend({
-	name: 'FeatureModelTreeEditDialog',
+    name: 'FeatureModelTreeEditDialog',
 
-	data: () => ({
-		name: undefined,
-		groupType: undefined,
-		mandatory: undefined,
-		abstract: undefined,
-	}),
+    data: () => ({
+        name: undefined,
+        groupType: undefined,
+        mandatory: undefined,
+        abstract: undefined,
+    }),
 
-	props: {
-		node: Object,
+    props: {
+        node: Object,
         show: Boolean,
-	},
+    },
 
-	watch: {
-		show() {
-			if (this.node) {
-				this.name = this.node.name;
-				this.groupType = this.node.groupType;
-				this.mandatory = this.node.isMandatory;
-				this.abstract = this.node.isAbstract;
-			}
-		},
-	},
+    watch: {
+        show() {
+            if (this.node) {
+                this.name = this.node.name;
+                this.groupType = this.node.groupType;
+                this.mandatory = this.node.isMandatory;
+                this.abstract = this.node.isAbstract;
+                console.log(this);
+            }
+        },
+    },
 
-	computed: {
-		showDialog: {
-			get() {
-				return this.show;
-			},
-			set() {},
-		},
+    computed: {
+        showDialog: {
+            get() {
+                return this.show;
+            },
+            set() {
+            },
+        },
 
-		convertGroupType: {
-			get() {
-				if (this.node) {
-					switch (this.groupType) {
-						case 'alt':
-							return 0;
-						case 'or':
-							return 1;
-						case 'and':
-							return 2;
-						default:
-							return 0;
-					}
-				}
-				return 0;
-			},
-			set(newValue) {
-				switch (newValue) {
-					case 0:
-						this.groupType = 'alt';
-						break;
-					case 1:
-						this.groupType = 'or';
-						break;
-					case 2:
-						this.groupType = 'and';
-						break;
-					default:
-						this.groupType = 'alt';
-						break;
-				}
-			},
-		},
+        convertGroupType: {
+            get() {
+                switch (this.groupType) {
+                    case 'alt':
+                        return 0;
+                    case 'or':
+                        return 1;
+                    case 'and':
+                        return 2;
+                    default:
+                        return 0;
+                }
+            },
+            set(newValue) {
+                switch (newValue) {
+                    case 0:
+                        this.groupType = 'alt';
+                        break;
+                    case 1:
+                        this.groupType = 'or';
+                        break;
+                    case 2:
+                        this.groupType = 'and';
+                        break;
+                    default:
+                        this.groupType = 'alt';
+                        break;
+                }
+            },
+        },
 
-		showMandatorySelection() {
-			if (this.node) {
-				return !this.node.isRoot && this.node.parent.isAnd();
-			}
-			return false;
-		},
+        convertMandatory: {
+            get() {
+                if (this.node) {
+                    return this.mandatory ? 0 : 1;
+                }
+                return 0;
+            },
+            set(newValue) {
+                this.mandatory = newValue === 0;
+            },
+        },
 
-		showGroupTypeSelection() {
-			if (this.node) {
-				return !this.node.isLeaf();
-			}
-			return false;
-		},
-	},
+        showMandatorySelection() {
+            if (this.node) {
+                return !this.node.isRoot && this.node.parent.isAnd();
+            }
+            return false;
+        },
 
-	methods: {
-		discard() {
+        showGroupTypeSelection() {
+            if (this.node) {
+                return !this.node.isLeaf();
+            }
+            return false;
+        },
+    },
+
+    methods: {
+        discard() {
             this.name = "";
             this.groupType = "";
             this.mandatory = false;
             this.abstract = false;
 
             this.$emit('close');
-		},
+        },
 
-		save() {
-			this.node.name = this.name;
-			this.node.groupType = this.groupType;
-			this.node.isMandatory = this.mandatory;
-			this.node.isAbstract = this.abstract;
-			this.$emit('edit');
-		},
-	},
+        save() {
+            this.node.name = this.name;
+            this.node.groupType = this.groupType;
+            this.node.isMandatory = this.mandatory;
+            this.node.isAbstract = this.abstract;
+            this.$emit('edit');
+        },
+    },
 });
 </script>
 
