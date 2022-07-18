@@ -16,6 +16,7 @@ export class FeatureNode {
 		this.constraintsHighlighted = [];
 		this.isCollapsed = true;
 		this.isHidden = false;
+		this.d3Node = null;
 	}
 
 	childrenCount() {

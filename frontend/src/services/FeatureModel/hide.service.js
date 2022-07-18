@@ -36,7 +36,15 @@ export function hideCurrentNode(d3Data, d3Node) {
 }
 
 export function hideAllOtherNodes(d3Data, d3Node) {
-    console.log(d3Data, d3Node);
+    // Get all nodes to root without root.
+    d3Node.data.getAllNodesToRoot().slice(0, -1).forEach((node) => {
+        node.hideRightSiblings();
+        node.hideLeftSiblings();
+        update(node.parent.d3Node);
+    });
+
+    update_service.updateSvg(d3Data);
+    view.focusNode(d3Data, d3Node);
 }
 
 export function hideAllNodesOnThisLevel(d3Data, d3Node) {
