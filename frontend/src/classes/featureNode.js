@@ -64,6 +64,7 @@ export class FeatureNode {
 
 	collapse() {
 		this.isCollapsed = true;
+		console.log(this.name);
 	}
 
 	toggleCollapse() {
