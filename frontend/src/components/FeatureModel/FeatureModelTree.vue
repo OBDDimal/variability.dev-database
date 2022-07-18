@@ -1,40 +1,40 @@
 <template>
     <div>
         <feature-model-tree-toolbar
-            @search="(search) => onChangeSearch(search)"
             @coloring="(coloringIndex) => coloring(coloringIndex)"
+            @export="$emit('exportToXML')"
             @fitToView="fitToView"
             @resetView="(levels, maxChildren) => resetView(levels, maxChildren)"
+            @search="(search) => onChangeSearch(search)"
             @shortName="changeShortName"
             @verticalSpacing="changeVerticalSpacing"
-            @export="$emit('exportToXML')"
         ></feature-model-tree-toolbar>
         <div id="svg-container"></div>
 
         <feature-model-tree-context-menu
             :d3Node="d3Data.contextMenu.selectedD3Node"
             :d3NodeEvent="d3Data.contextMenu.event"
+            @add="(d3Node) => openAddDialog(d3Node)"
+            @close="d3Data.contextMenu.selectedD3Node = undefined"
             @collapse="collapse"
+            @edit="(d3Node) => openEditDialog(d3Node)"
+            @hideCurrentNode="(d3Node) => hideCurrentNode(d3Node)"
             @hideLeftSiblings="(d3Node) => hideLeftSiblings(d3Node)"
             @hideRightSiblings="(d3Node) => hideRightSiblings(d3Node)"
-            @hideCurrentNode="(d3Node) => hideCurrentNode(d3Node)"
-            @edit="(d3Node) => openEditDialog(d3Node)"
-            @close="d3Data.contextMenu.selectedD3Node = undefined"
-            @add="(d3Node) => openAddDialog(d3Node)"
         ></feature-model-tree-context-menu>
 
         <feature-model-tree-edit-dialog
-            :show="showEditDialog"
             :node="editNode"
+            :show="showEditDialog"
             @close="showEditDialog = false"
             @edit="edit">
         </feature-model-tree-edit-dialog>
 
         <feature-model-tree-add-dialog
-            :show="showAddDialog"
             :parent="d3Data.d3ParentOfAddNode ? d3Data.d3ParentOfAddNode.data : undefined"
-            @close="showAddDialog = false"
+            :show="showAddDialog"
             @add="(newNode) => add(newNode)"
+            @close="showAddDialog = false"
         ></feature-model-tree-add-dialog>
     </div>
 </template>

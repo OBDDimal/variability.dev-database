@@ -5,11 +5,11 @@ import * as collapse from "@/services/FeatureModel/collapse.service.js";
 
 
 export function search(d3Data, searchText) {
-      d3Data.allNodes.forEach((d3Node) => {
+    d3Data.allNodes.forEach((d3Node) => {
         d3Node.data.isSearched = false;
-      });
+    });
 
-      if (searchText !== '') {
+    if (searchText !== '') {
         const foundD3Node = findD3Node(d3Data, searchText);
         const paths = foundD3Node.data.getAllNodesToRoot();
 
@@ -21,27 +21,27 @@ export function search(d3Data, searchText) {
         update.updateSvg(d3Data);
         view.zoomFit(d3Data);
         view.focusNode(d3Data, foundD3Node);
-      } else {
+    } else {
         update.updateSvg(d3Data);
-      }
     }
+}
 
 function findD3Node(d3Data, search) {
-      const [, d3Node] = d3Data.allNodes.reduce(([previousDistance, previousD3Node], currentD3Node) => {
+    const [, d3Node] = d3Data.allNodes.reduce(([previousDistance, previousD3Node], currentD3Node) => {
         const currentNodeName = currentD3Node.data.name.toLowerCase();
         if (currentNodeName !== search.toLowerCase() && currentNodeName.includes(search.toLowerCase())) {
-          return [1, currentD3Node];
+            return [1, currentD3Node];
         }
 
         const currentDistance = levenshtein(currentD3Node.data.name.toLowerCase(), search.toLowerCase());
 
         if (previousDistance <= currentDistance) {
-          return [previousDistance, previousD3Node];
+            return [previousDistance, previousD3Node];
         } else {
-          return [currentDistance, currentD3Node];
+            return [currentDistance, currentD3Node];
         }
-      });
+    });
 
-      // TODO: If levenshtein distance is above a good value dont display anything?
-      return d3Node;
-    }
+    // TODO: If levenshtein distance is above a good value dont display anything?
+    return d3Node;
+}

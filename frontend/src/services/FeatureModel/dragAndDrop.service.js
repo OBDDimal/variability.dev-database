@@ -30,7 +30,7 @@ export function updateGhostCircles(d3Data) {
         .descendants()
         .slice(1)
         .filter((node) => !dragChildren.includes(node));
-    const rightGhostNodes = allOtherNodes.map((node) => ({ d3Node: node, side: 'r' }));
+    const rightGhostNodes = allOtherNodes.map((node) => ({d3Node: node, side: 'r'}));
     const leftGhostNodes = allOtherNodes
         .filter((node) => node === node.parent.children[0])
         .map((node) => ({
