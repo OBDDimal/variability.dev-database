@@ -66,11 +66,14 @@
                 >
                 </v-select>
               </v-col>
-              <v-col cols="12" md="6" class="py-0">
+            </v-row>
+            <v-row justify="space-between" align="center">
+              <v-col cols="12" md="5" class="py-0 mb-7">
                 <v-autocomplete
                   :disabled="family != null"
                   outlined
                   dense
+                  hide-details
                   :required="family == null"
                   v-model="newVersionOf"
                   :items="gottenFiles"
@@ -78,27 +81,38 @@
                   hint="If your feature model is a new version of an existing one"
                 ></v-autocomplete>
               </v-col>
-              <v-col cols="12" md="6" class="py-0">
-                <v-combobox
+              <v-col cols="12" md="auto" class="py-0 mb-7 text-center">
+                OR
+              </v-col>
+              <v-col cols="12" md="5" class="py-0">
+                <!-- Change back to v-combobox when new family upload is working properly -->
+                <v-autocomplete
                   :disabled="newVersionOf != null"
                   :required="newVersionOf == null"
                   outlined
                   dense
+                  hide-details
                   v-model="family"
+                  class="mb-7"
                   :items="gottenFamilies"
                   label="Family"
                   hint="Add to or create new family"
-                ></v-combobox>
+                ></v-autocomplete>
                 <v-text-field
                     v-if="isNewFamily"
                     outlined
+                    hide-details
                     dense
                     v-model="newFamilyDescription"
                     label="New Family Description"
                     hint="Describe your new family"
+                    class="mb-7"
                 ></v-text-field>
               </v-col>
+            </v-row>
+            <v-row>
               <v-col cols="12" class="py-0">
+                <!-- Change back to v-combobox once sequential axios requests are implemented -->
                 <v-combobox
                   outlined
                   hide-details
@@ -154,7 +168,7 @@
                   <v-btn
                     color="primary"
                     @click="upload"
-                    :disabled="!valid"
+                    :disabled="!valid || !openSource || !userData || !legalShare"
                     :loading="loading"
                   >
                     Upload
@@ -163,90 +177,6 @@
               </v-col>
             </v-row>
           </v-form>
-          <!-- <v-row>
-                    <v-col cols="12" md="6">
-                      <v-text-field
-                        v-model="editedItem.label"
-                        label="Label"
-                      ></v-text-field>
-                    </v-col>
-                    <v-col cols="12" md="6">
-                      <v-text-field
-                        v-model="editedItem.description"
-                        label="Description"
-                      >
-                      </v-text-field>
-                    </v-col>
-                    <v-col cols="12" md="6">
-                      <v-file-input
-                        chips
-                        multiple
-                        label="File Upload"
-                        show-size
-                      ></v-file-input>
-                    </v-col>
-                    <v-col cols="12" md="6">
-                      <v-autocomplete
-                        v-model="editedItem.license"
-                        :items="licenses"
-                        label="License"
-                      ></v-autocomplete>
-                    </v-col>
-                    <v-col cols="12" md="6">
-                      <v-autocomplete
-                        :disabled="newFamily != ''"
-                        v-model="family"
-                        :items="existingFamilies"
-                        label="New version of"
-                      ></v-autocomplete>
-                    </v-col>
-                    <v-col cols="12" md="6">
-                      <v-text-field
-                        :disabled="family != null"
-                        v-model="newFamily"
-                        label="New family"
-                      ></v-text-field>
-                    </v-col>
-                    <v-col cols="12">
-                      <v-combobox
-                        v-model="editedItem.tags"
-                        :items="tags"
-                        label="Tags"
-                        multiple
-                        chips
-                      ></v-combobox>
-                    </v-col>
-                    <v-col cols="12">
-                      <v-checkbox
-                        v-model="check1"
-                        label="Lorem Ipsum"
-                        hide-details
-                      ></v-checkbox>
-                    </v-col>
-                    <v-col cols="12">
-                      <v-checkbox
-                        v-model="check2"
-                        label="Lorem Ipsum 2"
-                        hide-details
-                      >
-                      </v-checkbox>
-                    </v-col>
-                    <v-col cols="12">
-                      <v-checkbox
-                        v-model="check3"
-                        label="Lorem Ipsum 3"
-                        hide-details
-                      >
-                      </v-checkbox>
-                    </v-col>
-                    <v-col cols="12">
-                      <v-btn
-                        color="primary"
-                        :disabled="!check1 || !check2 || !check3"
-                        >Upload</v-btn
-                      >
-                    </v-col>
-                  </v-row> -->
         </v-container>
       </v-card-text>
     </v-card>
@@ -273,7 +203,7 @@ export default Vue.extend({
     labelRules: [(v) => !!v || "Label is required"],
 
     description: "",
-    descriptionRules: [(v) => v.length <= 250 || "Max 250 characters please"],
+    descriptionRules: [(v) => !!v || "Description is required", (v) => v.length <= 250 || "Max 250 characters please"],
 
     file: null,
     fileRules: [(v) => !!v || "File is required"],
@@ -324,12 +254,12 @@ export default Vue.extend({
     family: function(newValue) {
       console.log(newValue)
       if (typeof(newValue) == "string") {
-        console.log("its a string")
-        console.log(!this.gottenFamilies.map(x => x.text).includes(newValue))
+        /*console.log("its a string")
+        console.log(!this.gottenFamilies.map(x => x.text).includes(newValue))*/
         this.isNewFamily = !this.gottenFamilies.map(x => x.text).includes(newValue)
       } else if (typeof(newValue) == "object" && newValue != null) {
-        console.log("its an object")
-        console.log(!this.gottenFamilies.map(x => x.text).includes(newValue.text))
+        /*console.log("its an object")
+        console.log(!this.gottenFamilies.map(x => x.text).includes(newValue.text))*/
         this.isNewFamily = !this.gottenFamilies.map(x => x.text).includes(newValue.text)
       } else {
         this.isNewFamily = false
@@ -360,7 +290,7 @@ export default Vue.extend({
     getFiles() {
       const files = [];
       for (let i = 0; i < this.gottenFiles.length; i++) {
-        console.log(this.gottenFiles)
+        /*console.log(this.gottenFiles)*/
         const element = this.gottenFiles[i];
         if (!element.owner) {
           continue;
@@ -395,27 +325,53 @@ export default Vue.extend({
       return temp;
     },
     upload() {
-      console.log("hi");
       if (this.$refs.form.validate() !== false) {
         this.loading = true;
         const data = new FormData();
 
         data.append("label", this.label);
+        console.log("LABEL");
+        console.log(this.label);
         data.append("description", this.description);
+        console.log("DESCRIPTION");
+        console.log(this.description);
         data.append("local_file", this.file);
         console.log("FILE");
         console.log(this.file);
         data.append("license", this.license);
         console.log("LICENSE");
         console.log(this.license);
-        if (this.newVersionOf !== null) {
+        if (this.newVersionOf !== null && this.newVersionOf) {
           data.append("new_version_of", this.newVersionOf);
           console.log("NEW VERSION OF");
           console.log(this.newVersionOf);
         }
-        /*if (this.family !== "") {
-          data.append("family", this.family);
-        }*/
+        if (this.family !== "" && this.family) {
+          if (!this.isNewFamily) {
+            //change back to this.family.value when using v-combobox again
+            data.append("family", this.family);
+            console.log("FEATURE FAMILY (not new)")
+            console.log(this.family)
+          } /*else {
+            api
+              .post(`${API_URL}families/`, {label: this.family, description: this.newFamilyDescription})
+              .then(async () => {
+                await this.$store.dispatch("fetchFamilies");
+                await data.append("family", null);
+                console.log("FEATURE FAMILY (didnt work)")
+              })
+              .catch((error) => {
+                this.$store.commit("updateSnackbar", {
+                  message: "Error while creating new family: " + error.message,
+                  variant: "error",
+                  timeout: 5000,
+                  show: true,
+                });
+                data.append("family", null);
+                console.log("FEATURE FAMILY (didnt work)")
+              });
+          }*/
+        }
         for (let i = 0; i < this.tags.length; i++) {
           this.tags[i].label = this.tags[i]["text"];
           delete this.tags[i].text;
@@ -425,6 +381,8 @@ export default Vue.extend({
         data.append("tags", JSON.stringify(this.tags));
         console.log("TAGS");
         console.log(this.tags);
+
+        /*console.log(data)*/
 
         api
           .post(`${API_URL}files/`, data, {
@@ -457,15 +415,15 @@ export default Vue.extend({
   mounted() {
     this.$store.dispatch("fetchLicenses");
     if (this.$store.state.families !== []) {
-      console.log("already there fam")
-      console.log(this.$store.state.families)
+      /*console.log("already there fam")
+      console.log(this.$store.state.families)*/
       this.gottenFamilies = this.$store.state.families.map(x => {return {text: x.label, value: x.id}})
     } else {
       this.$store.dispatch("fetchFamilies");
     }
     if (this.$store.state.files !== []) {
-      console.log("already there file")
-      console.log(this.$store.state.files)
+      /*console.log("already there file")
+      console.log(this.$store.state.files)*/
       this.gottenFiles = this.$store.state.files.map(x => {return {text: x.label, value: x.id}})
     } else {
       this.$store.dispatch("fetchFiles");

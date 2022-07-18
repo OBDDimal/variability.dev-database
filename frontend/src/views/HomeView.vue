@@ -27,10 +27,10 @@
           </v-text-field>
           <v-btn
             color="primary"
-            dark
+            :disabled="!$store.state.loggedIn"
             rounded
             class="mb-2 ml-4"
-            @click="showModal()"
+            @click="createDialog = true"
           >
             <v-icon left> mdi-plus </v-icon>
             Upload Model
@@ -142,17 +142,7 @@ export default Vue.extend({
   watch: {
     dialog(val) {
       val || this.close();
-    },
-    $route() {
-      this.checkModal();
-    },
-    createDialog(to) {
-      if (to == false) {
-        if (this.$route.params.modal) {
-          this.$router.push("/");
-        }
-      }
-    },
+    }
   },
 
   methods: {
@@ -172,18 +162,6 @@ export default Vue.extend({
       } */
       this.close();
     },
-
-    checkModal() {
-      if (this.$route.params.modal) {
-        this.createDialog = true;
-      } else {
-        this.createDialog = false;
-      }
-    },
-
-    showModal() {
-      this.$router.push("upload").catch(() => {});
-    },
   },
 
   mounted() {
@@ -200,7 +178,4 @@ export default Vue.extend({
 </script>
 
 <style scoped>
-.v-input--selection-controls {
-  margin-top: 0 !important;
-}
 </style>
