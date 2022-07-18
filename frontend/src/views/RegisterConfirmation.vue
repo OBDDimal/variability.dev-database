@@ -9,7 +9,7 @@ import api from "../services/api.service";
 const API_URL = process.env.VUE_APP_DOMAIN;
 
 export default Vue.extend({
-  name: "Register",
+  name: "RegisterConfirmation",
 
   components: {},
 

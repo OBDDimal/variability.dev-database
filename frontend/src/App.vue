@@ -4,7 +4,7 @@
 
     <v-main style="position: relative">
       <div>
-        <router-view />
+        <router-view :key="$route.fullPath" />
       </div>
       <v-snackbar
         absolute
@@ -57,11 +57,4 @@ export default Vue.extend({
 </script>
 
 <style>
-.mainView {
-  margin-left: auto;
-  margin-right: auto;
-  padding-left: 30px;
-  padding-right: 30px;
-  max-width: 90% !important;
-}
 </style>
