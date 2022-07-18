@@ -44,14 +44,9 @@ export default Vue.extend({
   },
 
   data: () => ({
-    age: 23,
-    list: ["im", "in", "ddueruem"],
   }),
 
   methods: {
-    increment() {
-      this.age++;
-    },
   },
 });
 </script>
