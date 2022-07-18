@@ -13,7 +13,7 @@ export const GROUP_SEGMENT_RADIUS = 25; // Radius of the segment that represents
 export const CHILDREN_COUNT_LETTERS_TO_RADIUS = 11.5 * MONOSPACE_HEIGHT_WIDTH_FACTOR;
 
 export const FEATURE_FONT_SIZE = 16;
-export const CHILREN_COUNT_FONT_SIZE = 7;
+export const CHILDREN_COUNT_FONT_SIZE = 7;
 
 export const SPACE_BETWEEN_NODES_HORIZONTALLY = 20;
 

@@ -89,13 +89,13 @@ function updateFeatureNodes(d3Data, visibleD3Nodes) {
 		.classed('children-count-text', true)
 		.classed('direct-children', true)
 		.attr('dy', 5)
-		.attr('font-size', CONSTANTS.CHILREN_COUNT_FONT_SIZE);
+		.attr('font-size', CONSTANTS.CHILDREN_COUNT_FONT_SIZE);
 	childrenCountEnter
 		.append('text')
 		.classed('children-count-text', true)
 		.classed('total-children', true)
 		.attr('dy', 15)
-		.attr('font-size', CONSTANTS.CHILREN_COUNT_FONT_SIZE);
+		.attr('font-size', CONSTANTS.CHILDREN_COUNT_FONT_SIZE);
 
 	const childrenCountUpdate = childrenCountEnter.merge(childrenCount);
 	childrenCountUpdate.attr('transform', (d3Node) => 'translate(' + calcRectWidth(d3Data, d3Node) / 2 + ', ' + CONSTANTS.RECT_HEIGHT + ')');
