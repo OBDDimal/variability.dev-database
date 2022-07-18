@@ -57,4 +57,11 @@ export default Vue.extend({
 </script>
 
 <style>
+.mainView {
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 30px;
+  padding-right: 30px;
+  max-width: 90% !important;
+}
 </style>
