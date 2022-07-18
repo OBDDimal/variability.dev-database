@@ -3,42 +3,62 @@
     class="mainView"
     v-if="$store.state.currentUser"
   >
-    <div class="my-10 py-4" v-bind:class="[$vuetify.theme.dark ? 'profile-dark-card-color' : 'profile-light-card-color']" style="margin-right: 24rem; margin-left: 24rem">
-      <v-row align="center" no-gutters>
-        <v-col align="center" justify="center" cols="3">
-          <v-avatar
-            size="264"
-            color="primary"
-            class="mb-8 mt-4 mx-8"
-          >
-            <v-icon size="200"> mdi-account </v-icon>
-          </v-avatar>
-        </v-col>
-        <v-col cols="6">
-          <h1 class="mb-4">{{ $store.state.currentUser.email }}</h1>
-          <h3 v-if="$store.state.currentUser.institute === ''"> None </h3>
-          <h3 v-else>
-            {{ $store.state.currentUser.institute }}
-          </h3>
-        </v-col>
-      </v-row>
-      <v-divider></v-divider>
-      <v-row align="center" class="mx-8" no-gutters>
-        <v-col class="my-8" cols="3">
-          <h4>Token:</h4>
-        </v-col>
-        <v-col class="my-8" cols="9">
-          <div style="word-break: break-all">
-            {{ $store.state.accessToken }}
-          </div>
-        </v-col>
-        <v-col class="my-8" cols="3">
-          <h4>ID: </h4>
-        </v-col>
-        <v-col class="my-8" cols="9">
-          <div style="word-break: break-all">{{ $store.state.currentUser.id }}</div>
-        </v-col>
-      </v-row>
+    <div class="my-10 py-4 d-flex justify-center">
+      <v-card outlined elevation="4" max-width="1000px">
+        <v-card-title>
+          <v-row align="center">
+            <v-col cols="auto">
+              <v-avatar
+                  size="100"
+                  color="primary"
+                  class=""
+              >
+                <v-icon size="80" dark> mdi-account </v-icon>
+              </v-avatar>
+            </v-col>
+            <v-col cols="auto">
+              <h4 class="mb-2 text-h4">{{ $store.state.currentUser.email }}</h4>
+              <h6 class="text-h6" v-if="$store.state.currentUser.institute === ''">Institute: None </h6>
+              <h6 class="text-h6" v-else>
+                Institute: {{ $store.state.currentUser.institute }}
+              </h6>
+            </v-col>
+          </v-row>
+        </v-card-title>
+
+        <v-divider></v-divider>
+
+        <v-card-text>
+          <v-row align="center">
+            <v-col cols="2">
+              <h4>User since:</h4>
+            </v-col>
+            <v-col cols="10">
+              <div style="word-break: break-all">
+                {{ new Date($store.state.currentUser.date_joined).toLocaleString("en-US").substring(0, 9) }}
+              </div>
+            </v-col>
+          </v-row>
+          <v-row align="center">
+            <v-col cols="2">
+              <h4>Token:</h4>
+            </v-col>
+            <v-col cols="10">
+              <div style="word-break: break-all">
+                {{ $store.state.accessToken }}
+              </div>
+            </v-col>
+          </v-row>
+          <v-row align="center">
+            <v-col cols="2">
+              <h4>ID:</h4>
+            </v-col>
+            <v-col cols="9">
+              <div style="word-break: break-all">{{ $store.state.currentUser.id }}</div>
+            </v-col>
+          </v-row>
+        </v-card-text>
+      </v-card>
     </div>
   </div>
 </template>
