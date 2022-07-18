@@ -8,7 +8,7 @@ export function addNode(d3Data, newNode) {
         d3Data.d3ParentOfAddNode.allChildren = [];
     }
 
-    d3Data.d3ParentOfAddNode.data.collapse();
+    d3Data.d3ParentOfAddNode.data.uncollapse();
     collapse.update(d3Data);
 
     d3Data.d3ParentOfAddNode.data.unhideChildren();
@@ -20,6 +20,9 @@ export function addNode(d3Data, newNode) {
     d3NewNode.parent = d3Data.d3ParentOfAddNode;
     d3Data.d3ParentOfAddNode.allChildren.push(d3NewNode);
     d3Data.d3ParentOfAddNode.children = d3Data.d3ParentOfAddNode.allChildren;
+
+    // ADD to allNodes
+    d3Data.allNodes.push(d3NewNode);
 
     d3Data.d3ParentOfAddNode = undefined;
     update.updateSvg(d3Data);
