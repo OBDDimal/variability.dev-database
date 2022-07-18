@@ -21,8 +21,8 @@ function translateToPathD(...data) {
 
 function createPathDOfSegment(centerPoint, radius, startAngle, endAngle) {
     const start = polarToCartesian(centerPoint, radius, startAngle),
-          end   = polarToCartesian(centerPoint, radius, endAngle);
-    
+        end = polarToCartesian(centerPoint, radius, endAngle);
+
     const a = translateToPathD(MOVE, toPath(end), ARC, radius, radius, 0, 0, 1, toPath(start));
     const b = translateToPathD(LINE, toPath(centerPoint), CLOSE);
 
@@ -39,7 +39,7 @@ export function createGroupSegment(d3Node, radius) {
         const firstChild = d3Node.children[0].isPseudoElement ? d3Node.children[1] : d3Node.children[0];
         const lastChild = d3Node.children[d3Node.children.length - 1].isPseudoElement ? d3Node.children[d3Node.children.length - 2] : d3Node.children[d3Node.children.length - 1];
 
-        const bottom_rect = {x: d3Node.x, y: d3Node.y + CONSTANTS.RECT_HEIGHT };
+        const bottom_rect = {x: d3Node.x, y: d3Node.y + CONSTANTS.RECT_HEIGHT};
         const startAngle = cartesianToAngle(bottom_rect, firstChild);
         const endAngle = cartesianToAngle(bottom_rect, lastChild);
         return createPathDOfSegment({x: 0, y: CONSTANTS.RECT_HEIGHT}, radius, startAngle, endAngle);
@@ -54,13 +54,13 @@ export function createLink(src, dest) {
 }
 
 export function calculateTriangle() {
-      const base = 35;
+    const base = 35;
 
-      const h = Math.sin(60) * base;
+    const h = Math.sin(60) * base;
 
-      const [ax, ay] = [-(base / 2), base / 2];
-      const [bx, by] = [base / 2, base / 2];
-      const [cx, cy] = [0, h];
+    const [ax, ay] = [-(base / 2), base / 2];
+    const [bx, by] = [base / 2, base / 2];
+    const [cx, cy] = [0, h];
 
-      return [`${ax},${ay}`, `${bx},${by}`, `${cx},${cy}`];
+    return [`${ax},${ay}`, `${bx},${by}`, `${cx},${cy}`];
 }

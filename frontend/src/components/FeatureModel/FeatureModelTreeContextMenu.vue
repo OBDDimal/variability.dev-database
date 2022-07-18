@@ -1,11 +1,11 @@
 <template>
     <v-menu
         v-model="show"
-        transition="scroll-y-transition"
         :position-x="d3NodeEvent ? d3NodeEvent.pageX : 0"
         :position-y="d3NodeEvent ? d3NodeEvent.pageY : 0"
         absolute
         offset-y
+        transition="scroll-y-transition"
     >
         <v-list>
             <v-list-item :disabled="d3Node && !d3Node.children && !d3Node.collapsedChildren"
@@ -54,7 +54,8 @@
                 </v-list-item-content>
             </v-list-item>
 
-            <v-list-item @click="$emit('hideCurrentNode', d3Node)" :disabled="d3Node && d3Node.data && d3Node.data.isRoot">
+            <v-list-item :disabled="d3Node && d3Node.data && d3Node.data.isRoot"
+                         @click="$emit('hideCurrentNode', d3Node)">
                 <v-list-item-content>
                     <v-list-item-title>Hide current node
                     </v-list-item-title>
