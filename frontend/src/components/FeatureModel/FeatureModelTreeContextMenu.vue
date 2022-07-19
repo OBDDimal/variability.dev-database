@@ -71,6 +71,13 @@
                 </v-list-item-content>
             </v-list-item>
 
+            <v-list-item @click="$emit('resetHighlightConstraints', d3Node)"
+                         :disabled="!(d3Node && d3Node.data.constraints && d3Node.data.constraints.length)">
+                <v-list-item-content>
+                    <v-list-item-title>Reset highlight constraints</v-list-item-title>
+                </v-list-item-content>
+            </v-list-item>
+
             <v-divider></v-divider>
 
             <v-list-item @click="$emit('edit', d3Node)">

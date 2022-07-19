@@ -22,6 +22,7 @@
             @hideLeftSiblings="(d3Node) => hideLeftSiblings(d3Node)"
             @hideRightSiblings="(d3Node) => hideRightSiblings(d3Node)"
             @highlightConstraints="(d3Node) => highlightConstraints(d3Node)"
+            @resetHighlightConstraints="(d3Node) => resetHighlightConstraints(d3Node)"
         ></feature-model-tree-context-menu>
 
         <feature-model-tree-edit-dialog
@@ -184,6 +185,17 @@ export default Vue.extend({
         highlightConstraints(d3Node) {
             d3Node.data.constraints.forEach((constraint) => constraint.highlight());
             update.updateSvg(this.d3Data);
+            this.updateConstraints();
+        },
+
+        resetHighlightConstraints(d3Node) {
+            d3Node.data.constraints.forEach((constraint) => constraint.resetHighlight());
+            update.updateSvg(this.d3Data);
+            this.updateConstraints();
+        },
+
+        updateConstraints() {
+            this.$emit('update-constraints');
         },
     },
 });
