@@ -64,8 +64,8 @@
 
             <v-divider></v-divider>
 
-            <!-- TODO: Emit event to highlight -->
-            <v-list-item :disabled="!(d3Node && d3Node.data.constraints && d3Node.data.constraints.length)">
+            <v-list-item @click="$emit('highlightConstraints', d3Node)"
+                         :disabled="!(d3Node && d3Node.data.constraints && d3Node.data.constraints.length)">
                 <v-list-item-content>
                     <v-list-item-title>Highlight constraints</v-list-item-title>
                 </v-list-item-content>

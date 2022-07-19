@@ -21,6 +21,7 @@
             @hideCurrentNode="(d3Node) => hideCurrentNode(d3Node)"
             @hideLeftSiblings="(d3Node) => hideLeftSiblings(d3Node)"
             @hideRightSiblings="(d3Node) => hideRightSiblings(d3Node)"
+            @highlightConstraints="(d3Node) => highlightConstraints(d3Node)"
         ></feature-model-tree-context-menu>
 
         <feature-model-tree-edit-dialog
@@ -178,6 +179,11 @@ export default Vue.extend({
         openEditDialog(d3Node) {
             this.editNode = d3Node.data;
             this.showEditDialog = true;
+        },
+
+        highlightConstraints(d3Node) {
+            d3Node.data.constraints.forEach((constraint) => constraint.highlight());
+            update.updateSvg(this.d3Data);
         },
     },
 });
