@@ -59,4 +59,14 @@ export default Vue.extend({
   padding-right: 30px;
   max-width: 90% !important;
 }
+
+@media only screen and (max-width: 400px) {
+  .mainView {
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 10px;
+    padding-right: 10px;
+    max-width: 100% !important;
+  }
+}
 </style>

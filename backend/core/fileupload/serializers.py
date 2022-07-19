@@ -18,7 +18,7 @@ class FamiliesSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Family
-        fields = ['id', 'owner', 'label', 'description']
+        fields = ['id', 'owner', 'label', 'description', 'date_created']
 
 
 class LicensesSerializer(serializers.ModelSerializer):
