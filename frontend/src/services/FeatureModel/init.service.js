@@ -31,7 +31,6 @@ export function initialize(d3Data, data) {
         .select('#svg-container')
         .append('svg')
         .attr('preserveAspectRatio', 'xMidYMid meet')
-        .on('click', () => (d3Data.contextMenu.selectedD3Node = null)) // Click listener for closing all context-menus.
         .call(d3Data.zoom); // Zooming and penning.
 
     const svgContent = svg.append('g');

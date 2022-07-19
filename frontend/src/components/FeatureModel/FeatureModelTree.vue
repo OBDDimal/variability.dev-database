@@ -135,26 +135,36 @@ export default Vue.extend({
         },
 
         hideCurrentNode(d3Node) {
+            this.closeContextMenu();
             hide.hideCurrentNode(this.d3Data, d3Node);
         },
 
         hideRightSiblings(d3Node) {
+            this.closeContextMenu();
             hide.hideRightSiblings(this.d3Data, d3Node);
         },
 
         hideLeftSiblings(d3Node) {
+            this.closeContextMenu();
             hide.hideLeftSiblings(this.d3Data, d3Node);
         },
 
         hideAllOtherNodes(d3Node) {
+            this.closeContextMenu();
             hide.hideAllOtherNodes(this.d3Data, d3Node);
         },
 
         hideAllNodesOnThisLevel(d3Node) {
+            this.closeContextMenu();
             hide.hideAllNodesOnThisLevel(this.d3Data, d3Node);
         },
 
+        closeContextMenu() {
+            this.d3Data.contextMenu.selectedD3Node = undefined;
+        },
+
         collapse(d3Node) {
+            this.closeContextMenu();
             d3Node.data.toggleCollapse();
             collapse.update(this.d3Data);
             update.updateSvg(this.d3Data);
@@ -181,11 +191,13 @@ export default Vue.extend({
         },
 
         openAddDialog(d3Node) {
+            this.closeContextMenu();
             this.d3Data.d3ParentOfAddNode = d3Node;
             this.showAddDialog = true;
         },
 
         openEditDialog(d3Node) {
+            this.closeContextMenu();
             this.editNode = d3Node.data;
             this.showEditDialog = true;
         },

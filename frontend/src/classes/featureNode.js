@@ -64,7 +64,6 @@ export class FeatureNode {
 
 	collapse() {
 		this.isCollapsed = true;
-		console.log(this.name);
 	}
 
 	toggleCollapse() {
@@ -81,13 +80,13 @@ export class FeatureNode {
 
 	getLeftSibling() {
 		const index = this.parent.children.indexOf(this);
-		if (index == 0) return null;
+		if (index === 0) return null;
 		return this.parent.children[index - 1];
 	}
 
 	getRightSibling() {
 		const index = this.parent.children.indexOf(this);
-		if (index == this.parent.children.length - 1) return null;
+		if (index === this.parent.children.length - 1) return null;
 		return this.parent.children[index + 1];
 	}
 
