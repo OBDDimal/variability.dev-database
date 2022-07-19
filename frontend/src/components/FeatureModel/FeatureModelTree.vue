@@ -8,6 +8,7 @@
             @search="(search) => onChangeSearch(search)"
             @shortName="changeShortName"
             @verticalSpacing="changeVerticalSpacing"
+            @semanticEditing="(value) => d3Data.semanticEditing = value"
         ></feature-model-tree-toolbar>
         <div id="svg-container"></div>
 
@@ -98,6 +99,7 @@ export default Vue.extend({
             },
             verticalSpacing: 75,
             d3ParentOfAddNode: undefined,
+            semanticEditing: false,
         },
         showAddDialog: false,
         showEditDialog: false,
