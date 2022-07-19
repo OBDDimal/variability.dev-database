@@ -79,18 +79,24 @@
                 </v-list-item-content>
             </v-list-item>
 
-            <v-list-item @click="$emit('addAsChild', d3Node)">
-                <v-list-item-content>
-                    <v-list-item-title>Add as child</v-list-item-title>
-                </v-list-item-content>
-            </v-list-item>
+            <v-list-group prepend-icon="mdi-plus" no-action>
+                <template v-slot:activator>
+                    <v-list-item-title>Add</v-list-item-title>
+                </template>
 
-            <v-list-item :disabled="d3Node && d3Node.data.isRoot"
-                         @click="$emit('addAsSibling', d3Node)">
-                <v-list-item-content>
-                    <v-list-item-title>Add as sibling</v-list-item-title>
-                </v-list-item-content>
-            </v-list-item>
+                <v-list-item @click="$emit('addAsChild', d3Node)">
+                    <v-list-item-content>
+                        <v-list-item-title>Add as child</v-list-item-title>
+                    </v-list-item-content>
+                </v-list-item>
+
+                <v-list-item :disabled="d3Node && d3Node.data.isRoot"
+                             @click="$emit('addAsSibling', d3Node)">
+                    <v-list-item-content>
+                        <v-list-item-title>Add as sibling</v-list-item-title>
+                    </v-list-item-content>
+                </v-list-item>
+            </v-list-group>
         </v-list>
     </v-menu>
 </template>
