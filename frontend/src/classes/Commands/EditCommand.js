@@ -1,8 +1,8 @@
 import {Command} from "@/classes/Commands/Command";
 
 export class EditCommand extends Command {
-    constructor(d3Data, node, newData) {
-        super(d3Data);
+    constructor(node, newData) {
+        super();
         this.node = node;
         this.newData = newData;
 

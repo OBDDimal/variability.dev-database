@@ -1,8 +1,8 @@
 import {Command} from "@/classes/Commands/Command";
 
 export class SwapCommand extends Command {
-    constructor(d3Data, node, dstParent, dstIndex) {
-        super(d3Data);
+    constructor(node, dstParent, dstIndex) {
+        super();
         this.node = node;
         this.dstParent = dstParent;
         this.dstIndex = dstIndex;

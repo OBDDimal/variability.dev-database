@@ -2,8 +2,8 @@ import {Command} from "@/classes/Commands/Command";
 import {createFeatureNode} from "@/classes/FeatureNode";
 
 export class AddCommand extends Command {
-    constructor(d3Data, dstParent, dstIndex, data) {
-        super(d3Data);
+    constructor(dstParent, dstIndex, data) {
+        super();
         this.dstParent = dstParent;
         this.dstIndex = dstIndex;
         this.data = data;
@@ -21,9 +21,6 @@ export class AddCommand extends Command {
         }
 
         this.dstParent.insertChildAtIndex(this.addedNode, this.dstIndex);
-
-        // Add to all-nodes
-        this.d3Data.allNodes.push(this.addedNode.d3Node);
     }
 
     undo() {
@@ -31,8 +28,5 @@ export class AddCommand extends Command {
         this.dstParent.unhideChildren();
 
         this.dstParent.removeChild(this.addedNode);
-
-        // Remove from all-nodes
-        this.d3Data.allNodes = this.d3Data.allNodes.filter((d3Node) => d3Node.data !== this.addedNode);
     }
 }

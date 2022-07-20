@@ -153,7 +153,6 @@ export function init(d3Data) {
 
                 if (valid) {
                     const swapCommand = new SwapCommand(
-                        d3Data,
                         d3Node.data,
                         dstParent,
                         dstIndex

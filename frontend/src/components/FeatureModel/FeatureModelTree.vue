@@ -166,7 +166,6 @@ export default Vue.extend({
 
             const parent = this.d3Data.d3ParentOfAddNode.data;
             const addCommand = new AddCommand(
-                this.d3Data,
                 parent,
                 parent.children ? parent.children.length : 0,
                 data
@@ -180,7 +179,6 @@ export default Vue.extend({
             this.showEditDialog = false;
 
             const editCommand = new EditCommand(
-                this.d3Data,
                 this.editNode,
                 newData
             );
