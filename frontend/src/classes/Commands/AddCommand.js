@@ -1,5 +1,5 @@
 import {Command} from "@/classes/Commands/Command";
-import {createFeatureNode} from "@/classes/featureNode";
+import {createFeatureNode} from "@/classes/FeatureNode";
 
 export class AddCommand extends Command {
     constructor(d3Data, dstParent, dstIndex, data) {

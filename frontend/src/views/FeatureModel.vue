@@ -23,7 +23,7 @@ import FeatureModelTree from '../components/FeatureModel/FeatureModelTree.vue';
 import Constraints from '../components/Constraints.vue';
 import { Constraint, VarConstraint } from '@/classes/constraint';
 import { berkeley } from '@/classes/featureModelData';
-import { FeatureNode } from '@/classes/featureNode';
+import { FeatureNode } from '@/classes/FeatureNode';
 import * as update from "@/services/FeatureModel/update.service";
 
 export default Vue.extend({
