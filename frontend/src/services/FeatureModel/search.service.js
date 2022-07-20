@@ -1,7 +1,6 @@
 import levenshtein from 'js-levenshtein';
 import * as view from "@/services/FeatureModel/view.service.js";
 import * as update from '@/services/FeatureModel/update.service.js';
-import * as collapse from "@/services/FeatureModel/collapse.service.js";
 
 
 export function search(d3Data, searchText) {
@@ -17,7 +16,6 @@ export function search(d3Data, searchText) {
         d3Data.allNodes.forEach((d3Node) => d3Node.data.collapse());
 
         foundD3Node.data.uncollapse(true);
-        collapse.update(d3Data);
         update.updateSvg(d3Data);
         view.zoomFit(d3Data);
         view.focusNode(d3Data, foundD3Node);

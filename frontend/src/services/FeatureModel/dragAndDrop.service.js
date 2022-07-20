@@ -1,6 +1,5 @@
 import * as update from '@/services/FeatureModel/update.service.js';
 import * as hide from '@/services/FeatureModel/hide.service.js';
-import * as collapse from '@/services/FeatureModel/collapse.service.js';
 import * as CONSTANTS from '@/classes/constants';
 import * as d3 from 'd3';
 
@@ -12,8 +11,6 @@ function overGhostNode(d3Data, ghostNode) {
         setTimeout(() => {
             if (d3Data.drag.selectedGhostNode === ghostNode) {
                 ghostNode.d3Node.data.uncollapse();
-                collapse.update(d3Data);
-                update.updateSvg(d3Data);
                 updateGhostCircles(d3Data);
             }
         }, 500);

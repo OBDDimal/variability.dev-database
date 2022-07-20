@@ -14,8 +14,9 @@ export class FeatureNode {
 		this.color = CONSTANTS.NODE_COLOR;
 		this.constraints = [];
 		this.constraintsHighlighted = [];
-		this.isCollapsed = true;
+		this.isCollapsed = false;
 		this.isHidden = false;
+		this.d3Node = undefined;
 	}
 
 	childrenCount() {
@@ -55,18 +56,34 @@ export class FeatureNode {
 	}
 
 	uncollapse(toRoot = true) {
-		this.isCollapsed = false;
-		if (this.parent && toRoot) {
+		if (this.isCollapsed && !this.isLeaf()) {
+			this.d3Node.children = this.d3Node.collapsedChildren;
+			this.d3Node.collapsedChildren = null;
+		}
+
+		if (!this.isRoot && toRoot) {
 			this.parent.uncollapse();
 		}
+
+		console.log('uncollapse');
+		this.isCollapsed = false;
 	}
 
 	collapse() {
+		if (!this.isCollapsed && !this.isLeaf()) {
+			this.d3Node.collapsedChildren = this.d3Node.children;
+			this.d3Node.children = null;
+		}
+
 		this.isCollapsed = true;
 	}
 
 	toggleCollapse() {
-		this.isCollapsed = !this.isCollapsed;
+		if (this.isCollapsed) {
+			this.uncollapse();
+		} else {
+			this.collapse();
+		}
 	}
 
 	getAllNodesToRoot() {

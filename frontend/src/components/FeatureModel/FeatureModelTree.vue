@@ -49,7 +49,6 @@ import FeatureModelTreeEditDialog from './FeatureModelTreeEditDialog.vue';
 import FeatureModelTreeAddDialog from '@/components/FeatureModel/FeatureModelTreeAddDialog';
 
 // Import feature-model-services
-import * as collapse from "@/services/FeatureModel/collapse.service.js";
 import * as count from '@/services/FeatureModel/count.service.js';
 import * as dragAndDrop from "@/services/FeatureModel/dragAndDrop.service.js";
 import * as hide from "@/services/FeatureModel/hide.service.js";
@@ -150,7 +149,6 @@ export default Vue.extend({
 
         collapse(d3Node) {
             d3Node.data.toggleCollapse();
-            collapse.update(this.d3Data);
             update.updateSvg(this.d3Data);
         },
 

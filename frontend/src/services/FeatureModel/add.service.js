@@ -1,6 +1,5 @@
 import * as d3 from "d3";
 import * as update from '@/services/FeatureModel/update.service.js';
-import * as collapse from '@/services/FeatureModel/collapse.service.js';
 import * as hide from '@/services/FeatureModel/hide.service.js';
 
 export function addNode(d3Data, newNode) {
@@ -9,7 +8,6 @@ export function addNode(d3Data, newNode) {
     }
 
     d3Data.d3ParentOfAddNode.data.uncollapse();
-    collapse.update(d3Data);
 
     d3Data.d3ParentOfAddNode.data.unhideChildren();
     hide.update(d3Data.d3ParentOfAddNode);
