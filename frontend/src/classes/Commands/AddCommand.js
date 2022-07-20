@@ -1,37 +1,60 @@
 import {Command} from "@/classes/Commands/Command";
 import * as d3 from "d3";
+import {FeatureNode} from "@/classes/featureNode";
 
 export class AddCommand extends Command {
-    constructor(d3Data, dstParent, dstIndex, newFeatureNode) {
+    constructor(d3Data, dstD3Parent, dstIndex, data) {
         super(d3Data);
-        this.dstParent = dstParent;
+        this.dstD3Parent = dstD3Parent;
         this.dstIndex = dstIndex;
-        this.newFeatureNode = newFeatureNode;
+        this.data = data;
+
+        // Properties for undo.
+        this.addedNode = undefined;
     }
 
     execute() {
-        if (this.d3Data.d3ParentOfAddNode.data.isLeaf()) {
-            this.d3Data.d3ParentOfAddNode.allChildren = [];
+        this.dstD3Parent.data.uncollapse();
+        this.dstD3Parent.data.unhideChildren();
+
+        if (!this.addedNode) {
+            // Create new feature-node.
+            const node = new FeatureNode(this.dstD3Parent.data, this.data.name, this.data.groupType, this.data.mandatory, this.data.abstract);
+            const d3Node = d3.hierarchy(node);
+            node.d3Node = d3Node;
+            d3Node.parent = this.dstD3Parent;
+
+            // Save properties for undo.
+            this.addedNode = node;
         }
 
-        this.d3Data.d3ParentOfAddNode.data.uncollapse();
+        // Update d3-children
+        let leftD3Nodes = [];
+        let rightD3Nodes = [];
+        if (this.dstD3Parent.allChildren) {
+            leftD3Nodes = this.dstD3Parent.allChildren.slice(0, this.dstIndex);
+            rightD3Nodes = this.dstD3Parent.allChildren.slice(this.dstIndex);
+        }
+        this.dstD3Parent.allChildren = [...leftD3Nodes, this.addedNode.d3Node, ...rightD3Nodes];
+        this.dstD3Parent.children = this.dstD3Parent.allChildren;
 
-        this.d3Data.d3ParentOfAddNode.data.unhideChildren();
+        // Update feature-node-children
+        const leftNodes = this.addedNode.parent.children.slice(0, this.dstIndex);
+        const rightNodes = this.addedNode.parent.children.slice(this.dstIndex);
+        this.addedNode.parent.children = [...leftNodes, this.addedNode, ...rightNodes];
 
-        this.newFeatureNode.parent.children.push(this.newFeatureNode);
-
-        const d3NewNode = d3.hierarchy(this.newFeatureNode);
-        d3NewNode.parent = this.d3Data.d3ParentOfAddNode;
-        this.d3Data.d3ParentOfAddNode.allChildren.push(d3NewNode);
-        this.d3Data.d3ParentOfAddNode.children = this.d3Data.d3ParentOfAddNode.allChildren;
-
-        // ADD to allNodes
-        this.d3Data.allNodes.push(d3NewNode);
-
-        this.d3Data.d3ParentOfAddNode = undefined;
+        // Add to all-nodes
+        this.d3Data.allNodes.push(this.addedNode.d3Node);
     }
 
     undo() {
+        this.dstD3Parent.data.uncollapse();
+        this.dstD3Parent.data.unhideChildren();
 
+        this.addedNode.parent.children = this.addedNode.parent.children.filter((node) => node !== this.addedNode);
+        this.dstD3Parent.allChildren = this.dstD3Parent.allChildren.filter((d3Node) => d3Node.data !== this.addedNode);
+        this.dstD3Parent.children = this.dstD3Parent.allChildren;
+
+        this.d3Data.allNodes = this.d3Data.allNodes.filter((d3Node) => d3Node.data !== this.addedNode);
     }
 }

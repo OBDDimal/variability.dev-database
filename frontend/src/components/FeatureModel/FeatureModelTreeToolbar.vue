@@ -140,11 +140,11 @@
                 </v-list>
             </v-menu>
 
-            <v-btn icon @click="$emit('undo')">
+            <v-btn icon @click="$emit('undo')" :disabled="!isUndoAvailable">
                 <v-icon>mdi-undo</v-icon>
             </v-btn>
 
-            <v-btn icon @click="$emit('redo')">
+            <v-btn icon @click="$emit('redo')" :disabled="!isRedoAvailable">
                 <v-icon>mdi-redo</v-icon>
             </v-btn>
         </v-toolbar>
@@ -159,7 +159,10 @@ export default Vue.extend({
 
     components: {},
 
-    props: {},
+    props: {
+        isUndoAvailable: Boolean,
+        isRedoAvailable: Boolean,
+    },
 
     data: () => ({
         selectedColoring: undefined,

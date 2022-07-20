@@ -10,6 +10,8 @@
             @verticalSpacing="changeVerticalSpacing"
             @undo="undo"
             @redo="redo"
+            :is-undo-available="d3Data.commandManager.isUndoAvailable()"
+            :is-redo-available="d3Data.commandManager.isRedoAvailable()"
         ></feature-model-tree-toolbar>
         <div id="svg-container"></div>
 
@@ -35,7 +37,7 @@
         <feature-model-tree-add-dialog
             :parent="d3Data.d3ParentOfAddNode ? d3Data.d3ParentOfAddNode.data : undefined"
             :show="showAddDialog"
-            @add="(newNode) => add(newNode)"
+            @add="(data) => add(data)"
             @close="showAddDialog = false"
         ></feature-model-tree-add-dialog>
     </div>
@@ -152,7 +154,7 @@ export default Vue.extend({
             update.updateSvg(this.d3Data);
         },
 
-        add(newNode) {
+        add(data) {
             this.showAddDialog = false;
 
             const d3Parent = this.d3Data.d3ParentOfAddNode;
@@ -160,7 +162,7 @@ export default Vue.extend({
                 this.d3Data,
                 d3Parent,
                 d3Parent.allChildren ? d3Parent.allChildren.length : 0,
-                newNode
+                data
             );
             this.d3Data.commandManager.execute(addCommand);
 
@@ -194,10 +196,12 @@ export default Vue.extend({
 
         undo() {
             this.d3Data.commandManager.undo();
+            update.updateSvg(this.d3Data);
         },
 
         redo() {
             this.d3Data.commandManager.redo();
+            update.updateSvg(this.d3Data);
         },
     },
 });

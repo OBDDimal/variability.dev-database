@@ -11,8 +11,6 @@ export class CommandManager {
 
         // Reset stack of future commands because a new command was already executed.
         this.futureCommands = [];
-
-        console.log(this.historyCommands, this.futureCommands);
     }
 
     undo() {
