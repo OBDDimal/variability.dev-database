@@ -49,7 +49,6 @@ import FeatureModelTreeEditDialog from './FeatureModelTreeEditDialog.vue';
 import FeatureModelTreeAddDialog from '@/components/FeatureModel/FeatureModelTreeAddDialog';
 
 // Import feature-model-services
-import * as add from "@/services/FeatureModel/add.service.js";
 import * as collapse from "@/services/FeatureModel/collapse.service.js";
 import * as count from '@/services/FeatureModel/count.service.js';
 import * as dragAndDrop from "@/services/FeatureModel/dragAndDrop.service.js";
@@ -58,6 +57,8 @@ import * as update from '@/services/FeatureModel/update.service.js';
 import * as init from '@/services/FeatureModel/init.service.js';
 import * as view from "@/services/FeatureModel/view.service.js";
 import * as search from "@/services/FeatureModel/search.service.js";
+import {CommandManager} from "@/classes/Commands/CommandManager";
+import {AddCommand} from "@/classes/Commands/AddCommand";
 
 export default Vue.extend({
     name: 'FeatureModelTree',
@@ -75,6 +76,7 @@ export default Vue.extend({
 
     data: () => ({
         d3Data: {
+            commandManager: new CommandManager(),
             root: undefined,
             allNodes: undefined,
             flexLayout: undefined,
@@ -154,7 +156,17 @@ export default Vue.extend({
 
         add(newNode) {
             this.showAddDialog = false;
-            add.addNode(this.d3Data, newNode);
+
+            const d3Parent = this.d3Data.d3ParentOfAddNode;
+            const addCommand = new AddCommand(
+                this.d3Data,
+                d3Parent,
+                d3Parent.allChildren ? d3Parent.allChildren.length : 0,
+                newNode
+            );
+            this.d3Data.commandManager.execute(addCommand);
+
+            update.updateSvg(this.d3Data);
         },
 
         edit() {
@@ -183,11 +195,11 @@ export default Vue.extend({
         },
 
         undo() {
-            console.log('undo');
+            this.d3Data.commandManager.undo();
         },
 
         redo() {
-            console.log('redo');
+            this.d3Data.commandManager.redo();
         },
     },
 });
