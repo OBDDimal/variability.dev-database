@@ -11,6 +11,7 @@ function overGhostNode(d3Data, ghostNode) {
         setTimeout(() => {
             if (d3Data.drag.selectedGhostNode === ghostNode) {
                 ghostNode.d3Node.data.uncollapse();
+                update.updateSvg(d3Data);
                 updateGhostCircles(d3Data);
             }
         }, 500);
