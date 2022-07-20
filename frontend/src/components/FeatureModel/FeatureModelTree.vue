@@ -8,6 +8,8 @@
             @search="(search) => onChangeSearch(search)"
             @shortName="changeShortName"
             @verticalSpacing="changeVerticalSpacing"
+            @undo="undo"
+            @redo="redo"
         ></feature-model-tree-toolbar>
         <div id="svg-container"></div>
 
@@ -178,6 +180,14 @@ export default Vue.extend({
         openEditDialog(d3Node) {
             this.editNode = d3Node.data;
             this.showEditDialog = true;
+        },
+
+        undo() {
+            console.log('undo');
+        },
+
+        redo() {
+            console.log('redo');
         },
     },
 });

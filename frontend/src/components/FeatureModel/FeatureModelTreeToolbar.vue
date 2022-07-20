@@ -139,6 +139,14 @@
                     </v-list-item>
                 </v-list>
             </v-menu>
+
+            <v-btn icon @click="$emit('undo')">
+                <v-icon>mdi-undo</v-icon>
+            </v-btn>
+
+            <v-btn icon @click="$emit('redo')">
+                <v-icon>mdi-redo</v-icon>
+            </v-btn>
         </v-toolbar>
     </div>
 </template>
