@@ -219,9 +219,9 @@ export class FeatureNode {
 		this.d3Node.children = this.children.map((node) => node.d3Node);
 	}
 
-	insertAtIndex(node, index) {
+	insertChildAtIndex(child, index) {
 		// Update d3-parent
-		node.d3Node.parent = this.d3Node;
+		child.d3Node.parent = this.d3Node;
 
 		// Update d3-children
 		let leftD3Nodes = [];
@@ -230,18 +230,18 @@ export class FeatureNode {
 			leftD3Nodes = this.d3Node.allChildren.slice(0, index);
 			rightD3Nodes = this.d3Node.allChildren.slice(index);
 		}
-		this.d3Node.allChildren = [...leftD3Nodes, node.d3Node, ...rightD3Nodes];
+		this.d3Node.allChildren = [...leftD3Nodes, child.d3Node, ...rightD3Nodes];
 		this.d3Node.children = this.d3Node.allChildren;
 
 		// Update feature-node-children
 		const leftNodes = this.children.slice(0, index);
 		const rightNodes = this.children.slice(index);
-		this.children = [...leftNodes, node, ...rightNodes];
+		this.children = [...leftNodes, child, ...rightNodes];
 	}
 
-	remove(node) {
-		this.children = this.children.filter((node) => node !== node);
-		this.d3Node.allChildren = this.d3Node.allChildren.filter((d3Node) => d3Node.data !== node);
+	removeChild(child) {
+		this.children = this.children.filter((node) => node !== child);
+		this.d3Node.allChildren = this.d3Node.allChildren.filter((d3Node) => d3Node.data !== child);
 		this.d3Node.children = this.d3Node.allChildren;
 	}
 }

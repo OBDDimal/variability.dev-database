@@ -20,7 +20,7 @@ export class AddCommand extends Command {
             this.addedNode = createFeatureNode(this.dstParent, this.data.name, this.data.groupType, this.data.mandatory, this.data.abstract);
         }
 
-        this.dstParent.insertAtIndex(this.addedNode, this.dstIndex);
+        this.dstParent.insertChildAtIndex(this.addedNode, this.dstIndex);
 
         // Add to all-nodes
         this.d3Data.allNodes.push(this.addedNode.d3Node);
@@ -30,7 +30,7 @@ export class AddCommand extends Command {
         this.dstParent.uncollapse();
         this.dstParent.unhideChildren();
 
-        this.dstParent.remove(this.addedNode);
+        this.dstParent.removeChild(this.addedNode);
 
         // Remove from all-nodes
         this.d3Data.allNodes = this.d3Data.allNodes.filter((d3Node) => d3Node.data !== this.addedNode);
