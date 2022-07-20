@@ -116,6 +116,22 @@ export class FeatureNode {
 		return this.parent.children.slice(index + 1);
 	}
 
+	toggleHideLeftSiblings() {
+		if (this.getLeftSibling().isHidden) {
+			this.unhideLeftSiblings();
+		} else {
+			this.hideLeftSiblings();
+		}
+	}
+
+	toggleHideRightSiblings() {
+		if (this.getRightSibling().isHidden) {
+			this.unhideRightSiblings();
+		} else {
+			this.hideRightSiblings();
+		}
+	}
+
 	hideLeftSiblings() {
 		if (this.isRoot) return;
 

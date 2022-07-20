@@ -53,7 +53,6 @@ import FeatureModelTreeAddDialog from '@/components/FeatureModel/FeatureModelTre
 // Import feature-model-services
 import * as count from '@/services/FeatureModel/count.service.js';
 import * as dragAndDrop from "@/services/FeatureModel/dragAndDrop.service.js";
-import * as hide from "@/services/FeatureModel/hide.service.js";
 import * as update from '@/services/FeatureModel/update.service.js';
 import * as init from '@/services/FeatureModel/init.service.js';
 import * as view from "@/services/FeatureModel/view.service.js";
@@ -61,6 +60,7 @@ import * as search from "@/services/FeatureModel/search.service.js";
 import {CommandManager} from "@/classes/Commands/CommandManager";
 import {AddCommand} from "@/classes/Commands/AddCommand";
 import {EditCommand} from "@/classes/Commands/EditCommand";
+import * as update_service from "@/services/FeatureModel/update.service";
 
 export default Vue.extend({
     name: 'FeatureModelTree',
@@ -139,15 +139,21 @@ export default Vue.extend({
         },
 
         hideCurrentNode(d3Node) {
-            hide.hideCurrentNode(this.d3Data, d3Node);
+            d3Node.data.hide();
+            update_service.updateSvg(this.d3Data);
+            view.focusNode(this.d3Data, d3Node);
         },
 
         hideRightSiblings(d3Node) {
-            hide.hideRightSiblings(this.d3Data, d3Node);
+            d3Node.data.toggleHideRightSiblings(this.d3Data, d3Node);
+            update_service.updateSvg(this.d3Data);
+            view.focusNode(this.d3Data, d3Node);
         },
 
         hideLeftSiblings(d3Node) {
-            hide.hideLeftSiblings(this.d3Data, d3Node);
+            d3Node.data.toggleHideLeftSiblings(this.d3Data, d3Node);
+            update_service.updateSvg(this.d3Data);
+            view.focusNode(this.d3Data, d3Node);
         },
 
         collapse(d3Node) {
