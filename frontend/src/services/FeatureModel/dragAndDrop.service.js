@@ -143,6 +143,7 @@ export function init(d3Data) {
                     const dIndex = ghost.side === 'l' ? 0 : 1;
                     dstIndex = ghost.d3Node.data.parent.children.indexOf(ghost.d3Node.data) + dIndex;
                     dstParent = ghost.d3Node.data.parent;
+
                     valid = true;
                 } else if (ghost.side === 'b' && ghost.d3Node.data.isLeaf()) {
                     dstIndex = 0;

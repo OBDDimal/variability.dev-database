@@ -222,6 +222,7 @@ export class FeatureNode {
 	insertChildAtIndex(child, index) {
 		// Update d3-parent
 		child.d3Node.parent = this.d3Node;
+		child.parent = this;
 
 		// Update d3-children
 		let leftD3Nodes = [];

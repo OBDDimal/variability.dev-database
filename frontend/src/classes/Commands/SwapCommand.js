@@ -18,8 +18,14 @@ export class SwapCommand extends Command {
         this.srcParent = this.node.parent;
         this.srcIndex = this.srcParent.children.indexOf(this.node);
 
+        // Special case: If node is on same level and left of the ghost the index has to be decreased.
+        let tmp = 0;
+        if (this.srcParent === this.dstParent && this.srcIndex < this.dstIndex) {
+            tmp = 1;
+        }
+
         this.srcParent.removeChild(this.node);
-        this.dstParent.insertChildAtIndex(this.node, this.dstIndex);
+        this.dstParent.insertChildAtIndex(this.node, this.dstIndex - tmp);
     }
 
     undo() {
