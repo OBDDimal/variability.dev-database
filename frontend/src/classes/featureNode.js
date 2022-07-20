@@ -218,6 +218,38 @@ export class FeatureNode {
 		this.children.forEach((node) => node.isHidden = false);
 		this.d3Node.children = this.children.map((node) => node.d3Node);
 	}
+
+	insertAtIndex(node, index) {
+		// Update d3-parent
+		node.d3Node.parent = this.d3Node;
+
+		// Update d3-children
+		let leftD3Nodes = [];
+		let rightD3Nodes = [];
+		if (this.d3Node.allChildren) {
+			leftD3Nodes = this.d3Node.allChildren.slice(0, index);
+			rightD3Nodes = this.d3Node.allChildren.slice(index);
+		}
+		this.d3Node.allChildren = [...leftD3Nodes, node.d3Node, ...rightD3Nodes];
+		this.d3Node.children = this.d3Node.allChildren;
+
+		// Update feature-node-children
+		const leftNodes = this.children.slice(0, index);
+		const rightNodes = this.children.slice(index);
+		this.children = [...leftNodes, node, ...rightNodes];
+	}
+
+	remove(node) {
+		this.children = this.children.filter((node) => node !== node);
+		this.d3Node.allChildren = this.d3Node.allChildren.filter((d3Node) => d3Node.data !== node);
+		this.d3Node.children = this.d3Node.allChildren;
+	}
+}
+
+export function createFeatureNode(parent, name, groupType, mandatory, abstract) {
+	const node = new FeatureNode(parent, name, groupType, mandatory, abstract);
+	node.d3Node = d3.hierarchy(node);
+	return node;
 }
 
 export class PseudoNode {

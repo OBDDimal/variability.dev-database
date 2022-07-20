@@ -160,7 +160,7 @@ export default Vue.extend({
             const d3Parent = this.d3Data.d3ParentOfAddNode;
             const addCommand = new AddCommand(
                 this.d3Data,
-                d3Parent,
+                d3Parent.data,
                 d3Parent.allChildren ? d3Parent.allChildren.length : 0,
                 data
             );
