@@ -31,7 +31,7 @@
             :node="editNode"
             :show="showEditDialog"
             @close="showEditDialog = false"
-            @edit="edit">
+            @edit="(data) => edit(data)">
         </feature-model-tree-edit-dialog>
 
         <feature-model-tree-add-dialog
@@ -60,6 +60,7 @@ import * as view from "@/services/FeatureModel/view.service.js";
 import * as search from "@/services/FeatureModel/search.service.js";
 import {CommandManager} from "@/classes/Commands/CommandManager";
 import {AddCommand} from "@/classes/Commands/AddCommand";
+import {EditCommand} from "@/classes/Commands/EditCommand";
 
 export default Vue.extend({
     name: 'FeatureModelTree',
@@ -169,8 +170,16 @@ export default Vue.extend({
             update.updateSvg(this.d3Data);
         },
 
-        edit() {
+        edit(newData) {
             this.showEditDialog = false;
+
+            const editCommand = new EditCommand(
+                this.d3Data,
+                this.editNode,
+                newData
+            );
+            this.d3Data.commandManager.execute(editCommand);
+
             update.updateSvg(this.d3Data);
         },
 
