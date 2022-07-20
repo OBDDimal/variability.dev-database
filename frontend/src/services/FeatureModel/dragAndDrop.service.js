@@ -1,6 +1,7 @@
 import * as update from '@/services/FeatureModel/update.service.js';
 import * as CONSTANTS from '@/classes/constants';
 import * as d3 from 'd3';
+import {SwapCommand} from "@/classes/Commands/SwapCommand";
 
 function overGhostNode(d3Data, ghostNode) {
     d3Data.drag.selectedGhostNode = ghostNode;
@@ -134,34 +135,28 @@ export function init(d3Data) {
             const ghost = d3Data.drag.selectedGhostNode;
 
             if (ghost) {
-                // Remove dragged node from tree.
-                d3Node.parent.allChildren = d3Node.parent.allChildren.filter((node) => d3Node !== node);
-                d3Node.data.parent.children = d3Node.data.parent.children.filter((node) => d3Node.data !== node);
-
-                // Insert dragged node as neighbour of selected node.
+                let dstParent = undefined;
+                let dstIndex = undefined;
+                let valid = false;
                 if (ghost.side === 'l' || ghost.side === 'r') {
-                    // Insert as new child.
                     const dIndex = ghost.side === 'l' ? 0 : 1;
-                    let d3Index = ghost.d3Node.parent.allChildren.indexOf(ghost.d3Node) + dIndex;
-                    let index = ghost.d3Node.data.parent.children.indexOf(ghost.d3Node.data) + dIndex;
-                    ghost.d3Node.parent.allChildren.splice(d3Index, 0, d3Node);
-                    ghost.d3Node.data.parent.children.splice(index, 0, d3Node.data);
+                    dstIndex = ghost.d3Node.data.parent.children.indexOf(ghost.d3Node.data) + dIndex;
+                    dstParent = ghost.d3Node.data.parent;
+                    valid = true;
+                } else if (ghost.side === 'b' && ghost.d3Node.data.isLeaf()) {
+                    dstIndex = 0;
+                    dstParent = ghost.d3Node.data;
+                    valid = true;
+                }
 
-                    // Update member variables of nodes.
-                    d3Node.parent.children = d3Node.parent.allChildren;
-                    ghost.d3Node.parent.children = ghost.d3Node.parent.allChildren;
-                    d3Node.data.parent = ghost.d3Node.data.parent;
-                    d3Node.parent = ghost.d3Node.parent;
-                } else if (ghost.side === 'b') {
-                    if (ghost.d3Node.data.isLeaf()) {
-                        d3Node.parent.children = d3Node.parent.allChildren;
-                        d3Node.parent = ghost.d3Node;
-                        ghost.d3Node.allChildren = [d3Node];
-                        ghost.d3Node.children = ghost.d3Node.allChildren;
-
-                        d3Node.data.parent = ghost.d3Node.data;
-                        ghost.d3Node.data.children = [d3Node.data];
-                    }
+                if (valid) {
+                    const swapCommand = new SwapCommand(
+                        d3Data,
+                        d3Node.data,
+                        dstParent,
+                        dstIndex
+                    );
+                    d3Data.commandManager.execute(swapCommand);
                 }
 
                 d3Data.drag.selectedGhostNode = undefined;

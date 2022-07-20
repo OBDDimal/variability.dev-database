@@ -6,6 +6,7 @@ export class EditCommand extends Command {
         this.node = node;
         this.newData = newData;
 
+        // Properties for undo.
         this.oldData = undefined;
     }
 
