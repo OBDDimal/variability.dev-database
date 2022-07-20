@@ -80,7 +80,6 @@ export default Vue.extend({
         d3Data: {
             commandManager: new CommandManager(),
             root: undefined,
-            allNodes: undefined,
             flexLayout: undefined,
             zoom: undefined,
             nodeIdCounter: 0,

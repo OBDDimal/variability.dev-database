@@ -3,7 +3,7 @@ import * as update from '@/services/FeatureModel/update.service.js';
 
 export function reset(d3Data, uncollapsedLevels = 4, maxChildrenCount = 3) {
     // Collapses all nodes after depth 1.
-    d3Data.allNodes.forEach((d3Node) => d3Node.data.collapse());
+    d3Data.root.data.each((node) => node.collapse());
 
     let currentChildren = [d3Data.root.data];
     for (let i = 1; i <= uncollapsedLevels; i++) {

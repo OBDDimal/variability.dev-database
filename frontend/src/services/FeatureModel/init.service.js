@@ -15,10 +15,7 @@ export function initialize(d3Data, data) {
 
     // Create root-feature-node with d3 and the data of the feature-model.
     d3Data.root = d3.hierarchy(data, (node) => node.children);
-    d3Data.allNodes = d3Data.root.descendants();
-    d3Data.allNodes.forEach((d3Node) => {
-        d3Node.data.d3Node = d3Node;
-    });
+    d3Data.root.each((d3Node) => d3Node.data.d3Node = d3Node);
 
     d3Data.zoom = d3
         .zoom()

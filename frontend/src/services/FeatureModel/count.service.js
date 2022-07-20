@@ -3,18 +3,19 @@ import * as CONSTANTS from '@/classes/constants';
 import * as update from "@/services/FeatureModel/update.service.js";
 
 export function colorNodes(d3Data, coloringIndex) {
+    const allNodes = d3Data.root.data.descendants();
     switch (coloringIndex) {
         case 0:
-            coloring(d3Data.allNodes, countNodes);
+            coloring(allNodes, countNodes);
             break;
         case 1:
-            coloring(d3Data.allNodes, countDirectChildren);
+            coloring(allNodes, countDirectChildren);
             break;
         case 2:
-            coloring(d3Data.allNodes, countTotalChildren);
+            coloring(allNodes, countTotalChildren);
             break;
         default:
-            resetColorNodes(d3Data.allNodes);
+            resetColorNodes(allNodes);
             break;
     }
     update.updateSvg(d3Data);

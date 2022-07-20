@@ -261,6 +261,21 @@ export class FeatureNode {
 	getD3Children() {
 		return this.children.map((node) => node.d3Node);
 	}
+
+	each(func) {
+		func(this);
+		if (!this.isLeaf()) {
+			this.children.forEach((node) => node.each(func));
+		}
+	}
+
+	descendants() {
+		if (this.isLeaf()) {
+			return [this];
+		} else {
+			return this.children.map((node) => node.descendants()).flat();
+		}
+	}
 }
 
 export function createFeatureNode(parent, name, groupType, mandatory, abstract) {
