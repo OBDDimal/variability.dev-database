@@ -1,5 +1,4 @@
 import {Command} from "@/classes/Commands/Command";
-import * as hide from "@/services/FeatureModel/hide.service";
 import * as d3 from "d3";
 
 export class AddCommand extends Command {
@@ -18,7 +17,6 @@ export class AddCommand extends Command {
         this.d3Data.d3ParentOfAddNode.data.uncollapse();
 
         this.d3Data.d3ParentOfAddNode.data.unhideChildren();
-        hide.update(this.d3Data.d3ParentOfAddNode);
 
         this.newFeatureNode.parent.children.push(this.newFeatureNode);
 

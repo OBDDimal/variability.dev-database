@@ -1,5 +1,4 @@
 import * as update from '@/services/FeatureModel/update.service.js';
-import * as hide from '@/services/FeatureModel/hide.service.js';
 import * as CONSTANTS from '@/classes/constants';
 import * as d3 from 'd3';
 
@@ -112,7 +111,6 @@ export function init(d3Data) {
 
             if (d3Data.drag.hasStarted) {
                 d3Node.data.parent.unhideChildren();
-                hide.update(d3Node.parent);
                 update.updateSvg(d3Data);
 
                 updateGhostCircles(d3Data);

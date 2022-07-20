@@ -1,6 +1,5 @@
 import * as createPaths from '@/services/FeatureModel/createPaths.service.js';
 import * as CONSTANTS from '@/classes/constants';
-import * as hide from "@/services/FeatureModel/hide.service.js";
 import * as collapse from '@/services/FeatureModel/collapse.service.js';
 import {FeatureNode, PseudoNode} from '@/classes/featureNode';
 
@@ -42,7 +41,6 @@ function updateFeatureNodes(d3Data, visibleD3Nodes) {
         .classed('pseudo-node', true)
         .on('click', (_, d3Node) => {
             d3Node.data.unhideHiddenNodes();
-            hide.update(d3Node.parent);
             updateSvg(d3Data);
         });
     pseudoNodeEnter.append('circle').attr('r', CONSTANTS.PSEUDO_NODE_SIZE);
