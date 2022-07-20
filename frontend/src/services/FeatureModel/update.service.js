@@ -210,7 +210,7 @@ export function updateSvg(d3Data) {
     console.log('Rendertime', performance.now() - start);
 }
 
-// Calculates rect-witdh dependent on font-size dynamically.
+// Calculates rect-width dependent on font-size dynamically.
 export function calcRectWidth(d3Data, d3Node) {
     if (d3Node.data instanceof FeatureNode) {
         return (

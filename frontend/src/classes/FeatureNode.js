@@ -242,14 +242,10 @@ export class FeatureNode {
 		child.parent = this;
 
 		// Update d3-children
-		let leftD3Nodes = [];
-		let rightD3Nodes = [];
-		if (this.d3Node.allChildren) {
-			leftD3Nodes = this.d3Node.allChildren.slice(0, index);
-			rightD3Nodes = this.d3Node.allChildren.slice(index);
-		}
-		this.d3Node.allChildren = [...leftD3Nodes, child.d3Node, ...rightD3Nodes];
-		this.d3Node.children = this.d3Node.allChildren;
+		const d3Children = this.getD3Children();
+		const leftD3Nodes = d3Children.slice(0, index);
+		const rightD3Nodes = d3Children.slice(index);
+		this.d3Node.children = [...leftD3Nodes, child.d3Node, ...rightD3Nodes];
 
 		// Update feature-node-children
 		const leftNodes = this.children.slice(0, index);
@@ -259,8 +255,11 @@ export class FeatureNode {
 
 	removeChild(child) {
 		this.children = this.children.filter((node) => node !== child);
-		this.d3Node.allChildren = this.d3Node.allChildren.filter((d3Node) => d3Node.data !== child);
-		this.d3Node.children = this.d3Node.allChildren;
+		this.d3Node.children = this.getD3Children().filter((d3Node) => d3Node.data !== child);
+	}
+
+	getD3Children() {
+		return this.children.map((node) => node.d3Node);
 	}
 }
 

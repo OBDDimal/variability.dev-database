@@ -18,7 +18,6 @@ export function initialize(d3Data, data) {
     d3Data.allNodes = d3Data.root.descendants();
     d3Data.allNodes.forEach((d3Node) => {
         d3Node.data.d3Node = d3Node;
-        d3Node.allChildren = d3Node.children;
     });
 
     d3Data.zoom = d3

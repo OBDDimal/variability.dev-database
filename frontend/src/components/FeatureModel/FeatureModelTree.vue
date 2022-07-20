@@ -164,11 +164,11 @@ export default Vue.extend({
         add(data) {
             this.showAddDialog = false;
 
-            const d3Parent = this.d3Data.d3ParentOfAddNode;
+            const parent = this.d3Data.d3ParentOfAddNode.data;
             const addCommand = new AddCommand(
                 this.d3Data,
-                d3Parent.data,
-                d3Parent.allChildren ? d3Parent.allChildren.length : 0,
+                parent,
+                parent.children ? parent.children.length : 0,
                 data
             );
             this.d3Data.commandManager.execute(addCommand);
