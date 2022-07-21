@@ -65,9 +65,8 @@
     </v-app-bar>
     <v-navigation-drawer
         v-model="drawer"
-        absolute
         temporary
-        top
+        app
     >
       <v-list>
         <v-list-item
