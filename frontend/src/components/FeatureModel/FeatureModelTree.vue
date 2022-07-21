@@ -51,7 +51,6 @@ import FeatureModelTreeEditDialog from './FeatureModelTreeEditDialog.vue';
 import FeatureModelTreeAddDialog from '@/components/FeatureModel/FeatureModelTreeAddDialog';
 
 // Import feature-model-services
-import * as count from '@/services/FeatureModel/count.service.js';
 import * as dragAndDrop from "@/services/FeatureModel/dragAndDrop.service.js";
 import * as update from '@/services/FeatureModel/update.service.js';
 import * as init from '@/services/FeatureModel/init.service.js';
@@ -101,8 +100,12 @@ export default Vue.extend({
                 featureNodesContainer: undefined,
                 dragContainer: undefined,
             },
+            updateTrigger: {
+                coloring: false,
+            },
             verticalSpacing: 75,
             d3ParentOfAddNode: undefined,
+            coloringIndex: -1,
         },
         showAddDialog: false,
         showEditDialog: false,
@@ -122,8 +125,8 @@ export default Vue.extend({
         },
 
         coloring(coloringIndex) {
-            const allNodes = this.d3Data.root.data.descendants();
-            count.colorNodes(allNodes, coloringIndex);
+            this.d3Data.coloringIndex = coloringIndex;
+            this.d3Data.updateTrigger.coloring = true;
             update.updateSvg(this.d3Data);
         },
 
@@ -167,6 +170,7 @@ export default Vue.extend({
 
             const parent = this.d3Data.d3ParentOfAddNode.data;
             const addCommand = new AddCommand(
+                this.d3Data,
                 parent,
                 parent.children ? parent.children.length : 0,
                 data
@@ -180,6 +184,7 @@ export default Vue.extend({
             this.showEditDialog = false;
 
             const editCommand = new EditCommand(
+                this.d3Data,
                 this.editNode,
                 newData
             );

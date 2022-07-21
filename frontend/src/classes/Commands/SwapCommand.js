@@ -1,8 +1,8 @@
 import {Command} from "@/classes/Commands/Command";
 
 export class SwapCommand extends Command {
-    constructor(node, dstParent, dstIndex) {
-        super();
+    constructor(d3Data, node, dstParent, dstIndex) {
+        super(d3Data);
         this.node = node;
         this.dstParent = dstParent;
         this.dstIndex = dstIndex;
@@ -26,10 +26,14 @@ export class SwapCommand extends Command {
 
         this.srcParent.removeChild(this.node);
         this.dstParent.insertChildAtIndex(this.node, this.dstIndex - tmp);
+
+        this.d3Data.updateTrigger.coloring = true;
     }
 
     undo() {
         this.dstParent.removeChild(this.node);
         this.srcParent.insertChildAtIndex(this.node, this.srcIndex);
+
+        this.d3Data.updateTrigger.coloring = true;
     }
 }

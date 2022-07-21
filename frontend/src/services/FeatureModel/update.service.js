@@ -3,6 +3,7 @@ import * as CONSTANTS from '@/classes/constants';
 import * as collapse from '@/services/FeatureModel/collapse.service.js';
 import {FeatureNode} from '@/classes/FeatureNode';
 import {PseudoNode} from "@/classes/PseudoNode";
+import * as count from "@/services/FeatureModel/count.service";
 
 function updateFeatureNodes(d3Data, visibleD3Nodes) {
     const featureNode = d3Data.container.featureNodesContainer.selectAll('g.node').data(
@@ -177,6 +178,14 @@ function updateLinks(d3Data, visibleD3Nodes) {
     link.exit().remove();
 }
 
+function updateColoring(d3Data) {
+    if (!d3Data.updateTrigger.coloring) return;
+
+    const allNodes = d3Data.root.data.descendants();
+    count.colorNodes(allNodes, d3Data.coloringIndex);
+    d3Data.updateTrigger.coloring = false;
+}
+
 function updateSegments(d3Data, visibleD3Nodes) {
     const segment = d3Data.container.segmentsContainer.selectAll('path.segment').data(
         visibleD3Nodes.filter((d3Node) => d3Node.data instanceof FeatureNode && (d3Node.data.isAlt() || d3Node.data.isOr())),
@@ -202,6 +211,7 @@ export function updateSvg(d3Data) {
     // Flexlayout belongs to a d3-plugin that calculates the width between all nodes dynamically.
     const visibleD3Nodes = d3Data.flexlayout(d3Data.root).descendants();
 
+    updateColoring(d3Data);
     updateHighlightedConstraints(d3Data, visibleD3Nodes);
     updateSegments(d3Data, visibleD3Nodes);
     updateFeatureNodes(d3Data, visibleD3Nodes);

@@ -1,3 +1,5 @@
 export class Command {
-    constructor() {}
+    constructor(d3Data) {
+        this.d3Data = d3Data;
+    }
 }
