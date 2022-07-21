@@ -61,7 +61,7 @@
                     </v-col>
                     <v-col cols="12">
                       <v-checkbox
-                        v-model="editedItem.public"
+                        v-model="editedItem.is_public"
                         label="Public"
                       ></v-checkbox>
                     </v-col>
@@ -182,12 +182,12 @@ export default Vue.extend({
     editedItem: {
       label: "",
       description: "",
-      public: false,
+      is_public: false,
     },
     defaultItem: {
       label: "",
       description: "",
-      public: false,
+      is_public: false,
     },
     editedID: -1,
     tags: [],
@@ -308,6 +308,7 @@ export default Vue.extend({
 
     addTag() {
       this.addLoading = true;
+      console.log(this.editedItem)
       api
         .post(`${API_URL}tags/`, this.editedItem)
         .then(() => {
