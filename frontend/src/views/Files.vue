@@ -12,80 +12,10 @@
                     <v-spacer class="hidden-sm-and-down"></v-spacer>
                     <v-text-field v-model="search" append-icon="mdi-magnify" label="Search" single-line hide-details>
                     </v-text-field>
-                    <v-dialog v-model="dialog" max-width="700px">
-                        <template v-slot:activator="{ on, attrs }">
-                            <v-btn color="primary" dark rounded class="mb-2 ml-4" v-bind="attrs" v-on="on">
-                                <v-icon left> mdi-plus </v-icon>
-                                Upload Model
-                            </v-btn>
-                        </template>
-                        <v-card>
-                            <v-card-title>
-                                <span class="text-h5">{{ formTitle }}</span>
-                            </v-card-title>
-
-                            <v-card-text>
-                                <v-container>
-                                    <v-row>
-                                        <v-col cols="12" md="6">
-                                            <v-text-field v-model="editedItem.label" label="Label"></v-text-field>
-                                        </v-col>
-                                        <v-col cols="12" md="6">
-                                            <v-text-field v-model="editedItem.description" label="Description">
-                                            </v-text-field>
-                                        </v-col>
-                                        <v-col cols="12" md="6">
-                                            <v-file-input chips multiple label="File Upload" show-size></v-file-input>
-                                        </v-col>
-                                        <v-col cols="12" md="6">
-                                            <v-autocomplete v-model="editedItem.license.label" :items="licenses"
-                                                label="License"></v-autocomplete>
-                                        </v-col>
-                                        <v-col cols="12" md="6">
-                                            <v-autocomplete :disabled="newFamily != ''" v-model="family"
-                                                :items="existingFamilies" label="New version of"></v-autocomplete>
-                                        </v-col>
-                                        <v-col cols="12" md="6">
-                                            <v-text-field :disabled="family != null" v-model="newFamily"
-                                                label="New family"></v-text-field>
-                                        </v-col>
-                                        <v-col cols="12">
-                                            <v-combobox v-model="editedItem.tags" :items="tags" label="Tags" multiple
-                                                chips></v-combobox>
-                                        </v-col>
-                                        <v-col cols="12">
-                                            <v-checkbox v-model="check1" label="Lorem Ipsum" hide-details></v-checkbox>
-                                        </v-col>
-                                        <v-col cols="12">
-                                            <v-checkbox v-model="check2" label="Lorem Ipsum 2" hide-details>
-                                            </v-checkbox>
-                                        </v-col>
-                                        <v-col cols="12">
-                                            <v-checkbox v-model="check3" label="Lorem Ipsum 3" hide-details>
-                                            </v-checkbox>
-                                        </v-col>
-                                        <v-col cols="12">
-                                            <v-btn color="primary" :disabled="
-                                                !check1 ||
-                                                !check2 ||
-                                                !check3
-                                            ">Upload</v-btn>
-                                        </v-col>
-                                    </v-row>
-                                </v-container>
-                            </v-card-text>
-
-                            <v-card-actions>
-                                <v-spacer></v-spacer>
-                                <v-btn color="blue darken-1" text @click="close">
-                                    Cancel
-                                </v-btn>
-                                <v-btn color="blue darken-1" text @click="save">
-                                    Save
-                                </v-btn>
-                            </v-card-actions>
-                        </v-card>
-                    </v-dialog>
+                    <v-btn color="primary" rounded class="mb-2 ml-4" @click="createDialog = true">
+                        <v-icon left> mdi-plus </v-icon>
+                        Upload Model
+                    </v-btn>
                     <v-dialog v-model="dialogDelete" max-width="500px">
                         <v-card>
                             <v-card-title class="text-h5"
@@ -170,22 +100,29 @@
                 {{ new Date(item.uploaded_at).toLocaleString("en-US") }}
             </template>
         </v-data-table>
+        <v-dialog v-model="createDialog" max-width="850px">
+          <file-create @close="createDialog = !createDialog"></file-create>
+        </v-dialog>
     </div>
 </template>
 
 <script>
 import Vue from "vue"
+import FileCreate from "@/views/FileCreate.vue";
 
 export default Vue.extend({
     name: "Files",
 
-    components: {},
+    components: {
+      FileCreate,
+    },
 
     props: {},
 
     data: () => ({
         search: "",
         dialog: false,
+        createDialog: false,
         dialogDelete: false,
         dialogAnalysis: false,
         editedIndex: -1,

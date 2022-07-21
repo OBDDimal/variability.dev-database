@@ -157,7 +157,7 @@
       andere Zwecke verarbeitet.
     </p>
 
-    <h5 class="text-h5 mb-4">Umgang mit Kontaktdaten</h5>
+    <h5 class="text-h5 mb-4">Widerspruchsrecht</h5>
     <p>
       Nutzer dieser Webseite können von ihrem Widerspruchsrecht Gebrauch machen
       und der Verarbeitung ihrer personenbezogenen Daten zu jeder Zeit

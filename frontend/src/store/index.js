@@ -20,6 +20,7 @@ export default new Vuex.Store({
 		accessToken: authService.getAccessToken(),
 		tags: [],
 		families: [],
+		licenses: [],
 		files: [],
 		featureModels: [],
 		searchedNodes: '',
@@ -59,6 +60,11 @@ export default new Vuex.Store({
 				commit('setFamilies', { families: response.data });
 			});
 		},
+		fetchLicenses({ commit }) {
+			api.get(`${API_URL}licenses/`).then((response) => {
+				commit('setLicenses', { licenses: response.data });
+			});
+		},
 		fetchFiles({ commit }) {
 			api.get(`${API_URL}files/uploaded/confirmed/`).then((response) => {
 				commit('setFiles', { files: response.data });
@@ -94,6 +100,10 @@ export default new Vuex.Store({
 		setFamilies(state, payload) {
 			const { families } = payload;
 			state.families = families;
+		},
+		setLicenses(state, payload) {
+			const { licenses } = payload;
+			state.licenses = licenses;
 		},
 		setFiles(state, payload) {
 			const { files } = payload;
