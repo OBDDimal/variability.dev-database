@@ -122,7 +122,9 @@ export default Vue.extend({
         },
 
         coloring(coloringIndex) {
-            count.colorNodes(this.d3Data, coloringIndex);
+            const allNodes = this.d3Data.root.data.descendants();
+            count.colorNodes(allNodes, coloringIndex);
+            update.updateSvg(this.d3Data);
         },
 
         onChangeSearch(searchText) {
