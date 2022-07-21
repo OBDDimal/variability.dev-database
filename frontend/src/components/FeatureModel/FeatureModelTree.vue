@@ -85,6 +85,7 @@ export default Vue.extend({
                 hasStarted: false,
                 selectedD3Node: undefined,
                 selectedGhostNode: undefined,
+                selectedD3NodePosition: undefined,
             },
             contextMenu: {
                 selectedD3Node: undefined,

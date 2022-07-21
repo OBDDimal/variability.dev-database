@@ -15,6 +15,7 @@ function overGhostNode(d3Data, ghostNode) {
                 collapse.update(d3Data);
                 update.updateSvg(d3Data);
                 updateGhostCircles(d3Data);
+                translateD3NodeToMouse(d3Data, d3Data.drag.selectedD3Node);
             }
         }, 500);
     }
@@ -134,11 +135,8 @@ export function init(d3Data) {
                 d3Data.drag.hasStarted = false;
             }
 
-            // Transform current node.
-            d3Data.container.featureNodesContainer
-                .selectAll('g.node')
-                .data([d3Node], (d3Node) => d3Node.id)
-                .attr('transform', `translate(${event.x}, ${event.y})`);
+            d3Data.drag.selectedD3NodePosition = {x: event.x, y: event.y};
+            translateD3NodeToMouse(d3Data, d3Node);
         })
         .on('end', (_, d3Node) => {
             if (d3Node === d3Data.root) return;
@@ -186,4 +184,11 @@ export function init(d3Data) {
 
             update.updateSvg(d3Data);
         });
+}
+
+function translateD3NodeToMouse(d3Data, d3Node) {
+    d3Data.container.featureNodesContainer
+        .selectAll('g.node')
+        .data([d3Node], (d3Node) => d3Node.id)
+        .attr('transform', `translate(${d3Data.drag.selectedD3NodePosition.x}, ${d3Data.drag.selectedD3NodePosition.y})`);
 }
