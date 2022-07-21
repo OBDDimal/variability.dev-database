@@ -12,13 +12,19 @@ export class FeatureNode {
 		this.isRoot = parent === null;
 		this.isMandatory = mandatory;
 		this.isAbstract = abstract;
-		this.textColor = 'black';
-		this.color = CONSTANTS.NODE_COLOR;
+		this.colorValue = CONSTANTS.NODE_COLOR;
 		this.constraints = [];
 		this.constraintsHighlighted = [];
 		this.isCollapsed = false;
 		this.isHidden = false;
 		this.d3Node = undefined;
+		this.markedAsEdited = false;
+	}
+
+	color() {
+		if (this.markedAsEdited) return CONSTANTS.NODE_EDITED_COLOR;
+		else if (this.isAbstract) return CONSTANTS.NODE_ABSTRACT_COLOR;
+		else return this.colorValue;
 	}
 
 	childrenCount() {
@@ -275,6 +281,14 @@ export class FeatureNode {
 		} else {
 			return [this, ...this.children.map((node) => node.descendants()).flat()];
 		}
+	}
+
+	markAsEdited() {
+		this.markedAsEdited = true;
+	}
+
+	unmarkAsEdited() {
+		this.markedAsEdited = false;
 	}
 }
 

@@ -20,7 +20,7 @@ export function colorNodes(allNodes, coloringIndex) {
 
 function resetColorNodes(allNodes) {
     for (const node of allNodes) {
-        node.color = node.isAbstract ? CONSTANTS.NODE_ABSTRACT_COLOR : CONSTANTS.NODE_COLOR;
+        node.colorValue = node.isAbstract ? CONSTANTS.NODE_ABSTRACT_COLOR : CONSTANTS.NODE_COLOR;
     }
 }
 
@@ -30,7 +30,7 @@ function coloring(allNodes, coloringFunction) {
 
     for (const node of allNodes) {
         if (count[node.name] !== undefined && !node.isAbstract) {
-            node.color = colors(count[node.name]);
+            node.colorValue = colors(count[node.name]);
         }
     }
 }

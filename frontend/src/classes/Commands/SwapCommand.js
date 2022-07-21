@@ -1,9 +1,8 @@
-import {Command} from "@/classes/Commands/Command";
+import {SingleNodeCommand} from "@/classes/Commands/SingleNodeCommand";
 
-export class SwapCommand extends Command {
+export class SwapCommand extends SingleNodeCommand {
     constructor(d3Data, node, dstParent, dstIndex) {
-        super(d3Data);
-        this.node = node;
+        super(d3Data, node);
         this.dstParent = dstParent;
         this.dstIndex = dstIndex;
 
@@ -13,8 +12,6 @@ export class SwapCommand extends Command {
     }
 
     execute() {
-        if (this.isRoot) return;
-
         this.dstParent.uncollapse();
         this.dstParent.unhideChildren();
 

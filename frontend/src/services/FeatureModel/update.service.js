@@ -60,19 +60,16 @@ function updateFeatureNodes(d3Data, visibleD3Nodes) {
     rectAndTextUpdate
         .select('rect')
         .classed('is-searched-feature', (d3Node) => d3Node.data.isSearched)
-        .attr('fill', (d3Node) => (d3Node.data.isAbstract ? CONSTANTS.NODE_ABSTRACT_COLOR : d3Node.data.color))
+        .attr('fill', (d3Node) => d3Node.data.color())
         .attr('x', (d3Node) => -calcRectWidth(d3Data, d3Node) / 2)
         .attr('width', (d3Node) => calcRectWidth(d3Data, d3Node));
     rectAndTextUpdate
         .select('text')
         .attr('font-style', (d3Node) => (d3Node.data.isAbstract ? 'italic' : 'normal'))
-        .attr('class', (d3Node) => {
-            const rgb = d3Node.data.color.replace(/[^\d,]/g, '').split(',');
-            if (rgb[0] * 0.299 + rgb[1] * 0.587 + rgb[2] * 0.114 > 186) {
-                return 'blackText';
-            } else {
-                return 'whiteText';
-            }
+        .classed('whiteText', (d3Node) => {
+            let color = d3Node.data.color();
+            const rgb = color.replace(/[^\d,]/g, '').split(',');
+            return !(rgb[0] * 0.299 + rgb[1] * 0.587 + rgb[2] * 0.114 > 186);
         })
         .text((d3Node) => (d3Data.isShortenedName ? d3Node.data.displayName : d3Node.data.name));
 
