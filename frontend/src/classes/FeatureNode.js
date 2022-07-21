@@ -273,7 +273,7 @@ export class FeatureNode {
 		if (this.isLeaf()) {
 			return [this];
 		} else {
-			return this.children.map((node) => node.descendants()).flat();
+			return [this, ...this.children.map((node) => node.descendants()).flat()];
 		}
 	}
 }
