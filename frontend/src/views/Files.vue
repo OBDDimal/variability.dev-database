@@ -4,12 +4,12 @@
         <h5 class="text-h5 mb-4">
             Here you can add new Feature Models
         </h5>
-        <v-data-table :headers="headers" :items="featureModels" class="elevation-1" :search="search">
+        <v-data-table :headers="headers" :items="featureModelsComp" class="elevation-1" :search="search" :loading="loading">
             <template v-slot:top>
                 <v-toolbar flat>
-                    <v-toolbar-title>All Feature Models</v-toolbar-title>
-                    <v-divider class="mx-4" inset vertical></v-divider>
-                    <v-spacer></v-spacer>
+                    <v-toolbar-title class="hidden-sm-and-down">All Feature Models</v-toolbar-title>
+                    <v-divider class="mx-4 hidden-sm-and-down" inset vertical></v-divider>
+                    <v-spacer class="hidden-sm-and-down"></v-spacer>
                     <v-text-field v-model="search" append-icon="mdi-magnify" label="Search" single-line hide-details>
                     </v-text-field>
                     <v-dialog v-model="dialog" max-width="700px">
@@ -155,7 +155,7 @@
                 {{ index + 1 }}
             </template>
             <template v-slot:no-data>
-                <v-btn color="primary"> Reset </v-btn>
+              No feature models yet
             </template>
             <template v-slot:item.tags="{ item }">
                 <v-chip class="mx-1" v-for="(tag, index) in item.tags" :key="index">
@@ -242,6 +242,7 @@ export default Vue.extend({
         check2: false,
         check3: false,
         removeLoading: false,
+        loading: false,
     }),
 
     created() {
@@ -255,6 +256,9 @@ export default Vue.extend({
         existingFamilies() {
             return this.featureModels.map((x) => x.label);
         },
+        featureModelsComp() {
+          return this.$store.state.featureModels;
+        }
     },
 
     watch: {
