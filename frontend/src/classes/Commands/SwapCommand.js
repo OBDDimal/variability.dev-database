@@ -15,6 +15,9 @@ export class SwapCommand extends Command {
     execute() {
         if (this.isRoot) return;
 
+        this.dstParent.uncollapse();
+        this.dstParent.unhideChildren();
+
         this.srcParent = this.node.parent;
         this.srcIndex = this.srcParent.children.indexOf(this.node);
 
@@ -31,6 +34,9 @@ export class SwapCommand extends Command {
     }
 
     undo() {
+        this.dstParent.uncollapse();
+        this.dstParent.unhideChildren();
+
         this.dstParent.removeChild(this.node);
         this.srcParent.insertChildAtIndex(this.node, this.srcIndex);
 
