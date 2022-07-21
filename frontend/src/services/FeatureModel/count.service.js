@@ -25,7 +25,7 @@ function resetColorNodes(allNodes) {
 }
 
 function coloring(allNodes, coloringFunction) {
-    const [count, max] = coloringFunction(allNodes); // Must return {"nodeName": integer}
+    const {count, max} = coloringFunction(allNodes); // Must return {"nodeName": integer}
     const colors = d3.scaleLinear().domain(d3.ticks(1, max, CONSTANTS.COLORING_MAP.length)).range(CONSTANTS.COLORING_MAP);
 
     for (const node of allNodes) {
@@ -37,7 +37,7 @@ function coloring(allNodes, coloringFunction) {
 
 /**
  * Counts all nodes
- * @returns [{"nodeName": integer}, maxAmount]
+ * @returns {max: number, count: {}}
  */
 function countNodes(allNodes) {
     let count = {};
@@ -52,7 +52,7 @@ function countNodes(allNodes) {
         }
     }
 
-    return [count, max];
+    return {count: count, max: max};
 }
 
 function countDirectChildren(allNodes) {
@@ -64,7 +64,7 @@ function countDirectChildren(allNodes) {
         max = max < count[node.name] ? count[node.name] : max;
     }
 
-    return [count, max];
+    return {count: count, max: max};
 }
 
 function countTotalChildren(allNodes) {
@@ -76,5 +76,5 @@ function countTotalChildren(allNodes) {
         max = max < count[node.name] ? count[node.name] : max;
     }
 
-    return [count, max];
+    return {count: count, max: max};
 }
