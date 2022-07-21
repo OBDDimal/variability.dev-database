@@ -22,7 +22,7 @@ import Vue from 'vue';
 import FeatureModelTree from '../components/FeatureModel/FeatureModelTree.vue';
 import Constraints from '../components/Constraints.vue';
 import { Constraint, VarConstraint } from '@/classes/constraint';
-import { berkeley } from '@/classes/featureModelData';
+import {littleModel} from '@/classes/featureModelData';
 import { FeatureNode } from '@/classes/featureNode';
 import * as update from "@/services/FeatureModel/update.service";
 import * as collapse from "@/services/FeatureModel/collapse.service";
@@ -40,15 +40,17 @@ export default Vue.extend({
 	data: () => ({
 		featureMap: [],
 		constraints: [],
+        properties: [],
 		rootNode: undefined,
 	}),
 
 	created() {
 		// TODO: Axios request for xml
 
-		const [rootNode, constraints] = this.xmlToJson(berkeley);
-		this.rootNode = rootNode;
-		this.constraints = constraints;
+		const json = this.xmlToJson(littleModel);
+		this.rootNode = json.rootNode;
+		this.constraints = json.constraints;
+        this.properties = json.properties;
 	},
 
 	computed: {},
@@ -70,11 +72,15 @@ export default Vue.extend({
 
 			const struct = xmlDocument.querySelector('struct');
 			const constraints = xmlDocument.querySelector('constraints');
+            const properties = xmlDocument.querySelector('properties');
 
-			const featuresToReturn = this.getChildrenOfFeature(struct, null);
-			const constraintsToReturn = this.getConstraints(constraints);
-			console.log('Parsertime', performance.now() - start);
-			return [featuresToReturn[0], constraintsToReturn];
+			const toReturn =  {
+                rootNode: this.getChildrenOfFeature(struct, null)[0],
+                constraints: this.getConstraints(constraints),
+                properties: this.getProperties(properties)
+            }
+            console.log('Parsertime', performance.now() - start);
+            return toReturn;
 		},
 
 		getChildrenOfFeature(struct, parent) {
@@ -113,6 +119,23 @@ export default Vue.extend({
 			return toReturn;
 		},
 
+        getProperties(properties) {
+            let toReturn = [];
+
+            for (const prop of properties.childNodes) {
+                // To remove #text nodes, as they don't have a tagName
+                if (prop.tagName) {
+                    const property = {
+                        tag: prop.tagName,
+                        key: prop.getAttribute('key'),
+                        value: prop.getAttribute('value')
+                    };
+                    toReturn.push(property);
+                }
+            }
+            return toReturn;
+        },
+
 		exportToXML() {
 			let root = {};
 
@@ -123,6 +146,10 @@ export default Vue.extend({
 			});
 
 			let xml = `<?xml version="1.0" encoding="UTF-8" standalone="no"?><featureModel>`;
+            xml += `<properties>${this.properties.reduce(
+                (prev, prop) => prev + `<${prop.tag} key="${prop.key}" value="${prop.value}"/>`,
+                ''
+            )}</properties>`;
 			xml += `<struct>${this.nodeToXML(root)}</struct>`;
 			xml += `<constraints>${this.constraints.reduce(
 				(prev, constraint) => prev + '<rule>' + this.constraintToXML(constraint) + '</rule>',
