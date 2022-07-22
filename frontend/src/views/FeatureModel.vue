@@ -13,7 +13,10 @@
 			@click="$store.commit('openConstraints', true)"
 			><v-icon>mdi-format-list-checks</v-icon></v-btn
 		>
-		<constraints :constraints="constraints" @update-feature-model="updateFeatureModel"></constraints>
+		<constraints :constraints="constraints"
+                     :root-node="rootNode"
+                     @update-feature-model="updateFeatureModel"
+        ></constraints>
 	</div>
 </template>
 
