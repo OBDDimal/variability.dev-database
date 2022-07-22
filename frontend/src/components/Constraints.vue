@@ -61,10 +61,11 @@ export default Vue.extend({
   },
 
   methods: {
-    highlightConstraint(item) {
+    highlightConstraint(constraintRow) {
       //TODO: Table row color
-      item.checked = !item.checked;
-      item.constraint.toggleHighlighted();
+      constraintRow.checked = !constraintRow.checked;
+      constraintRow.constraint.toggleHighlighted();
+      constraintRow.constraint.getFeatureNodes().forEach((node) => node.uncollapse());
       this.$emit("update-feature-model");
     },
     computeColor(bg) {

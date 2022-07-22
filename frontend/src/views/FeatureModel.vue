@@ -26,6 +26,11 @@ import { berkeley } from '@/classes/featureModelData';
 import { FeatureNode } from '@/classes/featureNode';
 import * as update from "@/services/FeatureModel/update.service";
 import * as collapse from "@/services/FeatureModel/collapse.service";
+import {Disjunction} from "@/classes/Constraint/Disjunction";
+import {Conjunction} from "@/classes/Constraint/Conjunction";
+import {Implication} from "@/classes/Constraint/Implication";
+import {Negation} from "@/classes/Constraint/Negation";
+import {FeatureNodeConstraintItem} from "@/classes/Constraint/FeatureNodeConstraintItem";
 
 export default Vue.extend({
 	name: 'FeatureModel',
@@ -69,10 +74,10 @@ export default Vue.extend({
 			const xmlDocument = parser.parseFromString(m, 'text/xml');
 
 			const struct = xmlDocument.querySelector('struct');
-			const constraints = xmlDocument.querySelector('constraints');
+			const constraintSection = xmlDocument.querySelector('constraints');
 
 			const featuresToReturn = this.getChildrenOfFeature(struct, null);
-			const constraintsToReturn = this.getConstraints(constraints);
+			const constraintsToReturn = this.readConstraints([...constraintSection.childNodes]);
 			console.log('Parsertime', performance.now() - start);
 			return [featuresToReturn[0], constraintsToReturn];
 		},
@@ -100,18 +105,36 @@ export default Vue.extend({
 			return toReturn;
 		},
 
-		getConstraints(constraints) {
-			let toReturn = [];
-
-			for (const rule of constraints.childNodes) {
-				// To remove #text nodes, as they don't have a tagName
-				if (rule.tagName) {
-					const constraint = new Constraint([...rule.childNodes].filter((e) => e.tagName)[0], this.featureMap);
-					toReturn.push(constraint);
-				}
-			}
-			return toReturn;
+		readConstraints(constraints) {
+            return constraints
+                .filter((rule) => rule.tagName)
+                .map((rule) => {
+                    return [...rule.childNodes]
+                        .filter((item) => item.tagName)
+                        .map((item) => {
+                            const constraint = new Constraint();
+                            constraint.rule = this.readConstraintItem(item, constraint);
+                            return constraint;
+                        })[0];
+                });
 		},
+
+        readConstraintItem(item, constraint) {
+            if (item.tagName === 'var') {
+                return new FeatureNodeConstraintItem(this.featureMap[item.innerHTML], constraint);
+            } else {
+                const childItems = [...item.childNodes]
+                    .filter((childItem) => childItem.tagName)
+                    .map((childItem) => this.readConstraintItem(childItem, constraint));
+
+                switch (item.tagName) {
+                    case 'disj': return new Disjunction(childItems);
+                    case 'conj': return new Conjunction(childItems);
+                    case 'imp':  return new Implication(childItems[0], childItems[1]);
+                    case 'not':  return new Negation(childItems[0]);
+                }
+            }
+        },
 
 		exportToXML() {
 			let root = {};

@@ -16,4 +16,10 @@ export class GroupConstraintItem extends ConstraintItem {
           .map((item) => this.addPossibleBrackets(item))
           .join(` ${this.operator} `);
    }
+
+   getFeatureNodes() {
+      return this.items
+          .map((item) => item.getFeatureNodes())
+          .flat();
+   }
 }

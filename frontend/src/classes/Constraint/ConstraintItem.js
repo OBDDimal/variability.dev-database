@@ -4,9 +4,9 @@ export class ConstraintItem {
 
    addPossibleBrackets(item) {
       if (item.count() === 1) {
-         return `¬${item.print()}`;
+         return `¬${item.toString()}`;
       } else {
-         return `¬(${item.print()})`;
+         return `¬(${item.toString()})`;
       }
    }
 }

@@ -13,4 +13,8 @@ export class Negation extends ConstraintItem {
     toString() {
         return this.addPossibleBrackets(this.item);
     }
+
+    getFeatureNodes() {
+        return this.item.getFeatureNodes();
+    }
 }

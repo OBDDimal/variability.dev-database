@@ -13,7 +13,6 @@ export class FeatureNode {
 		this.textColor = 'black';
 		this.color = CONSTANTS.NODE_COLOR;
 		this.constraints = [];
-		this.constraintsHighlighted = [];
 		this.isCollapsed = true;
 		this.isHidden = false;
 	}
@@ -127,6 +126,14 @@ export class FeatureNode {
 		if (this.children) {
 			this.children.forEach((node) => node.unhide());
 		}
+	}
+
+	getHighlightedConstraints() {
+		return this.constraints.filter((constraint) => constraint.isHighlighted);
+	}
+
+	highlightConstraints() {
+		this.constraints.forEach((constraint) => constraint.isHighlighted = true);
 	}
 }
 
