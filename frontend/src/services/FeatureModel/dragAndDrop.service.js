@@ -114,8 +114,15 @@ export function init(d3Data) {
             if (d3Node === d3Data.root) return;
 
             if (d3Data.drag.hasStarted) {
-                d3Node.data.parent.unhideChildren();
-                hide.update(d3Node.parent);
+                d3Node.data.collapse();
+                collapse.update(d3Data);
+
+                // Get all nodes to root without root.
+                d3Node.data.getAllNodesToRoot().slice(1).forEach((node) => {
+                    node.unhideChildren();
+                    hide.update(node.d3Node);
+                });
+
                 update.updateSvg(d3Data);
 
                 updateGhostCircles(d3Data);
@@ -166,6 +173,9 @@ export function init(d3Data) {
 
                         d3Node.data.parent = ghost.d3Node.data;
                         ghost.d3Node.data.children = [d3Node.data];
+
+                        d3Node.parent.data.uncollapse();
+                        collapse.update(d3Data);
                     }
                 }
 

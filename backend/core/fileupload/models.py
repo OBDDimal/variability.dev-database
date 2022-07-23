@@ -13,6 +13,7 @@ class Family(models.Model):
     owner = models.ForeignKey(User, on_delete=models.RESTRICT)
     label = models.CharField(blank=False, max_length=255)
     description = models.TextField(blank=True)
+    date_created = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         verbose_name = 'family'

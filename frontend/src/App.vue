@@ -44,14 +44,9 @@ export default Vue.extend({
   },
 
   data: () => ({
-    age: 23,
-    list: ["im", "in", "ddueruem"],
   }),
 
   methods: {
-    increment() {
-      this.age++;
-    },
   },
 });
 </script>
@@ -63,5 +58,15 @@ export default Vue.extend({
   padding-left: 30px;
   padding-right: 30px;
   max-width: 90% !important;
+}
+
+@media only screen and (max-width: 400px) {
+  .mainView {
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 10px;
+    padding-right: 10px;
+    max-width: 100% !important;
+  }
 }
 </style>

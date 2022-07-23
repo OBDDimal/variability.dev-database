@@ -35,6 +35,7 @@ function add(d3Data, newNode) {
 
     // Add to allNodes
     d3Data.allNodes.push(d3NewNode);
+    newNode.d3Node = d3NewNode;
 
     // Reset and update svg.
     d3Data.d3ParentOfAddNode = undefined;

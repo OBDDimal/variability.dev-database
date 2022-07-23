@@ -79,7 +79,6 @@ export default Vue.extend({
                 this.groupType = this.node.groupType;
                 this.mandatory = this.node.isMandatory;
                 this.abstract = this.node.isAbstract;
-                console.log(this);
             }
         },
     },
