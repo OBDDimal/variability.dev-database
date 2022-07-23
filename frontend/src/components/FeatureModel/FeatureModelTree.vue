@@ -182,6 +182,18 @@ export default Vue.extend({
             update.updateSvg(this.d3Data);
         },
 
+        add(newNode) {
+            this.showAddDialog = false;
+
+            if (this.addType === 'child') {
+                add.addAsChild(this.d3Data, newNode);
+            } else {
+               add.addAsSibling(this.d3Data, newNode);
+            }
+
+            this.addType = "";
+        },
+
         openAddAsChildDialog(d3Node) {
             this.d3Data.d3ParentOfAddNode = d3Node;
             this.addType = 'child';
