@@ -14,7 +14,8 @@
         <feature-model-tree-context-menu
             :d3Node="d3Data.contextMenu.selectedD3Node"
             :d3NodeEvent="d3Data.contextMenu.event"
-            @add="(d3Node) => openAddDialog(d3Node)"
+            @addAsChild="(d3Node) => openAddAsChildDialog(d3Node)"
+            @addAsSibling="(d3Node) => openAddAsSiblingDialog(d3Node)"
             @close="d3Data.contextMenu.selectedD3Node = undefined"
             @collapse="collapse"
             @edit="(d3Node) => openEditDialog(d3Node)"
@@ -102,6 +103,7 @@ export default Vue.extend({
             d3ParentOfAddNode: undefined,
         },
         showAddDialog: false,
+        addType: "",
         showEditDialog: false,
         editNode: undefined,
     }),
@@ -170,16 +172,6 @@ export default Vue.extend({
             update.updateSvg(this.d3Data);
         },
 
-        add(newNode) {
-            this.showAddDialog = false;
-            add.addNode(this.d3Data, newNode);
-        },
-
-        edit() {
-            this.showEditDialog = false;
-            update.updateSvg(this.d3Data);
-        },
-
         changeShortName(isShortName) {
             this.d3Data.isShortenedName = isShortName;
             update.updateSvg(this.d3Data);
@@ -190,10 +182,33 @@ export default Vue.extend({
             update.updateSvg(this.d3Data);
         },
 
-        openAddDialog(d3Node) {
-            this.closeContextMenu();
+        add(newNode) {
+            this.showAddDialog = false;
+
+            if (this.addType === 'child') {
+                add.addAsChild(this.d3Data, newNode);
+            } else {
+               add.addAsSibling(this.d3Data, newNode);
+            }
+
+            this.addType = "";
+        },
+
+        openAddAsChildDialog(d3Node) {
             this.d3Data.d3ParentOfAddNode = d3Node;
+            this.addType = 'child';
             this.showAddDialog = true;
+        },
+
+        openAddAsSiblingDialog(d3Node) {
+            this.d3Data.d3ParentOfAddNode = d3Node.parent;
+            this.addType = 'sibling';
+            this.showAddDialog = true;
+        },
+
+        edit() {
+            this.showEditDialog = false;
+            update.updateSvg(this.d3Data);
         },
 
         openEditDialog(d3Node) {
