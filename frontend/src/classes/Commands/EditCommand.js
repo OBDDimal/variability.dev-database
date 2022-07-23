@@ -1,6 +1,6 @@
-import {Command} from "@/classes/Commands/Command";
+import {SingleNodeCommand} from "@/classes/Commands/SingleNodeCommand";
 
-export class EditCommand extends Command {
+export class EditCommand extends SingleNodeCommand {
     constructor(d3Data, node, newData) {
         super(d3Data);
         this.node = node;
@@ -11,8 +11,10 @@ export class EditCommand extends Command {
     }
 
     execute() {
-        this.node.parent.uncollapse();
-        this.node.parent.unhideChildren();
+        if (this.node.parent) {
+            this.node.parent.uncollapse();
+            this.node.parent.unhideChildren();
+        }
 
         if (!this.oldData) {
             this.oldData = {
@@ -30,8 +32,10 @@ export class EditCommand extends Command {
     }
 
     undo() {
-        this.node.parent.uncollapse();
-        this.node.parent.unhideChildren();
+        if (this.node.parent) {
+            this.node.parent.uncollapse();
+            this.node.parent.unhideChildren();
+        }
 
         this.node.name = this.oldData.name;
         this.node.groupType = this.oldData.groupType;

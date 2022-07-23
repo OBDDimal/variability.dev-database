@@ -43,6 +43,7 @@ export const COLORING_MAP = [
 export const STROKE_WIDTH_CONSTANT = 4;
 
 export const NODE_COLOR = "rgb(204, 204, 255)";
+export const NODE_EDITED_COLOR = "rgb(197,196,120)";
 export const NODE_ABSTRACT_COLOR = "#ebebff";
 
 export const DISPLAY_NAME_LENGTH = 8;

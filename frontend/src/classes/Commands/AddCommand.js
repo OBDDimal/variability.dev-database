@@ -1,26 +1,20 @@
-import {Command} from "@/classes/Commands/Command";
+import {SingleNodeCommand} from "@/classes/Commands/SingleNodeCommand";
 import {createFeatureNode} from "@/classes/FeatureNode";
 
-export class AddCommand extends Command {
+export class AddCommand extends SingleNodeCommand {
     constructor(d3Data, dstParent, dstIndex, data) {
-        super(d3Data);
+        const node = createFeatureNode(dstParent, data.name, data.groupType, data.mandatory, data.abstract);
+        super(d3Data, node);
         this.dstParent = dstParent;
         this.dstIndex = dstIndex;
         this.data = data;
-
-        // Properties for undo.
-        this.addedNode = undefined;
     }
 
     execute() {
         this.dstParent.uncollapse();
         this.dstParent.unhideChildren();
 
-        if (!this.addedNode) {
-            this.addedNode = createFeatureNode(this.dstParent, this.data.name, this.data.groupType, this.data.mandatory, this.data.abstract);
-        }
-
-        this.dstParent.insertChildAtIndex(this.addedNode, this.dstIndex);
+        this.dstParent.insertChildAtIndex(this.node, this.dstIndex);
 
         this.d3Data.updateTrigger.coloring = true;
     }
@@ -29,7 +23,7 @@ export class AddCommand extends Command {
         this.dstParent.uncollapse();
         this.dstParent.unhideChildren();
 
-        this.dstParent.removeChild(this.addedNode);
+        this.dstParent.removeChild(this.node);
 
         this.d3Data.updateTrigger.coloring = true;
     }
