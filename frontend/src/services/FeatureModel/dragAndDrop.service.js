@@ -13,6 +13,7 @@ function overGhostNode(d3Data, ghostNode) {
                 ghostNode.d3Node.data.uncollapse();
                 update.updateSvg(d3Data);
                 updateGhostCircles(d3Data);
+                translateD3NodeToMouse(d3Data, d3Data.drag.selectedD3Node);
             }
         }, 500);
     }
@@ -23,27 +24,8 @@ function outGhostNode(d3Data) {
 }
 
 export function updateGhostCircles(d3Data) {
-    const dragChildren = d3Data.drag.selectedD3Node.descendants();
-    const allOtherNodes = d3Data.root
-        .descendants()
-        .slice(1)
-        .filter((node) => !dragChildren.includes(node));
-    const rightGhostNodes = allOtherNodes.map((node) => ({d3Node: node, side: 'r'}));
-    const leftGhostNodes = allOtherNodes
-        .filter((node) => node === node.parent.children[0])
-        .map((node) => ({
-            d3Node: node,
-            side: 'l',
-        }));
-    const bottomGhostNodes = allOtherNodes
-        .filter((node) => node.data.isLeaf() || node.data.isCollapsed)
-        .map((node) => ({
-            d3Node: node,
-            side: 'b',
-        }));
-    const dragNodes = [...rightGhostNodes, ...leftGhostNodes, ...bottomGhostNodes];
-
     // Remove all children nodes under the current node and also the links between them.
+    const dragChildren = d3Data.drag.selectedD3Node.descendants();
     d3Data.container.featureNodesContainer
         .selectAll('g.node')
         .data(dragChildren.slice(1), (d3Node) => d3Node.id)
@@ -56,6 +38,37 @@ export function updateGhostCircles(d3Data) {
         .selectAll('path')
         .data(dragChildren, (d3Node) => d3Node.id)
         .remove();
+
+    let dragNodes = [];
+    if (d3Data.semanticEditing) {
+        const allOtherNodes = d3Data.root
+            .descendants()
+            .slice(1)
+            .filter((node) => !dragChildren.includes(node));
+        const rightGhostNodes = allOtherNodes.map((node) => ({d3Node: node, side: 'r'}));
+        const leftGhostNodes = allOtherNodes
+            .filter((node) => node === node.parent.children[0])
+            .map((node) => ({
+                d3Node: node,
+                side: 'l',
+            }));
+
+        const bottomGhostNodes = allOtherNodes
+            .filter((node) => node.data.isLeaf() || node.data.isCollapsed)
+            .map((node) => ({
+                d3Node: node,
+                side: 'b',
+            }));
+        dragNodes = [...rightGhostNodes, ...leftGhostNodes, ...bottomGhostNodes];
+    } else if (d3Data.drag.selectedD3Node.parent.children.length > 1) {
+        const allOtherNodes = d3Data.drag.selectedD3Node.parent.children.filter((node) => node !== d3Data.drag.selectedD3Node);
+        dragNodes = allOtherNodes.map((node) => ({d3Node: node, side: 'r'}));
+
+        // Add left-ghost-node if there are enough siblings on this level.
+        if (allOtherNodes) {
+            dragNodes.push({d3Node: allOtherNodes[0], side: 'l'});
+        }
+    }
 
     // Add ghost circles left and right to all nodes
     const ghostCircles = d3Data.container.dragContainer
@@ -113,17 +126,21 @@ export function init(d3Data) {
 
             if (d3Data.drag.hasStarted) {
                 d3Node.data.parent.unhideChildren();
+                d3Node.data.collapse();
+
+                // Get all nodes to root without root.
+                d3Node.data.getAllNodesToRoot().slice(1).forEach((node) => {
+                    node.unhideChildren();
+                });
+
                 update.updateSvg(d3Data);
 
                 updateGhostCircles(d3Data);
                 d3Data.drag.hasStarted = false;
             }
 
-            // Transform current node.
-            d3Data.container.featureNodesContainer
-                .selectAll('g.node')
-                .data([d3Node], (d3Node) => d3Node.id)
-                .attr('transform', `translate(${event.x}, ${event.y})`);
+            d3Data.drag.selectedD3NodePosition = {x: event.x, y: event.y};
+            translateD3NodeToMouse(d3Data, d3Node);
         })
         .on('end', (_, d3Node) => {
             if (d3Node === d3Data.root) return;
@@ -166,4 +183,11 @@ export function init(d3Data) {
 
             update.updateSvg(d3Data);
         });
+}
+
+function translateD3NodeToMouse(d3Data, d3Node) {
+    d3Data.container.featureNodesContainer
+        .selectAll('g.node')
+        .data([d3Node], (d3Node) => d3Node.id)
+        .attr('transform', `translate(${d3Data.drag.selectedD3NodePosition.x}, ${d3Data.drag.selectedD3NodePosition.y})`);
 }

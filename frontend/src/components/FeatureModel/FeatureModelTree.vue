@@ -12,19 +12,25 @@
             @redo="redo"
             :is-undo-available="d3Data.commandManager.isUndoAvailable()"
             :is-redo-available="d3Data.commandManager.isRedoAvailable()"
+            @semanticEditing="(value) => d3Data.semanticEditing = value"
         ></feature-model-tree-toolbar>
         <div id="svg-container"></div>
 
         <feature-model-tree-context-menu
             :d3Node="d3Data.contextMenu.selectedD3Node"
             :d3NodeEvent="d3Data.contextMenu.event"
-            @add="(d3Node) => openAddDialog(d3Node)"
+            @addAsChild="(d3Node) => openAddAsChildDialog(d3Node)"
+            @addAsSibling="(d3Node) => openAddAsSiblingDialog(d3Node)"
             @close="d3Data.contextMenu.selectedD3Node = undefined"
             @collapse="collapse"
             @edit="(d3Node) => openEditDialog(d3Node)"
             @hideCurrentNode="(d3Node) => hideCurrentNode(d3Node)"
             @hideLeftSiblings="(d3Node) => hideLeftSiblings(d3Node)"
             @hideRightSiblings="(d3Node) => hideRightSiblings(d3Node)"
+            @highlightConstraints="(d3Node) => highlightConstraints(d3Node)"
+            @resetHighlightConstraints="(d3Node) => resetHighlightConstraints(d3Node)"
+            @hideAllNodesOnThisLevel="(d3Node) => hideAllNodesOnThisLevel(d3Node)"
+            @hideAllOtherNodes="(d3Node) => hideAllOtherNodes(d3Node)"
         ></feature-model-tree-context-menu>
 
         <feature-model-tree-edit-dialog
@@ -51,6 +57,7 @@ import FeatureModelTreeEditDialog from './FeatureModelTreeEditDialog.vue';
 import FeatureModelTreeAddDialog from '@/components/FeatureModel/FeatureModelTreeAddDialog';
 
 // Import feature-model-services
+import * as add from "@/services/FeatureModel/add.service.js";
 import * as dragAndDrop from "@/services/FeatureModel/dragAndDrop.service.js";
 import * as update from '@/services/FeatureModel/update.service.js';
 import * as init from '@/services/FeatureModel/init.service.js';
@@ -88,6 +95,7 @@ export default Vue.extend({
                 hasStarted: false,
                 selectedD3Node: undefined,
                 selectedGhostNode: undefined,
+                selectedD3NodePosition: undefined,
             },
             contextMenu: {
                 selectedD3Node: undefined,
@@ -106,8 +114,10 @@ export default Vue.extend({
             verticalSpacing: 75,
             d3ParentOfAddNode: undefined,
             coloringIndex: -1,
+            semanticEditing: false,
         },
         showAddDialog: false,
+        addType: "",
         showEditDialog: false,
         editNode: undefined,
     }),
@@ -143,29 +153,51 @@ export default Vue.extend({
         },
 
         hideCurrentNode(d3Node) {
+            this.closeContextMenu();
             d3Node.data.hide();
             update_service.updateSvg(this.d3Data);
             view.focusNode(this.d3Data, d3Node);
         },
 
         hideRightSiblings(d3Node) {
-            d3Node.data.toggleHideRightSiblings(this.d3Data, d3Node);
+            this.closeContextMenu();
+            d3Node.data.toggleHideRightSiblings();
             update_service.updateSvg(this.d3Data);
             view.focusNode(this.d3Data, d3Node);
         },
 
         hideLeftSiblings(d3Node) {
-            d3Node.data.toggleHideLeftSiblings(this.d3Data, d3Node);
+            this.closeContextMenu();
+            d3Node.data.toggleHideLeftSiblings();
             update_service.updateSvg(this.d3Data);
             view.focusNode(this.d3Data, d3Node);
         },
 
+        hideAllOtherNodes(d3Node) {
+            this.closeContextMenu();
+            d3Node.data.hideAllOtherNodes();
+            update_service.updateSvg(this.d3Data);
+            view.focusNode(this.d3Data, d3Node);
+        },
+
+        hideAllNodesOnThisLevel(d3Node) {
+            this.closeContextMenu();
+            d3Node.data.hideAllNodesOnThisLevel();
+            update_service.updateSvg(this.d3Data);
+            view.focusNode(this.d3Data, d3Node);
+        },
+
+        closeContextMenu() {
+            this.d3Data.contextMenu.selectedD3Node = undefined;
+        },
+
         collapse(d3Node) {
+            this.closeContextMenu();
             d3Node.data.toggleCollapse();
             update.updateSvg(this.d3Data);
         },
 
-        add(data) {
+        addAsChild(data) {
             this.showAddDialog = false;
 
             const parent = this.d3Data.d3ParentOfAddNode.data;
@@ -203,12 +235,32 @@ export default Vue.extend({
             update.updateSvg(this.d3Data);
         },
 
-        openAddDialog(d3Node) {
+        add(newNode) {
+            this.showAddDialog = false;
+
+            if (this.addType === 'child') {
+                add.addAsChild(this.d3Data, newNode);
+            } else {
+               add.addAsSibling(this.d3Data, newNode);
+            }
+
+            this.addType = "";
+        },
+
+        openAddAsChildDialog(d3Node) {
             this.d3Data.d3ParentOfAddNode = d3Node;
+            this.addType = 'child';
+            this.showAddDialog = true;
+        },
+
+        openAddAsSiblingDialog(d3Node) {
+            this.d3Data.d3ParentOfAddNode = d3Node.parent;
+            this.addType = 'sibling';
             this.showAddDialog = true;
         },
 
         openEditDialog(d3Node) {
+            this.closeContextMenu();
             this.editNode = d3Node.data;
             this.showEditDialog = true;
         },
@@ -221,6 +273,22 @@ export default Vue.extend({
         redo() {
             this.d3Data.commandManager.redo();
             update.updateSvg(this.d3Data);
+        },
+
+        highlightConstraints(d3Node) {
+            d3Node.data.constraints.forEach((constraint) => constraint.highlight());
+            update.updateSvg(this.d3Data);
+            this.updateConstraints();
+        },
+
+        resetHighlightConstraints(d3Node) {
+            d3Node.data.constraints.forEach((constraint) => constraint.resetHighlight());
+            update.updateSvg(this.d3Data);
+            this.updateConstraints();
+        },
+
+        updateConstraints() {
+            this.$emit('update-constraints');
         },
     },
 });

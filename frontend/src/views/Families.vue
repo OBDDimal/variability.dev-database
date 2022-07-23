@@ -11,9 +11,9 @@
     >
       <template v-slot:top>
         <v-toolbar flat>
-          <v-toolbar-title>Families</v-toolbar-title>
-          <v-divider class="mx-4" inset vertical></v-divider>
-          <v-spacer></v-spacer>
+          <v-toolbar-title class="hidden-sm-and-down">Families</v-toolbar-title>
+          <v-divider class="mx-4 hidden-sm-and-down" inset vertical></v-divider>
+          <v-spacer class="hidden-sm-and-down"></v-spacer>
           <v-text-field
             v-model="search"
             append-icon="mdi-magnify"
