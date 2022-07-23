@@ -95,19 +95,19 @@
 
       <v-divider></v-divider>
 
-      <!-- TODO: Emit event to highlight -->
-      <v-list-item
-        :disabled="
-          !(d3Node && d3Node.data.constraints && d3Node.data.constraints.length)
-        "
-      >
-        <v-list-item-icon>
-          <v-icon>mdi-marker</v-icon>
-        </v-list-item-icon>
-        <v-list-item-content>
-          <v-list-item-title>Highlight constraints</v-list-item-title>
-        </v-list-item-content>
-      </v-list-item>
+      <v-list-item @click="$emit('highlightConstraints', d3Node)"
+                         :disabled="!(d3Node && d3Node.data.constraints && d3Node.data.constraints.length)">
+                <v-list-item-content>
+                    <v-list-item-title>Highlight constraints</v-list-item-title>
+                </v-list-item-content>
+            </v-list-item>
+
+            <v-list-item @click="$emit('resetHighlightConstraints', d3Node)"
+                         :disabled="!(d3Node && d3Node.data.constraints && d3Node.data.constraints.length)">
+                <v-list-item-content>
+                    <v-list-item-title>Reset highlight constraints</v-list-item-title>
+                </v-list-item-content>
+            </v-list-item>
 
       <v-divider></v-divider>
 
