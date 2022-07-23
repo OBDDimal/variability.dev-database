@@ -13,9 +13,9 @@
     >
       <template v-slot:top>
         <v-toolbar flat>
-          <v-toolbar-title>Tags</v-toolbar-title>
-          <v-divider class="mx-4" inset vertical></v-divider>
-          <v-spacer></v-spacer>
+          <v-toolbar-title class="hidden-sm-and-down">Tags</v-toolbar-title>
+          <v-divider class="mx-4 hidden-sm-and-down" inset vertical></v-divider>
+          <v-spacer class="hidden-sm-and-down"></v-spacer>
           <v-text-field
             v-model="search"
             append-icon="mdi-magnify"
@@ -61,7 +61,7 @@
                     </v-col>
                     <v-col cols="12">
                       <v-checkbox
-                        v-model="editedItem.public"
+                        v-model="editedItem.is_public"
                         label="Public"
                       ></v-checkbox>
                     </v-col>
@@ -182,12 +182,12 @@ export default Vue.extend({
     editedItem: {
       label: "",
       description: "",
-      public: false,
+      is_public: false,
     },
     defaultItem: {
       label: "",
       description: "",
-      public: false,
+      is_public: false,
     },
     editedID: -1,
     tags: [],
@@ -308,6 +308,7 @@ export default Vue.extend({
 
     addTag() {
       this.addLoading = true;
+      console.log(this.editedItem)
       api
         .post(`${API_URL}tags/`, this.editedItem)
         .then(() => {

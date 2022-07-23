@@ -14,7 +14,8 @@
         <feature-model-tree-context-menu
             :d3Node="d3Data.contextMenu.selectedD3Node"
             :d3NodeEvent="d3Data.contextMenu.event"
-            @add="(d3Node) => openAddDialog(d3Node)"
+            @addAsChild="(d3Node) => openAddAsChildDialog(d3Node)"
+            @addAsSibling="(d3Node) => openAddAsSiblingDialog(d3Node)"
             @close="d3Data.contextMenu.selectedD3Node = undefined"
             @collapse="collapse"
             @edit="(d3Node) => openEditDialog(d3Node)"
@@ -23,6 +24,8 @@
             @hideRightSiblings="(d3Node) => hideRightSiblings(d3Node)"
             @highlightConstraints="(d3Node) => highlightConstraints(d3Node)"
             @resetHighlightConstraints="(d3Node) => resetHighlightConstraints(d3Node)"
+            @hideAllNodesOnThisLevel="(d3Node) => hideAllNodesOnThisLevel(d3Node)"
+            @hideAllOtherNodes="(d3Node) => hideAllOtherNodes(d3Node)"
         ></feature-model-tree-context-menu>
 
         <feature-model-tree-edit-dialog
@@ -102,6 +105,7 @@ export default Vue.extend({
             d3ParentOfAddNode: undefined,
         },
         showAddDialog: false,
+        addType: "",
         showEditDialog: false,
         editNode: undefined,
     }),
@@ -135,30 +139,38 @@ export default Vue.extend({
         },
 
         hideCurrentNode(d3Node) {
+            this.closeContextMenu();
             hide.hideCurrentNode(this.d3Data, d3Node);
         },
 
         hideRightSiblings(d3Node) {
+            this.closeContextMenu();
             hide.hideRightSiblings(this.d3Data, d3Node);
         },
 
         hideLeftSiblings(d3Node) {
+            this.closeContextMenu();
             hide.hideLeftSiblings(this.d3Data, d3Node);
         },
 
+        hideAllOtherNodes(d3Node) {
+            this.closeContextMenu();
+            hide.hideAllOtherNodes(this.d3Data, d3Node);
+        },
+
+        hideAllNodesOnThisLevel(d3Node) {
+            this.closeContextMenu();
+            hide.hideAllNodesOnThisLevel(this.d3Data, d3Node);
+        },
+
+        closeContextMenu() {
+            this.d3Data.contextMenu.selectedD3Node = undefined;
+        },
+
         collapse(d3Node) {
+            this.closeContextMenu();
             d3Node.data.toggleCollapse();
             collapse.update(this.d3Data);
-            update.updateSvg(this.d3Data);
-        },
-
-        add(newNode) {
-            this.showAddDialog = false;
-            add.addNode(this.d3Data, newNode);
-        },
-
-        edit() {
-            this.showEditDialog = false;
             update.updateSvg(this.d3Data);
         },
 
@@ -172,12 +184,37 @@ export default Vue.extend({
             update.updateSvg(this.d3Data);
         },
 
-        openAddDialog(d3Node) {
+        add(newNode) {
+            this.showAddDialog = false;
+
+            if (this.addType === 'child') {
+                add.addAsChild(this.d3Data, newNode);
+            } else {
+               add.addAsSibling(this.d3Data, newNode);
+            }
+
+            this.addType = "";
+        },
+
+        openAddAsChildDialog(d3Node) {
             this.d3Data.d3ParentOfAddNode = d3Node;
+            this.addType = 'child';
             this.showAddDialog = true;
         },
 
+        openAddAsSiblingDialog(d3Node) {
+            this.d3Data.d3ParentOfAddNode = d3Node.parent;
+            this.addType = 'sibling';
+            this.showAddDialog = true;
+        },
+
+        edit() {
+            this.showEditDialog = false;
+            update.updateSvg(this.d3Data);
+        },
+
         openEditDialog(d3Node) {
+            this.closeContextMenu();
             this.editNode = d3Node.data;
             this.showEditDialog = true;
         },

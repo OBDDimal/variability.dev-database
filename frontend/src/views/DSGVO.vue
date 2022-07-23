@@ -1,6 +1,6 @@
 <template>
   <div class="mainView">
-    <h3 class="text-h3 mb-2 mt-8">Datenschutzerklärung</h3>
+    <h3 style="hyphens: manual" class="text-h3 mb-2 mt-8">Datenschutz&shy;erklärung</h3>
     <h5 class="text-h5 mb-4">Grundlegendes</h5>
     <p>
       Diese Datenschutzerklärung soll die Nutzer dieser Website über die Art,
@@ -157,7 +157,7 @@
       andere Zwecke verarbeitet.
     </p>
 
-    <h5 class="text-h5 mb-4">Umgang mit Kontaktdaten</h5>
+    <h5 class="text-h5 mb-4">Widerspruchsrecht</h5>
     <p>
       Nutzer dieser Webseite können von ihrem Widerspruchsrecht Gebrauch machen
       und der Verarbeitung ihrer personenbezogenen Daten zu jeder Zeit

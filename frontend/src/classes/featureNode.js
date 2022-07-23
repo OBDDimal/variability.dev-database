@@ -16,6 +16,7 @@ export class FeatureNode {
 		this.constraintsHighlighted = [];
 		this.isCollapsed = true;
 		this.isHidden = false;
+		this.d3Node = null;
 	}
 
 	childrenCount() {
@@ -79,13 +80,13 @@ export class FeatureNode {
 
 	getLeftSibling() {
 		const index = this.parent.children.indexOf(this);
-		if (index == 0) return null;
+		if (index === 0) return null;
 		return this.parent.children[index - 1];
 	}
 
 	getRightSibling() {
 		const index = this.parent.children.indexOf(this);
-		if (index == this.parent.children.length - 1) return null;
+		if (index === this.parent.children.length - 1) return null;
 		return this.parent.children[index + 1];
 	}
 
