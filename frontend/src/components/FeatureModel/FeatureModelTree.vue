@@ -57,7 +57,6 @@ import FeatureModelTreeEditDialog from './FeatureModelTreeEditDialog.vue';
 import FeatureModelTreeAddDialog from '@/components/FeatureModel/FeatureModelTreeAddDialog';
 
 // Import feature-model-services
-import * as add from "@/services/FeatureModel/add.service.js";
 import * as dragAndDrop from "@/services/FeatureModel/dragAndDrop.service.js";
 import * as update from '@/services/FeatureModel/update.service.js';
 import * as init from '@/services/FeatureModel/init.service.js';
@@ -117,7 +116,6 @@ export default Vue.extend({
             semanticEditing: false,
         },
         showAddDialog: false,
-        addType: "",
         showEditDialog: false,
         editNode: undefined,
     }),
@@ -197,20 +195,6 @@ export default Vue.extend({
             update.updateSvg(this.d3Data);
         },
 
-        addAsChild(data) {
-            this.showAddDialog = false;
-
-            const parent = this.d3Data.d3ParentOfAddNode.data;
-            const addCommand = new AddCommand(
-                this.d3Data,
-                parent,
-                parent.children ? parent.children.length : 0,
-                data
-            );
-            this.d3Data.commandManager.execute(addCommand);
-
-            update.updateSvg(this.d3Data);
-        },
 
         edit(newData) {
             this.showEditDialog = false;
@@ -238,24 +222,28 @@ export default Vue.extend({
         add(newNode) {
             this.showAddDialog = false;
 
-            if (this.addType === 'child') {
-                add.addAsChild(this.d3Data, newNode);
-            } else {
-               add.addAsSibling(this.d3Data, newNode);
-            }
+                this.showAddDialog = false;
 
+                const parent = this.d3Data.d3ParentOfAddNode.data;
+                const addCommand = new AddCommand(
+                    this.d3Data,
+                    parent,
+                    parent.children ? parent.children.length : 0,
+                    newNode
+                );
+                this.d3Data.commandManager.execute(addCommand);
+
+                update.updateSvg(this.d3Data);
             this.addType = "";
         },
 
         openAddAsChildDialog(d3Node) {
             this.d3Data.d3ParentOfAddNode = d3Node;
-            this.addType = 'child';
             this.showAddDialog = true;
         },
 
         openAddAsSiblingDialog(d3Node) {
             this.d3Data.d3ParentOfAddNode = d3Node.parent;
-            this.addType = 'sibling';
             this.showAddDialog = true;
         },
 
