@@ -1,8 +1,9 @@
 import * as createPaths from '@/services/FeatureModel/createPaths.service.js';
 import * as CONSTANTS from '@/classes/constants';
-import * as hide from "@/services/FeatureModel/hide.service.js";
 import * as collapse from '@/services/FeatureModel/collapse.service.js';
-import {FeatureNode, PseudoNode} from '@/classes/featureNode';
+import {FeatureNode} from '@/classes/FeatureNode';
+import {PseudoNode} from "@/classes/PseudoNode";
+import * as count from "@/services/FeatureModel/count.service";
 
 function updateFeatureNodes(d3Data, visibleD3Nodes) {
     const featureNode = d3Data.container.featureNodesContainer.selectAll('g.node').data(
@@ -42,7 +43,6 @@ function updateFeatureNodes(d3Data, visibleD3Nodes) {
         .classed('pseudo-node', true)
         .on('click', (_, d3Node) => {
             d3Node.data.unhideHiddenNodes();
-            hide.update(d3Node.parent);
             updateSvg(d3Data);
         });
     pseudoNodeEnter.append('circle').attr('r', CONSTANTS.PSEUDO_NODE_SIZE);
@@ -178,6 +178,14 @@ function updateLinks(d3Data, visibleD3Nodes) {
     link.exit().remove();
 }
 
+function updateColoring(d3Data) {
+    if (!d3Data.updateTrigger.coloring) return;
+
+    const allNodes = d3Data.root.data.descendants();
+    count.colorNodes(allNodes, d3Data.coloringIndex);
+    d3Data.updateTrigger.coloring = false;
+}
+
 function updateSegments(d3Data, visibleD3Nodes) {
     const segment = d3Data.container.segmentsContainer.selectAll('path.segment').data(
         visibleD3Nodes.filter((d3Node) => d3Node.data instanceof FeatureNode && (d3Node.data.isAlt() || d3Node.data.isOr())),
@@ -203,6 +211,7 @@ export function updateSvg(d3Data) {
     // Flexlayout belongs to a d3-plugin that calculates the width between all nodes dynamically.
     const visibleD3Nodes = d3Data.flexlayout(d3Data.root).descendants();
 
+    updateColoring(d3Data);
     updateHighlightedConstraints(d3Data, visibleD3Nodes);
     updateSegments(d3Data, visibleD3Nodes);
     updateFeatureNodes(d3Data, visibleD3Nodes);
@@ -211,7 +220,7 @@ export function updateSvg(d3Data) {
     console.log('Rendertime', performance.now() - start);
 }
 
-// Calculates rect-witdh dependent on font-size dynamically.
+// Calculates rect-width dependent on font-size dynamically.
 export function calcRectWidth(d3Data, d3Node) {
     if (d3Node.data instanceof FeatureNode) {
         return (

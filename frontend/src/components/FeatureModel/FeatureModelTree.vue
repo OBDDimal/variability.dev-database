@@ -8,6 +8,10 @@
             @search="(search) => onChangeSearch(search)"
             @shortName="changeShortName"
             @verticalSpacing="changeVerticalSpacing"
+            @undo="undo"
+            @redo="redo"
+            :is-undo-available="d3Data.commandManager.isUndoAvailable()"
+            :is-redo-available="d3Data.commandManager.isRedoAvailable()"
             @semanticEditing="(value) => d3Data.semanticEditing = value"
         ></feature-model-tree-toolbar>
         <div id="svg-container"></div>
@@ -33,13 +37,13 @@
             :node="editNode"
             :show="showEditDialog"
             @close="showEditDialog = false"
-            @edit="edit">
+            @edit="(data) => edit(data)">
         </feature-model-tree-edit-dialog>
 
         <feature-model-tree-add-dialog
             :parent="d3Data.d3ParentOfAddNode ? d3Data.d3ParentOfAddNode.data : undefined"
             :show="showAddDialog"
-            @add="(newNode) => add(newNode)"
+            @add="(data) => add(data)"
             @close="showAddDialog = false"
         ></feature-model-tree-add-dialog>
     </div>
@@ -53,15 +57,15 @@ import FeatureModelTreeEditDialog from './FeatureModelTreeEditDialog.vue';
 import FeatureModelTreeAddDialog from '@/components/FeatureModel/FeatureModelTreeAddDialog';
 
 // Import feature-model-services
-import * as add from "@/services/FeatureModel/add.service.js";
-import * as collapse from "@/services/FeatureModel/collapse.service.js";
-import * as count from '@/services/FeatureModel/count.service.js';
 import * as dragAndDrop from "@/services/FeatureModel/dragAndDrop.service.js";
-import * as hide from "@/services/FeatureModel/hide.service.js";
 import * as update from '@/services/FeatureModel/update.service.js';
 import * as init from '@/services/FeatureModel/init.service.js';
 import * as view from "@/services/FeatureModel/view.service.js";
 import * as search from "@/services/FeatureModel/search.service.js";
+import {CommandManager} from "@/classes/Commands/CommandManager";
+import {AddCommand} from "@/classes/Commands/AddCommand";
+import {EditCommand} from "@/classes/Commands/EditCommand";
+import * as update_service from "@/services/FeatureModel/update.service";
 
 export default Vue.extend({
     name: 'FeatureModelTree',
@@ -79,8 +83,8 @@ export default Vue.extend({
 
     data: () => ({
         d3Data: {
+            commandManager: new CommandManager(),
             root: undefined,
-            allNodes: undefined,
             flexLayout: undefined,
             zoom: undefined,
             nodeIdCounter: 0,
@@ -103,12 +107,15 @@ export default Vue.extend({
                 featureNodesContainer: undefined,
                 dragContainer: undefined,
             },
+            updateTrigger: {
+                coloring: false,
+            },
             verticalSpacing: 75,
             d3ParentOfAddNode: undefined,
+            coloringIndex: -1,
             semanticEditing: false,
         },
         showAddDialog: false,
-        addType: "",
         showEditDialog: false,
         editNode: undefined,
     }),
@@ -126,7 +133,9 @@ export default Vue.extend({
         },
 
         coloring(coloringIndex) {
-            count.colorNodes(this.d3Data, coloringIndex);
+            this.d3Data.coloringIndex = coloringIndex;
+            this.d3Data.updateTrigger.coloring = true;
+            update.updateSvg(this.d3Data);
         },
 
         onChangeSearch(searchText) {
@@ -143,27 +152,37 @@ export default Vue.extend({
 
         hideCurrentNode(d3Node) {
             this.closeContextMenu();
-            hide.hideCurrentNode(this.d3Data, d3Node);
+            d3Node.data.hide();
+            update_service.updateSvg(this.d3Data);
+            view.focusNode(this.d3Data, d3Node);
         },
 
         hideRightSiblings(d3Node) {
             this.closeContextMenu();
-            hide.hideRightSiblings(this.d3Data, d3Node);
+            d3Node.data.toggleHideRightSiblings();
+            update_service.updateSvg(this.d3Data);
+            view.focusNode(this.d3Data, d3Node);
         },
 
         hideLeftSiblings(d3Node) {
             this.closeContextMenu();
-            hide.hideLeftSiblings(this.d3Data, d3Node);
+            d3Node.data.toggleHideLeftSiblings();
+            update_service.updateSvg(this.d3Data);
+            view.focusNode(this.d3Data, d3Node);
         },
 
         hideAllOtherNodes(d3Node) {
             this.closeContextMenu();
-            hide.hideAllOtherNodes(this.d3Data, d3Node);
+            d3Node.data.hideAllOtherNodes();
+            update_service.updateSvg(this.d3Data);
+            view.focusNode(this.d3Data, d3Node);
         },
 
         hideAllNodesOnThisLevel(d3Node) {
             this.closeContextMenu();
-            hide.hideAllNodesOnThisLevel(this.d3Data, d3Node);
+            d3Node.data.hideAllNodesOnThisLevel();
+            update_service.updateSvg(this.d3Data);
+            view.focusNode(this.d3Data, d3Node);
         },
 
         closeContextMenu() {
@@ -173,7 +192,20 @@ export default Vue.extend({
         collapse(d3Node) {
             this.closeContextMenu();
             d3Node.data.toggleCollapse();
-            collapse.update(this.d3Data);
+            update.updateSvg(this.d3Data);
+        },
+
+
+        edit(newData) {
+            this.showEditDialog = false;
+
+            const editCommand = new EditCommand(
+                this.d3Data,
+                this.editNode,
+                newData
+            );
+            this.d3Data.commandManager.execute(editCommand);
+
             update.updateSvg(this.d3Data);
         },
 
@@ -190,36 +222,45 @@ export default Vue.extend({
         add(newNode) {
             this.showAddDialog = false;
 
-            if (this.addType === 'child') {
-                add.addAsChild(this.d3Data, newNode);
-            } else {
-               add.addAsSibling(this.d3Data, newNode);
-            }
+                this.showAddDialog = false;
 
+                const parent = this.d3Data.d3ParentOfAddNode.data;
+                const addCommand = new AddCommand(
+                    this.d3Data,
+                    parent,
+                    parent.children ? parent.children.length : 0,
+                    newNode
+                );
+                this.d3Data.commandManager.execute(addCommand);
+
+                update.updateSvg(this.d3Data);
             this.addType = "";
         },
 
         openAddAsChildDialog(d3Node) {
             this.d3Data.d3ParentOfAddNode = d3Node;
-            this.addType = 'child';
             this.showAddDialog = true;
         },
 
         openAddAsSiblingDialog(d3Node) {
             this.d3Data.d3ParentOfAddNode = d3Node.parent;
-            this.addType = 'sibling';
             this.showAddDialog = true;
-        },
-
-        edit() {
-            this.showEditDialog = false;
-            update.updateSvg(this.d3Data);
         },
 
         openEditDialog(d3Node) {
             this.closeContextMenu();
             this.editNode = d3Node.data;
             this.showEditDialog = true;
+        },
+
+        undo() {
+            this.d3Data.commandManager.undo();
+            update.updateSvg(this.d3Data);
+        },
+
+        redo() {
+            this.d3Data.commandManager.redo();
+            update.updateSvg(this.d3Data);
         },
 
         highlightConstraints(d3Node) {

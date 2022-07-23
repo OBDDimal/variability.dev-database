@@ -161,11 +161,14 @@ export default Vue.extend({
         },
 
         save() {
-            this.node.name = this.name;
-            this.node.groupType = this.groupType;
-            this.node.isMandatory = this.mandatory;
-            this.node.isAbstract = this.abstract;
-            this.$emit('edit');
+            const data = {
+                name: this.name,
+                groupType: this.groupType,
+                mandatory: this.mandatory,
+                abstract: this.abstract,
+            };
+
+            this.$emit('edit', data);
         },
     },
 });

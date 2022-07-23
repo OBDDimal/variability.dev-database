@@ -1,82 +1,80 @@
 import * as d3 from 'd3';
 import * as CONSTANTS from '@/classes/constants';
-import * as update from "@/services/FeatureModel/update.service.js";
 
-export function colorNodes(d3Data, coloringIndex) {
+export function colorNodes(allNodes, coloringIndex) {
     switch (coloringIndex) {
         case 0:
-            coloring(d3Data.allNodes, countNodes);
+            coloring(allNodes, countNodes);
             break;
         case 1:
-            coloring(d3Data.allNodes, countDirectChildren);
+            coloring(allNodes, countDirectChildren);
             break;
         case 2:
-            coloring(d3Data.allNodes, countTotalChildren);
+            coloring(allNodes, countTotalChildren);
             break;
         default:
-            resetColorNodes(d3Data.allNodes);
+            resetColorNodes(allNodes);
             break;
     }
-    update.updateSvg(d3Data);
 }
 
-function resetColorNodes(allD3Nodes) {
-    for (const d3Node of allD3Nodes) {
-        d3Node.data.color = d3Node.data.isAbstract ? CONSTANTS.NODE_ABSTRACT_COLOR : CONSTANTS.NODE_COLOR;
+function resetColorNodes(allNodes) {
+    for (const node of allNodes) {
+        node.color = node.isAbstract ? CONSTANTS.NODE_ABSTRACT_COLOR : CONSTANTS.NODE_COLOR;
     }
 }
 
-function coloring(allD3Nodes, coloringFunction) {
-    const [count, max] = coloringFunction(allD3Nodes); // Must return {"nodeName": integer}
+function coloring(allNodes, coloringFunction) {
+    const {count, max} = coloringFunction(allNodes); // Must return {"nodeName": integer}
     const colors = d3.scaleLinear().domain(d3.ticks(1, max, CONSTANTS.COLORING_MAP.length)).range(CONSTANTS.COLORING_MAP);
 
-    for (const d3Node of allD3Nodes) {
-        if (count[d3Node.data.name] !== undefined && !d3Node.data.isAbstract) {
-            d3Node.data.color = colors(count[d3Node.data.name]);
+    for (const node of allNodes) {
+        if (count[node.name] !== undefined && !node.isAbstract) {
+            node.color = colors(count[node.name]);
         }
     }
 }
 
 /**
  * Counts all nodes
- * @returns [{"nodeName": integer}, maxAmount]
+ * @returns {max: number, count: {}}
  */
-function countNodes(allD3Nodes) {
+function countNodes(allNodes) {
     let count = {};
     let max = 0;
-    for (const d3Node of allD3Nodes) {
-        if (count[d3Node.data.name]) {
-            count[d3Node.data.name] += 1;
-            max = max < count[d3Node.data.name] ? count[d3Node.data.name] : max;
+    for (const node of allNodes) {
+        if (count[node.name]) {
+            count[node.name] += 1;
+            max = max < count[node.name] ? count[node.name] : max;
         } else {
-            count[d3Node.data.name] = 1;
-            max = max < count[d3Node.data.name] ? count[d3Node.data.name] : max;
+            count[node.name] = 1;
+            max = max < count[node.name] ? count[node.name] : max;
         }
     }
 
-    return [count, max];
+    return {count: count, max: max};
 }
 
-function countDirectChildren(allD3Nodes) {
+function countDirectChildren(allNodes) {
     let count = {};
     let max = 0;
 
-    for (const d3Node of allD3Nodes) {
-        count[d3Node.data.name] = d3Node.data.childrenCount();
-        max = max < count[d3Node.data.name] ? count[d3Node.data.name] : max;
+    for (const node of allNodes) {
+        count[node.name] = node.childrenCount();
+        max = max < count[node.name] ? count[node.name] : max;
     }
 
-    return [count, max];
+    return {count: count, max: max};
 }
 
-function countTotalChildren(allD3Nodes) {
+function countTotalChildren(allNodes) {
     let count = {};
     let max = 0;
 
-    for (const d3Node of allD3Nodes) {
-        count[d3Node.data.name] = d3Node.data.totalSubnodesCount();
-        max = max < count[d3Node.data.name] ? count[d3Node.data.name] : max;
+    for (const node of allNodes) {
+        count[node.name] = node.totalSubnodesCount();
+        max = max < count[node.name] ? count[node.name] : max;
     }
 
-    return [count, max];
+    return {count: count, max: max};
 }
