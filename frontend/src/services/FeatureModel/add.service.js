@@ -23,6 +23,7 @@ export function addNode(d3Data, newNode) {
 
     // ADD to allNodes
     d3Data.allNodes.push(d3NewNode);
+    newNode.d3Node = d3NewNode;
 
     d3Data.d3ParentOfAddNode = undefined;
     update.updateSvg(d3Data);
