@@ -2,10 +2,11 @@
     <v-bottom-sheet v-model="$store.state.openConstraints" hide-overlay>
         <constraint-add-dialog
             :show="showAddDialog"
-            :all-nodes="[rootNode]"
+            :all-nodes="rootNode ? rootNode.descendants() : undefined"
             @close="showAddDialog = false"
             @add="(newConstraint) => add(newConstraint)"
         ></constraint-add-dialog>
+
         <v-data-table
             :headers="headers"
             :items="tableConstraints"

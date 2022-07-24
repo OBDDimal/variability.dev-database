@@ -3,13 +3,14 @@ import {Implication} from "@/classes/Constraint/Implication";
 import {Conjunction} from "@/classes/Constraint/Conjunction";
 import {Disjunction} from "@/classes/Constraint/Disjunction";
 import {FeatureNodeConstraintItem} from "@/classes/Constraint/FeatureNodeConstraintItem";
-import {FeatureNode} from "@/classes/featureNode";
+import {Constraint} from "@/classes/constraint";
 
 const operators = ['not', 'and', 'or', 'implies'];
 const operatorPrecedence = {};
 operators.forEach((operator, i) => operatorPrecedence[operator] = i);
 
-export function parse(toParse) {
+export function parse(toParse, allNodes) {
+    const constraint = new Constraint();
     const inputToken = toParse.replaceAll('(', '( ').replaceAll(')', ' )').split(' ');
 
     const operatorStack = [];
@@ -20,7 +21,7 @@ export function parse(toParse) {
                 let lastOperator = operatorStack.at(-1);
                 while (lastOperator && lastOperator !== '(' && operatorPrecedence[token] > operatorPrecedence[lastOperator]) {
                     operatorStack.pop();
-                    convertToConstraintItem(lastOperator, outputStack);
+                    convertToConstraintItem(lastOperator, outputStack, allNodes);
                     lastOperator = operatorStack.length ? operatorStack.at(-1) : undefined;
                 }
             }
@@ -37,16 +38,17 @@ export function parse(toParse) {
             }
 
         } else {
-            outputStack.push(createFeatureNodeConstraintItem(token));
+            outputStack.push(createFeatureNodeConstraintItem(token, constraint, allNodes));
         }
     });
 
     // Push all operators that remains on operator-stack to output
     while (operatorStack.length) {
-        convertToConstraintItem(operatorStack.pop(), outputStack);
+        convertToConstraintItem(operatorStack.pop(), outputStack, allNodes);
     }
 
-    return outputStack[0];
+    constraint.rule = outputStack[0];
+    return constraint;
 }
 
 function convertToConstraintItem(operator, stack) {
@@ -72,7 +74,7 @@ function convertToConstraintItem(operator, stack) {
         if (second instanceof Disjunction) {
             items = [first, ...second.items]
         } else {
-            items = [first, second];1
+            items = [first, second];
         }
         constraintItem = new Disjunction(items);
     } else if (operator === 'implies') {
@@ -84,6 +86,11 @@ function convertToConstraintItem(operator, stack) {
     stack.push(constraintItem);
 }
 
-function createFeatureNodeConstraintItem(featureNodeName) {
-    return new FeatureNodeConstraintItem(new FeatureNode(undefined, featureNodeName), undefined);
+function createFeatureNodeConstraintItem(featureNodeName, constraint, allNodes) {
+    debugger;
+    const foundNode = allNodes.find((node) => node.name === featureNodeName);
+    if (!foundNode) {
+        console.error('constraint-parser', featureNodeName + ' was not found');
+    }
+    return new FeatureNodeConstraintItem(foundNode, constraint);
 }

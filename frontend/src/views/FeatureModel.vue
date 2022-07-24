@@ -14,7 +14,7 @@
 			><v-icon>mdi-format-list-checks</v-icon></v-btn
 		>
 		<constraints :constraints="constraints"
-                     :root-node="rootNode"
+                     :rootNode="rootNode"
                      @update-feature-model="updateFeatureModel"
         ></constraints>
 	</div>

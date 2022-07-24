@@ -23,15 +23,14 @@
 
 <script>
 import Vue from "vue";
-import {Constraint} from "@/classes/constraint";
-import {Implication} from "@/classes/Constraint/Implication";
-import {FeatureNodeConstraintItem} from "@/classes/Constraint/FeatureNodeConstraintItem";
 import {FeatureNode} from "@/classes/featureNode";
+import {parse} from "@/services/booleanExpressionParser.service";
 
 export default Vue.extend({
     name: "ConstraintAddDialog",
 
     data: () => ({
+        constraintText: "BerkeleyDB or (BASE or FBTree and FLogging and (not FStatistics)) implies FConcurrency",
     }),
 
     props: {
@@ -54,12 +53,7 @@ export default Vue.extend({
         },
 
         add() {
-            const newConstraint = new Constraint();
-            const premise = new FeatureNodeConstraintItem(this.allNodes[0], newConstraint);
-            const conclusion = new FeatureNodeConstraintItem(this.allNodes[0], newConstraint);
-            const imp = new Implication(premise, conclusion);
-            newConstraint.rule = imp;
-
+            const newConstraint = parse(this.constraintText, this.allNodes);
             this.$emit('add', newConstraint);
         },
     }
