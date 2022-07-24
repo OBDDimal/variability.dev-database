@@ -56,11 +56,25 @@ function convertToConstraintItem(operator, stack) {
     } else if (operator === 'and') {
         const second = stack.pop();
         const first = stack.pop();
-        constraintItem = new Conjunction([first, second]);
+
+        let items;
+        if (second instanceof Conjunction) {
+            items = [first, ...second.items]
+        } else {
+            items = [first, second];1
+        }
+        constraintItem = new Conjunction(items);
     } else if (operator === 'or') {
         const second = stack.pop();
         const first = stack.pop();
-        constraintItem = new Disjunction([first, second]);
+
+        let items;
+        if (second instanceof Disjunction) {
+            items = [first, ...second.items]
+        } else {
+            items = [first, second];1
+        }
+        constraintItem = new Disjunction(items);
     } else if (operator === 'implies') {
         const conclusion = stack.pop();
         const premise = stack.pop();

@@ -11,11 +11,11 @@ export class Negation extends ConstraintItem {
     }
 
     toString() {
-        return this.addPossibleBrackets(this.item);
+        return `¬${this.addPossibleBrackets(this.item)}`;
     }
 
     toStringPostfix() {
-        return `${this.item.toStringPostfix()} not`;
+        return `${this.item.toStringPostfix()} Negation`;
     }
 
     getFeatureNodes() {

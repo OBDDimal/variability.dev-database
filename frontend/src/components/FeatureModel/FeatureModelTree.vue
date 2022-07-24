@@ -110,6 +110,7 @@ export default Vue.extend({
         //const output = parse('A or B and C');
         console.log(output);
         console.log(output.toStringPostfix());
+        console.log(output.toString());
 
         init.initialize(this.d3Data, this.rootNode);
         dragAndDrop.init(this.d3Data);
