@@ -109,6 +109,7 @@ export default Vue.extend({
         const output = parse('A or (B or C and D and (not E)) implies F');
         //const output = parse('A or B and C');
         console.log(output);
+        console.log(output.toStringPostfix());
 
         init.initialize(this.d3Data, this.rootNode);
         dragAndDrop.init(this.d3Data);

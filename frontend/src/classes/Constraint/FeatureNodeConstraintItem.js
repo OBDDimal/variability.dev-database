@@ -17,6 +17,10 @@ export class FeatureNodeConstraintItem extends ConstraintItem {
         return this.featureNode.name;
     }
 
+    toStringPostfix() {
+        return this.toString();
+    }
+
     getFeatureNodes() {
         return [this.featureNode];
     }

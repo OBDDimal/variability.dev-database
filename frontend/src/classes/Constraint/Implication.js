@@ -15,6 +15,10 @@ export class Implication extends ConstraintItem {
         return `${this.addPossibleBrackets(this.premise)} ⇒ ${this.addPossibleBrackets(this.conclusion)}`;
     }
 
+    toStringPostfix() {
+        return `${this.premise.toStringPostfix()} ${this.conclusion.toStringPostfix()} Implication`;
+    }
+
     getFeatureNodes() {
         return [...this.premise.getFeatureNodes().flat(), ...this.conclusion.getFeatureNodes()];
     }

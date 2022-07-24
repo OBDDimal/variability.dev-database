@@ -2,6 +2,8 @@ import {Negation} from "@/classes/Constraint/Negation";
 import {Implication} from "@/classes/Constraint/Implication";
 import {Conjunction} from "@/classes/Constraint/Conjunction";
 import {Disjunction} from "@/classes/Constraint/Disjunction";
+import {FeatureNodeConstraintItem} from "@/classes/Constraint/FeatureNodeConstraintItem";
+import {FeatureNode} from "@/classes/featureNode";
 
 const operators = ['not', 'and', 'or', 'implies'];
 const operatorPrecedence = {};
@@ -10,11 +12,9 @@ operators.forEach((operator, i) => operatorPrecedence[operator] = i);
 export function parse(toParse) {
     const inputToken = toParse.replaceAll('(', '( ').replaceAll(')', ' )').split(' ');
 
-    console.log('start')
     const operatorStack = [];
     let outputStack = [];
     inputToken.forEach((token) => {
-        console.log(token);
         if (operators.includes(token)) {
             if(operatorStack.length) {
                 let lastOperator = operatorStack.at(-1);
@@ -37,21 +37,19 @@ export function parse(toParse) {
             }
 
         } else {
-            outputStack.push(token);
+            outputStack.push(createFeatureNodeConstraintItem(token));
         }
     });
 
     // Push all operators that remains on operator-stack to output
     while (operatorStack.length) {
-        console.log(operatorStack.length);
         convertToConstraintItem(operatorStack.pop(), outputStack);
     }
 
-    return outputStack;
+    return outputStack[0];
 }
 
 function convertToConstraintItem(operator, stack) {
-    console.log(operator, stack);
     let constraintItem = undefined;
     if (operator === 'not') {
         constraintItem = new Negation(stack.pop());
@@ -70,4 +68,8 @@ function convertToConstraintItem(operator, stack) {
     }
 
     stack.push(constraintItem);
+}
+
+function createFeatureNodeConstraintItem(featureNodeName) {
+    return new FeatureNodeConstraintItem(new FeatureNode(undefined, featureNodeName), undefined);
 }
