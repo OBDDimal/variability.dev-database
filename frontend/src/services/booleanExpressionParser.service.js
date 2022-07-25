@@ -3,15 +3,17 @@ import {Implication} from "@/classes/Constraint/Implication";
 import {Conjunction} from "@/classes/Constraint/Conjunction";
 import {Disjunction} from "@/classes/Constraint/Disjunction";
 import {FeatureNodeConstraintItem} from "@/classes/Constraint/FeatureNodeConstraintItem";
-import {Constraint} from "@/classes/constraint";
 
 const operators = ['not', 'and', 'or', 'implies'];
 const operatorPrecedence = {};
 operators.forEach((operator, i) => operatorPrecedence[operator] = i);
 
 export function parse(toParse, allNodes) {
-    const constraint = new Constraint();
-    const inputToken = toParse.replaceAll('(', '( ').replaceAll(')', ' )').split(' ');
+    const inputToken = toParse
+        .replaceAll('(', '( ')
+        .replaceAll(')', ' )')
+        .split(' ')
+        .filter((str) => str);
 
     const operatorStack = [];
     let outputStack = [];
@@ -38,7 +40,7 @@ export function parse(toParse, allNodes) {
             }
 
         } else {
-            outputStack.push(createFeatureNodeConstraintItem(token, constraint, allNodes));
+            outputStack.push(createFeatureNodeConstraintItem(token, allNodes));
         }
     });
 
@@ -47,8 +49,7 @@ export function parse(toParse, allNodes) {
         convertToConstraintItem(operatorStack.pop(), outputStack, allNodes);
     }
 
-    constraint.rule = outputStack[0];
-    return constraint;
+    return outputStack[0];
 }
 
 function convertToConstraintItem(operator, stack) {
@@ -63,7 +64,7 @@ function convertToConstraintItem(operator, stack) {
         if (second instanceof Conjunction) {
             items = [first, ...second.items]
         } else {
-            items = [first, second];1
+            items = [first, second];
         }
         constraintItem = new Conjunction(items);
     } else if (operator === 'or') {
@@ -86,11 +87,10 @@ function convertToConstraintItem(operator, stack) {
     stack.push(constraintItem);
 }
 
-function createFeatureNodeConstraintItem(featureNodeName, constraint, allNodes) {
-    debugger;
+function createFeatureNodeConstraintItem(featureNodeName, allNodes) {
     const foundNode = allNodes.find((node) => node.name === featureNodeName);
     if (!foundNode) {
         console.error('constraint-parser', featureNodeName + ' was not found');
     }
-    return new FeatureNodeConstraintItem(foundNode, constraint);
+    return new FeatureNodeConstraintItem(foundNode);
 }

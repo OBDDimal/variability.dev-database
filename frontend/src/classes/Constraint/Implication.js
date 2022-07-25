@@ -15,6 +15,10 @@ export class Implication extends ConstraintItem {
         return `${this.addPossibleBrackets(this.premise)} ⇒ ${this.addPossibleBrackets(this.conclusion)}`;
     }
 
+    toStringForEdit() {
+        return `${this.addPossibleBracketsForEdit(this.premise)} implies ${this.addPossibleBracketsForEdit(this.conclusion)}`;
+    }
+
     toStringPostfix() {
         return `${this.premise.toStringPostfix()} ${this.conclusion.toStringPostfix()} Implication`;
     }
@@ -25,5 +29,10 @@ export class Implication extends ConstraintItem {
 
     getFeatureNodes() {
         return [...this.premise.getFeatureNodes().flat(), ...this.conclusion.getFeatureNodes()];
+    }
+
+    setConstraint(constraint) {
+        this.premise.setConstraint(constraint);
+        this.conclusion.setConstraint(constraint);
     }
 }

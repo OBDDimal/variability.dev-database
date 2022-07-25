@@ -125,21 +125,17 @@ export default Vue.extend({
                 .map((rule) => {
                     return [...rule.childNodes]
                         .filter((item) => item.tagName)
-                        .map((item) => {
-                            const constraint = new Constraint();
-                            constraint.rule = this.readConstraintItem(item, constraint);
-                            return constraint;
-                        })[0];
+                        .map((item) => new Constraint(this.readConstraintItem(item)))[0];
                 });
 		},
 
-        readConstraintItem(item, constraint) {
+        readConstraintItem(item) {
             if (item.tagName === 'var') {
-                return new FeatureNodeConstraintItem(this.featureMap[item.innerHTML], constraint);
+                return new FeatureNodeConstraintItem(this.featureMap[item.innerHTML]);
             } else {
                 const childItems = [...item.childNodes]
                     .filter((childItem) => childItem.tagName)
-                    .map((childItem) => this.readConstraintItem(childItem, constraint));
+                    .map((childItem) => this.readConstraintItem(childItem));
 
                 switch (item.tagName) {
                     case 'disj': return new Disjunction(childItems);

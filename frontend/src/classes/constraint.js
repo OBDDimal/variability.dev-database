@@ -2,9 +2,10 @@ import * as CONSTANTS from "./constants";
 
 export class Constraint {
 
-    constructor() {
+    constructor(rule) {
         this.isHighlighted = false;
-        this.rule = undefined;
+        this.rule = rule;
+        this.rule.setConstraint(this);
     }
 
     highlight() {
@@ -36,6 +37,10 @@ export class Constraint {
 
     toString() {
         return this.rule.toString();
+    }
+
+    toStringForEdit() {
+        return this.rule.toStringForEdit();
     }
 
     toStringPostfix() {

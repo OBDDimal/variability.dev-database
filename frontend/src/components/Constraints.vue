@@ -1,10 +1,12 @@
 <template>
     <v-bottom-sheet v-model="$store.state.openConstraints" hide-overlay>
         <constraint-add-dialog
-            :show="showAddDialog"
+            :show="showAddEditDialog"
             :all-nodes="rootNode ? rootNode.descendants() : undefined"
-            @close="showAddDialog = false"
-            @add="(newConstraint) => add(newConstraint)"
+            @close="closeAddEditDialog"
+            @save="(newConstraint) => save(newConstraint)"
+            :constraint="constraintAddEdit"
+            :mode="modeAddEdit"
         ></constraint-add-dialog>
 
         <v-data-table
@@ -19,14 +21,14 @@
         >
             <template v-slot:top>
                 <div class="d-flex justify-center align-center">
-                    <v-btn color="primary" @click="showAddDialog = true">Add</v-btn>
-
                     <v-text-field
                         v-model="search"
                         class="mx-4"
                         label="Search"
                         prepend-inner-icon="mdi-magnify"
                     ></v-text-field>
+
+                    <v-btn color="primary" @click="openAddEditDialog('Add', undefined)">Add</v-btn>
 
                     <v-btn icon @click="$store.commit('openConstraints', false)">
                         <v-icon>mdi-close</v-icon>
@@ -43,6 +45,28 @@
                     {{ item.formula }}
                 </v-chip>
             </template>
+
+            <template v-slot:item.actions="{ item }">
+                <v-icon
+                    class="mr-6"
+                    @click="openAddEditDialog('Edit', item.constraint)"
+                >
+                    mdi-pencil
+                </v-icon>
+                <v-icon
+                >
+                    mdi-delete
+                </v-icon>
+            </template>
+
+            <template v-slot:no-data>
+                <v-btn
+                    color="primary"
+                    @click="initialize"
+                >
+                    Reset
+                </v-btn>
+            </template>
         </v-data-table>
     </v-bottom-sheet>
 </template>
@@ -50,6 +74,7 @@
 <script>
 import Vue from "vue";
 import ConstraintAddDialog from '@/components/ConstraintAddDialog';
+import {Constraint} from "@/classes/constraint";
 
 export default Vue.extend({
     name: "Constraints",
@@ -64,9 +89,14 @@ export default Vue.extend({
     },
 
     data: () => ({
-        headers: [{text: "Constraint", value: "formula"}],
+        headers: [
+            {text: "Constraint", value: "formula"},
+            {text: "Actions", value: "actions"},
+        ],
         search: "",
-        showAddDialog: false,
+        showAddEditDialog: false,
+        modeAddEdit: undefined,
+        constraintAddEdit: undefined,
         updateKey: 0,
     }),
 
@@ -93,9 +123,14 @@ export default Vue.extend({
             this.updateKey++;
         },
 
-        add(newConstraint) {
-            this.showAddDialog = false;
-            this.constraints.push(newConstraint);
+        save(newConstraintItem) {
+            if (this.modeAddEdit === 'Add') {
+                this.constraints.push(new Constraint(newConstraintItem));
+            } else {
+                this.constraintAddEdit.rule = newConstraintItem;
+            }
+
+            this.closeAddEditDialog();
         },
 
         computeColor(bg) {
@@ -120,6 +155,17 @@ export default Vue.extend({
                 return "#000"
             }
         },
+
+        openAddEditDialog(mode, constraint) {
+            this.showAddEditDialog = true;
+            this.modeAddEdit = mode;
+            this.constraintAddEdit = constraint;
+        },
+
+        closeAddEditDialog() {
+            this.showAddEditDialog = false;
+            this.constraintAddEdit = undefined;
+        }
     },
 });
 </script>

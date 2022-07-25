@@ -1,12 +1,9 @@
 import {ConstraintItem} from "@/classes/Constraint/ConstraintItem";
 
 export class FeatureNodeConstraintItem extends ConstraintItem {
-    constructor(featureNode, constraint) {
+    constructor(featureNode) {
         super();
         this.featureNode = featureNode;
-        this.constraint = constraint;
-        if (!this.featureNode.constraints.includes(this.constraint))
-            this.featureNode.constraints.push(this.constraint);
     }
 
     count() {
@@ -15,6 +12,10 @@ export class FeatureNodeConstraintItem extends ConstraintItem {
 
     toString() {
         return this.featureNode.name;
+    }
+
+    toStringForEdit() {
+        return this.toString();
     }
 
     toStringPostfix() {
@@ -27,5 +28,11 @@ export class FeatureNodeConstraintItem extends ConstraintItem {
 
     getFeatureNodes() {
         return [this.featureNode];
+    }
+
+    setConstraint(constraint) {
+        this.constraint = constraint;
+        if (!this.featureNode.constraints.includes(this.constraint))
+            this.featureNode.constraints.push(this.constraint);
     }
 }
