@@ -6,10 +6,6 @@ export class SingleNodeCommand extends Command {
         this.node = node;
     }
 
-    undo() {
-
-    }
-
     markChanges() {
         this.node.markAsEdited();
     }

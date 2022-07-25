@@ -1,4 +1,4 @@
-import {SingleNodeCommand} from "@/classes/Commands/SingleNodeCommand";
+import {SingleNodeCommand} from "@/classes/Commands/FeatureModel/SingleNodeCommand";
 import {createFeatureNode} from "@/classes/FeatureNode";
 
 export class AddCommand extends SingleNodeCommand {

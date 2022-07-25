@@ -73,9 +73,7 @@ export default Vue.extend({
 
     watch: {
         constraint() {
-            console.log(this.constraint);
             this.constraintText = this.constraint ? this.constraint.toStringForEdit() : "";
-            console.log(this.constraintText);
         },
     },
 
