@@ -26,9 +26,8 @@ jobs:
       - name: Build dependencies
         run: npm run build
 
-      # TODO: When tests are ready 
       # - name: Test & create coverage
-      # run: yarn test:ci
+        # run: yarn test:ci
       
       # - name: Upload Sonar Test Results Frontend
         # uses: actions/upload-artifact@v2

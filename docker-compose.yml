@@ -13,7 +13,7 @@ services:
       - "--providers.docker.exposedbydefault=false"
       - "--entrypoints.websecure.address=:443"
       - "--certificatesresolvers.myresolver.acme.tlschallenge=true"
-      # - "--certificatesresolvers.myresolver.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory"
+      #- "--certificatesresolvers.myresolver.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory"
       - "--certificatesresolvers.myresolver.acme.email=tobias.hess@uni-ulm.com"
       - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
     labels:
@@ -41,10 +41,8 @@ services:
 
   backend:
     build: ./backend
-    privileged: true
     volumes:
       - djangomedia:/api/media
-      - /var/run/docker.sock:/var/run/docker.sock
     command: ./entrypoint.sh
     depends_on:
       - db
@@ -58,9 +56,10 @@ services:
     build: ./frontend
     depends_on:
       - backend
+    command: nginx -g 'daemon off;'
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.frontend.rule=Host(`ddueruem.tobiasbetz.de`)"
+      - "traefik.http.routers.frontend.rule=Host(`vm-154-210.bwcloud.uni-ulm.de`)"
       - "traefik.http.routers.frontend.entrypoints=websecure"
       - "traefik.http.routers.frontend.tls.certresolver=myresolver"
 

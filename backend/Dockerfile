@@ -3,8 +3,6 @@ RUN apt update && apt install -y nginx
 ADD . /api
 COPY ./ddueruemweb/.env.production /api/ddueruemweb/.env
 WORKDIR /api
-RUN pip install --upgrade pip
-RUN pip install --upgrade setuptools
 
 # This is for the performant prod server
 RUN pip install uwsgi
