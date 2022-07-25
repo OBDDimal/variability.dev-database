@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - dev
+      # Remove on dev branch
       - 193-repair-pipeline-and-deploy
 jobs:
   deploy:
