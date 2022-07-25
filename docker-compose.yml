@@ -41,8 +41,10 @@ services:
 
   backend:
     build: ./backend
+    privileged: true
     volumes:
       - djangomedia:/api/media
+      - /var/run/docker.sock:/var/run/docker.sock
     command: ./entrypoint.sh
     depends_on:
       - db
