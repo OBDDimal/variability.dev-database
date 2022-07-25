@@ -86,7 +86,7 @@
               </v-col>
               <v-col cols="12" md="5" class="py-0">
                 <!-- Change back to v-combobox when new family upload is working properly -->
-                <v-autocomplete
+                <v-combobox
                   :disabled="newVersionOf != null"
                   :required="newVersionOf == null"
                   outlined
@@ -97,7 +97,7 @@
                   :items="gottenFamilies"
                   label="Family"
                   hint="Add to or create new family"
-                ></v-autocomplete>
+                ></v-combobox>
                 <v-text-field
                     v-if="isNewFamily"
                     outlined
@@ -113,18 +113,20 @@
             <v-row>
               <v-col cols="12" class="py-0">
                 <!-- Change back to v-combobox once sequential axios requests are implemented -->
-                <v-combobox
-                  outlined
-                  hide-details
-                  v-model="tags"
-                  :items="getTags"
-                  label="Tags"
-                  multiple
-                  chips
-                  small-chips
-                  dense
-                  hint="Choose or create tags for your feature model"
-                ></v-combobox>
+                <v-autocomplete
+                    outlined
+                    hide-details
+                    v-model="tags"
+                    :items="getTags"
+                    label="Tags"
+                    multiple
+                    chips
+                    small-chips
+                    dense
+                    hint="Choose or create tags for your feature model"
+                    append-outer-icon="mdi-plus"
+                    @click:append-outer="editTagMenu = !editTagMenu"
+                ></v-autocomplete>
               </v-col>
               <v-col cols="12" class="pb-0">
                 <v-checkbox
@@ -162,8 +164,9 @@
                 </v-checkbox>
               </v-col>
               <v-col cols="12" class="pb-0">
-                <div class="d-flex">
+                <div class="d-flex align-center">
                   <v-spacer></v-spacer>
+                  <span v-if="uploadStatus != ''" class="text-subtitle-1">{{ uploadStatus }}</span>
                   <v-btn color="primary" text @click="close"> Cancel </v-btn>
                   <v-btn
                     color="primary"
@@ -180,14 +183,53 @@
         </v-container>
       </v-card-text>
     </v-card>
+    <v-dialog v-model="editTagMenu" max-width="350">
+      <v-card>
+        <v-card-title>Add new Tag</v-card-title>
+        <v-card-text>
+          <v-row no-gutters>
+            <v-col cols="12">
+              <v-text-field
+                  v-model="newTag.label"
+                  hide-details
+                  label="Label"
+              >
+              </v-text-field>
+            </v-col>
+            <v-col cols="12">
+              <v-text-field
+                  v-model="newTag.description"
+                  hide-details
+                  label="Description"
+              >
+              </v-text-field>
+            </v-col>
+            <v-col cols="12">
+              <v-checkbox
+                  v-model="newTag.is_public"
+                  hide-details
+                  label="Public"
+              ></v-checkbox>
+            </v-col>
+          </v-row>
+        </v-card-text>
+        <v-card-actions class="pa-4">
+          <v-spacer></v-spacer>
+          <v-btn text color="primary" @click="editTagMenu = !editTagMenu">
+            Cancel
+          </v-btn>
+          <v-btn color="primary" @click="uploadTag()" :loading="loadingAddTag">Upload Tag</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 
 <script>
 import Vue from "vue";
-import api from "@/services/api.service";
+/*import api from "@/services/api.service";
 
-const API_URL = process.env.VUE_APP_DOMAIN;
+const API_URL = process.env.VUE_APP_DOMAIN;*/
 
 export default Vue.extend({
   name: "FileCreate",
@@ -221,13 +263,18 @@ export default Vue.extend({
     isNewFamily: false,
 
     gottenTags: [],
-    tags: null,
+    tags: [],
+    newTag: { label: "", description: "", is_public: false },
 
     legalShare: false,
     userData: false,
     openSource: false,
 
     loading: false,
+    uploadStatus: '',
+
+    editTagMenu: false,
+    loadingAddTag: false,
 
     /* gottenFiles: [],
     newVersionOf: "",
@@ -264,6 +311,9 @@ export default Vue.extend({
       } else {
         this.isNewFamily = false
       }
+    },
+    tags: function(newValue) {
+      console.log(newValue)
     }
   },
 
@@ -303,7 +353,7 @@ export default Vue.extend({
       const tags = [];
       for (let i = 0; i < this.gottenTags.length; i++) {
         const element = this.gottenTags[i];
-        tags.push({ text: element.label, value: element.id });
+        tags.push({ text: element.label, value: { label: element.label, id: element.id } });
       }
       return tags;
     },
@@ -324,92 +374,54 @@ export default Vue.extend({
       }
       return temp;
     },
-    upload() {
+    async upload() {
       if (this.$refs.form.validate() !== false) {
         this.loading = true;
         const data = new FormData();
 
         data.append("label", this.label);
-        console.log("LABEL");
-        console.log(this.label);
         data.append("description", this.description);
-        console.log("DESCRIPTION");
-        console.log(this.description);
         data.append("local_file", this.file);
-        console.log("FILE");
-        console.log(this.file);
         data.append("license", this.license);
-        console.log("LICENSE");
-        console.log(this.license);
         if (this.newVersionOf !== null && this.newVersionOf) {
           data.append("new_version_of", this.newVersionOf);
-          console.log("NEW VERSION OF");
-          console.log(this.newVersionOf);
         }
         if (this.family !== "" && this.family) {
           if (!this.isNewFamily) {
             //change back to this.family.value when using v-combobox again
-            data.append("family", this.family);
-            console.log("FEATURE FAMILY (not new)")
-            console.log(this.family)
-          } /*else {
-            api
-              .post(`${API_URL}families/`, {label: this.family, description: this.newFamilyDescription})
-              .then(async () => {
-                await this.$store.dispatch("fetchFamilies");
-                await data.append("family", null);
-                console.log("FEATURE FAMILY (didnt work)")
-              })
-              .catch((error) => {
-                this.$store.commit("updateSnackbar", {
-                  message: "Error while creating new family: " + error.message,
-                  variant: "error",
-                  timeout: 5000,
-                  show: true,
-                });
-                data.append("family", null);
-                console.log("FEATURE FAMILY (didnt work)")
-              });
-          }*/
-        }
-        for (let i = 0; i < this.tags.length; i++) {
-          this.tags[i].label = this.tags[i]["text"];
-          delete this.tags[i].text;
-          this.tags[i].id = this.tags[i]["value"];
-          delete this.tags[i].value;
+            data.append("family", this.family.value);
+          } else {
+            this.uploadStatus = 'Uploading new family...'
+            const uploadedFamily = await this.$store.dispatch("uploadFamily", {label: this.family, description: this.newFamilyDescription})
+            data.append("family", uploadedFamily.id);
+          }
         }
         data.append("tags", JSON.stringify(this.tags));
-        console.log("TAGS");
-        console.log(this.tags);
-
-        /*console.log(data)*/
-
-        api
-          .post(`${API_URL}files/`, data, {
-            headers: { "Content-Type": "multipart/form-data" },
-          })
-          .then(() => {
-            this.$store.commit("updateSnackbar", {
-              message: "File uploaded successfully! Check your mails",
-              variant: "success",
-              timeout: 5000,
-              show: true,
-            });
-            this.loading = false;
-            this.close();
-          })
-          .catch((error) => {
-            this.$store.commit("updateSnackbar", {
-              message: "Error: " + error.message,
-              variant: "error",
-              timeout: 5000,
-              show: true,
-            });
-            this.loading = false;
-            this.close();
-          });
+        this.uploadStatus = 'Uploading file...'
+        await this.$store.dispatch("uploadFeatureModel", data)
+        this.uploadStatus = ''
+        this.loading = false
+        this.close()
       }
     },
+    async uploadTag() {
+      this.loadingAddTag = true
+      const uploadedTag = await this.$store.dispatch("uploadTag", this.newTag)
+      await this.$store.dispatch("fetchTags");
+      this.tags.push({ label: uploadedTag.label, id: uploadedTag.id })
+      this.newTag = { label: "", description: "", is_public: false }
+      this.editTagMenu = false
+      this.loadingAddTag = false
+    }
+    /*uploadFile() {
+
+    },
+    uploadFamily() {
+
+    },
+    uploadTags() {
+
+    }*/
   },
 
   mounted() {

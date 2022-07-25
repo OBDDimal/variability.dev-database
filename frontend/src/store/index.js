@@ -75,6 +75,62 @@ export default new Vuex.Store({
 				commit('setFeatureModels', { featureModels: response.data });
 			});
 		},
+		async uploadFeatureModel({ commit }, data) {
+			return await api
+				.post(`${API_URL}files/`, data, {
+					headers: { "Content-Type": "multipart/form-data" },
+				})
+				.then(() => {
+					commit("updateSnackbar", {
+						message: "File uploaded successfully! Check your mails",
+						variant: "success",
+						timeout: 5000,
+						show: true,
+					});
+				})
+				.catch((error) => {
+					commit("updateSnackbar", {
+						message: "Error: " + error.message,
+						variant: "error",
+						timeout: 5000,
+						show: true,
+					});
+				});
+		},
+		async uploadFamily({ commit }, payload) {
+			// payload = { label: this.family, description: this.newFamilyDescription }
+			return await api
+				.post(`${API_URL}families/`, payload)
+				.then((response) => {
+					return response.data
+				})
+				.catch((error) => {
+					commit("updateSnackbar", {
+						message: "Error while creating new family: " + error.message,
+						variant: "error",
+						timeout: 5000,
+						show: true,
+					});
+					return error
+				});
+		},
+		async uploadTag({ commit }, payload) {
+			// payload = { label: "", description: "", is_public: false }
+			return await api
+				.post(`${API_URL}tags/`, payload)
+				.then((response) => {
+					return response.data
+				})
+				.catch((error) => {
+					commit("updateSnackbar", {
+						message: "Error while uploading new tag: " + error.message,
+						variant: "error",
+						timeout: 5000,
+						show: true,
+					});
+					return error
+				});
+		}
 	},
 	mutations: {
 		updateSnackbar(state, payload) {
