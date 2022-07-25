@@ -56,10 +56,9 @@ services:
     build: ./frontend
     depends_on:
       - backend
-    command: nginx -g 'daemon off;'
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.frontend.rule=Host(`vm-154-210.bwcloud.uni-ulm.de`)"
+      - "traefik.http.routers.frontend.rule=Host(`ddueruem.uni-ulm.de`)"
       - "traefik.http.routers.frontend.entrypoints=websecure"
       - "traefik.http.routers.frontend.tls.certresolver=myresolver"
 
