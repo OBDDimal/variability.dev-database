@@ -18,6 +18,10 @@ export class Negation extends ConstraintItem {
         return `${this.item.toStringPostfix()} Negation`;
     }
 
+    toStringXML() {
+        return `<not>${this.item.toStringXML()}</not>`;
+    }
+
     getFeatureNodes() {
         return this.item.getFeatureNodes();
     }

@@ -10,4 +10,12 @@ export class Disjunction extends GroupConstraintItem {
             .map((item) => item.toStringPostfix())
             .join(` `) + ' Disjunction';
     }
+
+    toStringXML() {
+        return `<disj>${
+            this.items
+            .map((item) => item.toStringXML())
+            .join(` `)
+        }</disj>`;
+    }
 }

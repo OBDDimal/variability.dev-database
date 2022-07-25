@@ -17,7 +17,6 @@ export class GroupConstraintItem extends ConstraintItem {
           .join(` ${this.operator} `);
    }
 
-
    getFeatureNodes() {
       return this.items
           .map((item) => item.getFeatureNodes())

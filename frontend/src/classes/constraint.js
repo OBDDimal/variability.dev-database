@@ -37,4 +37,12 @@ export class Constraint {
     toString() {
         return this.rule.toString();
     }
+
+    toStringPostfix() {
+        return this.rule.toStringPostfix();
+    }
+
+    toStringXML() {
+        return this.rule.toStringXML();
+    }
 }

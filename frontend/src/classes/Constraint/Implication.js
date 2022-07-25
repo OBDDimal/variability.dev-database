@@ -19,6 +19,10 @@ export class Implication extends ConstraintItem {
         return `${this.premise.toStringPostfix()} ${this.conclusion.toStringPostfix()} Implication`;
     }
 
+    toStringXML() {
+        return `<imp>${this.premise.toStringXML()} ${this.conclusion.toStringXML()}</imp>`;
+    }
+
     getFeatureNodes() {
         return [...this.premise.getFeatureNodes().flat(), ...this.conclusion.getFeatureNodes()];
     }

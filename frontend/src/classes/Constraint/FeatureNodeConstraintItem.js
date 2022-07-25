@@ -21,6 +21,10 @@ export class FeatureNodeConstraintItem extends ConstraintItem {
         return this.toString();
     }
 
+    toStringXML() {
+        return `<var>${this.featureNode.name}</var>`;
+    }
+
     getFeatureNodes() {
         return [this.featureNode];
     }

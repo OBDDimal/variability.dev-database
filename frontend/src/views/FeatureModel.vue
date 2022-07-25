@@ -162,7 +162,7 @@ export default Vue.extend({
             let xml = `<?xml version="1.0" encoding="UTF-8" standalone="no"?><featureModel>`;
             xml += `<struct>${this.nodeToXML(root)}</struct>`;
             xml += `<constraints>${this.constraints.reduce(
-                (prev, constraint) => prev + '<rule>' + this.constraintToXML(constraint) + '</rule>',
+                (prev, constraint) => prev + '<rule>' + constraint.toStringXML() + '</rule>',
                 ''
             )}</constraints>`;
             xml += `</featureModel>`;
@@ -196,20 +196,6 @@ export default Vue.extend({
                 toReturn += `</${node.groupType}>`;
                 return toReturn;
             }
-        },
-
-        constraintToXML(constraint) {
-            console.log(constraint);
-            /*if (constraint instanceof VarConstraint) {
-                return `<var>${constraint.featureNode.name}</var>`;
-            } else if (constraint instanceof Constraint) {
-                let toReturn = `<${constraint.xmlOperator}>`;
-                constraint.children.forEach((childConstraint) => {
-                    toReturn += this.constraintToXML(childConstraint);
-                });
-                toReturn += `</${constraint.xmlOperator}>`;
-                return toReturn;
-            }*/
         },
     },
 });
