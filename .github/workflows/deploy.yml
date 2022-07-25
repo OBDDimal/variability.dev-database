@@ -3,7 +3,6 @@ on:
   push:
     branches:
       - dev
-      - 193-repair-pipeline-and-deploy
 jobs:
   deploy:
     runs-on: ubuntu-latest
