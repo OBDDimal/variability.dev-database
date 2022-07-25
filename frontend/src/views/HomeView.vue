@@ -1,6 +1,6 @@
 <template>
   <div class="mainView">
-    <h3 class="text-h3 mb-2 mt-8">Welcome to Ddueruem</h3>
+    <h3 class="text-h3 mb-2 mt-8">Welcome to ddueruem</h3>
     <h5 class="text-h5 mb-4">
       A web service for sharing feature model instances and collaborative
       benchmarking

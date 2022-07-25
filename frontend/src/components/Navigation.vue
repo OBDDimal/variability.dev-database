@@ -31,6 +31,14 @@
       <v-spacer></v-spacer>
       <div class="hidden-lg-and-up">
         <v-btn
+          icon
+          class="mr-3"
+          @click="$vuetify.theme.dark = !$vuetify.theme.dark"
+        >
+          <v-icon v-if="$vuetify.theme.dark"> mdi-brightness-7 </v-icon>
+          <v-icon v-else> mdi-brightness-4 </v-icon>
+        </v-btn>
+        <v-btn
             icon
             @click.stop="drawer = !drawer"
         >
