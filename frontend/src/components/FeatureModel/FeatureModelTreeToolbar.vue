@@ -53,7 +53,7 @@
                     </v-list-item>
                     <v-list-item
                         class="clickable"
-                        @click="$emit('resetView', levels, maxChilds)"
+                        @click="$emit('resetView', levels, maxChildren)"
                     >
                         <v-list-item-content>
                             <v-list-item-title>Reset view</v-list-item-title>
@@ -123,22 +123,34 @@
                             class="mt-0 pt-0"
                             min="0"
                             type="number"
-                            @change="$emit('resetView', levels, maxChilds)"
+                            @change="$emit('resetView', levels, maxChildren)"
                         ></v-text-field>
                     </v-list-item>
                     <v-subheader>Adjust Max Children</v-subheader>
 
                     <v-list-item>
                         <v-text-field
-                            v-model="maxChilds"
+                            v-model="maxChildren"
                             class="mt-0 pt-0"
                             min="0"
                             type="number"
-                            @change="$emit('resetView', levels, maxChilds)"
+                            @change="$emit('resetView', levels, maxChildren)"
                         ></v-text-field>
+                    </v-list-item>
+
+                    <v-list-item>
+                        <v-checkbox label="Semantic editing" v-model="semanticEditing"></v-checkbox>
                     </v-list-item>
                 </v-list>
             </v-menu>
+
+            <v-btn icon @click="$emit('undo')" :disabled="!isUndoAvailable">
+                <v-icon>mdi-undo</v-icon>
+            </v-btn>
+
+            <v-btn icon @click="$emit('redo')" :disabled="!isRedoAvailable">
+                <v-icon>mdi-redo</v-icon>
+            </v-btn>
         </v-toolbar>
     </div>
 </template>
@@ -151,17 +163,21 @@ export default Vue.extend({
 
     components: {},
 
-    props: {},
+    props: {
+        isUndoAvailable: Boolean,
+        isRedoAvailable: Boolean,
+    },
 
     data: () => ({
         selectedColoring: undefined,
         selectedView: undefined,
         levels: 4,
-        maxChilds: 3,
+        maxChildren: 3,
         verticalSpacing: 75,
         itemsColoring: ["Count", "Direct Children", "Total Children"],
         searchText: "",
         isShortName: false,
+        semanticEditing: false,
     }),
 
     watch: {
@@ -182,6 +198,9 @@ export default Vue.extend({
         },
         maxChilds: function (newValue) {
             this.$emit("maxChilds", newValue);
+        },
+        semanticEditing: function (newValue) {
+            this.$emit("semanticEditing", newValue);
         },
     },
 

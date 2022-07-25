@@ -66,6 +66,7 @@ export default Vue.extend({
         headers: [{text: "Constraint", value: "formula"}],
         search: "",
         showAddDialog: false,
+        updateKey: 0,
     }),
 
     computed: {
@@ -85,6 +86,10 @@ export default Vue.extend({
             constraintRow.constraint.toggleHighlighted();
             constraintRow.constraint.getFeatureNodes().forEach((node) => node.uncollapse());
             this.$emit("update-feature-model");
+        },
+
+        update() {
+            this.updateKey++;
         },
 
         add(newConstraint) {

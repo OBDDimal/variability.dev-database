@@ -7,14 +7,27 @@ export class Constraint {
         this.rule = undefined;
     }
 
-    toggleHighlighted() {
+    highlight() {
+        if (!this.isHighlighted) {
+            this.color = CONSTANTS.CONSTRAINT_HIGHLIGHT_COLORS.pop();
+            this.isHighlighted = true;
+        }
+    }
+
+    resetHighlight() {
         if (this.isHighlighted) {
             CONSTANTS.CONSTRAINT_HIGHLIGHT_COLORS.push(this.color);
             this.color = undefined;
-        } else {
-            this.color = CONSTANTS.CONSTRAINT_HIGHLIGHT_COLORS.pop();
+            this.isHighlighted = false;
         }
-        this.isHighlighted = !this.isHighlighted;
+    }
+
+    toggleHighlighted() {
+        if (this.isHighlighted) {
+            this.resetHighlight();
+        } else {
+            this.highlight();
+        }
     }
 
     getFeatureNodes() {
