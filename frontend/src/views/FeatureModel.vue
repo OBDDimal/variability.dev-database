@@ -33,10 +33,15 @@
 import Vue from 'vue';
 import FeatureModelTree from '../components/FeatureModel/FeatureModelTree.vue';
 import Constraints from '../components/Constraints.vue';
-import {Constraint, VarConstraint} from '@/classes/constraint';
+import {Constraint} from '@/classes/constraint';
 import {berkeley} from '@/classes/featureModelData';
 import {FeatureNode} from '@/classes/FeatureNode';
 import * as update from "@/services/FeatureModel/update.service";
+import {FeatureNodeConstraintItem} from "@/classes/Constraint/FeatureNodeConstraintItem";
+import {Disjunction} from "@/classes/Constraint/Disjunction";
+import {Conjunction} from "@/classes/Constraint/Conjunction";
+import {Implication} from "@/classes/Constraint/Implication";
+import {Negation} from "@/classes/Constraint/Negation";
 
 export default Vue.extend({
     name: 'FeatureModel',
@@ -194,7 +199,8 @@ export default Vue.extend({
         },
 
         constraintToXML(constraint) {
-            if (constraint instanceof VarConstraint) {
+            console.log(constraint);
+            /*if (constraint instanceof VarConstraint) {
                 return `<var>${constraint.featureNode.name}</var>`;
             } else if (constraint instanceof Constraint) {
                 let toReturn = `<${constraint.xmlOperator}>`;
@@ -203,7 +209,7 @@ export default Vue.extend({
                 });
                 toReturn += `</${constraint.xmlOperator}>`;
                 return toReturn;
-            }
+            }*/
         },
     },
 });

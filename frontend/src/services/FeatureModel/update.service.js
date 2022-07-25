@@ -111,6 +111,7 @@ function updateFeatureNodes(d3Data, visibleD3Nodes) {
 
 function updateHighlightedConstraints(d3Data, visibleD3Nodes) {
     const highlightedNodes = visibleD3Nodes
+        .filter((d3Node) => d3Node.data instanceof FeatureNode)
         .map((d3Node) => ({d3Node: d3Node, highlightedConstraints: d3Node.data.getHighlightedConstraints()}))
         .filter((d) => d.highlightedConstraints.length);
 

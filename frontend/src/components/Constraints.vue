@@ -8,6 +8,7 @@
         ></constraint-add-dialog>
 
         <v-data-table
+            :key="updateKey"
             :headers="headers"
             :items="tableConstraints"
             :items-per-page="5"

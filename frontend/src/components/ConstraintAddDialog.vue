@@ -23,7 +23,7 @@
 
 <script>
 import Vue from "vue";
-import {FeatureNode} from "@/classes/featureNode";
+import {FeatureNode} from "@/classes/FeatureNode";
 import {parse} from "@/services/booleanExpressionParser.service";
 
 export default Vue.extend({
