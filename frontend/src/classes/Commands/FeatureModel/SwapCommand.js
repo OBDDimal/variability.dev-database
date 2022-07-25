@@ -1,6 +1,6 @@
-import {SingleNodeCommand} from "@/classes/Commands/FeatureModel/SingleNodeCommand";
+import {FeatureNodeCommand} from "@/classes/Commands/FeatureModel/FeatureNodeCommand";
 
-export class SwapCommand extends SingleNodeCommand {
+export class SwapCommand extends FeatureNodeCommand {
     constructor(d3Data, node, dstParent, dstIndex) {
         super(d3Data, node);
         this.dstParent = dstParent;

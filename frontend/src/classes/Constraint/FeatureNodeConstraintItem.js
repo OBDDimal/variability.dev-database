@@ -35,4 +35,9 @@ export class FeatureNodeConstraintItem extends ConstraintItem {
         if (!this.featureNode.constraints.includes(this.constraint))
             this.featureNode.constraints.push(this.constraint);
     }
+
+    removeConstraint() {
+        this.featureNode.constraints = this.featureNode.constraints.filter((c) => c !== this.constraint);
+        this.constraint = undefined;
+    }
 }

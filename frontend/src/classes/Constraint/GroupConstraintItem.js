@@ -33,4 +33,8 @@ export class GroupConstraintItem extends ConstraintItem {
    setConstraint(constraint) {
       this.items.forEach((item) => item.setConstraint(constraint));
    }
+
+   removeConstraint() {
+      this.items.forEach((item) => item.removeConstraint());
+   }
 }

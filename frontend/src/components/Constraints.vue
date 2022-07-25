@@ -30,6 +30,20 @@
 
                     <v-btn color="primary" @click="openAddEditDialog('Add', undefined)">Add</v-btn>
 
+                    <v-btn
+                        color="primary"
+                        @click="undo"
+                        :disabled="!commandManager.isUndoAvailable()">
+                        <v-icon>mdi-undo</v-icon>
+                    </v-btn>
+
+                    <v-btn
+                        color="primary"
+                        @click="redo"
+                        :disabled="!commandManager.isRedoAvailable()">
+                        <v-icon>mdi-redo</v-icon>
+                    </v-btn>
+
                     <v-btn icon @click="$store.commit('openConstraints', false)">
                         <v-icon>mdi-close</v-icon>
                     </v-btn>
@@ -54,18 +68,10 @@
                     mdi-pencil
                 </v-icon>
                 <v-icon
+                    @click="deleteConstraint(item.constraint)"
                 >
                     mdi-delete
                 </v-icon>
-            </template>
-
-            <template v-slot:no-data>
-                <v-btn
-                    color="primary"
-                    @click="initialize"
-                >
-                    Reset
-                </v-btn>
             </template>
         </v-data-table>
     </v-bottom-sheet>
@@ -74,7 +80,10 @@
 <script>
 import Vue from "vue";
 import ConstraintAddDialog from '@/components/ConstraintAddDialog';
-import {Constraint} from "@/classes/constraint";
+import {AddCommand} from "@/classes/Commands/Constraints/AddCommand";
+import {CommandManager} from "@/classes/Commands/CommandManager";
+import {EditCommand} from "@/classes/Commands/Constraints/EditCommand";
+import {DeleteCommand} from "@/classes/Commands/Constraints/DeleteCommand";
 
 export default Vue.extend({
     name: "Constraints",
@@ -98,6 +107,7 @@ export default Vue.extend({
         modeAddEdit: undefined,
         constraintAddEdit: undefined,
         updateKey: 0,
+        commandManager: new CommandManager(),
     }),
 
     computed: {
@@ -124,13 +134,29 @@ export default Vue.extend({
         },
 
         save(newConstraintItem) {
+            let command;
             if (this.modeAddEdit === 'Add') {
-                this.constraints.push(new Constraint(newConstraintItem));
+                command = new AddCommand(
+                    this.constraints,
+                    newConstraintItem
+                );
             } else {
-                this.constraintAddEdit.rule = newConstraintItem;
+                command = new EditCommand(
+                    this.constraints,
+                    this.constraintAddEdit,
+                    newConstraintItem
+                );
             }
-
             this.closeAddEditDialog();
+            this.commandManager.execute(command);
+        },
+
+        deleteConstraint(constraint) {
+            const command = new DeleteCommand(
+                this.constraints,
+                constraint
+            );
+            this.commandManager.execute(command);
         },
 
         computeColor(bg) {
@@ -165,7 +191,15 @@ export default Vue.extend({
         closeAddEditDialog() {
             this.showAddEditDialog = false;
             this.constraintAddEdit = undefined;
-        }
+        },
+
+        undo() {
+            this.commandManager.undo();
+        },
+
+        redo() {
+            this.commandManager.redo();
+        },
     },
 });
 </script>

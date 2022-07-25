@@ -1,6 +1,6 @@
-import {SingleNodeCommand} from "@/classes/Commands/FeatureModel/SingleNodeCommand";
+import {FeatureNodeCommand} from "@/classes/Commands/FeatureModel/FeatureNodeCommand";
 
-export class EditCommand extends SingleNodeCommand {
+export class EditCommand extends FeatureNodeCommand {
     constructor(d3Data, node, newData) {
         super(d3Data);
         this.node = node;

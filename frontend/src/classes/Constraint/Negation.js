@@ -33,4 +33,8 @@ export class Negation extends ConstraintItem {
     setConstraint(constraint) {
         this.item.setConstraint(constraint);
     }
+
+    removeConstraint() {
+        this.item.removeConstraint();
+    }
 }

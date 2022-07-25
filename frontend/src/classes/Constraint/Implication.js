@@ -35,4 +35,9 @@ export class Implication extends ConstraintItem {
         this.premise.setConstraint(constraint);
         this.conclusion.setConstraint(constraint);
     }
+
+    removeConstraint() {
+        this.premise.removeConstraint();
+        this.conclusion.removeConstraint();
+    }
 }

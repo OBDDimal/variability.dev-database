@@ -1,7 +1,7 @@
-import {SingleNodeCommand} from "@/classes/Commands/FeatureModel/SingleNodeCommand";
+import {FeatureNodeCommand} from "@/classes/Commands/FeatureModel/FeatureNodeCommand";
 import {createFeatureNode} from "@/classes/FeatureNode";
 
-export class AddCommand extends SingleNodeCommand {
+export class AddCommand extends FeatureNodeCommand {
     constructor(d3Data, dstParent, dstIndex, data) {
         const node = createFeatureNode(dstParent, data.name, data.groupType, data.mandatory, data.abstract);
         super(d3Data, node);
