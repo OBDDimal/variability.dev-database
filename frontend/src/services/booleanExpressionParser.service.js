@@ -18,7 +18,8 @@ export function parse(toParse, allNodes) {
     const operatorStack = [];
     let outputStack = [];
     inputToken.forEach((token) => {
-        if (operators.includes(token)) {
+        if (operators.includes(token.toLowerCase())) {
+            token = token.toLowerCase();
             if(operatorStack.length) {
                 let lastOperator = operatorStack.at(-1);
                 while (lastOperator && lastOperator !== '(' && operatorPrecedence[token] > operatorPrecedence[lastOperator]) {
@@ -53,31 +54,18 @@ export function parse(toParse, allNodes) {
 }
 
 function convertToConstraintItem(operator, stack) {
+    operator = operator.toLowerCase();
     let constraintItem = undefined;
     if (operator === 'not') {
         constraintItem = new Negation(stack.pop());
     } else if (operator === 'and') {
         const second = stack.pop();
         const first = stack.pop();
-
-        let items;
-        if (second instanceof Conjunction) {
-            items = [first, ...second.items]
-        } else {
-            items = [first, second];
-        }
-        constraintItem = new Conjunction(items);
+        constraintItem = new Conjunction(first, second);
     } else if (operator === 'or') {
         const second = stack.pop();
         const first = stack.pop();
-
-        let items;
-        if (second instanceof Disjunction) {
-            items = [first, ...second.items]
-        } else {
-            items = [first, second];
-        }
-        constraintItem = new Disjunction(items);
+        constraintItem = new Disjunction(first, second);
     } else if (operator === 'implies') {
         const conclusion = stack.pop();
         const premise = stack.pop();

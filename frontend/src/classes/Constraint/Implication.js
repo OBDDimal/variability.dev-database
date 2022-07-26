@@ -12,11 +12,11 @@ export class Implication extends ConstraintItem {
     }
 
     toString() {
-        return `${this.addPossibleBrackets(this.premise)} ⇒ ${this.addPossibleBrackets(this.conclusion)}`;
+        return `${this.premise.toString()} ⇒ ${this.conclusion.toString()}`;
     }
 
     toStringForEdit() {
-        return `${this.addPossibleBracketsForEdit(this.premise)} implies ${this.addPossibleBracketsForEdit(this.conclusion)}`;
+        return `${this.premise.toStringForEdit()} IMPLIES ${this.conclusion.toStringForEdit()}`;
     }
 
     toStringPostfix() {

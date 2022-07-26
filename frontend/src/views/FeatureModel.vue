@@ -138,8 +138,8 @@ export default Vue.extend({
                     .map((childItem) => this.readConstraintItem(childItem));
 
                 switch (item.tagName) {
-                    case 'disj': return new Disjunction(childItems);
-                    case 'conj': return new Conjunction(childItems);
+                    case 'disj': return new Disjunction(childItems[0], childItems[1]);
+                    case 'conj': return new Conjunction(childItems[0], childItems[1]);
                     case 'imp':  return new Implication(childItems[0], childItems[1]);
                     case 'not':  return new Negation(childItems[0]);
                 }

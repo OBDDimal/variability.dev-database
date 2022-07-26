@@ -1,6 +1,6 @@
 <template>
     <div class="text-center">
-        <v-dialog v-model="showDialog" persistent width="800">
+        <v-dialog v-model="showDialog" persistent width="80%">
             <v-card>
                 <v-card-title class="text-h5 grey lighten-2"> {{mode}} Constraint</v-card-title>
 
@@ -15,10 +15,10 @@
                             @change="appendText(selectedFeatureNode.name, true, true)"
                         ></v-combobox>
 
-                        <v-btn @click="appendText('and', true, true)">and</v-btn>
-                        <v-btn @click="appendText('or', true, true)">or</v-btn>
-                        <v-btn @click="appendText('implies', true, true)">implies</v-btn>
-                        <v-btn @click="appendText('not', true, true)">not</v-btn>
+                        <v-btn @click="appendText('AND', true, true)">and</v-btn>
+                        <v-btn @click="appendText('OR', true, true)">or</v-btn>
+                        <v-btn @click="appendText('IMPLIES', true, true)">implies</v-btn>
+                        <v-btn @click="appendText('NOT', true, true)">not</v-btn>
                         <v-btn @click="appendText('(', true, false)">(</v-btn>
                         <v-btn @click="appendText(')', false, true)">)</v-btn>
 
@@ -57,7 +57,7 @@ import {FeatureNode} from "@/classes/FeatureNode";
 import {parse} from "@/services/booleanExpressionParser.service";
 
 export default Vue.extend({
-    name: "ConstraintAddDialog",
+    name: "ConstraintAddEditDialog",
 
     data: () => ({
         constraintText: "",

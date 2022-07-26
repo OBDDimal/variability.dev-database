@@ -1,13 +1,13 @@
 <template>
     <v-bottom-sheet v-model="$store.state.openConstraints" hide-overlay>
-        <constraint-add-dialog
+        <constraint-add-edit-dialog
             :show="showAddEditDialog"
             :all-nodes="rootNode ? rootNode.descendants() : undefined"
             @close="closeAddEditDialog"
             @save="(newConstraint) => save(newConstraint)"
             :constraint="constraintAddEdit"
             :mode="modeAddEdit"
-        ></constraint-add-dialog>
+        ></constraint-add-edit-dialog>
 
         <v-data-table
             :key="updateKey"
@@ -17,7 +17,6 @@
             :search="search"
             hide-default-header
             style="padding: 10px"
-            @click:row="highlightConstraint"
         >
             <template v-slot:top>
                 <div class="d-flex justify-center align-center">
@@ -28,17 +27,21 @@
                         prepend-inner-icon="mdi-magnify"
                     ></v-text-field>
 
-                    <v-btn color="primary" @click="openAddEditDialog('Add', undefined)">Add</v-btn>
+                    <v-btn
+                        rounded
+                        @click="openAddEditDialog('Add', undefined)">
+                        <v-icon>mdi-plus</v-icon>
+                    </v-btn>
 
                     <v-btn
-                        color="primary"
+                        rounded
                         @click="undo"
                         :disabled="!commandManager.isUndoAvailable()">
                         <v-icon>mdi-undo</v-icon>
                     </v-btn>
 
                     <v-btn
-                        color="primary"
+                        rounded
                         @click="redo"
                         :disabled="!commandManager.isRedoAvailable()">
                         <v-icon>mdi-redo</v-icon>
@@ -55,6 +58,7 @@
                     v-model="item.checked"
                     :color="item.constraint.color"
                     :style="`color: ${computeColor(item.constraint.color)}`"
+                    @click="highlightConstraint(item)"
                 >
                     {{ item.formula }}
                 </v-chip>
@@ -79,7 +83,7 @@
 
 <script>
 import Vue from "vue";
-import ConstraintAddDialog from '@/components/ConstraintAddDialog';
+import ConstraintAddEditDialog from '@/components/ConstraintAddEditDialog';
 import {AddCommand} from "@/classes/Commands/Constraints/AddCommand";
 import {CommandManager} from "@/classes/Commands/CommandManager";
 import {EditCommand} from "@/classes/Commands/Constraints/EditCommand";
@@ -89,7 +93,7 @@ export default Vue.extend({
     name: "Constraints",
 
     components: {
-        ConstraintAddDialog,
+        ConstraintAddEditDialog: ConstraintAddEditDialog,
     },
 
     props: {
@@ -99,8 +103,8 @@ export default Vue.extend({
 
     data: () => ({
         headers: [
-            {text: "Constraint", value: "formula"},
-            {text: "Actions", value: "actions"},
+            {text: "Constraint", value: "formula", width: "50%"},
+            {text: "Actions", value: "actions", width: "50%"},
         ],
         search: "",
         showAddEditDialog: false,
@@ -122,7 +126,6 @@ export default Vue.extend({
 
     methods: {
         highlightConstraint(constraintRow) {
-            //TODO: Table row color
             constraintRow.checked = !constraintRow.checked;
             constraintRow.constraint.toggleHighlighted();
             constraintRow.constraint.getFeatureNodes().forEach((node) => node.uncollapse());

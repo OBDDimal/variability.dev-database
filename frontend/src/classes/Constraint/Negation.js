@@ -15,7 +15,7 @@ export class Negation extends ConstraintItem {
     }
 
     toStringForEdit() {
-        return `not ${this.addPossibleBracketsForEdit(this.item)}`;
+        return `NOT ${this.addPossibleBracketsForEdit(this.item)}`;
     }
 
     toStringPostfix() {

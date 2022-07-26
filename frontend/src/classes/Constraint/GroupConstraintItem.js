@@ -1,49 +1,51 @@
 import {ConstraintItem} from "@/classes/Constraint/ConstraintItem";
 
 export class GroupConstraintItem extends ConstraintItem {
-   constructor(items, symbol, operator, tag) {
+   constructor(first, second, symbol, operator, tag) {
       super();
-      this.items = items;
+      this.first = first;
+      this.second = second;
       this.operator = operator;
       this.symbol = symbol;
       this.tag = tag;
    }
 
    count() {
-      return this.items.length;
+      return 2;
    }
 
    toString() {
-      return this.items
-          .map((item) => this.addPossibleBrackets(item))
-          .join(` ${this.symbol} `);
+      const firstText = this.first.constructor.name === this.constructor.name ? this.first.toString() : this.addPossibleBrackets(this.first);
+      const secondText = this.second.constructor.name === this.constructor.name ? this.second.toString() : this.addPossibleBrackets(this.second);
+      return `${firstText} ${this.symbol} ${secondText}`
+   }
+
+   toStringPostfix() {
+      return `${this.first.toStringPostfix()} ${this.second.toStringPostfix()} ${this.constructor.name}`
    }
 
    toStringForEdit() {
-      return this.items
-          .map((item) => this.addPossibleBracketsForEdit(item))
-          .join(` ${this.operator} `);
+      const firstText = this.first.constructor.name === this.constructor.name ? this.first.toStringForEdit() : this.addPossibleBracketsForEdit(this.first);
+      const secondText = this.second.constructor.name === this.constructor.name ? this.second.toStringForEdit() : this.addPossibleBracketsForEdit(this.second);
+      return `${firstText} ${this.operator} ${secondText}`
    }
 
    toStringXML() {
-      return `<${this.tag}>${
-          this.items
-              .map((item) => item.toStringXML())
-              .join(` `)
-      }</${this.tag}>`;
+      return `<${this.tag}>
+        ${this.first.toStringXML()} 
+        ${this.second.toStringXML()}
+        </${this.tag}>`;
    }
 
    getFeatureNodes() {
-      return this.items
-          .map((item) => item.getFeatureNodes())
-          .flat();
+      return [...this.first.getFeatureNodes(), ...this.second.getFeatureNodes()];
    }
 
    setConstraint(constraint) {
-      this.items.forEach((item) => item.setConstraint(constraint));
+      this.first.setConstraint(constraint);
    }
 
    removeConstraint() {
-      this.items.forEach((item) => item.removeConstraint());
+      this.first.removeConstraint();
    }
 }
