@@ -213,45 +213,6 @@ export default Vue.extend({
     },
 
     methods: {
-        initialize() {
-            /* this.tags = [
-                              {
-                                  label: "My first public tag",
-                                  description: "Test tag 1 for demonstration",
-                                  owner: true,
-                                  dateCreated: new Date(),
-                                  public: true
-                              },
-                              {
-                                  label: "My second private tag",
-                                  description: "Test tag 2 for demonstration",
-                                  owner: true,
-                                  dateCreated: new Date(),
-                                  public: false
-                              },
-                              {
-                                  label: "Not my public tag",
-                                  description: "Test tag 3 for demonstration",
-                                  owner: false,
-                                  dateCreated: new Date(),
-                                  public: true
-                              },
-                              // {   private tags from other users should not be fetched from the server!
-                              //     label: "Not my private tag",
-                              //     description: "Test tag 4 for demonstration",
-                              //     owner: false,
-                              //     dateCreated: new Date(),
-                              //     public: false
-                              // },
-                              {
-                                  label: "Not my public tag 2",
-                                  description: "Test tag 4 for demonstration",
-                                  owner: false,
-                                  dateCreated: new Date(),
-                                  public: true
-                              },
-                          ]; */
-        },
         /* editItem(item: Tag) {
                         this.editedIndex = this.tags.indexOf(item);
                         this.editedItem = Object.assign({}, item);

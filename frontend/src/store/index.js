@@ -76,7 +76,7 @@ export default new Vuex.Store({
             });
         },
         async uploadFeatureModel({commit}, data) {
-            return await api
+            return api
                 .post(`${API_URL}files/`, data, {
                     headers: {"Content-Type": "multipart/form-data"},
                 })
@@ -99,7 +99,7 @@ export default new Vuex.Store({
         },
         async uploadFamily({commit}, payload) {
             // payload = { label: this.family, description: this.newFamilyDescription }
-            return await api
+            return api
                 .post(`${API_URL}families/`, payload)
                 .then((response) => {
                     return response.data
@@ -116,7 +116,7 @@ export default new Vuex.Store({
         },
         async uploadTag({commit}, payload) {
             // payload = { label: "", description: "", is_public: false }
-            return await api
+            return api
                 .post(`${API_URL}tags/`, payload)
                 .then((response) => {
                     return response.data

@@ -227,9 +227,6 @@
 
 <script>
 import Vue from "vue";
-/*import api from "@/services/api.service";
-
-const API_URL = process.env.VUE_APP_DOMAIN;*/
 
 export default Vue.extend({
     name: "FileCreate",
@@ -301,12 +298,8 @@ export default Vue.extend({
         family: function (newValue) {
             console.log(newValue)
             if (typeof (newValue) == "string") {
-                /*console.log("its a string")
-                console.log(!this.gottenFamilies.map(x => x.text).includes(newValue))*/
                 this.isNewFamily = !this.gottenFamilies.map(x => x.text).includes(newValue)
             } else if (typeof (newValue) == "object" && newValue != null) {
-                /*console.log("its an object")
-                console.log(!this.gottenFamilies.map(x => x.text).includes(newValue.text))*/
                 this.isNewFamily = !this.gottenFamilies.map(x => x.text).includes(newValue.text)
             } else {
                 this.isNewFamily = false
@@ -319,43 +312,22 @@ export default Vue.extend({
 
     computed: {
         getLicenses() {
-            const licenses = [];
-            for (let i = 0; i < this.gottenLicenses.length; i++) {
-                const element = this.gottenLicenses[i];
-                licenses.push({text: element.label, value: element.id});
-            }
-            return licenses;
+            return this.gottenLicenses
+                .map((element) => ({text: element.label, value: element.id}));
         },
         getFamilies() {
-            const families = [];
-            for (let i = 0; i < this.gottenFamilies.length; i++) {
-                const element = this.gottenFamilies[i];
-                if (!element.owner) {
-                    continue;
-                }
-                families.push({text: element.label, value: element.id});
-            }
-            return families;
+            return this.gottenFamilies
+                .filter((element) => element.owner)
+                .map((element) => ({text: element.label, value: element.id}));
         },
         getFiles() {
-            const files = [];
-            for (let i = 0; i < this.gottenFiles.length; i++) {
-                /*console.log(this.gottenFiles)*/
-                const element = this.gottenFiles[i];
-                if (!element.owner) {
-                    continue;
-                }
-                files.push({text: element.label, value: element.id});
-            }
-            return files;
+            return this.gottenFiles
+                .filter((element) => element.owner)
+                .map((element) => ({text: element.label, value: element.id}));
         },
         getTags() {
-            const tags = [];
-            for (let i = 0; i < this.gottenTags.length; i++) {
-                const element = this.gottenTags[i];
-                tags.push({text: element.label, value: {label: element.label, id: element.id}});
-            }
-            return tags;
+            return this.gottenTags
+                .map((element) => ({text: element.label, value: {label: element.label, id: element.id}}));
         },
     },
 
@@ -364,15 +336,9 @@ export default Vue.extend({
             this.$emit("close");
         },
         transferToDropdown(objects) {
-            const temp = [];
-            for (let i = 0; i < objects.length; i++) {
-                const element = objects[i];
-                if (!element.owner) {
-                    continue;
-                }
-                temp.push({text: element.label, value: element.id});
-            }
-            return temp;
+            return objects
+                .filter((element) => element.owner)
+                .map((element) => ({text: element.label, value: element.id}));
         },
         async upload() {
             if (this.$refs.form.validate() !== false) {
@@ -430,8 +396,6 @@ export default Vue.extend({
     mounted() {
         this.$store.dispatch("fetchLicenses");
         if (this.$store.state.families !== []) {
-            /*console.log("already there fam")
-            console.log(this.$store.state.families)*/
             this.gottenFamilies = this.$store.state.families.map(x => {
                 return {text: x.label, value: x.id}
             })
@@ -439,8 +403,6 @@ export default Vue.extend({
             this.$store.dispatch("fetchFamilies");
         }
         if (this.$store.state.files !== []) {
-            /*console.log("already there file")
-            console.log(this.$store.state.files)*/
             this.gottenFiles = this.$store.state.files.map(x => {
                 return {text: x.label, value: x.id}
             })

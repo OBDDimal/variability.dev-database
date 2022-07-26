@@ -82,11 +82,11 @@ export default Vue.extend({
 
     computed: {
         isReady() {
-            return this.valid && this.email != "" && this.password != "";
+            return this.valid && this.email !== "" && this.password !== "";
         },
     },
 
-    beforeRouteEnter(to, from, next) {
+    beforeRouteEnter(_to, from, next) {
         next((vm) => {
             vm.prevRoute = from.path;
         });
@@ -96,7 +96,7 @@ export default Vue.extend({
         onSubmit(e) {
             e.preventDefault();
             // Call to this.isReady() does not work, due to typescript checking
-            if (this.email != "" && this.password != "") {
+            if (this.email !== "" && this.password !== "") {
                 this.loading = true;
 
                 AuthService.login(this.email, this.password).then(

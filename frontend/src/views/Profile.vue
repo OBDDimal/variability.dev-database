@@ -130,7 +130,7 @@ export default Vue.extend({
     data: () => ({}),
 
     computed: {
-        preparedElems() {
+        preparedElems: function () {
             // gets, filters, sorts and transpiles all files
             const files = this.$store.state.files
             const tags = this.$store.state.tags
@@ -144,7 +144,12 @@ export default Vue.extend({
             const preparedFamilies = families.filter(elem => elem.owner).map((elem) => {
                 return {id: elem.id, label: elem.label, uploaded_at: elem.date_created, type: "family"}
             })
-            const combined = preparedFiles.concat(preparedTags).concat(preparedFamilies).sort((a, b) => (a.uploaded_at < b.uploaded_at) ? 1 : ((b.uploaded_at < a.uploaded_at) ? -1 : 0))
+            const combined = preparedFiles
+                .concat(preparedTags)
+                .concat(preparedFamilies)
+                .sort((a, b) => {
+                    return a.uploaded_at < b.uploaded_at ? 1 : (b.uploaded_at < a.uploaded_at ? -1 : 0);
+                })
             console.log(combined)
             return combined
         }

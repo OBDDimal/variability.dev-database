@@ -163,35 +163,6 @@ export default Vue.extend({
     },
 
     methods: {
-        initialize() {
-            /* this.families = [
-                          {
-                              label: "My first family",
-                              description: "Test family 1 for demonstration",
-                              owner: true,
-                          },
-                          {
-                              label: "My second family",
-                              description: "Test family 2 for demonstration",
-                              owner: true,
-                          },
-                          {
-                              label: "Not my family",
-                              description: "Test family 3 for demonstration",
-                              owner: false,
-                          },
-                          {
-                              label: "Not my family 2",
-                              description: "Test family 4 for demonstration",
-                              owner: false,
-                          },
-                          {
-                              label: "Not my family 3",
-                              description: "Test family 5 for demonstration",
-                              owner: false,
-                          },
-                      ]; */
-        },
         editItem(item) {
             this.editedIndex = item.id;
             this.editedItem = Object.assign({}, item);
@@ -200,7 +171,6 @@ export default Vue.extend({
         close() {
             this.dialog = false;
             this.$nextTick(() => {
-                //this.editedItem = Object.assign({}, this.defaultItem);
                 this.editedIndex = -1;
             });
         },

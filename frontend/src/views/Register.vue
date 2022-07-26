@@ -110,9 +110,9 @@ export default Vue.extend({
         onSubmit(e) {
             e.preventDefault();
             if (
-                this.email != "" &&
-                this.password != "" &&
-                this.passwordConfirmation != "" &&
+                this.email !== "" &&
+                this.password !== "" &&
+                this.passwordConfirmation !== "" &&
                 this.password === this.passwordConfirmation
             ) {
                 this.loading = true;
