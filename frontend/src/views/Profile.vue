@@ -150,7 +150,9 @@ export default Vue.extend({
                 .concat(preparedTags)
                 .concat(preparedFamilies)
                 .sort((a, b) => {
-                    return a.uploaded_at < b.uploaded_at ? 1 : (b.uploaded_at < a.uploaded_at ? -1 : 0);
+                    if (a.uploaded_at < b.uploaded_at) return 1;
+                    else if (b.uploaded_at < a.uploaded_at) return -1;
+                    else return 0;
                 })
             console.log(combined)
             return combined
