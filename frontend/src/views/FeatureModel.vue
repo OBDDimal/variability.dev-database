@@ -204,7 +204,7 @@ export default Vue.extend({
                     />`;
             }
 
-            xml += `<comments>${this.comments.map((comment) => `<c>${comment}</c>`).join(' ')}</comments>`;
+            xml += `<comments>${this.comments.map((comment) => "<c>" + comment + "</c>").join(' ')}</comments>`;
 
             if (this.featureOrder) {
                 xml += `<featureOrder
