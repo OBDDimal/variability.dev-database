@@ -41,12 +41,13 @@ export default Vue.extend({
         Constraints,
     },
 
-    props: {},
-
     data: () => ({
         featureMap: [],
         constraints: [],
         properties: [],
+        calculations: undefined,
+        comments: [],
+        featureOrder: undefined,
         rootNode: undefined,
     }),
 
@@ -57,9 +58,11 @@ export default Vue.extend({
         this.rootNode = json.rootNode;
         this.constraints = json.constraints;
         this.properties = json.properties;
+        this.calculations = json.calculations;
+        this.comments = json.comments;
+        this.featureOrder = json.featureOrder;
     },
 
-	methods: {
     methods: {
         updateFeatureModel() {
             update.updateSvg(this.$refs.featureModelTree.d3Data);
@@ -93,7 +96,6 @@ export default Vue.extend({
                 comments: this.getComments(commentsSection),
                 featureOrder: this.getFeatureOrder(featureOrderSection),
             }
-            console.log(toReturn);
             console.log('Parsertime', performance.now() - start);
             return toReturn;
         },
@@ -191,6 +193,24 @@ export default Vue.extend({
                 (prev, constraint) => prev + '<rule>' + this.constraintToXML(constraint) + '</rule>',
                 ''
             )}</constraints>`;
+
+            if (this.calculations) {
+                xml += `<calculations
+                    Auto="${this.calculations.Auto}"
+                    Constraints="${this.calculations.Constraints}"
+                    Redundant="${this.calculations.Redundant}"
+                    Tautology="${this.calculations.Tautology}"
+                    Features="${this.calculations.Features}"
+                    />`;
+            }
+
+            xml += `<comments>${this.comments.map((comment) => `<c>${comment}</c>`).join(' ')}</comments>`;
+
+            if (this.featureOrder) {
+                xml += `<featureOrder
+                    userDefined="${this.featureOrder.userDefined}"
+                    />`;
+            }
 
             xml += `</featureModel>`;
 
