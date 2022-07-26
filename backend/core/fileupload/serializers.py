@@ -104,9 +104,9 @@ class FilesSerializer(serializers.ModelSerializer):
         Updates the label, description, tags and new_version_of an already existing file.
         """
         instance.label = validated_data.get('label', instance.label)
-        instance.description = validated_data.get('label', instance.description)
+        instance.description = validated_data.get('description', instance.description)
         instance.tags = validated_data.get('tags', instance.tags)
-        instance.new_version_of = validated_data.get('tags', instance.new_version_of)
+        instance.new_version_of = validated_data.get('new_version_of', instance.new_version_of)
         instance.save()
         return instance
 
