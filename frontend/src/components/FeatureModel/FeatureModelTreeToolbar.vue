@@ -139,16 +139,16 @@
                     </v-list-item>
 
                     <v-list-item>
-                        <v-checkbox label="Semantic editing" v-model="semanticEditing"></v-checkbox>
+                        <v-checkbox v-model="semanticEditing" label="Semantic editing"></v-checkbox>
                     </v-list-item>
                 </v-list>
             </v-menu>
 
-            <v-btn icon @click="$emit('undo')" :disabled="!isUndoAvailable">
+            <v-btn :disabled="!isUndoAvailable" icon @click="$emit('undo')">
                 <v-icon>mdi-undo</v-icon>
             </v-btn>
 
-            <v-btn icon @click="$emit('redo')" :disabled="!isRedoAvailable">
+            <v-btn :disabled="!isRedoAvailable" icon @click="$emit('redo')">
                 <v-icon>mdi-redo</v-icon>
             </v-btn>
         </v-toolbar>
