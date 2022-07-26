@@ -107,7 +107,6 @@ function calcGhostCircleTransform(d3Data, ghostNode) {
             break;
         case 'b':
             dy = CONSTANTS.RECT_HEIGHT;
-            dx = 0;
             break;
     }
     return `translate(${x + dx}, ${y + dy})`;
@@ -144,7 +143,7 @@ export function init(d3Data) {
         })
         .on('end', (_, d3Node) => {
             if (d3Node === d3Data.root) return;
-            const nodeSelection = d3Data.container.featureNodesContainer.selectAll('g.node').data([d3Node], (d3Node) => d3Node.id);
+            const nodeSelection = d3Data.container.featureNodesContainer.selectAll('g.node').data([d3Node], (d) => d.id);
             nodeSelection.select('g.rect-and-text').attr('pointer-events', 'mouseover');
 
             // Remove ghost circles.
@@ -188,6 +187,6 @@ export function init(d3Data) {
 function translateD3NodeToMouse(d3Data, d3Node) {
     d3Data.container.featureNodesContainer
         .selectAll('g.node')
-        .data([d3Node], (d3Node) => d3Node.id)
+        .data([d3Node], (d) => d.id)
         .attr('transform', `translate(${d3Data.drag.selectedD3NodePosition.x}, ${d3Data.drag.selectedD3NodePosition.y})`);
 }

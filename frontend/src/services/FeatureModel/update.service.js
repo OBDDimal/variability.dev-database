@@ -69,7 +69,7 @@ function updateFeatureNodes(d3Data, visibleD3Nodes) {
         .classed('whiteText', (d3Node) => {
             let color = d3Node.data.color();
             const rgb = color.replace(/[^\d,]/g, '').split(',');
-            return !(rgb[0] * 0.299 + rgb[1] * 0.587 + rgb[2] * 0.114 > 186);
+            return rgb[0] * 0.299 + rgb[1] * 0.587 + rgb[2] * 0.114 <= 186;
         })
         .text((d3Node) => (d3Data.isShortenedName ? d3Node.data.displayName : d3Node.data.name));
 
@@ -221,7 +221,7 @@ export function updateSvg(d3Data) {
 export function calcRectWidth(d3Data, d3Node) {
     if (d3Node.data instanceof FeatureNode) {
         return (
-            (d3Data.isShortenedName // TODO: Ask Lukas whether to use prop or not
+            (d3Data.isShortenedName
                 ? d3Node.data.displayName.length
                 : d3Node.data.name.length) *
             (CONSTANTS.FEATURE_FONT_SIZE * CONSTANTS.MONOSPACE_HEIGHT_WIDTH_FACTOR) +

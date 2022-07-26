@@ -19,7 +19,8 @@
             <v-icon>mdi-format-list-checks</v-icon>
         </v-btn
         >
-        <constraints ref="constraints" :constraints="constraints" @update-feature-model="updateFeatureModel"></constraints>
+        <constraints ref="constraints" :constraints="constraints"
+                     @update-feature-model="updateFeatureModel"></constraints>
     </div>
 </template>
 
@@ -27,9 +28,9 @@
 import Vue from 'vue';
 import FeatureModelTree from '../components/FeatureModel/FeatureModelTree.vue';
 import Constraints from '../components/Constraints.vue';
-import { Constraint, VarConstraint } from '@/classes/constraint';
-import { berkeley } from '@/classes/featureModelData';
-import { FeatureNode } from '@/classes/FeatureNode';
+import {Constraint, VarConstraint} from '@/classes/constraint';
+import {berkeley} from '@/classes/featureModelData';
+import {FeatureNode} from '@/classes/FeatureNode';
 import * as update from "@/services/FeatureModel/update.service";
 
 export default Vue.extend({
@@ -58,10 +59,10 @@ export default Vue.extend({
 
     computed: {},
 
-	methods: {
-		updateFeatureModel() {
-			update.updateSvg(this.$refs.featureModelTree.d3Data);
-		},
+    methods: {
+        updateFeatureModel() {
+            update.updateSvg(this.$refs.featureModelTree.d3Data);
+        },
 
         updateConstraints() {
             this.$refs.constraints.update();
@@ -184,5 +185,3 @@ export default Vue.extend({
     },
 });
 </script>
-
-<style scoped></style>

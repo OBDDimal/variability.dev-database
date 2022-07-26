@@ -4,36 +4,39 @@
         <h5 class="text-h5 mb-4">
             Here you can add new Feature Models
         </h5>
-        <v-data-table :headers="headers" :items="featureModelsComp" class="elevation-1" :search="search" :loading="loading">
+        <v-data-table :headers="headers" :items="featureModelsComp" :loading="loading" :search="search"
+                      class="elevation-1">
             <template v-slot:top>
                 <v-toolbar flat>
                     <v-toolbar-title class="hidden-sm-and-down">All Feature Models</v-toolbar-title>
                     <v-divider class="mx-4 hidden-sm-and-down" inset vertical></v-divider>
                     <v-spacer class="hidden-sm-and-down"></v-spacer>
-                    <v-text-field v-model="search" append-icon="mdi-magnify" label="Search" single-line hide-details>
+                    <v-text-field v-model="search" append-icon="mdi-magnify" hide-details label="Search" single-line>
                     </v-text-field>
-                    <v-btn color="primary" rounded class="mb-2 ml-4" @click="createDialog = true">
-                        <v-icon left> mdi-plus </v-icon>
+                    <v-btn class="mb-2 ml-4" color="primary" rounded @click="createDialog = true">
+                        <v-icon left> mdi-plus</v-icon>
                         Upload Model
                     </v-btn>
                     <v-dialog v-model="dialogDelete" max-width="500px">
                         <v-card>
                             <v-card-title class="text-h5"
-                                >Are you sure you want to delete this
-                                feature model?</v-card-title
+                            >Are you sure you want to delete this
+                                feature model?
+                            </v-card-title
                             >
                             <v-card-actions>
                                 <v-spacer></v-spacer>
                                 <v-btn color="primary" text @click="closeDelete"
-                                    >Cancel</v-btn
+                                >Cancel
+                                </v-btn
                                 >
                                 <v-spacer></v-spacer>
                                 <v-btn
+                                    :loading="removeLoading"
                                     color="primary"
                                     text
                                     @click="deleteItemConfirm"
-                                    :loading="removeLoading"
-                                    >Delete
+                                >Delete
                                 </v-btn>
                                 <v-spacer></v-spacer>
                             </v-card-actions>
@@ -46,7 +49,7 @@
                             </v-card-title>
                             <v-spacer></v-spacer>
                             <div class="analysis-width" style="word-break: break-all">
-                                {{editedItem.analysis.order}}
+                                {{ editedItem.analysis.order }}
                             </div>
                             <v-spacer></v-spacer>
                             <v-divider></v-divider>
@@ -55,7 +58,7 @@
                             </v-card-title>
                             <v-spacer></v-spacer>
                             <div class="analysis-width" style="word-break: break-all">
-                                {{editedItem.analysis.report}}
+                                {{ editedItem.analysis.report }}
                             </div>
                             <v-spacer></v-spacer>
                         </v-card>
@@ -63,20 +66,21 @@
                 </v-toolbar>
             </template>
             <template v-slot:item.actions="{ item }">
-                <v-btn small rounded color="primary" class="mr-2" to="/feature-model">
+                <v-btn class="mr-2" color="primary" rounded small to="/feature-model">
                     <v-icon>mdi-eye</v-icon>
                 </v-btn>
                 <v-btn
-                    small
-                    rounded
-                    color="error"
-                    class="mr-2"
-                    @click="deleteItem(item)"
                     :disabled="item.owner === false"
+                    class="mr-2"
+                    color="error"
+                    rounded
+                    small
+                    @click="deleteItem(item)"
                 >
                     <v-icon>mdi-delete</v-icon>
                 </v-btn>
-                <v-btn small rounded color="success" class="mr-2" @click="showAnalysis(item)" :disabled="item.analysis === undefined">
+                <v-btn :disabled="item.analysis === undefined" class="mr-2" color="success" rounded small
+                       @click="showAnalysis(item)">
                     <v-icon>mdi-play</v-icon>
                 </v-btn>
                 <!-- <v-btn small rounded color="error" class="mr-2"> <v-icon>mdi-delete</v-icon></v-btn> -->
@@ -85,23 +89,23 @@
                 {{ index + 1 }}
             </template>
             <template v-slot:no-data>
-              No feature models yet
+                No feature models yet
             </template>
             <template v-slot:item.tags="{ item }">
-                <v-chip class="mx-1" v-for="(tag, index) in item.tags" :key="index">
-                {{ tag.label }}
+                <v-chip v-for="(tag, index) in item.tags" :key="index" class="mx-1">
+                    {{ tag.label }}
                 </v-chip>
             </template>
             <template v-slot:item.owner="{ item }">
-                <v-icon v-if="item.owner" color="success"> mdi-check </v-icon>
-                <v-icon v-else color="error"> mdi-cancel </v-icon>
+                <v-icon v-if="item.owner" color="success"> mdi-check</v-icon>
+                <v-icon v-else color="error"> mdi-cancel</v-icon>
             </template>
             <template v-slot:item.uploaded="{ item }">
                 {{ new Date(item.uploaded_at).toLocaleString("en-US") }}
             </template>
         </v-data-table>
         <v-dialog v-model="createDialog" max-width="850px">
-          <file-create @close="createDialog = !createDialog"></file-create>
+            <file-create @close="createDialog = !createDialog"></file-create>
         </v-dialog>
     </div>
 </template>
@@ -114,7 +118,7 @@ export default Vue.extend({
     name: "Files",
 
     components: {
-      FileCreate,
+        FileCreate,
     },
 
     props: {},
@@ -135,13 +139,13 @@ export default Vue.extend({
                 sortable: false,
                 value: "id",
             },
-            { text: "Label", value: "label" },
-            { text: "Description", value: "description" },
-            { text: "License", value: "license.label" },
-            { text: "Tags", value: "tags" },
-            { text: "Uploaded on", value: "uploaded" },
-            { text: "Owner", value: "owner" },
-            { text: "Family", value: "family.label" },
+            {text: "Label", value: "label"},
+            {text: "Description", value: "description"},
+            {text: "License", value: "license.label"},
+            {text: "Tags", value: "tags"},
+            {text: "Uploaded on", value: "uploaded"},
+            {text: "Owner", value: "owner"},
+            {text: "Family", value: "family.label"},
             {
                 text: "Actions",
                 align: "center",
@@ -194,7 +198,7 @@ export default Vue.extend({
             return this.featureModels.map((x) => x.label);
         },
         featureModelsComp() {
-          return this.$store.state.featureModels;
+            return this.$store.state.featureModels;
         }
     },
 
@@ -305,40 +309,40 @@ export default Vue.extend({
             ];
         },
         deleteItemConfirm() {
-                this.removeLoading = true;
+            this.removeLoading = true;
 
-                //TODO: actually delete the feature model
-                // api.delete(`${API_URL}tags/${this.editedID}/`)
-                //     .then(() => {
-                //         this.$store.commit("updateSnackbar", {
-                //             message: "Tag deleted successfully!",
-                //             variant: "success",
-                //             timeout: 5000,
-                //             show: true,
-                //         });
-                //         this.$store.dispatch("fetchTags");
-                //         this.removeLoading = false;
-                //     })
-                //     .catch((error) => {
-                //         this.$store.commit("updateSnackbar", {
-                //             message: "Error: " + error.message,
-                //             variant: "error",
-                //             timeout: 5000,
-                //             show: true,
-                //         });
-                //         this.removeLoading = false;
-                //     });
+            //TODO: actually delete the feature model
+            // api.delete(`${API_URL}tags/${this.editedID}/`)
+            //     .then(() => {
+            //         this.$store.commit("updateSnackbar", {
+            //             message: "Tag deleted successfully!",
+            //             variant: "success",
+            //             timeout: 5000,
+            //             show: true,
+            //         });
+            //         this.$store.dispatch("fetchTags");
+            //         this.removeLoading = false;
+            //     })
+            //     .catch((error) => {
+            //         this.$store.commit("updateSnackbar", {
+            //             message: "Error: " + error.message,
+            //             variant: "error",
+            //             timeout: 5000,
+            //             show: true,
+            //         });
+            //         this.removeLoading = false;
+            //     });
 
-                this.$store.commit("updateSnackbar", {
-                    message: "Error: " + "deletion of feature models is not yet implemented!",
-                    variant: "error",
-                    timeout: 5000,
-                    show: true,
-                });
-                this.removeLoading = false;
+            this.$store.commit("updateSnackbar", {
+                message: "Error: " + "deletion of feature models is not yet implemented!",
+                variant: "error",
+                timeout: 5000,
+                show: true,
+            });
+            this.removeLoading = false;
 
-                this.closeDelete();
-            },
+            this.closeDelete();
+        },
         close() {
             this.dialog = false;
             this.$nextTick(() => {
@@ -354,15 +358,15 @@ export default Vue.extend({
             });
         },
         deleteItem(item) {
-                this.editedIndex = this.featureModels.indexOf(item);
-                this.editedItem = Object.assign({}, item);
-                this.dialogDelete = true;
-            },
+            this.editedIndex = this.featureModels.indexOf(item);
+            this.editedItem = Object.assign({}, item);
+            this.dialogDelete = true;
+        },
         showAnalysis(item) {
-                this.editedIndex = this.featureModels.indexOf(item);
-                this.editedItem = Object.assign({}, item);
-                this.dialogAnalysis = true;
-            },
+            this.editedIndex = this.featureModels.indexOf(item);
+            this.editedItem = Object.assign({}, item);
+            this.dialogAnalysis = true;
+        },
         save() {
             if (this.editedIndex > -1) {
                 Object.assign(this.featureModels[this.editedIndex], this.editedItem);
@@ -375,7 +379,12 @@ export default Vue.extend({
 
     mounted() {
         if (!this.$store.state.loggedIn || !this.$store.state.currentUser) {
-            this.$store.commit('updateSnackbar', { message: "Please log in to view this page", variant: "info", timeout: 5000, show: true })
+            this.$store.commit('updateSnackbar', {
+                message: "Please log in to view this page",
+                variant: "info",
+                timeout: 5000,
+                show: true
+            })
             this.$router.push("/login")
         } else {
             this.loading = true;
@@ -388,7 +397,7 @@ export default Vue.extend({
 });
 </script>
 <style scoped>
-    .analysis-width {
-        margin: 0 2rem;
-    }
+.analysis-width {
+    margin: 0 2rem;
+}
 </style>

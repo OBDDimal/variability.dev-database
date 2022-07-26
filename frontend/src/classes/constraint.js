@@ -68,7 +68,7 @@ export class VarConstraint {
     constructor(featureNodeName, featureMap, rootConstraint) {
         this.featureNode = featureMap[featureNodeName];
         this.rootConstraint = rootConstraint;
-        
+
         if (!this.featureNode.constraints.includes(rootConstraint)) {
             this.featureNode.constraints.push(rootConstraint);
         }
