@@ -30,24 +30,26 @@ def anonymize_file(file, request):
     Replace email address of file owner with True or False,
     indicating whether the user which has sent the request is the owner.
     """
+    user_email = "" if request.user.is_anonymous else request.user.email
+
     anonymized_file = OrderedDict()
     for (file_key, file_value) in file.items():
         if file_key == 'owner':
-            anonymized_file[file_key] = file_value == request.user.email
+            anonymized_file[file_key] = file_value == user_email
         elif file_key == 'tags':
             tags = []
             for tag in list(file_value):
                 new_tag = OrderedDict()
                 for (tag_key, tag_value) in tag.items():
                     if tag_key == 'owner':
-                        new_tag[tag_key] = tag_value == request.user.email
+                        new_tag[tag_key] = tag_value == user_email
                     else:
                         new_tag[tag_key] = tag_value
                 tags.append(new_tag)
             anonymized_file[file_key] = tags
         elif file_key == 'family':
             new_family = file_value
-            new_family.update({'owner': new_family['owner'] == request.user.email})
+            new_family.update({'owner': new_family['owner'] == user_email})
             anonymized_file[file_key] = new_family
         else:
             anonymized_file[file_key] = file_value
@@ -217,8 +219,8 @@ class FamiliesViewSet(viewsets.GenericViewSet, mixins.ListModelMixin, mixins.Cre
         anonymized_family = OrderedDict()
         for (key, value) in family.items():
             if key == 'owner':
-                user_mail = "" if request.user.is_anonymous else request.user.email
-                anonymized_family[key] = value == user_mail
+                user_email = "" if request.user.is_anonymous else request.user.email
+                anonymized_family[key] = value == user_email
             else:
                 anonymized_family[key] = value
         return anonymized_family
@@ -265,8 +267,8 @@ class TagsViewSet(viewsets.GenericViewSet, mixins.ListModelMixin, mixins.CreateM
         anonymized_tag = OrderedDict()
         for (key, value) in family.items():
             if key == 'owner':
-                user_mail = "" if request.user.is_anonymous else request.user.email
-                anonymized_tag[key] = value == user_mail
+                user_email = "" if request.user.is_anonymous else request.user.email
+                anonymized_tag[key] = value == user_email
             else:
                 anonymized_tag[key] = value
         return anonymized_tag

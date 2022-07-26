@@ -1,3 +1,3 @@
-export default function isNumeric(value) {
-  return /^-?\d+$/.test(value);
+export function isNumeric(value) {
+    return /^-?\d+$/.test(value);
 }

@@ -17,14 +17,8 @@ export class Constraint {
             });
     }
 
-    toggleHighlighted() {
-        if (this.isHighlighted) {
-            CONSTANTS.CONSTRAINT_HIGHLIGHT_COLORS.push(this.color);
-            this.color = undefined;
-            this.getAllVars().forEach((child) => {
-                child.featureNode.constraintsHighlighted = child.featureNode.constraintsHighlighted.filter((constraint) => constraint !== this);
-            });
-        } else {
+    highlight() {
+        if (!this.isHighlighted) {
             this.color = CONSTANTS.CONSTRAINT_HIGHLIGHT_COLORS.pop();
             this.getAllVars().forEach((child) => {
                 if (!child.featureNode.constraintsHighlighted.includes(this)) {
@@ -32,8 +26,29 @@ export class Constraint {
                     child.featureNode.uncollapse(true);
                 }
             });
+
+            this.isHighlighted = true;
         }
-        this.isHighlighted = !this.isHighlighted;
+    }
+
+    resetHighlight() {
+        if (this.isHighlighted) {
+            CONSTANTS.CONSTRAINT_HIGHLIGHT_COLORS.push(this.color);
+            this.color = undefined;
+            this.getAllVars().forEach((child) => {
+                child.featureNode.constraintsHighlighted = child.featureNode.constraintsHighlighted.filter((constraint) => constraint !== this);
+            });
+
+            this.isHighlighted = false;
+        }
+    }
+
+    toggleHighlighted() {
+        if (this.isHighlighted) {
+            this.resetHighlight();
+        } else {
+            this.highlight();
+        }
     }
 
     toString() {
@@ -53,7 +68,7 @@ export class VarConstraint {
     constructor(featureNodeName, featureMap, rootConstraint) {
         this.featureNode = featureMap[featureNodeName];
         this.rootConstraint = rootConstraint;
-        
+
         if (!this.featureNode.constraints.includes(rootConstraint)) {
             this.featureNode.constraints.push(rootConstraint);
         }

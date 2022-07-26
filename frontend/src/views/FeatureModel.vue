@@ -1,6 +1,10 @@
 <template>
     <div>
-        <feature-model-tree ref="featureModelTree" :rootNode="rootNode" @exportToXML="exportToXML"></feature-model-tree>
+        <feature-model-tree ref="featureModelTree"
+                            :rootNode="rootNode"
+                            @exportToXML="exportToXML"
+                            @update-constraints="updateConstraints">
+        </feature-model-tree>
         <v-btn
             absolute
             bottom
@@ -15,7 +19,8 @@
             <v-icon>mdi-format-list-checks</v-icon>
         </v-btn
         >
-        <constraints :constraints="constraints" @update-feature-model="updateFeatureModel"></constraints>
+        <constraints ref="constraints" :constraints="constraints"
+                     @update-feature-model="updateFeatureModel"></constraints>
     </div>
 </template>
 
@@ -25,9 +30,8 @@ import FeatureModelTree from '../components/FeatureModel/FeatureModelTree.vue';
 import Constraints from '../components/Constraints.vue';
 import {Constraint, VarConstraint} from '@/classes/constraint';
 import {berkeley} from '@/classes/featureModelData';
-import {FeatureNode} from '@/classes/featureNode';
+import {FeatureNode} from '@/classes/FeatureNode';
 import * as update from "@/services/FeatureModel/update.service";
-import * as collapse from "@/services/FeatureModel/collapse.service";
 
 export default Vue.extend({
     name: 'FeatureModel',
@@ -55,12 +59,14 @@ export default Vue.extend({
         this.properties = json.properties;
     },
 
-    computed: {},
-
+	methods: {
     methods: {
         updateFeatureModel() {
-            collapse.update(this.$refs.featureModelTree.d3Data);
             update.updateSvg(this.$refs.featureModelTree.d3Data);
+        },
+
+        updateConstraints() {
+            this.$refs.constraints.update();
         },
 
         xmlToJson(currentModel) {
@@ -234,5 +240,3 @@ export default Vue.extend({
     },
 });
 </script>
-
-<style scoped></style>

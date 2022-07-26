@@ -46,7 +46,6 @@
 
 <script>
 import Vue from 'vue';
-import {FeatureNode} from "@/classes/featureNode";
 
 export default Vue.extend({
     name: 'FeatureModelTreeAddDialog',
@@ -66,8 +65,6 @@ export default Vue.extend({
         showDialog: {
             get() {
                 return this.show;
-            },
-            set() {
             },
         },
 
@@ -89,15 +86,13 @@ export default Vue.extend({
         },
 
         add() {
-            const newNode = new FeatureNode(this.parent, this.name, 'and', this.mandatory === 0, this.abstract);
+            const data = {name: this.name, groupType: 'and', mandatory: this.mandatory === 0, abstract: this.abstract};
             this.name = "";
             this.mandatory = false;
             this.abstract = false;
 
-            this.$emit('add', newNode, this.parent);
+            this.$emit('add', data, this.parent);
         },
     },
 });
 </script>
-
-<style scoped></style>
