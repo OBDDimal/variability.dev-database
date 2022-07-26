@@ -1,5 +1,5 @@
 import {ConstraintCommand} from "@/classes/Commands/Constraints/ConstraintCommand";
-import {Constraint} from "@/classes/constraint";
+import {Constraint} from "@/classes/Constraint";
 
 export class AddCommand extends ConstraintCommand{
     constructor(allConstraints, newConstraintItem) {

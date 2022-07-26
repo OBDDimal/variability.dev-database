@@ -33,7 +33,7 @@
 import Vue from 'vue';
 import FeatureModelTree from '../components/FeatureModel/FeatureModelTree.vue';
 import Constraints from '../components/Constraints.vue';
-import {Constraint} from '@/classes/constraint';
+import {Constraint} from '@/classes/Constraint';
 import {berkeley} from '@/classes/featureModelData';
 import {FeatureNode} from '@/classes/FeatureNode';
 import * as update from "@/services/FeatureModel/update.service";

@@ -1,11 +1,12 @@
 import {ConstraintItem} from "@/classes/Constraint/ConstraintItem";
 
 export class GroupConstraintItem extends ConstraintItem {
-   constructor(items, symbol, operator) {
+   constructor(items, symbol, operator, tag) {
       super();
       this.items = items;
       this.operator = operator;
       this.symbol = symbol;
+      this.tag = tag;
    }
 
    count() {
@@ -22,6 +23,14 @@ export class GroupConstraintItem extends ConstraintItem {
       return this.items
           .map((item) => this.addPossibleBracketsForEdit(item))
           .join(` ${this.operator} `);
+   }
+
+   toStringXML() {
+      return `<${this.tag}>${
+          this.items
+              .map((item) => item.toStringXML())
+              .join(` `)
+      }</${this.tag}>`;
    }
 
    getFeatureNodes() {

@@ -2,7 +2,7 @@ import {GroupConstraintItem} from "@/classes/Constraint/GroupConstraintItem";
 
 export class Conjunction extends GroupConstraintItem {
     constructor(items) {
-        super(items, '∧', 'and');
+        super(items, '∧', 'and', 'conj');
     }
 
     toStringPostfix() {
@@ -11,11 +11,4 @@ export class Conjunction extends GroupConstraintItem {
             .join(` `) + ' Conjunction';
     }
 
-    toStringXML() {
-        return `<conj>${
-            this.items
-                .map((item) => item.toStringXML())
-                .join(` `)
-        }</conj>`;
-    }
 }
