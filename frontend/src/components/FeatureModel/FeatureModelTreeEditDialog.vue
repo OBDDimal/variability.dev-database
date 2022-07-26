@@ -88,8 +88,6 @@ export default Vue.extend({
             get() {
                 return this.show;
             },
-            set() {
-            },
         },
 
         convertGroupType: {

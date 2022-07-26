@@ -13,7 +13,6 @@ export const SPACE_BETWEEN_NODES_HORIZONTALLY = 20;
 
 export const PSEUDO_NODE_SIZE = 20;
 
-//TODO: Add more colors. Also for black font
 export let CONSTRAINT_HIGHLIGHT_COLORS = [
     '#B762D9',
     '#FFB17A',
