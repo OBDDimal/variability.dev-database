@@ -66,8 +66,6 @@ export default Vue.extend({
             get() {
                 return this.show;
             },
-            set() {
-            },
         },
 
         showMandatorySelection() {
@@ -88,7 +86,7 @@ export default Vue.extend({
         },
 
         add() {
-            const data = { name: this.name, groupType: 'and', mandatory: this.mandatory === 0, abstract: this.abstract };
+            const data = {name: this.name, groupType: 'and', mandatory: this.mandatory === 0, abstract: this.abstract};
             this.name = "";
             this.mandatory = false;
             this.abstract = false;
@@ -98,5 +96,3 @@ export default Vue.extend({
     },
 });
 </script>
-
-<style scoped></style>

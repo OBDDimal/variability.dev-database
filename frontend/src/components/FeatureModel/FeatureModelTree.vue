@@ -1,18 +1,18 @@
 <template>
     <div>
         <feature-model-tree-toolbar
+            :is-redo-available="d3Data.commandManager.isRedoAvailable()"
+            :is-undo-available="d3Data.commandManager.isUndoAvailable()"
             @coloring="(coloringIndex) => coloring(coloringIndex)"
             @export="$emit('exportToXML')"
             @fitToView="fitToView"
+            @redo="redo"
             @resetView="(levels, maxChildren) => resetView(levels, maxChildren)"
             @search="(search) => onChangeSearch(search)"
-            @shortName="changeShortName"
-            @verticalSpacing="changeVerticalSpacing"
-            @undo="undo"
-            @redo="redo"
-            :is-undo-available="d3Data.commandManager.isUndoAvailable()"
-            :is-redo-available="d3Data.commandManager.isRedoAvailable()"
             @semanticEditing="(value) => d3Data.semanticEditing = value"
+            @shortName="changeShortName"
+            @undo="undo"
+            @verticalSpacing="changeVerticalSpacing"
         ></feature-model-tree-toolbar>
         <div id="svg-container"></div>
 
@@ -24,13 +24,13 @@
             @close="d3Data.contextMenu.selectedD3Node = undefined"
             @collapse="collapse"
             @edit="(d3Node) => openEditDialog(d3Node)"
+            @hideAllNodesOnThisLevel="(d3Node) => hideAllNodesOnThisLevel(d3Node)"
+            @hideAllOtherNodes="(d3Node) => hideAllOtherNodes(d3Node)"
             @hideCurrentNode="(d3Node) => hideCurrentNode(d3Node)"
             @hideLeftSiblings="(d3Node) => hideLeftSiblings(d3Node)"
             @hideRightSiblings="(d3Node) => hideRightSiblings(d3Node)"
             @highlightConstraints="(d3Node) => highlightConstraints(d3Node)"
             @resetHighlightConstraints="(d3Node) => resetHighlightConstraints(d3Node)"
-            @hideAllNodesOnThisLevel="(d3Node) => hideAllNodesOnThisLevel(d3Node)"
-            @hideAllOtherNodes="(d3Node) => hideAllOtherNodes(d3Node)"
         ></feature-model-tree-context-menu>
 
         <feature-model-tree-edit-dialog
@@ -222,18 +222,18 @@ export default Vue.extend({
         add(newNode) {
             this.showAddDialog = false;
 
-                this.showAddDialog = false;
+            this.showAddDialog = false;
 
-                const parent = this.d3Data.d3ParentOfAddNode.data;
-                const addCommand = new AddCommand(
-                    this.d3Data,
-                    parent,
-                    parent.children ? parent.children.length : 0,
-                    newNode
-                );
-                this.d3Data.commandManager.execute(addCommand);
+            const parent = this.d3Data.d3ParentOfAddNode.data;
+            const addCommand = new AddCommand(
+                this.d3Data,
+                parent,
+                parent.children ? parent.children.length : 0,
+                newNode
+            );
+            this.d3Data.commandManager.execute(addCommand);
 
-                update.updateSvg(this.d3Data);
+            update.updateSvg(this.d3Data);
             this.addType = "";
         },
 

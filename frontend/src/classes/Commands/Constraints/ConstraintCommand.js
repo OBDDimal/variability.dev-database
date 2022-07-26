@@ -7,7 +7,7 @@ export class ConstraintCommand extends Command {
         this.allConstraints = allConstraints;
     }
 
-    markChanges() {}
+    markChanges() { /* Do nothing */ }
 
-    unmarkChanges() {}
+    unmarkChanges() { /* Do nothing */ }
 }

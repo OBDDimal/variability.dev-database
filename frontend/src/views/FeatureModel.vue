@@ -119,7 +119,7 @@ export default Vue.extend({
             return toReturn;
         },
 
-		readConstraints(constraints) {
+        readConstraints(constraints) {
             return constraints
                 .filter((rule) => rule.tagName)
                 .map((rule) => {
@@ -127,7 +127,7 @@ export default Vue.extend({
                         .filter((item) => item.tagName)
                         .map((item) => new Constraint(this.readConstraintItem(item)))[0];
                 });
-		},
+        },
 
         readConstraintItem(item) {
             if (item.tagName === 'var') {
@@ -138,10 +138,14 @@ export default Vue.extend({
                     .map((childItem) => this.readConstraintItem(childItem));
 
                 switch (item.tagName) {
-                    case 'disj': return new Disjunction(childItems[0], childItems[1]);
-                    case 'conj': return new Conjunction(childItems[0], childItems[1]);
-                    case 'imp':  return new Implication(childItems[0], childItems[1]);
-                    case 'not':  return new Negation(childItems[0]);
+                    case 'disj':
+                        return new Disjunction(childItems[0], childItems[1]);
+                    case 'conj':
+                        return new Conjunction(childItems[0], childItems[1]);
+                    case 'imp':
+                        return new Implication(childItems[0], childItems[1]);
+                    case 'not':
+                        return new Negation(childItems[0]);
                 }
             }
         },
@@ -196,5 +200,3 @@ export default Vue.extend({
     },
 });
 </script>
-
-<style scoped></style>

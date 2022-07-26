@@ -1,3 +1,1 @@
-export class Command {
-    constructor() {}
-}
+export class Command {}

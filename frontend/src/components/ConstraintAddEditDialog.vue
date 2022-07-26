@@ -2,7 +2,7 @@
     <div class="text-center">
         <v-dialog v-model="showDialog" persistent width="80%">
             <v-card>
-                <v-card-title class="text-h5 grey lighten-2"> {{mode}} Constraint</v-card-title>
+                <v-card-title class="text-h5 grey lighten-2"> {{ mode }} Constraint</v-card-title>
 
                 <v-form @submit.prevent="save">
                     <v-card-text>
@@ -43,7 +43,7 @@
                     <v-card-actions>
                         <v-btn color="secondary" text @click="discard">Discard</v-btn>
                         <v-spacer></v-spacer>
-                        <v-btn color="primary" text type="submit">{{mode}}</v-btn>
+                        <v-btn color="primary" text type="submit">{{ mode }}</v-btn>
                     </v-card-actions>
                 </v-form>
             </v-card>
@@ -82,7 +82,6 @@ export default Vue.extend({
             get() {
                 return this.show;
             },
-            set() {},
         },
     },
 

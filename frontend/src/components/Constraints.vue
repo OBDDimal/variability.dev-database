@@ -1,12 +1,12 @@
 <template>
     <v-bottom-sheet v-model="$store.state.openConstraints" hide-overlay>
         <constraint-add-edit-dialog
-            :show="showAddEditDialog"
             :all-nodes="rootNode ? rootNode.descendants() : undefined"
-            @close="closeAddEditDialog"
-            @save="(newConstraint) => save(newConstraint)"
             :constraint="constraintAddEdit"
             :mode="modeAddEdit"
+            :show="showAddEditDialog"
+            @close="closeAddEditDialog"
+            @save="(newConstraint) => save(newConstraint)"
         ></constraint-add-edit-dialog>
 
         <v-data-table
@@ -34,16 +34,16 @@
                     </v-btn>
 
                     <v-btn
+                        :disabled="!commandManager.isUndoAvailable()"
                         rounded
-                        @click="undo"
-                        :disabled="!commandManager.isUndoAvailable()">
+                        @click="undo">
                         <v-icon>mdi-undo</v-icon>
                     </v-btn>
 
                     <v-btn
+                        :disabled="!commandManager.isRedoAvailable()"
                         rounded
-                        @click="redo"
-                        :disabled="!commandManager.isRedoAvailable()">
+                        @click="redo">
                         <v-icon>mdi-redo</v-icon>
                     </v-btn>
 
@@ -163,8 +163,8 @@ export default Vue.extend({
         },
 
         computeColor(bg) {
-            var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(bg);
-            var rgb = result
+            const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(bg);
+            const rgb = result
                 ? [
                     parseInt(result[1], 16),
                     parseInt(result[2], 16),

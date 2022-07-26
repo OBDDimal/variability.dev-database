@@ -19,27 +19,11 @@ export function parse(toParse, allNodes) {
     let outputStack = [];
     inputToken.forEach((token) => {
         if (operators.includes(token.toLowerCase())) {
-            token = token.toLowerCase();
-            if(operatorStack.length) {
-                let lastOperator = operatorStack.at(-1);
-                while (lastOperator && lastOperator !== '(' && operatorPrecedence[token] > operatorPrecedence[lastOperator]) {
-                    operatorStack.pop();
-                    convertToConstraintItem(lastOperator, outputStack, allNodes);
-                    lastOperator = operatorStack.length ? operatorStack.at(-1) : undefined;
-                }
-            }
-            operatorStack.push(token);
-
+            parseOperator(token.toLowerCase(), operatorStack, outputStack);
         } else if (token === '(') {
             operatorStack.push('(');
-
         } else if (token === ')') {
-            let lastOperator = operatorStack.pop();
-            while (lastOperator !== '(' && operatorStack.length !== 0) {
-                convertToConstraintItem(lastOperator, outputStack);
-                lastOperator = operatorStack.pop();
-            }
-
+            parseClosingBracket(operatorStack, outputStack);
         } else {
             outputStack.push(createFeatureNodeConstraintItem(token, allNodes));
         }
@@ -47,10 +31,30 @@ export function parse(toParse, allNodes) {
 
     // Push all operators that remains on operator-stack to output
     while (operatorStack.length) {
-        convertToConstraintItem(operatorStack.pop(), outputStack, allNodes);
+        convertToConstraintItem(operatorStack.pop(), outputStack);
     }
 
     return outputStack[0];
+}
+
+function parseOperator(token, operatorStack, outputStack) {
+    if (operatorStack.length) {
+        let lastOperator = operatorStack.at(-1);
+        while (lastOperator && lastOperator !== '(' && operatorPrecedence[token] > operatorPrecedence[lastOperator]) {
+            operatorStack.pop();
+            convertToConstraintItem(lastOperator, outputStack);
+            lastOperator = operatorStack.length ? operatorStack.at(-1) : undefined;
+        }
+    }
+    operatorStack.push(token);
+}
+
+function parseClosingBracket(operatorStack, outputStack) {
+    let lastOperator = operatorStack.pop();
+    while (lastOperator !== '(' && operatorStack.length !== 0) {
+        convertToConstraintItem(lastOperator, outputStack);
+        lastOperator = operatorStack.pop();
+    }
 }
 
 function convertToConstraintItem(operator, stack) {
