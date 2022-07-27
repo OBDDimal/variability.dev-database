@@ -287,7 +287,13 @@ export default Vue.extend({
 .ghost-circle {
     fill: red;
     fill-opacity: 0.2;
-    r: 30px;
+    r: 15px;
+}
+
+@media only screen and (max-width: 400px) {
+    .ghost-circle {
+        r: 30px;
+    }
 }
 
 .ghost-circle-highlighted {
