@@ -316,6 +316,7 @@ export default Vue.extend({
         /* fill: black; */
         font-family: monospace;
         text-anchor: middle;
+        user-select: none;
     }
 }
 
