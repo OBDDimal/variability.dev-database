@@ -13,6 +13,8 @@
             @shortName="changeShortName"
             @undo="undo"
             @verticalSpacing="changeVerticalSpacing"
+            @save="$emit('save')"
+            @reset="$emit('reset')"
         ></feature-model-tree-toolbar>
         <div id="svg-container"></div>
 

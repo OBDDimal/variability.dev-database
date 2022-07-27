@@ -7,6 +7,28 @@
             permanent
         >
             <v-list dense>
+
+                <v-list-item :disabled="!isUndoAvailable" @click="$emit('save')">
+                    <v-list-item-icon>
+                        <v-icon disabled v-if="!isUndoAvailable">mdi-content-save</v-icon>
+                        <v-icon v-else>mdi-content-save-edit</v-icon>
+                    </v-list-item-icon>
+
+                    <v-list-item-content>
+                        <v-list-item-title>Save</v-list-item-title>
+                    </v-list-item-content>
+                </v-list-item>
+
+                <v-list-item :disabled="!isUndoAvailable" @click="$emit('reset')">
+                    <v-list-item-icon>
+                        <v-icon :disabled="!isUndoAvailable">mdi-backup-restore</v-icon>
+                    </v-list-item-icon>
+
+                    <v-list-item-content>
+                        <v-list-item-title>Discard changes</v-list-item-title>
+                    </v-list-item-content>
+                </v-list-item>
+
                 <v-list-item>
                     <v-list-item-icon>
                         <v-icon>mdi-magnify</v-icon>

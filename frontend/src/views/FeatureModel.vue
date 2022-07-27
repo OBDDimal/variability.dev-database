@@ -1,10 +1,16 @@
 <template>
     <div>
-        <feature-model-tree ref="featureModelTree"
-                            :rootNode="rootNode"
-                            @exportToXML="exportToXML"
-                            @update-constraints="updateConstraints">
+        <feature-model-tree
+            ref="featureModelTree"
+            :key="reloadKey"
+            :rootNode="rootNode"
+            @exportToXML="exportToXML"
+            @reset="reset"
+            @save="save"
+            @update-constraints="updateConstraints"
+        >
         </feature-model-tree>
+
         <v-btn
             absolute
             bottom
@@ -17,10 +23,13 @@
             @click="$store.commit('openConstraints', true)"
         >
             <v-icon>mdi-format-list-checks</v-icon>
-        </v-btn
-        >
-        <constraints ref="constraints" :constraints="constraints"
-                     @update-feature-model="updateFeatureModel"></constraints>
+        </v-btn>
+
+        <constraints
+            ref="constraints"
+            :constraints="constraints"
+            @update-feature-model="updateFeatureModel">
+        </constraints>
     </div>
 </template>
 
@@ -47,19 +56,34 @@ export default Vue.extend({
         featureMap: [],
         constraints: [],
         rootNode: undefined,
+        reloadKey: 0,
     }),
 
     created() {
         // TODO: Axios request for xml
 
-        const [rootNode, constraints] = this.xmlToJson(berkeley);
-        this.rootNode = rootNode;
-        this.constraints = constraints;
+        this.initData();
     },
 
     computed: {},
 
     methods: {
+        save() {
+            // TODO: Axios post request to update the xml file in the backend.
+        },
+
+        reset() {
+            // TODO: Transpile the xml file new and restart viewer.
+            this.initData();
+            this.reloadKey++;
+        },
+
+        initData() {
+            const [rootNode, constraints] = this.xmlToJson(berkeley);
+            this.rootNode = rootNode;
+            this.constraints = constraints;
+        },
+
         updateFeatureModel() {
             update.updateSvg(this.$refs.featureModelTree.d3Data);
         },
