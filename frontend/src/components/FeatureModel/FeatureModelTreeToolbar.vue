@@ -1,156 +1,195 @@
 <template>
     <div>
-        <v-toolbar
+        <v-navigation-drawer
+            v-model="drawer"
             absolute
-            class="mt-lg-5 ms-lg-7"
-            elevation="12"
-            floating
-            left
-            style="border: 2px solid white"
-            top
+            expand-on-hover
+            permanent
         >
-            <v-text-field
-                v-model="searchText"
-                hide-details
-                placeholder="Search Features"
-                prepend-icon="mdi-magnify"
-                single-line
-            ></v-text-field>
+            <v-list dense>
+                <v-list-item>
+                    <v-list-item-icon>
+                        <v-icon>mdi-magnify</v-icon>
+                    </v-list-item-icon>
+                    <v-list-item-content>
+                        <v-text-field
+                            class="my-n4"
+                            v-model="searchText"
+                            placeholder="Search"
+                            single-line
+                            clearable
+                        ></v-text-field>
+                    </v-list-item-content>
+                </v-list-item>
 
-            <v-menu offset-y>
-                <template v-slot:activator="{ on, attrs }">
-                    <v-btn icon v-bind="attrs" v-on="on">
-                        <v-icon>mdi-palette</v-icon>
-                    </v-btn>
-                </template>
-                <v-list>
-                    <v-subheader>Coloring</v-subheader>
+                <v-list-item :disabled="!isUndoAvailable" @click="$emit('undo')">
+                    <v-list-item-icon>
+                        <v-icon :disabled="!isUndoAvailable">mdi-undo</v-icon>
+                    </v-list-item-icon>
 
-                    <v-list-item-group v-model="selectedColoring" color="primary">
+                    <v-list-item-content>
+                        <v-list-item-title>Undo</v-list-item-title>
+                    </v-list-item-content>
+                </v-list-item>
+
+                <v-list-item :disabled="!isRedoAvailable" @click="$emit('redo')">
+                    <v-list-item-icon>
+                        <v-icon :disabled="!isRedoAvailable">mdi-redo</v-icon>
+                    </v-list-item-icon>
+
+                    <v-list-item-content>
+                        <v-list-item-title>Redo</v-list-item-title>
+                    </v-list-item-content>
+                </v-list-item>
+
+                <v-menu offset-y>
+                    <template v-slot:activator="{ on, attrs }">
+                        <v-list-item v-bind="attrs" v-on="on">
+                            <v-list-item-icon>
+                                <v-icon>mdi-palette</v-icon>
+                            </v-list-item-icon>
+
+                            <v-list-item-content>
+                                <v-list-item-title>Coloring</v-list-item-title>
+                            </v-list-item-content>
+                        </v-list-item>
+                    </template>
+                    <v-list>
+                        <v-list-item-group v-model="selectedColoring" color="primary">
+                            <v-list-item v-for="(item, i) in itemsColoring" :key="i">
+                                <v-list-item-content>
+                                    <v-list-item-title v-text="item"></v-list-item-title>
+                                </v-list-item-content>
+                            </v-list-item>
+                        </v-list-item-group>
+                    </v-list>
+                </v-menu>
+
+                <v-menu :close-on-content-click="false" offset-y>
+                    <template v-slot:activator="{ on, attrs }">
+                        <v-list-item v-bind="attrs" v-on="on">
+                            <v-list-item-icon>
+                                <v-icon>mdi-eye</v-icon>
+                            </v-list-item-icon>
+
+                            <v-list-item-content>
+                                <v-list-item-title>View</v-list-item-title>
+                            </v-list-item-content>
+                        </v-list-item>
+                    </template>
+                    <v-list>
+                        <v-list-item class="clickable" @click="$emit('fitToView')">
+                            <v-list-item-content>
+                                <v-list-item-title>Fit to view</v-list-item-title>
+                            </v-list-item-content>
+                        </v-list-item>
+                        <v-list-item
+                            class="clickable"
+                            @click="$emit('resetView', levels, maxChildren)"
+                        >
+                            <v-list-item-content>
+                                <v-list-item-title>Reset view</v-list-item-title>
+                            </v-list-item-content>
+                        </v-list-item>
+                        <v-list-item class="clickable" @click="$store.commit('openConstraints', true)">
+                            <v-list-item-content>
+                                <v-list-item-title>Show Constraints</v-list-item-title>
+                            </v-list-item-content>
+                        </v-list-item>
+                        <v-list-item>
+                            <template v-slot:default="{ active }">
+                                <v-list-item-action>
+                                    <v-checkbox
+                                        v-model="isShortName"
+                                        :input-value="active"
+                                        color="primary"
+                                    ></v-checkbox>
+                                </v-list-item-action>
+
+                                <v-list-item-content>
+                                    <v-list-item-title>Short Name</v-list-item-title>
+                                </v-list-item-content>
+                            </template>
+                        </v-list-item>
+                        <v-subheader>Spacing</v-subheader>
+                        <v-list-item>
+                            <v-slider
+                                v-model="verticalSpacing"
+                                hide-details
+                                max="300"
+                                min="40"
+                                style="width: 200px"
+                            ></v-slider>
+                        </v-list-item>
+                    </v-list>
+                </v-menu>
+
+                <v-list-item @click="$emit('export')">
+                    <v-list-item-icon>
+                        <v-icon>mdi-export-variant</v-icon>
+                    </v-list-item-icon>
+
+                    <v-list-item-content>
+                        <v-list-item-title>Export as XML</v-list-item-title>
+                    </v-list-item-content>
+                </v-list-item>
+
+                <v-menu :close-on-content-click="false" offset-y>
+                    <template v-slot:activator="{ on, attrs }">
+                        <v-list-item v-bind="attrs" v-on="on">
+                            <v-list-item-icon>
+                                <v-icon>mdi-dots-vertical</v-icon>
+                            </v-list-item-icon>
+
+                            <v-list-item-content>
+                                <v-list-item-title>Settings</v-list-item-title>
+                            </v-list-item-content>
+                        </v-list-item>
+                    </template>
+                    <v-list>
+                        <v-subheader>Adjust Levels</v-subheader>
+
+                        <v-list-item>
+                            <v-text-field
+                                v-model="levels"
+                                class="mt-0 pt-0"
+                                min="0"
+                                type="number"
+                                @change="$emit('resetView', levels, maxChildren)"
+                            ></v-text-field>
+                        </v-list-item>
+                        <v-subheader>Adjust Max Children</v-subheader>
+
+                        <v-list-item>
+                            <v-text-field
+                                v-model="maxChildren"
+                                class="mt-0 pt-0"
+                                min="0"
+                                type="number"
+                                @change="$emit('resetView', levels, maxChildren)"
+                            ></v-text-field>
+                        </v-list-item>
+
+                        <v-list-item>
+                            <v-checkbox v-model="semanticEditing" label="Semantic editing"></v-checkbox>
+                        </v-list-item>
+                    </v-list>
+                </v-menu>
+                <!--<v-list-group no-action prepend-icon="mdi-palette">
+                    <template v-slot:activator>
+                        <v-list-item-title>Coloring</v-list-item-title>
+                    </template>
+
+                    <v-list-item-group v-model="selectedColoring">
                         <v-list-item v-for="(item, i) in itemsColoring" :key="i">
                             <v-list-item-content>
-                                <v-list-item-title v-text="item"></v-list-item-title>
+                                <v-list-item-title>{{item}}</v-list-item-title>
                             </v-list-item-content>
                         </v-list-item>
                     </v-list-item-group>
-                </v-list>
-            </v-menu>
-
-            <v-menu :close-on-content-click="false" offset-y>
-                <template v-slot:activator="{ on, attrs }">
-                    <v-btn icon v-bind="attrs" v-on="on">
-                        <v-icon>mdi-eye</v-icon>
-                    </v-btn>
-                </template>
-                <v-list>
-                    <v-subheader>View</v-subheader>
-
-                    <v-list-item class="clickable" @click="$emit('fitToView')">
-                        <v-list-item-content>
-                            <v-list-item-title>Fit to view</v-list-item-title>
-                        </v-list-item-content>
-                    </v-list-item>
-                    <v-list-item
-                        class="clickable"
-                        @click="$emit('resetView', levels, maxChildren)"
-                    >
-                        <v-list-item-content>
-                            <v-list-item-title>Reset view</v-list-item-title>
-                        </v-list-item-content>
-                    </v-list-item>
-                    <v-list-item class="clickable" @click="$store.commit('openConstraints', true)">
-                        <v-list-item-content>
-                            <v-list-item-title>Show Constraints</v-list-item-title>
-                        </v-list-item-content>
-                    </v-list-item>
-                    <v-list-item>
-                        <template v-slot:default="{ active }">
-                            <v-list-item-action>
-                                <v-checkbox
-                                    v-model="isShortName"
-                                    :input-value="active"
-                                    color="primary"
-                                ></v-checkbox>
-                            </v-list-item-action>
-
-                            <v-list-item-content>
-                                <v-list-item-title>Short Name</v-list-item-title>
-                            </v-list-item-content>
-                        </template>
-                    </v-list-item>
-                    <v-subheader>Spacing</v-subheader>
-                    <v-list-item>
-                        <v-slider
-                            v-model="verticalSpacing"
-                            hide-details
-                            max="300"
-                            min="40"
-                            style="width: 200px"
-                        ></v-slider>
-                    </v-list-item>
-                </v-list>
-            </v-menu>
-
-            <v-menu offset-y>
-                <template v-slot:activator="{ on, attrs }">
-                    <v-btn icon v-bind="attrs" v-on="on">
-                        <v-icon>mdi-export-variant</v-icon>
-                    </v-btn>
-                </template>
-                <v-list>
-                    <v-subheader>Export</v-subheader>
-
-                    <v-btn color="primary" rounded text @click="$emit('export')"
-                    >Export as XML
-                    </v-btn
-                    >
-                </v-list>
-            </v-menu>
-
-            <v-menu :close-on-content-click="false" offset-y>
-                <template v-slot:activator="{ on, attrs }">
-                    <v-btn icon v-bind="attrs" v-on="on">
-                        <v-icon>mdi-dots-vertical</v-icon>
-                    </v-btn>
-                </template>
-                <v-list>
-                    <v-subheader>Adjust Levels</v-subheader>
-
-                    <v-list-item>
-                        <v-text-field
-                            v-model="levels"
-                            class="mt-0 pt-0"
-                            min="0"
-                            type="number"
-                            @change="$emit('resetView', levels, maxChildren)"
-                        ></v-text-field>
-                    </v-list-item>
-                    <v-subheader>Adjust Max Children</v-subheader>
-
-                    <v-list-item>
-                        <v-text-field
-                            v-model="maxChildren"
-                            class="mt-0 pt-0"
-                            min="0"
-                            type="number"
-                            @change="$emit('resetView', levels, maxChildren)"
-                        ></v-text-field>
-                    </v-list-item>
-
-                    <v-list-item>
-                        <v-checkbox v-model="semanticEditing" label="Semantic editing"></v-checkbox>
-                    </v-list-item>
-                </v-list>
-            </v-menu>
-
-            <v-btn :disabled="!isUndoAvailable" icon @click="$emit('undo')">
-                <v-icon>mdi-undo</v-icon>
-            </v-btn>
-
-            <v-btn :disabled="!isRedoAvailable" icon @click="$emit('redo')">
-                <v-icon>mdi-redo</v-icon>
-            </v-btn>
-        </v-toolbar>
+                </v-list-group>-->
+            </v-list>
+        </v-navigation-drawer>
     </div>
 </template>
 
@@ -177,6 +216,7 @@ export default Vue.extend({
         searchText: "",
         isShortName: false,
         semanticEditing: false,
+        drawer: true,
     }),
 
     watch: {

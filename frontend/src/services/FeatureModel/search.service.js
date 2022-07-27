@@ -8,7 +8,7 @@ export function search(d3Data, searchText) {
         node.collapse();
     });
 
-    if (searchText !== '') {
+    if (searchText && searchText !== '') {
         const foundNode = findNode(d3Data, searchText);
         console.log(foundNode);
         foundNode.getAllNodesToRoot().forEach((node) => node.isSearched = true);
