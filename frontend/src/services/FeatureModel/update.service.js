@@ -4,6 +4,7 @@ import * as collapse from '@/services/FeatureModel/collapse.service.js';
 import {FeatureNode} from '@/classes/FeatureNode';
 import {PseudoNode} from "@/classes/PseudoNode";
 import * as count from "@/services/FeatureModel/count.service";
+import {ghostNodeTouchMove} from "@/services/FeatureModel/dragAndDrop.service";
 
 function updateFeatureNodes(d3Data, visibleD3Nodes) {
     const featureNode = d3Data.container.featureNodesContainer.selectAll('g.node').data(
@@ -17,6 +18,7 @@ function updateFeatureNodes(d3Data, visibleD3Nodes) {
         .append('g')
         .classed('node', true)
         .call(d3Data.drag.listener)
+        .on('touchmove', (event) => ghostNodeTouchMove(event, d3Data), true)
         .on('contextmenu', (event, d3Node) => {
             event.preventDefault();
             d3Data.contextMenu.selectedD3Node = d3Node;

@@ -92,6 +92,7 @@ export default Vue.extend({
             drag: {
                 listener: undefined,
                 hasStarted: false,
+                ghostNodes: [],
                 selectedD3Node: undefined,
                 selectedGhostNode: undefined,
                 selectedD3NodePosition: undefined,
@@ -286,10 +287,10 @@ export default Vue.extend({
 .ghost-circle {
     fill: red;
     fill-opacity: 0.2;
-    r: 15px;
+    r: 30px;
 }
 
-.ghost-circle:hover {
+.ghost-circle-highlighted {
     fill-opacity: 0.8;
 }
 

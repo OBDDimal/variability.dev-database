@@ -6,6 +6,12 @@ import {SwapCommand} from "@/classes/Commands/SwapCommand";
 function overGhostNode(d3Data, ghostNode) {
     d3Data.drag.selectedGhostNode = ghostNode;
 
+    // Highlight current ghostNode.
+    d3Data.container.dragContainer
+        .selectAll('circle.ghost-circle')
+        .data([ghostNode], (gN) => gN.d3Node.id + gN.side)
+        .classed('ghost-circle-highlighted', true);
+
     // Uncollapse features.
     if (ghostNode.side === 'b' && !ghostNode.d3Node.data.isLeaf()) {
         setTimeout(() => {
@@ -20,6 +26,14 @@ function overGhostNode(d3Data, ghostNode) {
 }
 
 function outGhostNode(d3Data) {
+    // Reset highlighting of current ghostNode.
+    if (d3Data.drag.selectedGhostNode) {
+        d3Data.container.dragContainer
+            .selectAll('circle.ghost-circle')
+            .data([d3Data.drag.selectedGhostNode], (gN) => gN.d3Node.id + gN.side)
+            .classed('ghost-circle-highlighted', false);
+    }
+
     d3Data.drag.selectedGhostNode = undefined;
 }
 
@@ -69,6 +83,7 @@ export function updateGhostCircles(d3Data) {
             dragNodes.push({d3Node: allOtherNodes[0], side: 'l'});
         }
     }
+    d3Data.drag.ghostNodes = dragNodes;
 
     // Add ghost circles left and right to all nodes
     const ghostCircles = d3Data.container.dragContainer
@@ -78,6 +93,7 @@ export function updateGhostCircles(d3Data) {
     const ghostCirclesEnter = ghostCircles
         .enter()
         .append('circle')
+        .attr('ref', (ghostNode) => ghostNode.d3Node.id + ghostNode.side)
         .classed('ghost-circle', true)
         .on('mouseover', (_, ghostNode) => overGhostNode(d3Data, ghostNode))
         .on('mouseout', () => outGhostNode(d3Data));
@@ -144,7 +160,7 @@ export function init(d3Data) {
         .on('end', (_, d3Node) => {
             if (d3Node === d3Data.root) return;
             const nodeSelection = d3Data.container.featureNodesContainer.selectAll('g.node').data([d3Node], (d) => d.id);
-            nodeSelection.select('g.rect-and-text').attr('pointer-events', 'mouseover');
+            nodeSelection.select('g.rect-and-text').attr('pointer-events', 'all');
 
             // Remove ghost circles.
             d3Data.container.dragContainer.selectAll('circle.ghost-circle').remove();
@@ -178,6 +194,7 @@ export function init(d3Data) {
                 }
 
                 d3Data.drag.selectedGhostNode = undefined;
+                d3Data.drag.ghostNodes = [];
             }
 
             update.updateSvg(d3Data);
@@ -189,4 +206,15 @@ function translateD3NodeToMouse(d3Data, d3Node) {
         .selectAll('g.node')
         .data([d3Node], (d) => d.id)
         .attr('transform', `translate(${d3Data.drag.selectedD3NodePosition.x}, ${d3Data.drag.selectedD3NodePosition.y})`);
+}
+
+export function ghostNodeTouchMove(event, d3Data) {
+    const htmlElement = document.elementFromPoint(event.changedTouches[0].clientX, event.changedTouches[0].clientY);
+    const ghostNodeRef = htmlElement.getAttribute('ref');
+    if (ghostNodeRef) {
+        const ghostNode = d3Data.drag.ghostNodes.find((gN) => gN.d3Node.id + gN.side === ghostNodeRef);
+        overGhostNode(d3Data, ghostNode);
+    } else {
+        outGhostNode(d3Data);
+    }
 }
