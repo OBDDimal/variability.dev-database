@@ -2,11 +2,10 @@
     <div>
         <v-toolbar
             absolute
-            class="mt-5 ml-5"
+            class="mt-lg-5 ms-lg-7"
             elevation="12"
             floating
             left
-            shaped
             style="border: 2px solid white"
             top
         >
@@ -213,5 +212,11 @@ export default Vue.extend({
 <style scoped>
 .clickable {
     cursor: pointer;
+}
+
+@media only screen and (max-width: 1800px) {
+    .v-toolbar {
+        width: 100%;
+    }
 }
 </style>
