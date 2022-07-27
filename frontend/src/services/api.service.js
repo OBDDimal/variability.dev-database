@@ -4,7 +4,7 @@ import authService from './auth.service';
 const API_URL = process.env.VUE_APP_DOMAIN;
 
 // axios instance for checking if token is (still) valid.
-export const instance = axios.create({
+const instance = axios.create({
     baseURL: API_URL,
     headers: {
         'Content-Type': 'application/json',
@@ -61,3 +61,5 @@ instance.interceptors.response.use(
         }
     },
 );
+
+export default instance;
