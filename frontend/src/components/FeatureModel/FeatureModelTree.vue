@@ -1,5 +1,51 @@
 <template>
     <div>
+        <div class="float-right mt-2 mr-3" style="position: absolute; right: 0;">
+            <v-toolbar
+                height="auto"
+                class="rounded-pill"
+                elevation="9"
+                style="border: 2px solid white"
+            >
+                <v-btn icon>
+                    <v-icon>mdi-chevron-left</v-icon>
+                </v-btn>
+
+                <v-btn icon>
+                    <v-icon>mdi-chevron-right</v-icon>
+                </v-btn>
+
+                <!--<v-combobox
+                    v-if="showSearch"
+                    v-model="searchText"
+                    :item-text="(node) => node.name"
+                    :item-value="(node) => node.name"
+                    :items="allNodes"
+                    class="px-4"
+                    clearable
+                    hide-details
+                    label="Search"
+                    placeholder="Search"
+                    single-line
+                >
+                </v-combobox>-->
+
+                <v-text-field
+                    v-if="showSearch"
+                    v-model="searchText"
+                    class="px-4"
+                    clearable
+                    hide-details
+                    placeholder="Search"
+                    single-line
+                ></v-text-field>
+
+                <v-btn icon @click="showSearch = !showSearch">
+                    <v-icon>mdi-magnify</v-icon>
+                </v-btn>
+            </v-toolbar>
+        </div>
+
         <feature-model-tree-toolbar
             :is-redo-available="d3Data.commandManager.isRedoAvailable()"
             :is-undo-available="d3Data.commandManager.isUndoAvailable()"
@@ -7,14 +53,13 @@
             @export="$emit('exportToXML')"
             @fitToView="fitToView"
             @redo="redo"
+            @reset="$emit('reset')"
             @resetView="(levels, maxChildren) => resetView(levels, maxChildren)"
-            @search="(search) => onChangeSearch(search)"
+            @save="$emit('save')"
             @semanticEditing="(value) => d3Data.semanticEditing = value"
             @shortName="changeShortName"
             @undo="undo"
             @verticalSpacing="changeVerticalSpacing"
-            @save="$emit('save')"
-            @reset="$emit('reset')"
         ></feature-model-tree-toolbar>
         <div id="svg-container"></div>
 
@@ -121,6 +166,8 @@ export default Vue.extend({
         showAddDialog: false,
         showEditDialog: false,
         editNode: undefined,
+        searchText: undefined,
+        showSearch: false,
     }),
 
     mounted() {
@@ -282,6 +329,22 @@ export default Vue.extend({
             this.$emit('update-constraints');
         },
     },
+
+    computed: {
+        allNodes() {
+            if (this.d3Data.root) {
+                return this.d3Data.root.data.descendants();
+            } else {
+                return [];
+            }
+        }
+    },
+
+    watch: {
+        searchText() {
+            this.onChangeSearch(this.searchText);
+        }
+    }
 });
 </script>
 

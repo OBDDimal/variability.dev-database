@@ -29,21 +29,6 @@
                     </v-list-item-content>
                 </v-list-item>
 
-                <v-list-item>
-                    <v-list-item-icon>
-                        <v-icon>mdi-magnify</v-icon>
-                    </v-list-item-icon>
-                    <v-list-item-content>
-                        <v-text-field
-                            class="my-n4"
-                            v-model="searchText"
-                            placeholder="Search"
-                            single-line
-                            clearable
-                        ></v-text-field>
-                    </v-list-item-content>
-                </v-list-item>
-
                 <v-list-item :disabled="!isUndoAvailable" @click="$emit('undo')">
                     <v-list-item-icon>
                         <v-icon :disabled="!isUndoAvailable">mdi-undo</v-icon>
@@ -240,16 +225,12 @@ export default Vue.extend({
         maxChildren: 3,
         verticalSpacing: 75,
         itemsColoring: ["Count", "Direct Children", "Total Children"],
-        searchText: "",
         isShortName: false,
         semanticEditing: false,
         drawer: true,
     }),
 
     watch: {
-        searchText: function (newValue) {
-            this.$emit("search", newValue);
-        },
         selectedColoring: function (newValue) {
             this.$emit("coloring", newValue);
         },
