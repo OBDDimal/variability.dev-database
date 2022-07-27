@@ -1,5 +1,7 @@
 <template>
     <v-app>
+        <fullscreen></fullscreen>
+
         <navigation title="ddueruem"/>
 
         <v-main style="position: relative">

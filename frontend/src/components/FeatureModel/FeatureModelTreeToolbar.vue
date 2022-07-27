@@ -78,6 +78,11 @@
                         </v-list-item>
                     </template>
                     <v-list>
+                        <v-list-item class="clickable" v-fullscreen>
+                            <v-list-item-content>
+                                <v-list-item-title>Fullscreen</v-list-item-title>
+                            </v-list-item-content>
+                        </v-list-item>
                         <v-list-item class="clickable" @click="$emit('fitToView')">
                             <v-list-item-content>
                                 <v-list-item-title>Fit to view</v-list-item-title>
