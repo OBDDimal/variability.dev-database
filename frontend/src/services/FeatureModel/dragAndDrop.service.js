@@ -58,7 +58,8 @@ export function updateGhostCircles(d3Data) {
         const allOtherNodes = d3Data.root
             .descendants()
             .slice(1)
-            .filter((node) => !dragChildren.includes(node));
+            .filter((node) => !dragChildren.includes(node) && !d3Data.drag.selectedD3Node.parent.children.includes(node));
+
         const rightGhostNodes = allOtherNodes.map((node) => ({d3Node: node, side: 'r'}));
         const leftGhostNodes = allOtherNodes
             .filter((node) => node === node.parent.children[0])
@@ -73,16 +74,14 @@ export function updateGhostCircles(d3Data) {
                 d3Node: node,
                 side: 'b',
             }));
-        dragNodes = [...rightGhostNodes, ...leftGhostNodes, ...bottomGhostNodes];
-    } else if (d3Data.drag.selectedD3Node.parent.children.length > 1) {
-        const allOtherNodes = d3Data.drag.selectedD3Node.parent.children.filter((node) => node !== d3Data.drag.selectedD3Node);
-        dragNodes = allOtherNodes.map((node) => ({d3Node: node, side: 'r'}));
 
-        // Add left-ghost-node if there are enough siblings on this level.
-        if (allOtherNodes) {
-            dragNodes.push({d3Node: allOtherNodes[0], side: 'l'});
-        }
+        dragNodes = [...rightGhostNodes, ...leftGhostNodes, ...bottomGhostNodes];
     }
+
+    // Siblings on the same level.
+    const leftGhostNodesOnSameLevel = d3Data.drag.selectedD3Node.data.getLeftSiblings().map((node) => ({d3Node: node.d3Node, side: 'l'}))
+    const rightGhostNodesOnSameLevel = d3Data.drag.selectedD3Node.data.getRightSiblings().map((node) => ({d3Node: node.d3Node, side: 'r'}))
+    dragNodes = [...dragNodes, ...leftGhostNodesOnSameLevel, ...rightGhostNodesOnSameLevel];
     d3Data.drag.ghostNodes = dragNodes;
 
     // Add ghost circles left and right to all nodes
