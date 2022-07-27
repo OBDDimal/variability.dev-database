@@ -18,12 +18,20 @@ function updateFeatureNodes(d3Data, visibleD3Nodes) {
         .append('g')
         .classed('node', true)
         .call(d3Data.drag.listener)
+        // Highlight and reset highlighting of ghost-nodes during drag and drop of feature-nodes.
         .on('touchmove', (event) => ghostNodeTouchMove(event, d3Data), true)
+        // Open contextmenu with right-click on d3Node.
         .on('contextmenu', (event, d3Node) => {
             event.preventDefault();
             d3Data.contextMenu.selectedD3Node = d3Node;
             d3Data.contextMenu.event = event;
-        }) // Open contextmenu with right-click on d3Node.
+        })
+        // Toggle collapsing on double-clock on feature-node.
+        .on('dblclick', (event, d3Node) => {
+            event.preventDefault();
+            d3Node.data.toggleCollapse();
+            updateSvg(d3Data);
+        })
         .on('click', (event, d3Node) => collapse.collapseShortcut(d3Data, event, d3Node)); // Collapse d3Node with Ctrl + left-click on d3Node.
 
     const rectAndTextEnter = featureNodeEnter.append('g').classed('rect-and-text', true);

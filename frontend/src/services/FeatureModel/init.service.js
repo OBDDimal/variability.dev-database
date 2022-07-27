@@ -27,7 +27,8 @@ export function initialize(d3Data, data) {
         .select('#svg-container')
         .append('svg')
         .attr('preserveAspectRatio', 'xMidYMid meet')
-        .call(d3Data.zoom); // Zooming and penning.
+        .call(d3Data.zoom) // Zooming and penning.
+        .on('dblclick.zoom', null);
 
     const svgContent = svg.append('g');
 
