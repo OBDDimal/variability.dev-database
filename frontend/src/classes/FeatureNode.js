@@ -114,11 +114,13 @@ export class FeatureNode {
     }
 
     getLeftSiblings() {
+        if (this.isRoot) return [];
         const index = this.parent.children.indexOf(this);
         return this.parent.children.slice(0, index);
     }
 
     getRightSiblings() {
+        if (this.isRoot) return [];
         const index = this.parent.children.indexOf(this);
         return this.parent.children.slice(index + 1);
     }
@@ -233,6 +235,20 @@ export class FeatureNode {
 
         this.parent.d3Node.children = [...leftD3Siblings, d3PseudoNode, ...rightD3Siblings];
         this.isHidden = true;
+    }
+
+    hideAllNodesOnThisLevel() {
+        if (this.getLeftSiblings().length) {
+            this.hideLeftSiblings();
+        }
+        if (this.getRightSiblings().length) {
+            this.hideRightSiblings();
+        }
+    }
+
+    hideAllOtherNodes() {
+        this.collapse();
+        this.getAllNodesToRoot().forEach((node) => node.hideAllNodesOnThisLevel());
     }
 
     unhideChildren() {

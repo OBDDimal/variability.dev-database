@@ -88,7 +88,7 @@
                 >
                     <v-list-item-content>
                         <v-list-item-title>
-                            Hide all other nodes on this level
+                            Hide all other siblings on this level
                         </v-list-item-title>
                     </v-list-item-content>
                 </v-list-item>
