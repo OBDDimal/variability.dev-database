@@ -92,6 +92,7 @@ export function updateGhostCircles(d3Data) {
     const ghostCirclesEnter = ghostCircles
         .enter()
         .append('circle')
+        .attr('r', d3Data.drag.mode === 'mouse' ? CONSTANTS.GHOST_NODE_RADIUS_MOUSE : CONSTANTS.GHOST_NODE_RADIUS_TOUCH)
         .attr('ref', (ghostNode) => ghostNode.d3Node.id + ghostNode.side)
         .classed('ghost-circle', true)
         .on('mouseover', (_, ghostNode) => overGhostNode(d3Data, ghostNode))
@@ -139,6 +140,7 @@ export function init(d3Data) {
             if (d3Node === d3Data.root) return;
 
             if (d3Data.drag.hasStarted) {
+                d3Data.drag.mode = event.sourceEvent instanceof MouseEvent ? 'mouse' : 'touch';
                 d3Node.data.parent.unhideChildren();
                 d3Node.data.collapse();
 

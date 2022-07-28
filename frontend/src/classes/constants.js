@@ -13,6 +13,9 @@ export const SPACE_BETWEEN_NODES_HORIZONTALLY = 20;
 
 export const PSEUDO_NODE_SIZE = 20;
 
+export const GHOST_NODE_RADIUS_MOUSE = 15;
+export const GHOST_NODE_RADIUS_TOUCH = 30;
+
 export let CONSTRAINT_HIGHLIGHT_COLORS = [
     '#B762D9',
     '#FFB17A',
