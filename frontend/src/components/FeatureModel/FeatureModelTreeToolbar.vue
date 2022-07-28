@@ -3,10 +3,19 @@
         <v-navigation-drawer
             v-model="drawer"
             absolute
-            expand-on-hover
             permanent
+            :mini-variant="showSidebar"
         >
             <v-list dense>
+                <v-list-item @click.stop="showSidebar = !showSidebar">
+                    <v-list-item-icon>
+                        <v-icon v-if="showSidebar">mdi-chevron-right</v-icon>
+                        <v-icon v-else>mdi-chevron-left</v-icon>
+                    </v-list-item-icon>
+
+                    <v-list-item-content>
+                    </v-list-item-content>
+                </v-list-item>
 
                 <v-list-item :disabled="!isUndoAvailable" @click="$emit('save')">
                     <v-list-item-icon>
@@ -228,6 +237,7 @@ export default Vue.extend({
         isShortName: false,
         semanticEditing: false,
         drawer: true,
+        showSidebar: false,
     }),
 
     watch: {
