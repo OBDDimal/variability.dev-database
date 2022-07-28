@@ -26,4 +26,4 @@ jobs:
         with:
           working-directory: ./frontend
           build: npm run build
-          start: serve build -p 8080
+          start: serve dist -s -p 8080
