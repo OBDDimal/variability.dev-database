@@ -91,19 +91,12 @@ class FileManager(models.Manager):
         if tags is None:
             raise TypeError('Tags is not set')
         family = kwargs.get('family', None)
-        if family is None:
-            raise TypeError('Feature Model Family is not set')
-        else:
-            family_id = family.split(':')[0]
-            kwargs.update({'family': Family.objects.get(id=int(family_id))})
         # get file from id
         if kwargs.get('new_version_of', None) is not None:
             kwargs.update({'new_version_of': File.objects.get(id=kwargs['new_version_of'])})
         # get license from id
         if kwargs.get('license', None) is None:
             raise TypeError('License not set!')
-        else:
-            kwargs.update({'license': License.objects.get(id=kwargs['license'])})
         file = self.model(**kwargs)
         file.save()
         file.tags.set(tags)
