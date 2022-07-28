@@ -113,11 +113,13 @@ export class FeatureNode {
     }
 
     getLeftSiblings() {
+        if (this.isRoot) return [];
         const index = this.parent.children.indexOf(this);
         return this.parent.children.slice(0, index);
     }
 
     getRightSiblings() {
+        if (this.isRoot) return [];
         const index = this.parent.children.indexOf(this);
         return this.parent.children.slice(index + 1);
     }
@@ -237,13 +239,17 @@ export class FeatureNode {
     }
 
     hideAllNodesOnThisLevel() {
-        this.hideLeftSiblings();
-        this.hideRightSiblings();
+        if (this.getLeftSiblings().length) {
+            this.hideLeftSiblings();
+        }
+        if (this.getRightSiblings().length) {
+            this.hideRightSiblings();
+        }
     }
 
     hideAllOtherNodes() {
-        this.getAllNodesToRoot().forEach((node) => node.hideAllNodesOnThisLevel());
         this.collapse();
+        this.getAllNodesToRoot().forEach((node) => node.hideAllNodesOnThisLevel());
     }
 
     unhideChildren() {
