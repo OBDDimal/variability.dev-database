@@ -23,4 +23,4 @@ jobs:
         with:
           working-directory: ./frontend
           build: npm run build
-          start: npm serve build
+          start: ./node_modules/.bin/serve build -p 8080
