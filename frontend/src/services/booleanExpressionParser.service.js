@@ -4,8 +4,8 @@ import {Conjunction} from "@/classes/Constraint/Conjunction";
 import {Disjunction} from "@/classes/Constraint/Disjunction";
 import {FeatureNodeConstraintItem} from "@/classes/Constraint/FeatureNodeConstraintItem";
 
-const operators = ['not', 'and', 'or', 'implies'];
-const operatorPrecedence = {};
+const operators = ['not', 'implies', 'and', 'or'];
+export const operatorPrecedence = {};
 operators.forEach((operator, i) => operatorPrecedence[operator] = i);
 
 export function parse(toParse, allNodes) {
@@ -29,12 +29,16 @@ export function parse(toParse, allNodes) {
         }
     });
 
-    // Push all operators that remains on operator-stack to output
+    // Push all operators to output that remains on operator-stack
     while (operatorStack.length) {
         convertToConstraintItem(operatorStack.pop(), outputStack);
     }
 
-    return outputStack[0];
+    if (outputStack.length > 1) {
+        throw Error(`Missing operator between ${outputStack[0].toString()} and ${outputStack[1].toString()}`);
+    } else {
+        return outputStack[0];
+    }
 }
 
 function parseOperator(token, operatorStack, outputStack) {
@@ -59,21 +63,26 @@ function parseClosingBracket(operatorStack, outputStack) {
 
 function convertToConstraintItem(operator, stack) {
     operator = operator.toLowerCase();
-    let constraintItem = undefined;
+    let constraintItem;
     if (operator === 'not') {
+        if (stack.length < 1) {
+            throw Error('Too few arguments: Expected 1 argument for not');
+        }
         constraintItem = new Negation(stack.pop());
-    } else if (operator === 'and') {
+    } else {
+        if (stack.length < 2) {
+            throw Error(`Too few arguments: Expected 2 arguments for ${operator}`);
+        }
         const second = stack.pop();
         const first = stack.pop();
-        constraintItem = new Conjunction(first, second);
-    } else if (operator === 'or') {
-        const second = stack.pop();
-        const first = stack.pop();
-        constraintItem = new Disjunction(first, second);
-    } else if (operator === 'implies') {
-        const conclusion = stack.pop();
-        const premise = stack.pop();
-        constraintItem = new Implication(premise, conclusion);
+
+        if (operator === 'and') {
+            constraintItem = new Conjunction(first, second);
+        } else if (operator === 'or') {
+            constraintItem = new Disjunction(first, second);
+        } else if (operator === 'implies') {
+            constraintItem = new Implication(first, second);
+        }
     }
 
     stack.push(constraintItem);
@@ -82,7 +91,7 @@ function convertToConstraintItem(operator, stack) {
 function createFeatureNodeConstraintItem(featureNodeName, allNodes) {
     const foundNode = allNodes.find((node) => node.name === featureNodeName);
     if (!foundNode) {
-        console.error('constraint-parser', featureNodeName + ' was not found');
+        throw Error(`FeatureNode '${featureNodeName} cannot be found`);
     }
     return new FeatureNodeConstraintItem(foundNode);
 }

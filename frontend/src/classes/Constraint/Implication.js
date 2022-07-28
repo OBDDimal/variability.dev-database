@@ -8,15 +8,15 @@ export class Implication extends ConstraintItem {
     }
 
     count() {
-        return 1;
+        return 2;
     }
 
     toString() {
-        return `${this.premise.toString()} ⇒ ${this.conclusion.toString()}`;
+        return `${this.addPossibleBrackets(this.premise)} ⇒ ${this.addPossibleBrackets(this.conclusion)}`;
     }
 
     toStringForEdit() {
-        return `${this.premise.toStringForEdit()} IMPLIES ${this.conclusion.toStringForEdit()}`;
+        return `${this.addPossibleBracketsForEdit(this.premise)} IMPLIES ${this.addPossibleBracketsForEdit(this.conclusion)}`;
     }
 
     toStringPostfix() {

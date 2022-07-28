@@ -28,11 +28,14 @@
                                     <v-text-field
                                         ref="inputField"
                                         v-model="constraintText"
-                                        :rules="[(value) => !!value || 'Required.']"
+                                        :rules="[(value) => !!value || 'Required.', (value) => checkParse(value) || this.errorText]"
                                         clearable
                                         hide-details
                                         label="Constraint"
                                     ></v-text-field>
+                                    <label v-if="!isValid">
+                                        {{errorText}}
+                                    </label>
                                 </template>
                             </v-col>
                         </v-row>
@@ -43,7 +46,7 @@
                     <v-card-actions>
                         <v-btn color="secondary" text @click="discard">Discard</v-btn>
                         <v-spacer></v-spacer>
-                        <v-btn color="primary" text type="submit">{{ mode }}</v-btn>
+                        <v-btn :disabled="!isValid" color="primary" text type="submit">{{ mode }}</v-btn>
                     </v-card-actions>
                 </v-form>
             </v-card>
@@ -62,6 +65,8 @@ export default Vue.extend({
     data: () => ({
         constraintText: "",
         selectedFeatureNode: "",
+        isValid: false,
+        errorText: '',
     }),
 
     props: {
@@ -92,9 +97,26 @@ export default Vue.extend({
         },
 
         save() {
-            const newConstraintItem = parse(this.constraintText, this.allNodes);
-            this.constraintText = "";
-            this.$emit('save', newConstraintItem);
+            try {
+                const newConstraintItem = parse(this.constraintText, this.allNodes);
+                this.constraintText = "";
+                this.$emit('save', newConstraintItem);
+            } catch(e) {
+                console.log(e);
+            }
+        },
+
+        checkParse(value) {
+            try {
+                parse(value, this.allNodes);
+                this.errorText = '';
+                this.isValid = true;
+                return true;
+            } catch(e) {
+                this.errorText = e.message;
+                this.isValid = false;
+                return false;
+            }
         },
 
         appendText(text, addSpaceBefore, addSpaceAfter) {

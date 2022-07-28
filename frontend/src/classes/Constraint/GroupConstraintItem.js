@@ -17,17 +17,17 @@ export class GroupConstraintItem extends ConstraintItem {
     toString() {
         const firstText = this.first.constructor.name === this.constructor.name ? this.first.toString() : this.addPossibleBrackets(this.first);
         const secondText = this.second.constructor.name === this.constructor.name ? this.second.toString() : this.addPossibleBrackets(this.second);
-        return `${firstText} ${this.symbol} ${secondText}`
+        return `${firstText} ${this.symbol} ${secondText}`;
     }
 
     toStringPostfix() {
-        return `${this.first.toStringPostfix()} ${this.second.toStringPostfix()} ${this.constructor.name}`
+        return `${this.first.toStringPostfix()} ${this.second.toStringPostfix()} ${this.constructor.name}`;
     }
 
     toStringForEdit() {
         const firstText = this.first.constructor.name === this.constructor.name ? this.first.toStringForEdit() : this.addPossibleBracketsForEdit(this.first);
         const secondText = this.second.constructor.name === this.constructor.name ? this.second.toStringForEdit() : this.addPossibleBracketsForEdit(this.second);
-        return `${firstText} ${this.operator} ${secondText}`
+        return `${firstText} ${this.operator} ${secondText}`;
     }
 
     toStringXML() {
