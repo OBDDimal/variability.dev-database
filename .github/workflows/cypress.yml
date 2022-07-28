@@ -15,10 +15,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
+      - name: Install serve
+        run: npm install -g serve
+
       - name: Install dependencies
-        run:
-          - npm install -g serve
-          - npm install
+        run: npm install
 
       - name: Cypress run
         uses: cypress-io/github-action@v4
