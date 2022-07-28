@@ -1,7 +1,7 @@
 from core.analysis.models import DockerProcess, Analysis
 from core.fileupload.models import Family, Tag, License, File
 from core.fileupload.serializers import FilesSerializer, TagsSerializer, FamiliesSerializer, LicensesSerializer
-from core.fileupload.permissions import IsOwnerOrReadOnly
+from core.fileupload.permissions import IsOwnerOrReadOnly, IsOriginalOwner
 from collections import OrderedDict
 import logging
 from django.utils import timezone, dateparse
@@ -99,7 +99,7 @@ class ConfirmFileUploadViewSet(GenericViewSet, CreateModelMixin):
 class FileUploadViewSet(viewsets.ModelViewSet):
     queryset = File.objects.all()
     serializer_class = FilesSerializer
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [AllowAny, IsOriginalOwner]
 
     def list(self, request, **kwargs):
         """
