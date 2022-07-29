@@ -13,6 +13,7 @@
             @shortName="changeShortName"
             @undo="undo"
             @verticalSpacing="changeVerticalSpacing"
+            @toggleDirection="toggleDirection"
         ></feature-model-tree-toolbar>
         <div id="svg-container"></div>
 
@@ -110,10 +111,11 @@ export default Vue.extend({
             updateTrigger: {
                 coloring: false,
             },
-            verticalSpacing: 75,
+            spaceBetweenNodes: 75,
             d3ParentOfAddNode: undefined,
             coloringIndex: -1,
             semanticEditing: false,
+            direction: 'v', // h = horizontally, v = vertically
         },
         showAddDialog: false,
         showEditDialog: false,
@@ -148,6 +150,11 @@ export default Vue.extend({
 
         fitToView() {
             view.zoomFit(this.d3Data);
+        },
+
+        toggleDirection() {
+            this.d3Data.direction = this.d3Data.direction === 'v' ? 'h' : 'v';
+            update.updateSvg(this.d3Data);
         },
 
         hideCurrentNode(d3Node) {
@@ -202,7 +209,7 @@ export default Vue.extend({
             const editCommand = new EditCommand(
                 this.d3Data,
                 this.editNode,
-                newData
+                newData,
             );
             this.d3Data.commandManager.execute(editCommand);
 
@@ -215,7 +222,7 @@ export default Vue.extend({
         },
 
         changeVerticalSpacing(verticalSpacing) {
-            this.d3Data.verticalSpacing = verticalSpacing;
+            this.d3Data.spaceBetweenNodes = verticalSpacing;
             update.updateSvg(this.d3Data);
         },
 
@@ -229,7 +236,7 @@ export default Vue.extend({
                 this.d3Data,
                 parent,
                 parent.children ? parent.children.length : 0,
-                newNode
+                newNode,
             );
             this.d3Data.commandManager.execute(addCommand);
 

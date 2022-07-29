@@ -7,10 +7,7 @@ import * as windowResize from '@/services/FeatureModel/windowResize.service.js';
 export function initialize(d3Data, data) {
     // Flexlayout belongs to a d3-plugin that calculates the width between all nodes dynamically.
     d3Data.flexlayout = flextree()
-        .nodeSize((d3Node) => [
-            update.calcRectWidth(d3Data, d3Node) + CONSTANTS.SPACE_BETWEEN_NODES_HORIZONTALLY,
-            CONSTANTS.RECT_HEIGHT + d3Data.verticalSpacing,
-        ])
+        .nodeSize((d3Node) => calcNodeSize(d3Data, d3Node))
         .spacing((d3NodeA, d3NodeB) => d3NodeA.path(d3NodeB).length);
 
     // Create root-feature-node with d3 and the data of the feature-model.
@@ -45,4 +42,20 @@ export function initialize(d3Data, data) {
     // Listen to window resize.
     window.onresize = () => windowResize.update(d3Data);
     windowResize.update(d3Data);
+}
+
+function calcNodeSize(d3Data, d3Node) {
+    let width, height;
+    switch (d3Data.direction) {
+        case 'v':
+            width = update.calcRectWidth(d3Data, d3Node) + CONSTANTS.SPACE_BETWEEN_NODES_HORIZONTALLY;
+            height = CONSTANTS.RECT_HEIGHT + d3Data.spaceBetweenNodes;
+            break;
+        case 'h':
+            width = CONSTANTS.RECT_HEIGHT + CONSTANTS.SPACE_BETWEEN_NODES_VERTICALLY;
+            height = 200 +  d3Data.spaceBetweenNodes;
+            break;
+    }
+
+    return [width, height];
 }

@@ -10,6 +10,7 @@ export const FEATURE_FONT_SIZE = 16;
 export const CHILDREN_COUNT_FONT_SIZE = 7;
 
 export const SPACE_BETWEEN_NODES_HORIZONTALLY = 20;
+export const SPACE_BETWEEN_NODES_VERTICALLY= 20;
 
 export const PSEUDO_NODE_SIZE = 20;
 
