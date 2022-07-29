@@ -43,9 +43,11 @@ export class GroupConstraintItem extends ConstraintItem {
 
     setConstraint(constraint) {
         this.first.setConstraint(constraint);
+        this.second.setConstraint(constraint);
     }
 
     removeConstraint() {
         this.first.removeConstraint();
+        this.second.removeConstraint();
     }
 }

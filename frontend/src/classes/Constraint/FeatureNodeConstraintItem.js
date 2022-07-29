@@ -32,12 +32,13 @@ export class FeatureNodeConstraintItem extends ConstraintItem {
 
     setConstraint(constraint) {
         this.constraint = constraint;
-        if (!this.featureNode.constraints.includes(this.constraint))
+        if (!this.featureNode.constraints.includes(this.constraint)) {
             this.featureNode.constraints.push(this.constraint);
+        }
     }
 
     removeConstraint() {
         this.featureNode.constraints = this.featureNode.constraints.filter((c) => c !== this.constraint);
-        this.constraint = undefined;
+        this.constraint = null;
     }
 }
