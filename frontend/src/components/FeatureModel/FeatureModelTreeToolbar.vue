@@ -84,13 +84,23 @@
                             </v-list-item-content>
                         </template>
                     </v-list-item>
-                    <v-subheader>Spacing</v-subheader>
+                    <v-subheader>Space parent -> child</v-subheader>
                     <v-list-item>
                         <v-slider
-                            v-model="verticalSpacing"
+                            v-model="spaceBetweenParentChild"
                             hide-details
                             max="300"
                             min="40"
+                            style="width: 200px"
+                        ></v-slider>
+                    </v-list-item>
+                    <v-subheader>Space between siblings</v-subheader>
+                    <v-list-item>
+                        <v-slider
+                            v-model="spaceBetweenSiblings"
+                            hide-details
+                            max="300"
+                            min="5"
                             style="width: 200px"
                         ></v-slider>
                     </v-list-item>
@@ -178,7 +188,8 @@ export default Vue.extend({
         selectedView: undefined,
         levels: 4,
         maxChildren: 3,
-        verticalSpacing: 75,
+        spaceBetweenParentChild: 75,
+        spaceBetweenSiblings: 20,
         itemsColoring: ["Count", "Direct Children", "Total Children"],
         searchText: "",
         isShortName: false,
@@ -195,8 +206,11 @@ export default Vue.extend({
         isShortName: function (newValue) {
             this.$emit("shortName", newValue);
         },
-        verticalSpacing: function (newValue) {
-            this.$emit("verticalSpacing", newValue);
+        spaceBetweenParentChild: function (newValue) {
+            this.$emit("spaceBetweenParentChild", newValue);
+        },
+        spaceBetweenSiblings: function (newValue) {
+            this.$emit("spaceBetweenSiblings", newValue);
         },
         levels: function (newValue) {
             this.$emit("levels", newValue);

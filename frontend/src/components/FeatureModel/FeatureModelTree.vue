@@ -12,7 +12,8 @@
             @semanticEditing="(value) => d3Data.semanticEditing = value"
             @shortName="changeShortName"
             @undo="undo"
-            @verticalSpacing="changeVerticalSpacing"
+            @spaceBetweenParentChild="changeSpaceBetweenParentChild"
+            @spaceBetweenSiblings="changeSpaceBetweenSiblings"
             @toggleDirection="toggleDirection"
         ></feature-model-tree-toolbar>
         <div id="svg-container"></div>
@@ -111,7 +112,8 @@ export default Vue.extend({
             updateTrigger: {
                 coloring: false,
             },
-            spaceBetweenNodes: 75,
+            spaceBetweenParentChild: 75,
+            spaceBetweenSiblings: 20,
             d3ParentOfAddNode: undefined,
             coloringIndex: -1,
             semanticEditing: false,
@@ -193,7 +195,7 @@ export default Vue.extend({
         },
 
         closeContextMenu() {
-            this.d3Data.contextMenu.selectedD3Node = undefined;
+            this.d3Data.contextMenu.selectedD3Node = null;
         },
 
         collapse(d3Node) {
@@ -221,8 +223,13 @@ export default Vue.extend({
             update.updateSvg(this.d3Data);
         },
 
-        changeVerticalSpacing(verticalSpacing) {
-            this.d3Data.spaceBetweenNodes = verticalSpacing;
+        changeSpaceBetweenParentChild(spacing) {
+            this.d3Data.spaceBetweenParentChild = spacing;
+            update.updateSvg(this.d3Data);
+        },
+
+        changeSpaceBetweenSiblings(spacing) {
+            this.d3Data.spaceBetweenSiblings = spacing;
             update.updateSvg(this.d3Data);
         },
 
@@ -271,13 +278,13 @@ export default Vue.extend({
         },
 
         highlightConstraints(d3Node) {
-            d3Node.data.constraints.forEach((constraint) => constraint.highlight());
+            d3Node.data.constraints.forEach(constraint => constraint.highlight());
             update.updateSvg(this.d3Data);
             this.updateConstraints();
         },
 
         resetHighlightConstraints(d3Node) {
-            d3Node.data.constraints.forEach((constraint) => constraint.resetHighlight());
+            d3Node.data.constraints.forEach(constraint => constraint.resetHighlight());
             update.updateSvg(this.d3Data);
             this.updateConstraints();
         },

@@ -48,12 +48,12 @@ function calcNodeSize(d3Data, d3Node) {
     let width, height;
     switch (d3Data.direction) {
         case 'v':
-            width = update.calcRectWidth(d3Data, d3Node) + CONSTANTS.SPACE_BETWEEN_NODES_HORIZONTALLY;
-            height = CONSTANTS.RECT_HEIGHT + d3Data.spaceBetweenNodes;
+            width = update.calcRectWidth(d3Data, d3Node) + d3Data.spaceBetweenSiblings;
+            height = CONSTANTS.RECT_HEIGHT + d3Data.spaceBetweenParentChild;
             break;
         case 'h':
-            width = CONSTANTS.RECT_HEIGHT + CONSTANTS.SPACE_BETWEEN_NODES_VERTICALLY;
-            height = 200 +  d3Data.spaceBetweenNodes;
+            width = CONSTANTS.RECT_HEIGHT + d3Data.spaceBetweenSiblings;
+            height = 200 +  d3Data.spaceBetweenParentChild;
             break;
     }
 
