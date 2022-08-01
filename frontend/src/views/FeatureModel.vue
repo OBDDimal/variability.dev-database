@@ -51,23 +51,27 @@ export default Vue.extend({
         Constraints,
     },
 
-    props: {},
-
     data: () => ({
         featureMap: [],
         constraints: [],
+        properties: [],
+        calculations: undefined,
+        comments: [],
+        featureOrder: undefined,
         rootNode: undefined,
     }),
 
     created() {
         // TODO: Axios request for xml
 
-        const [rootNode, constraints] = this.xmlToJson(berkeley);
-        this.rootNode = rootNode;
-        this.constraints = constraints;
+        const json = this.xmlToJson(berkeley);
+        this.rootNode = json.rootNode;
+        this.constraints = json.constraints;
+        this.properties = json.properties;
+        this.calculations = json.calculations;
+        this.comments = json.comments;
+        this.featureOrder = json.featureOrder;
     },
-
-    computed: {},
 
     methods: {
         updateFeatureModel() {
@@ -88,12 +92,22 @@ export default Vue.extend({
             const xmlDocument = parser.parseFromString(m, 'text/xml');
 
             const struct = xmlDocument.querySelector('struct');
-            const constraintSection = xmlDocument.querySelector('constraints');
+            const constraintsContainer = xmlDocument.querySelector('constraints');
+            const propertiesSection = xmlDocument.querySelector('properties');
+            const calculationsSection = xmlDocument.querySelector('calculations');
+            const commentsSection = xmlDocument.querySelector('comments');
+            const featureOrderSection = xmlDocument.querySelector('featureOrder');
 
-            const featuresToReturn = this.getChildrenOfFeature(struct, null);
-            const constraintsToReturn = this.readConstraints([...constraintSection.childNodes]);
+            const toReturn = {
+                rootNode: this.getChildrenOfFeature(struct, null)[0],
+                constraints: this.readConstraints([...constraintsContainer.childNodes]),
+                properties: this.getProperties(propertiesSection),
+                calculations: this.getCalculations(calculationsSection),
+                comments: this.getComments(commentsSection),
+                featureOrder: this.getFeatureOrder(featureOrderSection),
+            };
             console.log('Parsertime', performance.now() - start);
-            return [featuresToReturn[0], constraintsToReturn];
+            return toReturn;
         },
 
         getChildrenOfFeature(struct, parent) {
@@ -107,7 +121,7 @@ export default Vue.extend({
                         child.getAttribute('name'),
                         child.tagName,
                         child.getAttribute('mandatory') === 'true',
-                        child.getAttribute('abstract') === 'true'
+                        child.getAttribute('abstract') === 'true',
                     );
                     toAppend.children = this.getChildrenOfFeature(child, toAppend);
 
@@ -150,6 +164,46 @@ export default Vue.extend({
             }
         },
 
+        getProperties(properties) {
+            if (!properties) return null;
+
+            return [...properties.childNodes]
+                .filter((element) => element.tagName)
+                .map((element) => ({
+                    tag: element.tagName,
+                    key: element.getAttribute('key'),
+                    value: element.getAttribute('value'),
+                }));
+        },
+
+        getCalculations(calculationsSection) {
+            if (!calculationsSection) return null;
+
+            return {
+                Auto: calculationsSection.getAttribute('Auto'),
+                Constraints: calculationsSection.getAttribute('Constraints'),
+                Features: calculationsSection.getAttribute('Features'),
+                Redundant: calculationsSection.getAttribute('Redundant'),
+                Tautology: calculationsSection.getAttribute('Tautology'),
+            };
+        },
+
+        getComments(commentsSection) {
+            if (!commentsSection) return null;
+
+            return [...commentsSection.childNodes]
+                .filter((element) => element.tagName)
+                .map((element) => element.innerHTML);
+        },
+
+        getFeatureOrder(featureOrder) {
+            if (!featureOrder) return null;
+
+            return {
+                userDefined: featureOrder.getAttribute('userDefined'),
+            };
+        },
+
         exportToXML() {
             let root = {};
 
@@ -160,11 +214,37 @@ export default Vue.extend({
             });
 
             let xml = `<?xml version="1.0" encoding="UTF-8" standalone="no"?><featureModel>`;
+
+            xml += `<properties>${this.properties.reduce(
+                (prev, prop) => prev + `<${prop.tag} key="${prop.key}" value="${prop.value}"/>`,
+                ''
+            )}</properties>`;
+
             xml += `<struct>${this.nodeToXML(root)}</struct>`;
+
             xml += `<constraints>${this.constraints.reduce(
                 (prev, constraint) => prev + '<rule>' + constraint.toStringXML() + '</rule>',
                 ''
             )}</constraints>`;
+
+            if (this.calculations) {
+                xml += `<calculations
+                    Auto="${this.calculations.Auto}"
+                    Constraints="${this.calculations.Constraints}"
+                    Redundant="${this.calculations.Redundant}"
+                    Tautology="${this.calculations.Tautology}"
+                    Features="${this.calculations.Features}"
+                    />`;
+            }
+
+            xml += `<comments>${this.comments.map((comment) => "<c>" + comment + "</c>").join(' ')}</comments>`;
+
+            if (this.featureOrder) {
+                xml += `<featureOrder
+                    userDefined="${this.featureOrder.userDefined}"
+                    />`;
+            }
+
             xml += `</featureModel>`;
 
             const filename = 'featureModel.xml';
