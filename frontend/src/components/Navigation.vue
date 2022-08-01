@@ -39,6 +39,7 @@
                     <v-icon v-else> mdi-brightness-4</v-icon>
                 </v-btn>
                 <v-btn
+                    class="drawer-button"
                     icon
                     @click.stop="drawer = !drawer"
                 >
@@ -62,7 +63,7 @@
                 </v-btn>
                 <v-divider class="mx-5" vertical></v-divider>
                 <v-btn
-                    class="mr-3"
+                    class="mr-3 theme-button"
                     icon
                     @click="$vuetify.theme.dark = !$vuetify.theme.dark"
                 >
@@ -72,6 +73,7 @@
             </div>
         </v-app-bar>
         <v-navigation-drawer
+            class="mobile-navigation"
             v-model="drawer"
             app
             temporary
@@ -156,7 +158,7 @@
                     </v-list-item-icon>
                     Logout
                 </v-list-item>
-                <v-list-item link
+                <v-list-item class="mobile-theme-button" link
                              @click="$vuetify.theme.dark = !$vuetify.theme.dark"
                 >
                     <v-list-item-icon v-if="$vuetify.theme.dark">
