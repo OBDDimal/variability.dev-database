@@ -53,6 +53,8 @@ services:
       - "traefik.http.routers.backend.rule=Host(`doener.tobiasbetz.de`)"
       - "traefik.http.routers.backend.entrypoints=websecure"
       - "traefik.http.routers.backend.tls.certresolver=myresolver"
+      - "traefik.http.middlewares.testHeader.headers.customrequestheaders.HTTP_X_FORWARDED_PROTO=https"
+
 
   frontend:
     build: ./frontend
