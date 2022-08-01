@@ -1,9 +1,10 @@
 <template>
     <div>
-        <feature-model-tree ref="featureModelTree"
-                            :rootNode="rootNode"
-                            @exportToXML="exportToXML"
-                            @update-constraints="updateConstraints">
+        <feature-model-tree
+            ref="featureModelTree"
+            :rootNode="rootNode"
+            @exportToXML="exportToXML"
+            @update-constraints="updateConstraints">
         </feature-model-tree>
         <v-btn
             absolute
@@ -19,8 +20,12 @@
             <v-icon>mdi-format-list-checks</v-icon>
         </v-btn
         >
-        <constraints ref="constraints" :constraints="constraints"
-                     @update-feature-model="updateFeatureModel"></constraints>
+        <constraints
+            ref="constraints"
+            :constraints="constraints"
+            :rootNode="rootNode"
+            @update-feature-model="updateFeatureModel"
+        ></constraints>
     </div>
 </template>
 
@@ -28,10 +33,15 @@
 import Vue from 'vue';
 import FeatureModelTree from '../components/FeatureModel/FeatureModelTree.vue';
 import Constraints from '../components/Constraints.vue';
-import {Constraint, VarConstraint} from '@/classes/constraint';
+import {Constraint} from '@/classes/Constraint';
 import {berkeley} from '@/classes/featureModelData';
 import {FeatureNode} from '@/classes/FeatureNode';
 import * as update from "@/services/FeatureModel/update.service";
+import {FeatureNodeConstraintItem} from "@/classes/Constraint/FeatureNodeConstraintItem";
+import {Disjunction} from "@/classes/Constraint/Disjunction";
+import {Conjunction} from "@/classes/Constraint/Conjunction";
+import {Implication} from "@/classes/Constraint/Implication";
+import {Negation} from "@/classes/Constraint/Negation";
 
 export default Vue.extend({
     name: 'FeatureModel',
@@ -90,12 +100,12 @@ export default Vue.extend({
 
             const toReturn = {
                 rootNode: this.getChildrenOfFeature(struct, null)[0],
-                constraints: this.getConstraints(constraintsContainer),
+                constraints: this.readConstraints([...constraintsContainer.childNodes]),
                 properties: this.getProperties(propertiesSection),
                 calculations: this.getCalculations(calculationsSection),
                 comments: this.getComments(commentsSection),
                 featureOrder: this.getFeatureOrder(featureOrderSection),
-            }
+            };
             console.log('Parsertime', performance.now() - start);
             return toReturn;
         },
@@ -111,7 +121,7 @@ export default Vue.extend({
                         child.getAttribute('name'),
                         child.tagName,
                         child.getAttribute('mandatory') === 'true',
-                        child.getAttribute('abstract') === 'true'
+                        child.getAttribute('abstract') === 'true',
                     );
                     toAppend.children = this.getChildrenOfFeature(child, toAppend);
 
@@ -123,12 +133,35 @@ export default Vue.extend({
             return toReturn;
         },
 
-        getConstraints(constraints) {
-            if (!constraints) return null;
+        readConstraints(constraints) {
+            return constraints
+                .filter((rule) => rule.tagName)
+                .map((rule) => {
+                    return [...rule.childNodes]
+                        .filter((item) => item.tagName)
+                        .map((item) => new Constraint(this.readConstraintItem(item)))[0];
+                });
+        },
 
-            return [...constraints.childNodes]
-                .filter((element) => element.tagName)
-                .map((element) => new Constraint([...element.childNodes].filter((e) => e.tagName)[0], this.featureMap));
+        readConstraintItem(item) {
+            if (item.tagName === 'var') {
+                return new FeatureNodeConstraintItem(this.featureMap[item.innerHTML]);
+            } else {
+                const childItems = [...item.childNodes]
+                    .filter((childItem) => childItem.tagName)
+                    .map((childItem) => this.readConstraintItem(childItem));
+
+                switch (item.tagName) {
+                    case 'disj':
+                        return new Disjunction(childItems[0], childItems[1]);
+                    case 'conj':
+                        return new Conjunction(childItems[0], childItems[1]);
+                    case 'imp':
+                        return new Implication(childItems[0], childItems[1]);
+                    case 'not':
+                        return new Negation(childItems[0]);
+                }
+            }
         },
 
         getProperties(properties) {
@@ -139,7 +172,7 @@ export default Vue.extend({
                 .map((element) => ({
                     tag: element.tagName,
                     key: element.getAttribute('key'),
-                    value: element.getAttribute('value')
+                    value: element.getAttribute('value'),
                 }));
         },
 
@@ -190,7 +223,7 @@ export default Vue.extend({
             xml += `<struct>${this.nodeToXML(root)}</struct>`;
 
             xml += `<constraints>${this.constraints.reduce(
-                (prev, constraint) => prev + '<rule>' + this.constraintToXML(constraint) + '</rule>',
+                (prev, constraint) => prev + '<rule>' + constraint.toStringXML() + '</rule>',
                 ''
             )}</constraints>`;
 
@@ -241,19 +274,6 @@ export default Vue.extend({
                 });
 
                 toReturn += `</${node.groupType}>`;
-                return toReturn;
-            }
-        },
-
-        constraintToXML(constraint) {
-            if (constraint instanceof VarConstraint) {
-                return `<var>${constraint.featureNode.name}</var>`;
-            } else if (constraint instanceof Constraint) {
-                let toReturn = `<${constraint.xmlOperator}>`;
-                constraint.children.forEach((childConstraint) => {
-                    toReturn += this.constraintToXML(childConstraint);
-                });
-                toReturn += `</${constraint.xmlOperator}>`;
                 return toReturn;
             }
         },

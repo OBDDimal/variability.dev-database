@@ -63,8 +63,8 @@ import * as init from '@/services/FeatureModel/init.service.js';
 import * as view from "@/services/FeatureModel/view.service.js";
 import * as search from "@/services/FeatureModel/search.service.js";
 import {CommandManager} from "@/classes/Commands/CommandManager";
-import {AddCommand} from "@/classes/Commands/AddCommand";
-import {EditCommand} from "@/classes/Commands/EditCommand";
+import {AddCommand} from "@/classes/Commands/FeatureModel/AddCommand";
+import {EditCommand} from "@/classes/Commands/FeatureModel/EditCommand";
 import * as update_service from "@/services/FeatureModel/update.service";
 
 export default Vue.extend({
@@ -186,7 +186,7 @@ export default Vue.extend({
         },
 
         closeContextMenu() {
-            this.d3Data.contextMenu.selectedD3Node = undefined;
+            this.d3Data.contextMenu.selectedD3Node = null;
         },
 
         collapse(d3Node) {
@@ -202,7 +202,7 @@ export default Vue.extend({
             const editCommand = new EditCommand(
                 this.d3Data,
                 this.editNode,
-                newData
+                newData,
             );
             this.d3Data.commandManager.execute(editCommand);
 
@@ -229,7 +229,7 @@ export default Vue.extend({
                 this.d3Data,
                 parent,
                 parent.children ? parent.children.length : 0,
-                newNode
+                newNode,
             );
             this.d3Data.commandManager.execute(addCommand);
 
