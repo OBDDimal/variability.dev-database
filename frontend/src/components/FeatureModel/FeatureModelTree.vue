@@ -3,6 +3,7 @@
         <feature-model-tree-toolbar
             :is-redo-available="d3Data.commandManager.isRedoAvailable()"
             :is-undo-available="d3Data.commandManager.isUndoAvailable()"
+            :direction="d3Data.direction"
             @coloring="(coloringIndex) => coloring(coloringIndex)"
             @export="$emit('exportToXML')"
             @fitToView="fitToView"

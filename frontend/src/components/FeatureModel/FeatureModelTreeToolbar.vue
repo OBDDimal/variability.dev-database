@@ -53,7 +53,7 @@
                     </v-list-item>
                     <v-list-item class="clickable" @click="$emit('toggleDirection')">
                         <v-list-item-content>
-                            <v-list-item-title>Toggle Direction</v-list-item-title>
+                            <v-list-item-title>{{direction === 'v' ? 'Change direction to horizontally' : 'Change direction to vertically'}}</v-list-item-title>
                         </v-list-item-content>
                     </v-list-item>
                     <v-list-item
@@ -181,6 +181,7 @@ export default Vue.extend({
     props: {
         isUndoAvailable: Boolean,
         isRedoAvailable: Boolean,
+        direction: String,
     },
 
     data: () => ({
