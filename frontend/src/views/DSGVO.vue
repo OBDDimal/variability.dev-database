@@ -66,9 +66,9 @@
             <template v-slot:default>
                 <thead>
                 <tr>
-                    <th scope="col" class="text-left">Name</th>
-                    <th scope="col" class="text-left">Zweck</th>
-                    <th scope="col" class="text-left">Vorhaltedauer</th>
+                    <th class="text-left" scope="col">Name</th>
+                    <th class="text-left" scope="col">Zweck</th>
+                    <th class="text-left" scope="col">Vorhaltedauer</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -108,9 +108,9 @@
             <template v-slot:default>
                 <thead>
                 <tr>
-                    <th scope="col" class="text-left">Art der Daten</th>
-                    <th scope="col" class="text-left">Art der Sammlung</th>
-                    <th scope="col" class="text-left">Zweck</th>
+                    <th class="text-left" scope="col">Art der Daten</th>
+                    <th class="text-left" scope="col">Art der Sammlung</th>
+                    <th class="text-left" scope="col">Zweck</th>
                 </tr>
                 </thead>
                 <tbody>

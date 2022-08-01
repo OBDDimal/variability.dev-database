@@ -132,9 +132,14 @@ function updatePseudoNodes(d3Data, visibleD3Nodes) {
 }
 
 function updateHighlightedConstraints(d3Data, visibleD3Nodes) {
+    const highlightedNodes = visibleD3Nodes
+        .filter((d3Node) => d3Node.data instanceof FeatureNode)
+        .map((d3Node) => ({d3Node: d3Node, highlightedConstraints: d3Node.data.getHighlightedConstraints()}))
+        .filter((d) => d.highlightedConstraints.length);
+
     const highlightedConstraintNodes = d3Data.container.highlightedConstraintsContainer.selectAll('g.highlighted-constraints').data(
-        visibleD3Nodes.filter(d3Node => d3Node.data instanceof FeatureNode && d3Node.data.constraintsHighlighted.length),
-        d3Node => d3Node.id || (d3Node.id = ++d3Data.nodeIdCounter),
+        highlightedNodes,
+        d => d.d3Node.id || (d.d3Node.id = ++d3Data.nodeIdCounter)
     );
 
     const highlightedConstraintNodesEnter = highlightedConstraintNodes.enter().append('g').classed('highlighted-constraints', true);
@@ -143,12 +148,12 @@ function updateHighlightedConstraints(d3Data, visibleD3Nodes) {
         .merge(highlightedConstraintNodes)
         .selectAll('rect')
         .data(
-            d3Node =>
-                d3Node.data.constraintsHighlighted.map(c => ({
+            d =>
+                d.highlightedConstraints.map((c) => ({
                     constraint: c,
-                    d3Node: d3Node,
+                    d3Node: d.d3Node,
                 })),
-            json => json.constraint.toString() + json.d3Node.id,
+            d => d.constraint.toString() + d.d3Node.id
         );
 
     // Enter highlighted constraint rects

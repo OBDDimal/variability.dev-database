@@ -1,9 +1,10 @@
 import {Command} from "@/classes/Commands/Command";
 
-export class SingleNodeCommand extends Command {
+export class FeatureNodeCommand extends Command {
     constructor(d3Data, node) {
-        super(d3Data);
+        super();
         this.node = node;
+        this.d3Data = d3Data;
     }
 
     markChanges() {

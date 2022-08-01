@@ -22,7 +22,9 @@
                             <span v-else class="mb-2 text-h5">{{ $store.state.currentUser.email }}</span>
                             <h6 class="text-h6">
                                 Institute:
-                                {{ $store.state.currentUser.institute == '' ? 'None' : $store.state.currentUser.institute }}
+                                {{
+                                    $store.state.currentUser.institute == '' ? 'None' : $store.state.currentUser.institute
+                                }}
                             </h6>
                         </v-col>
                     </v-row>
@@ -148,7 +150,9 @@ export default Vue.extend({
                 .concat(preparedTags)
                 .concat(preparedFamilies)
                 .sort((a, b) => {
-                    return a.uploaded_at < b.uploaded_at ? 1 : (b.uploaded_at < a.uploaded_at ? -1 : 0);
+                    if (a.uploaded_at < b.uploaded_at) return 1;
+                    else if (b.uploaded_at < a.uploaded_at) return -1;
+                    else return 0;
                 })
             console.log(combined)
             return combined

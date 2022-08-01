@@ -1,7 +1,7 @@
 import * as update from '@/services/FeatureModel/update.service.js';
 import * as CONSTANTS from '@/classes/constants';
 import * as d3 from 'd3';
-import {SwapCommand} from "@/classes/Commands/SwapCommand";
+import {SwapCommand} from "@/classes/Commands/FeatureModel/SwapCommand";
 
 function overGhostNode(d3Data, ghostNode) {
     d3Data.drag.selectedGhostNode = ghostNode;
