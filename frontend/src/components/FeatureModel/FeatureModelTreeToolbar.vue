@@ -2,14 +2,14 @@
     <div>
         <v-navigation-drawer
             v-model="drawer"
-            :mini-variant="showSidebar"
+            :mini-variant="miniSidebar"
             absolute
             permanent
         >
             <v-list dense>
-                <v-list-item @click.stop="showSidebar = !showSidebar">
+                <v-list-item @click.stop="miniSidebar = !miniSidebar">
                     <v-list-item-icon>
-                        <v-icon v-if="showSidebar">mdi-chevron-right</v-icon>
+                        <v-icon v-if="miniSidebar">mdi-chevron-right</v-icon>
                         <v-icon v-else>mdi-chevron-left</v-icon>
                     </v-list-item-icon>
 
@@ -250,8 +250,8 @@ export default Vue.extend({
         itemsColoring: ["Count", "Direct Children", "Total Children"],
         isShortName: false,
         semanticEditing: false,
-        drawer: true,
-        showSidebar: false,
+        drawer: false,
+        miniSidebar: true,
         discardChangesConfirmDialog: false,
     }),
 
