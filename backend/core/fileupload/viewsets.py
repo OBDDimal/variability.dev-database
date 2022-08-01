@@ -1,7 +1,7 @@
 from core.analysis.models import DockerProcess, Analysis
 from core.fileupload.models import Family, Tag, License, File
 from core.fileupload.serializers import FilesSerializer, TagsSerializer, FamiliesSerializer, LicensesSerializer
-from core.fileupload.permissions import IsOwnerOrReadOnly
+from core.fileupload.permissions import IsOwnerOrReadOnly, IsAdminToAddPublicTag
 from collections import OrderedDict
 import logging
 from django.utils import timezone, dateparse
@@ -257,7 +257,7 @@ class LicensesViewSet(viewsets.GenericViewSet, mixins.ListModelMixin, mixins.Ret
 class TagsViewSet(viewsets.GenericViewSet, mixins.ListModelMixin, mixins.CreateModelMixin, mixins.RetrieveModelMixin, mixins.DestroyModelMixin):
     queryset = Tag.objects.all()
     serializer_class = TagsSerializer
-    permission_classes = [IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
+    permission_classes = [IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly, IsAdminToAddPublicTag]
 
     def public_or_owner(self, tag, request):
         user_email = "" if request.user.is_anonymous else request.user.email

@@ -9,3 +9,14 @@ class IsOwnerOrReadOnly(permissions.BasePermission):
         if request.method in permissions.SAFE_METHODS:
             return True
         return obj.owner == request.user
+
+class IsAdminToAddPublicTag(permissions.BasePermission):
+    """
+    This permissions checks whether the user adding a public tag is an admin.
+    """
+
+    def has_permission(self, request, view):
+        if request.method == 'POST' and 'is_public' in request.data and request.data['is_public'] == 'True' and not request.user.is_staff:
+            return False
+        return True
+
