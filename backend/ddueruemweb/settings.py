@@ -196,3 +196,5 @@ LOGGING = {
     'version': 1,  # the dictConfig format version
     'disable_existing_loggers': False,  # retain the default loggers
 }
+
+SECURE_SSL_REDIRECT = env("USE_SSL")
