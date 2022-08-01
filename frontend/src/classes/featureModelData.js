@@ -55,7 +55,14 @@ export const littleModel = `
 export const berkeley = `
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <featureModel>
-    <properties/>
+    <properties>
+        <graphics key="legendautolayout" value="true"/>
+        <graphics key="showshortnames" value="false"/>
+        <graphics key="layout" value="horizontal"/>
+        <graphics key="showcollapsedconstraints" value="true"/>
+        <graphics key="legendhidden" value="false"/>
+        <graphics key="layoutalgorithm" value="1"/>
+    </properties>
     <struct>
         <alt  mandatory="true" name="BerkeleyDbRoot">
             <and  name="BerkeleyDB">
@@ -360,6 +367,7 @@ export const berkeley = `
     <calculations Auto="true" Constraints="true" Features="true" Redundant="true" Tautology="true"/>
     <comments>
         <c>Semantic Dependencies</c>
+        <c>Example</c>
     </comments>
     <featureOrder userDefined="false"/>
 </featureModel>
