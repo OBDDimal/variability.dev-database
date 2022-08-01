@@ -27,12 +27,10 @@ function updateFeatureNodes(d3Data, visibleD3Nodes) {
             d3Data.contextMenu.event = event;
         })
         // Toggle collapsing on double-clock on feature-node.
-        .on('dblclick', (event, d3Node) => {
-            event.preventDefault();
-            d3Node.data.toggleCollapse();
-            updateSvg(d3Data);
-        })
-        .on('click', (event, d3Node) => collapse.collapseShortcut(d3Data, event, d3Node)); // Collapse d3Node with Ctrl + left-click on d3Node.
+        .on('click', (event, d3Node) => {
+            dblClickEvent(event, d3Data, d3Node);
+            collapse.collapseShortcut(d3Data, event, d3Node); // Collapse d3Node with Ctrl + left-click on d3Node.
+        });
 
     const rectAndTextEnter = featureNodeEnter.append('g').classed('rect-and-text', true);
     rectAndTextEnter.append('rect').attr('height', CONSTANTS.RECT_HEIGHT);
@@ -240,5 +238,25 @@ export function calcRectWidth(d3Data, d3Node) {
         );
     } else if (d3Node.data instanceof PseudoNode) {
         return CONSTANTS.PSEUDO_NODE_SIZE * 2;
+    }
+}
+
+let touchtime = 0;
+function dblClickEvent(event, d3Data, d3Node) {
+    if (touchtime === 0) {
+        // set first click
+        touchtime = new Date().getTime();
+    } else {
+        // compare first click to this click and see if they occurred within double click threshold
+        if (((new Date().getTime()) - touchtime) < 300) {
+            // double click occurred
+            event.preventDefault();
+            d3Node.data.toggleCollapse();
+            updateSvg(d3Data);
+            touchtime = 0;
+        } else {
+            // not a double click so set as a new first click
+            touchtime = new Date().getTime();
+        }
     }
 }
