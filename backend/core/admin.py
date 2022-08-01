@@ -89,12 +89,13 @@ class FamilyAdmin(ModelAdmin):
     Class for defining the backend Feature Model Family admin panel.
     """
     model = Family
-    list_display = ('id', 'label', 'owner')
+    list_display = ('id', 'label', 'owner', 'slug')
     fieldsets = [
         (None, {'fields': ['owner']}),
         ('Information',
          {'fields': ['label', 'description']}),
     ]
+    prepopulated_fields = {"slug": ("label",)}
     search_fields = ('owner', 'id')
     ordering = ('owner',)
     filter_horizontal = ()

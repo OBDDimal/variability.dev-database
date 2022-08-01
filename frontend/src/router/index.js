@@ -7,6 +7,7 @@ import Tags from '../views/Tags.vue'
 import Families from '../views/Families.vue'
 import DSGVO from '../views/DSGVO.vue'
 import Register from '../views/Register.vue'
+import FamilyDetail from "@/views/FamilyDetail";
 import Login from '../views/Login.vue'
 import FileCreate from '../views/FileCreate.vue'
 import RegisterConfirmation from '../views/RegisterConfirmation.vue'
@@ -80,6 +81,11 @@ const routes = [
         path: '/feature-model',
         name: 'FeatureModel',
         component: FeatureModel
+    },
+    {
+        path: '/families/:id/:slug',
+        name: 'FamilyDetail',
+        component: FamilyDetail
     },
 ]
 

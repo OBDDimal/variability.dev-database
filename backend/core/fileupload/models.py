@@ -1,6 +1,7 @@
 from django.db import models
 from core.user.models import User
 from django.core.files.base import ContentFile
+from django.template.defaultfilters import slugify  # new
 
 
 # -------------------------------------------------- Family Model --------------------------------------------------
@@ -14,6 +15,7 @@ class Family(models.Model):
     label = models.CharField(blank=False, max_length=255)
     description = models.TextField(blank=True)
     date_created = models.DateTimeField(auto_now_add=True)
+    slug = models.SlugField(null=True)
 
     class Meta:
         verbose_name = 'family'
@@ -22,6 +24,11 @@ class Family(models.Model):
     def __str__(self):
         # do not change that
         return f"{self.id}:{self.label}"
+
+    def save(self, *args, **kwargs):  # new
+        if not self.slug:
+            self.slug = slugify(self.label)
+        return super().save(*args, **kwargs)
 
 
 # -------------------------------------------------- Tag Model --------------------------------------------------
