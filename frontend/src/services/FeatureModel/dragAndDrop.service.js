@@ -94,20 +94,36 @@ function calcGhostCircleTransform(d3Data, ghostNode) {
     const x = ghostNode.d3Node.x;
     let dy = 0;
 
-    switch (ghostNode.side) {
-        case 'l':
-            dx += update.calcRectWidth(d3Data, ghostNode.d3Node) / 2 + CONSTANTS.SPACE_BETWEEN_NODES_HORIZONTALLY / 2;
-            dx *= -1;
-            dy = CONSTANTS.RECT_HEIGHT / 2;
-            break;
-        case 'r':
-            dx += update.calcRectWidth(d3Data, ghostNode.d3Node) / 2 + CONSTANTS.SPACE_BETWEEN_NODES_HORIZONTALLY / 2;
-            dx *= 1;
-            dy = CONSTANTS.RECT_HEIGHT / 2;
-            break;
-        case 'b':
-            dy = CONSTANTS.RECT_HEIGHT;
-            break;
+    if (d3Data.direction === 'v') {
+        switch (ghostNode.side) {
+            case 'l':
+                dx += ghostNode.d3Node.width / 2 + d3Data.spaceBetweenSiblings / 2;
+                dx *= -1;
+                dy = CONSTANTS.RECT_HEIGHT / 2;
+                break;
+            case 'r':
+                dx += ghostNode.d3Node.width / 2 + d3Data.spaceBetweenSiblings / 2;
+                dx *= 1;
+                dy = CONSTANTS.RECT_HEIGHT / 2;
+                break;
+            case 'b':
+                dy = CONSTANTS.RECT_HEIGHT;
+                break;
+        }
+    } else {
+        switch (ghostNode.side) {
+            case 'l':
+                dy += CONSTANTS.RECT_HEIGHT / 2 + d3Data.spaceBetweenSiblings / 2 + 1;
+                dy *= -1;
+                break;
+            case 'r':
+                dy += CONSTANTS.RECT_HEIGHT / 2 + d3Data.spaceBetweenSiblings / 2 + 1;
+                dy *= 1;
+                break;
+            case 'b':
+                dx = ghostNode.d3Node.width;
+                break;
+        }
     }
     return `translate(${x + dx}, ${y + dy})`;
 }

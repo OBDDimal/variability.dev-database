@@ -3,6 +3,7 @@
         <feature-model-tree-toolbar
             :is-redo-available="d3Data.commandManager.isRedoAvailable()"
             :is-undo-available="d3Data.commandManager.isUndoAvailable()"
+            :direction="d3Data.direction"
             @coloring="(coloringIndex) => coloring(coloringIndex)"
             @export="$emit('exportToXML')"
             @fitToView="fitToView"
@@ -12,7 +13,9 @@
             @semanticEditing="(value) => d3Data.semanticEditing = value"
             @shortName="changeShortName"
             @undo="undo"
-            @verticalSpacing="changeVerticalSpacing"
+            @spaceBetweenParentChild="changeSpaceBetweenParentChild"
+            @spaceBetweenSiblings="changeSpaceBetweenSiblings"
+            @toggleDirection="toggleDirection"
         ></feature-model-tree-toolbar>
         <div id="svg-container"></div>
 
@@ -110,10 +113,13 @@ export default Vue.extend({
             updateTrigger: {
                 coloring: false,
             },
-            verticalSpacing: 75,
+            spaceBetweenParentChild: 75,
+            spaceBetweenSiblings: 20,
             d3ParentOfAddNode: undefined,
             coloringIndex: -1,
             semanticEditing: false,
+            direction: 'v', // h = horizontally, v = vertically
+            maxHorizontallyLevelWidth: [],
         },
         showAddDialog: false,
         showEditDialog: false,
@@ -148,6 +154,11 @@ export default Vue.extend({
 
         fitToView() {
             view.zoomFit(this.d3Data);
+        },
+
+        toggleDirection() {
+            this.d3Data.direction = this.d3Data.direction === 'v' ? 'h' : 'v';
+            update.updateSvg(this.d3Data);
         },
 
         hideCurrentNode(d3Node) {
@@ -214,8 +225,13 @@ export default Vue.extend({
             update.updateSvg(this.d3Data);
         },
 
-        changeVerticalSpacing(verticalSpacing) {
-            this.d3Data.verticalSpacing = verticalSpacing;
+        changeSpaceBetweenParentChild(spacing) {
+            this.d3Data.spaceBetweenParentChild = spacing;
+            update.updateSvg(this.d3Data);
+        },
+
+        changeSpaceBetweenSiblings(spacing) {
+            this.d3Data.spaceBetweenSiblings = spacing;
             update.updateSvg(this.d3Data);
         },
 
@@ -264,13 +280,13 @@ export default Vue.extend({
         },
 
         highlightConstraints(d3Node) {
-            d3Node.data.constraints.forEach((constraint) => constraint.highlight());
+            d3Node.data.constraints.forEach(constraint => constraint.highlight());
             update.updateSvg(this.d3Data);
             this.updateConstraints();
         },
 
         resetHighlightConstraints(d3Node) {
-            d3Node.data.constraints.forEach((constraint) => constraint.resetHighlight());
+            d3Node.data.constraints.forEach(constraint => constraint.resetHighlight());
             update.updateSvg(this.d3Data);
             this.updateConstraints();
         },
