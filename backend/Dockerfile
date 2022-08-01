@@ -1,19 +1,29 @@
-FROM python:3
-RUN apt update && apt install -y nginx
-ADD . /api
-COPY ./ddueruemweb/.env.production /api/ddueruemweb/.env
-WORKDIR /api
-RUN pip install --upgrade pip
-RUN pip install --upgrade setuptools
+FROM python:3-alpine
+ADD . /app
+COPY ./ddueruemweb/.env.production /app/ddueruemweb/.env
 
-# This is for the performant prod server LTS version
-RUN pip install https://projects.unbit.it/downloads/uwsgi-lts.tar.gz
-RUN pip install -r requirements.txt
+RUN set -ex \
+  && apk add --no-cache --virtual .build-deps postgresql-dev build-base netcat-openbsd \
+  && python -m venv /env \
+  && /env/bin/pip install --upgrade pip \
+  && /env/bin/pip install --no-cache-dir gunicorn \
+  && /env/bin/pip install --no-cache-dir -r /app/requirements.txt \
+  && runDeps="$(scanelf --needed --nobanner --recursive /env \
+  | awk '{ gsub(/,/, "\nso:", $2); print "so:" $2 }' \
+  | sort -u \
+  | xargs -r apk info --installed \
+  | sort -u)" \
+  && apk add --virtual rundeps $runDeps \
+  && apk del .build-deps
+
+WORKDIR /app
+
+ENV VIRTUAL_ENV /env
+ENV PATH /env/bin:$PATH
 ENV PORT=8000
+
 EXPOSE 8000
 
 RUN ./manage.py collectstatic --no-input
 
-COPY nginx.conf /etc/nginx/conf.d/default.conf
-COPY uwsgi_params.conf /etc/uwsgi/sites/uwsgi_params
 CMD ["./entrypoint.sh"]
