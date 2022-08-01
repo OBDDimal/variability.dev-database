@@ -255,11 +255,21 @@ function updateSegments(d3Data, visibleD3Nodes) {
 export function updateSvg(d3Data) {
     const start = performance.now();
 
+    // Calculate rect widths of all d3Nodes once for better performance instead of repeatedly during update.
+    d3Data.root.descendants().forEach(d3Node => {
+        d3Node.width = calcRectWidth(d3Data, d3Node);
+        const level = d3Node.data.level();
+        if (d3Data.maxHorizontallyLevelWidth.length <= level) {
+            d3Data.maxHorizontallyLevelWidth.push(0);
+        }
+
+        if (d3Data.maxHorizontallyLevelWidth[level] < d3Node.width) {
+            d3Data.maxHorizontallyLevelWidth[level] = d3Node.width;
+        }
+    });
+
     // Flexlayout belongs to a d3-plugin that calculates the width between all nodes dynamically.
     const visibleD3Nodes = d3Data.flexlayout(d3Data.root).descendants();
-
-    // Calculate rect widths of all d3Nodes once for better performance instead of repeatedly during update.
-    visibleD3Nodes.forEach(d3Node => d3Node.width = calcRectWidth(d3Data, d3Node));
 
     // Swap x and y to draw from left to right instead of drawing from top to bottom
     if (d3Data.direction === 'h') {

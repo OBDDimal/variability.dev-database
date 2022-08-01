@@ -26,6 +26,14 @@ export class FeatureNode {
         else return this.colorValue;
     }
 
+    level() {
+        if (this.isRoot) {
+            return 0;
+        } else {
+            return this.parent.level() + 1;
+        }
+    }
+
     childrenCount() {
         if (this.isLeaf()) {
             return 0;

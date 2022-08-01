@@ -97,12 +97,12 @@ function calcGhostCircleTransform(d3Data, ghostNode) {
     if (d3Data.direction === 'v') {
         switch (ghostNode.side) {
             case 'l':
-                dx += update.calcRectWidth(d3Data, ghostNode.d3Node) / 2 + CONSTANTS.SPACE_BETWEEN_NODES_HORIZONTALLY / 2;
+                dx += ghostNode.d3Node.width / 2 + d3Data.spaceBetweenSiblings / 2;
                 dx *= -1;
                 dy = CONSTANTS.RECT_HEIGHT / 2;
                 break;
             case 'r':
-                dx += update.calcRectWidth(d3Data, ghostNode.d3Node) / 2 + CONSTANTS.SPACE_BETWEEN_NODES_HORIZONTALLY / 2;
+                dx += ghostNode.d3Node.width / 2 + d3Data.spaceBetweenSiblings / 2;
                 dx *= 1;
                 dy = CONSTANTS.RECT_HEIGHT / 2;
                 break;
@@ -113,11 +113,11 @@ function calcGhostCircleTransform(d3Data, ghostNode) {
     } else {
         switch (ghostNode.side) {
             case 'l':
-                dy += CONSTANTS.RECT_HEIGHT;
+                dy += CONSTANTS.RECT_HEIGHT / 2 + d3Data.spaceBetweenSiblings / 2 + 1;
                 dy *= -1;
                 break;
             case 'r':
-                dy += CONSTANTS.RECT_HEIGHT;
+                dy += CONSTANTS.RECT_HEIGHT / 2 + d3Data.spaceBetweenSiblings / 2 + 1;
                 dy *= 1;
                 break;
             case 'b':

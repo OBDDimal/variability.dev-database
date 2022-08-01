@@ -1,7 +1,6 @@
 import {flextree} from 'd3-flextree';
 import * as CONSTANTS from '@/classes/constants';
 import * as d3 from 'd3';
-import * as update from '@/services/FeatureModel/update.service.js';
 import * as windowResize from '@/services/FeatureModel/windowResize.service.js';
 
 export function initialize(d3Data, data) {
@@ -48,12 +47,12 @@ function calcNodeSize(d3Data, d3Node) {
     let width, height;
     switch (d3Data.direction) {
         case 'v':
-            width = update.calcRectWidth(d3Data, d3Node) + d3Data.spaceBetweenSiblings;
+            width = d3Node.width + d3Data.spaceBetweenSiblings;
             height = CONSTANTS.RECT_HEIGHT + d3Data.spaceBetweenParentChild;
             break;
         case 'h':
             width = CONSTANTS.RECT_HEIGHT + d3Data.spaceBetweenSiblings;
-            height = 200 +  d3Data.spaceBetweenParentChild;
+            height = d3Data.maxHorizontallyLevelWidth[d3Node.data.level()] + d3Data.spaceBetweenParentChild;
             break;
     }
 

@@ -118,6 +118,7 @@ export default Vue.extend({
             coloringIndex: -1,
             semanticEditing: false,
             direction: 'v', // h = horizontally, v = vertically
+            maxHorizontallyLevelWidth: [],
         },
         showAddDialog: false,
         showEditDialog: false,
