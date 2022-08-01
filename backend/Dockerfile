@@ -6,8 +6,8 @@ WORKDIR /api
 RUN pip install --upgrade pip
 RUN pip install --upgrade setuptools
 
-# This is for the performant prod server
-RUN pip install uwsgi
+# This is for the performant prod server LTS version
+RUN pip install https://projects.unbit.it/downloads/uwsgi-lts.tar.gz
 RUN pip install -r requirements.txt
 ENV PORT=8000
 EXPOSE 8000
