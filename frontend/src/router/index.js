@@ -77,9 +77,10 @@ const routes = [
         component: FileCreate
     },
     {
-        path: '/feature-model',
+        path: '/feature-model/:id',
         name: 'FeatureModel',
-        component: FeatureModel
+        component: FeatureModel,
+        props: true
     },
 ]
 

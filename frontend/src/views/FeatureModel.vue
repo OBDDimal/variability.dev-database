@@ -1,6 +1,7 @@
 <template>
     <div>
         <feature-model-tree
+            v-if="rootNode"
             ref="featureModelTree"
             :rootNode="rootNode"
             @exportToXML="exportToXML"
@@ -21,6 +22,7 @@
         </v-btn
         >
         <constraints
+            v-if="constraints"
             ref="constraints"
             :constraints="constraints"
             :rootNode="rootNode"
@@ -34,7 +36,6 @@ import Vue from 'vue';
 import FeatureModelTree from '../components/FeatureModel/FeatureModelTree.vue';
 import Constraints from '../components/Constraints.vue';
 import {Constraint} from '@/classes/Constraint';
-import {berkeley} from '@/classes/featureModelData';
 import {FeatureNode} from '@/classes/FeatureNode';
 import * as update from "@/services/FeatureModel/update.service";
 import {FeatureNodeConstraintItem} from "@/classes/Constraint/FeatureNodeConstraintItem";
@@ -42,6 +43,8 @@ import {Disjunction} from "@/classes/Constraint/Disjunction";
 import {Conjunction} from "@/classes/Constraint/Conjunction";
 import {Implication} from "@/classes/Constraint/Implication";
 import {Negation} from "@/classes/Constraint/Negation";
+import api from "@/services/api.service";
+import beautify from "xml-beautifier";
 
 export default Vue.extend({
     name: 'FeatureModel',
@@ -49,6 +52,10 @@ export default Vue.extend({
     components: {
         FeatureModelTree,
         Constraints,
+    },
+
+    props: {
+        id: undefined,
     },
 
     data: () => ({
@@ -62,15 +69,20 @@ export default Vue.extend({
     }),
 
     created() {
-        // TODO: Axios request for xml
-
-        const json = this.xmlToJson(berkeley);
-        this.rootNode = json.rootNode;
-        this.constraints = json.constraints;
-        this.properties = json.properties;
-        this.calculations = json.calculations;
-        this.comments = json.comments;
-        this.featureOrder = json.featureOrder;
+        api.get(`${process.env.VUE_APP_DOMAIN}files/${this.id}/`)
+            .then((data) => {
+                api.get(data.data.local_file)
+                    .then((data) => {
+                        const formattedJson = beautify(data.data)
+                        const json = this.xmlToJson(formattedJson)
+                        this.constraints = json.constraints;
+                        this.properties = json.properties;
+                        this.calculations = json.calculations;
+                        this.comments = json.comments;
+                        this.featureOrder = json.featureOrder;
+                        this.rootNode = json.rootNode;
+                    })
+            });
     },
 
     methods: {
@@ -145,7 +157,7 @@ export default Vue.extend({
 
         readConstraintItem(item) {
             if (item.tagName === 'var') {
-                return new FeatureNodeConstraintItem(this.featureMap[item.innerHTML]);
+                return new FeatureNodeConstraintItem(this.featureMap[item.innerHTML.trim()]);
             } else {
                 const childItems = [...item.childNodes]
                     .filter((childItem) => childItem.tagName)
