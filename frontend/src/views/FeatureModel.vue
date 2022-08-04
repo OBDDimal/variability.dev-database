@@ -22,6 +22,7 @@
         </v-btn
         >
         <constraints
+            v-if="constraints"
             ref="constraints"
             :constraints="constraints"
             :rootNode="rootNode"
@@ -35,7 +36,6 @@ import Vue from 'vue';
 import FeatureModelTree from '../components/FeatureModel/FeatureModelTree.vue';
 import Constraints from '../components/Constraints.vue';
 import {Constraint} from '@/classes/Constraint';
-import {berkeley} from '@/classes/featureModelData';
 import {FeatureNode} from '@/classes/FeatureNode';
 import * as update from "@/services/FeatureModel/update.service";
 import {FeatureNodeConstraintItem} from "@/classes/Constraint/FeatureNodeConstraintItem";
@@ -52,6 +52,10 @@ export default Vue.extend({
     components: {
         FeatureModelTree,
         Constraints,
+    },
+
+    props: {
+        id: undefined,
     },
 
     data: () => ({
@@ -153,7 +157,7 @@ export default Vue.extend({
 
         readConstraintItem(item) {
             if (item.tagName === 'var') {
-                return new FeatureNodeConstraintItem(this.featureMap[item.innerHTML]);
+                return new FeatureNodeConstraintItem(this.featureMap[item.innerHTML.trim()]);
             } else {
                 const childItems = [...item.childNodes]
                     .filter((childItem) => childItem.tagName)
