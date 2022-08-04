@@ -1,6 +1,7 @@
 <template>
     <div>
         <feature-model-tree
+            v-if="rootNode"
             ref="featureModelTree"
             :rootNode="rootNode"
             @exportToXML="exportToXML"
@@ -42,6 +43,8 @@ import {Disjunction} from "@/classes/Constraint/Disjunction";
 import {Conjunction} from "@/classes/Constraint/Conjunction";
 import {Implication} from "@/classes/Constraint/Implication";
 import {Negation} from "@/classes/Constraint/Negation";
+import api from "@/services/api.service";
+import beautify from "xml-beautifier";
 
 export default Vue.extend({
     name: 'FeatureModel',
@@ -62,15 +65,20 @@ export default Vue.extend({
     }),
 
     created() {
-        // TODO: Axios request for xml
-
-        const json = this.xmlToJson(berkeley);
-        this.rootNode = json.rootNode;
-        this.constraints = json.constraints;
-        this.properties = json.properties;
-        this.calculations = json.calculations;
-        this.comments = json.comments;
-        this.featureOrder = json.featureOrder;
+        api.get(`${process.env.VUE_APP_DOMAIN}files/${this.id}/`)
+            .then((data) => {
+                api.get(data.data.local_file)
+                    .then((data) => {
+                        const formattedJson = beautify(data.data)
+                        const json = this.xmlToJson(formattedJson)
+                        this.constraints = json.constraints;
+                        this.properties = json.properties;
+                        this.calculations = json.calculations;
+                        this.comments = json.comments;
+                        this.featureOrder = json.featureOrder;
+                        this.rootNode = json.rootNode;
+                    })
+            });
     },
 
     methods: {
