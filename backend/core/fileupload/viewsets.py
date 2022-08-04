@@ -1,7 +1,7 @@
 from core.analysis.models import DockerProcess, Analysis
 from core.fileupload.models import Family, Tag, License, File
 from core.fileupload.serializers import FilesSerializer, TagsSerializer, FamiliesSerializer, LicensesSerializer
-from core.fileupload.permissions import IsOwnerOrReadOnly, IsAdminToAddPublicTag
+from core.fileupload.permissions import IsOwnerOrIsAdminOrReadOnly, IsAdminToAddPublicTag
 from collections import OrderedDict
 import logging
 from django.utils import timezone, dateparse
@@ -132,7 +132,7 @@ class FileUploadViewSet(viewsets.ModelViewSet):
 class UnconfirmedFileViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin, mixins.DestroyModelMixin, mixins.ListModelMixin):
     queryset = File.objects.filter(is_confirmed=False)
     serializer_class = FilesSerializer
-    permission_classes = [permissions.IsAuthenticated, IsOwnerOrReadOnly]
+    permission_classes = [permissions.IsAuthenticated, IsOwnerOrIsAdminOrReadOnly]
 
     def list(self, request, **kwargs):
         """
@@ -209,7 +209,7 @@ class ConfirmedFileViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin, m
 class FamiliesViewSet(viewsets.GenericViewSet, mixins.ListModelMixin, mixins.CreateModelMixin, mixins.RetrieveModelMixin, mixins.UpdateModelMixin):
     queryset = Family.objects.all()
     serializer_class = FamiliesSerializer
-    permission_classes = [IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
+    permission_classes = [IsAuthenticatedOrReadOnly, IsOwnerOrIsAdminOrReadOnly]
 
     def anonymize_family(self, family, request):
         """
@@ -257,7 +257,7 @@ class LicensesViewSet(viewsets.GenericViewSet, mixins.ListModelMixin, mixins.Ret
 class TagsViewSet(viewsets.GenericViewSet, mixins.ListModelMixin, mixins.CreateModelMixin, mixins.RetrieveModelMixin, mixins.DestroyModelMixin):
     queryset = Tag.objects.all()
     serializer_class = TagsSerializer
-    permission_classes = [IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly, IsAdminToAddPublicTag]
+    permission_classes = [IsAuthenticatedOrReadOnly, IsOwnerOrIsAdminOrReadOnly, IsAdminToAddPublicTag]
 
     def public_or_owner(self, tag, request):
         user_email = "" if request.user.is_anonymous else request.user.email
