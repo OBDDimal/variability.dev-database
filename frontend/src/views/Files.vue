@@ -66,7 +66,7 @@
                 </v-toolbar>
             </template>
             <template v-slot:item.actions="{ item }">
-                <v-btn class="mr-2" color="primary" rounded small to="/feature-model">
+                <v-btn class="mr-2" color="primary" rounded small :to="'/feature-model/' + item.id">
                     <v-icon>mdi-eye</v-icon>
                 </v-btn>
                 <v-btn
