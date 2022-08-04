@@ -259,13 +259,24 @@ class TagsViewSet(viewsets.GenericViewSet, mixins.ListModelMixin, mixins.CreateM
     serializer_class = TagsSerializer
     permission_classes = [IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
 
-    def anonymize_tag(self, family, request):
+    def public_or_owner(self, tag, request):
+        user_email = "" if request.user.is_anonymous else request.user.email
+        return tag['is_public'] or tag['owner'] == user_email
+
+    def remove_private_tags(self, tags, request):
+        public_tags = []
+        for tag in tags:
+            if self.public_or_owner(tag, request):
+                public_tags.append(tag)
+        return public_tags
+
+    def anonymize_tag(self, tag, request):
         """
         Replace email address of tag owner with True or False,
         indicating whether the user which has sent the request is the owner.
         """
         anonymized_tag = OrderedDict()
-        for (key, value) in family.items():
+        for (key, value) in tag.items():
             if key == 'owner':
                 user_email = "" if request.user.is_anonymous else request.user.email
                 anonymized_tag[key] = value == user_email
@@ -276,14 +287,17 @@ class TagsViewSet(viewsets.GenericViewSet, mixins.ListModelMixin, mixins.CreateM
     def list(self, request, **kwargs):
         queryset = Tag.objects.all()
         tags = TagsSerializer(queryset, many=True).data
+        public_tags = self.remove_private_tags(tags, request)
         anonymized_tags = []
-        for tag in tags:
+        for tag in public_tags:
             anonymized_tags.append(self.anonymize_tag(tag, request))
         return Response(anonymized_tags)
 
     def retrieve(self, request, *args, **kwargs):
         instance = self.get_object()
         serializer = self.get_serializer(instance)
+        if not self.public_or_owner(serializer.data, request):
+            return Response({"detail": "Not found."}, status.HTTP_404_NOT_FOUND)
         anonymized_tag = self.anonymize_tag(serializer.data, request)
         return Response(anonymized_tag)
 

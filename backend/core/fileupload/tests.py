@@ -89,11 +89,17 @@ class TagTest(APITestCase):
         json = res.json()
         self.assertEqual(len(json), 2)
 
-        # Licenses are listable when logged out
+        # Public licenses are listable when logged out
         self.client.logout()
         res = self.client.get("/tags/")
         json = res.json()
-        self.assertEqual(len(json), 2)
+        self.assertEqual(len(json), 1)
+
+        # Public licenses are listable when logged in as another user
+        self.client.logout()
+        res = self.client.get("/tags/")
+        json = res.json()
+        self.assertEqual(len(json), 1)
 
     def test_tag_retrieve(self):
         # Tags are retrievable as owner
@@ -125,11 +131,7 @@ class TagTest(APITestCase):
         self.assertEqual(json["is_public"], True)
 
         res = self.client.get("/tags/2/")
-        json = res.json()
-        self.assertEqual(json["label"], self.other_tag_label)
-        self.assertEqual(json["description"], self.other_tag_description)
-        self.assertEqual(json["owner"], False)
-        self.assertEqual(json["is_public"], False)
+        self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
 
         # Tags are retrievable as unauthenticated user
         self.client.logout()
@@ -142,11 +144,7 @@ class TagTest(APITestCase):
         self.assertEqual(json["is_public"], True)
 
         res = self.client.get("/tags/2/")
-        json = res.json()
-        self.assertEqual(json["label"], self.other_tag_label)
-        self.assertEqual(json["description"], self.other_tag_description)
-        self.assertEqual(json["owner"], False)
-        self.assertEqual(json["is_public"], False)
+        self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_tag_create(self):
         self.client.login(email="ad@m.in", password="12345678!")
@@ -183,12 +181,8 @@ class TagTest(APITestCase):
         self.assertEqual(json["owner"], False)
         self.assertEqual(json["is_public"], True)
 
-        #res = self.client.get(f"/tags/{second_id}/")
-        #json = res.json()
-        #self.assertEqual(json["label"], "otherlabel")
-        #self.assertEqual(json["description"], "otherdescription")
-        #self.assertEqual(json["owner"], False)
-        #self.assertEqual(json["is_public"], False)
+        res = self.client.get(f"/tags/{second_id}/")
+        self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_tag_destroy(self):
         # Tags are not destroyable by an unauthenticated user

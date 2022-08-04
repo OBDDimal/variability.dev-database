@@ -197,7 +197,7 @@ LOGGING = {
     'disable_existing_loggers': False,  # retain the default loggers
 }
 
-SECURE_SSL_REDIRECT = env("USE_SSL") if env("USE_SSL") == True else None
+SECURE_SSL_REDIRECT = env("USE_SSL") == True
 SECURE_PROXY_SSL_HEADER = None
 
 if env("USE_SSL"):
