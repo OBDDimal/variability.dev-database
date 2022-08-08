@@ -2,6 +2,56 @@
   <div class="mainView">
     <h3 class="text-h3 mb-2 mt-8">Family: {{family.label}}</h3>
     <h5 class="text-h5 mb-4">Details and more information</h5>
+    <v-row justify="space-between">
+      <v-col cols="12" sm="6" md="3">
+        <v-sheet
+            :color="`grey ${$vuetify.theme.dark ? 'darken-2' : 'lighten-4'}`"
+            class="pa-3"
+        >
+          <v-skeleton-loader
+              class="mx-auto"
+              max-width="300"
+              type="card"
+          ></v-skeleton-loader>
+        </v-sheet>
+      </v-col>
+      <v-col cols="12" sm="6" md="3">
+        <v-sheet
+            :color="`grey ${$vuetify.theme.dark ? 'darken-2' : 'lighten-4'}`"
+            class="pa-3"
+        >
+          <v-skeleton-loader
+              class="mx-auto"
+              max-width="300"
+              type="card"
+          ></v-skeleton-loader>
+        </v-sheet>
+      </v-col>
+      <v-col cols="12" sm="6" md="3">
+        <v-sheet
+            :color="`grey ${$vuetify.theme.dark ? 'darken-2' : 'lighten-4'}`"
+            class="pa-3"
+        >
+          <v-skeleton-loader
+              class="mx-auto"
+              max-width="300"
+              type="card"
+          ></v-skeleton-loader>
+        </v-sheet>
+      </v-col>
+      <v-col cols="12" sm="6" md="3">
+        <v-sheet
+            :color="`grey ${$vuetify.theme.dark ? 'darken-2' : 'lighten-4'}`"
+            class="pa-3"
+        >
+          <v-skeleton-loader
+              class="mx-auto"
+              max-width="300"
+              type="card"
+          ></v-skeleton-loader>
+        </v-sheet>
+      </v-col>
+    </v-row>
   </div>
 </template>
 
