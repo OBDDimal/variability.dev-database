@@ -1,16 +1,62 @@
 <template>
     <div>
+        <div class="float-right mt-2 mr-3" style="position: absolute; right: 0;">
+            <v-toolbar
+                height="auto"
+                class="rounded-pill"
+                elevation="9"
+                style="border: 2px solid white"
+            >
+                <v-btn
+                    icon
+                    :disabled="search.foundNodeIndex === 0"
+                    @click="onChangeFoundNodeIndex(--search.foundNodeIndex)">
+                    <v-icon>mdi-chevron-left</v-icon>
+                </v-btn>
+
+                <v-btn
+                    icon
+                    :disabled="search.foundNodeDistances.length === search.foundNodeIndex"
+                    @click="onChangeFoundNodeIndex(++search.foundNodeIndex)">
+                    <v-icon>mdi-chevron-right</v-icon>
+                </v-btn>
+
+                <v-text-field
+                    v-if="search.showSearch"
+                    v-model="search.searchText"
+                    class="px-4"
+                    clearable
+                    hide-details
+                    placeholder="Search"
+                    single-line
+                    @input="onChangeSearchText"
+                ></v-text-field>
+
+                <v-badge
+                    inline
+                    v-if="search.foundNodeDistances.length"
+                    :content="search.foundNodeIndex + 1 + '/' + search.foundNodeDistances.length"
+                ></v-badge>
+
+                <v-btn icon @click="search.showSearch = !search.showSearch">
+                    <v-icon>mdi-magnify</v-icon>
+                </v-btn>
+
+            </v-toolbar>
+        </div>
+
         <feature-model-tree-toolbar
             :is-redo-available="d3Data.commandManager.isRedoAvailable()"
             :is-undo-available="d3Data.commandManager.isUndoAvailable()"
             :direction="d3Data.direction"
-            @coloring="(coloringIndex) => coloring(coloringIndex)"
+            @coloring="coloringIndex => coloring(coloringIndex)"
             @export="$emit('exportToXML')"
             @fitToView="fitToView"
             @redo="redo"
+            @reset="$emit('reset')"
             @resetView="(levels, maxChildren) => resetView(levels, maxChildren)"
-            @search="(search) => onChangeSearch(search)"
-            @semanticEditing="(value) => d3Data.semanticEditing = value"
+            @save="$emit('save')"
+            @semanticEditing="value => d3Data.semanticEditing = value"
             @shortName="changeShortName"
             @undo="undo"
             @spaceBetweenParentChild="changeSpaceBetweenParentChild"
@@ -22,31 +68,31 @@
         <feature-model-tree-context-menu
             :d3Node="d3Data.contextMenu.selectedD3Node"
             :d3NodeEvent="d3Data.contextMenu.event"
-            @addAsChild="(d3Node) => openAddAsChildDialog(d3Node)"
-            @addAsSibling="(d3Node) => openAddAsSiblingDialog(d3Node)"
+            @addAsChild="d3Node => openAddAsChildDialog(d3Node)"
+            @addAsSibling="d3Node => openAddAsSiblingDialog(d3Node)"
             @close="d3Data.contextMenu.selectedD3Node = undefined"
             @collapse="collapse"
-            @edit="(d3Node) => openEditDialog(d3Node)"
-            @hideAllNodesOnThisLevel="(d3Node) => hideAllNodesOnThisLevel(d3Node)"
-            @hideAllOtherNodes="(d3Node) => hideAllOtherNodes(d3Node)"
-            @hideCurrentNode="(d3Node) => hideCurrentNode(d3Node)"
-            @hideLeftSiblings="(d3Node) => hideLeftSiblings(d3Node)"
-            @hideRightSiblings="(d3Node) => hideRightSiblings(d3Node)"
-            @highlightConstraints="(d3Node) => highlightConstraints(d3Node)"
-            @resetHighlightConstraints="(d3Node) => resetHighlightConstraints(d3Node)"
+            @edit="d3Node => openEditDialog(d3Node)"
+            @hideAllNodesOnThisLevel="d3Node => hideAllNodesOnThisLevel(d3Node)"
+            @hideAllOtherNodes="d3Node => hideAllOtherNodes(d3Node)"
+            @hideCurrentNode="d3Node => hideCurrentNode(d3Node)"
+            @hideLeftSiblings="d3Node => hideLeftSiblings(d3Node)"
+            @hideRightSiblings="d3Node => hideRightSiblings(d3Node)"
+            @highlightConstraints="d3Node => highlightConstraints(d3Node)"
+            @resetHighlightConstraints="d3Node => resetHighlightConstraints(d3Node)"
         ></feature-model-tree-context-menu>
 
         <feature-model-tree-edit-dialog
             :node="editNode"
             :show="showEditDialog"
             @close="showEditDialog = false"
-            @edit="(data) => edit(data)">
+            @edit="data => edit(data)">
         </feature-model-tree-edit-dialog>
 
         <feature-model-tree-add-dialog
             :parent="d3Data.d3ParentOfAddNode ? d3Data.d3ParentOfAddNode.data : undefined"
             :show="showAddDialog"
-            @add="(data) => add(data)"
+            @add="data => add(data)"
             @close="showAddDialog = false"
         ></feature-model-tree-add-dialog>
     </div>
@@ -95,9 +141,11 @@ export default Vue.extend({
             drag: {
                 listener: undefined,
                 hasStarted: false,
+                ghostNodes: [],
                 selectedD3Node: undefined,
                 selectedGhostNode: undefined,
                 selectedD3NodePosition: undefined,
+                mode: 'mouse', // touch or mouse
             },
             contextMenu: {
                 selectedD3Node: undefined,
@@ -124,6 +172,13 @@ export default Vue.extend({
         showAddDialog: false,
         showEditDialog: false,
         editNode: undefined,
+        search: {
+            showSearch: false,
+            searchText: undefined,
+            selectedNode: undefined,
+            foundNodeIndex: 0,
+            foundNodeDistances: [],
+        },
     }),
 
     mounted() {
@@ -144,8 +199,21 @@ export default Vue.extend({
             update.updateSvg(this.d3Data);
         },
 
-        onChangeSearch(searchText) {
-            search.search(this.d3Data, searchText);
+        onChangeFoundNodeIndex(index) {
+            if (index < this.search.foundNodeDistances.length) {
+                this.search.selectedNode = this.search.foundNodeDistances[index].node;
+                search.markNodeAsSearched(this.d3Data, this.search.selectedNode);
+            }
+        },
+
+        onChangeSearchText(searchText) {
+            this.search.foundNodeDistances = search.search(this.d3Data, searchText);
+            if (this.search.foundNodeDistances.length) {
+                this.onChangeFoundNodeIndex(0);
+            } else {
+                search.resetSearch(this.d3Data);
+                update.updateSvg(this.d3Data);
+            }
         },
 
         updateSvg() {
@@ -295,6 +363,16 @@ export default Vue.extend({
             this.$emit('update-constraints');
         },
     },
+
+    computed: {
+        allNodes() {
+            if (this.d3Data.root) {
+                return this.d3Data.root.data.descendants();
+            } else {
+                return [];
+            }
+        },
+    },
 });
 </script>
 
@@ -302,10 +380,9 @@ export default Vue.extend({
 .ghost-circle {
     fill: red;
     fill-opacity: 0.2;
-    r: 15px;
 }
 
-.ghost-circle:hover {
+.ghost-circle-highlighted {
     fill-opacity: 0.8;
 }
 
@@ -331,6 +408,7 @@ export default Vue.extend({
         /* fill: black; */
         font-family: monospace;
         text-anchor: middle;
+        user-select: none;
     }
 }
 

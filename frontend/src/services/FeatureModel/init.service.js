@@ -10,20 +10,21 @@ export function initialize(d3Data, data) {
         .spacing((d3NodeA, d3NodeB) => d3NodeA.path(d3NodeB).length);
 
     // Create root-feature-node with d3 and the data of the feature-model.
-    d3Data.root = d3.hierarchy(data, (node) => node.children);
-    d3Data.root.each((d3Node) => d3Node.data.d3Node = d3Node);
+    d3Data.root = d3.hierarchy(data, node => node.children);
+    d3Data.root.each(d3Node => d3Node.data.d3Node = d3Node);
 
     d3Data.zoom = d3
         .zoom()
         //.scaleExtent([0.1, 8])
-        .on('zoom', (event) => svgContent.attr('transform', event.transform));
+        .on('zoom', event => svgContent.attr('transform', event.transform));
 
     // Create svg-container.
     const svg = d3
         .select('#svg-container')
         .append('svg')
         .attr('preserveAspectRatio', 'xMidYMid meet')
-        .call(d3Data.zoom); // Zooming and penning.
+        .call(d3Data.zoom) // Zooming and penning.
+        .on('dblclick.zoom', null);
 
     const svgContent = svg.append('g');
 

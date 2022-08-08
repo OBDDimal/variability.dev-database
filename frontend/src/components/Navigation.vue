@@ -39,6 +39,13 @@
                     <v-icon v-else> mdi-brightness-4</v-icon>
                 </v-btn>
                 <v-btn
+                    class="mr-3"
+                    icon
+                    v-fullscreen
+                >
+                    <v-icon> mdi-fullscreen</v-icon>
+                </v-btn>
+                <v-btn
                     icon
                     @click.stop="drawer = !drawer"
                 >
@@ -68,6 +75,13 @@
                 >
                     <v-icon v-if="$vuetify.theme.dark"> mdi-brightness-7</v-icon>
                     <v-icon v-else> mdi-brightness-4</v-icon>
+                </v-btn>
+                <v-btn
+                    class="mr-3"
+                    icon
+                    v-fullscreen
+                >
+                    <v-icon> mdi-fullscreen</v-icon>
                 </v-btn>
             </div>
         </v-app-bar>

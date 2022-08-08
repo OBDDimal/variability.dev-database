@@ -4,6 +4,7 @@ import * as collapse from '@/services/FeatureModel/collapse.service.js';
 import {FeatureNode} from '@/classes/FeatureNode';
 import {PseudoNode} from "@/classes/PseudoNode";
 import * as count from "@/services/FeatureModel/count.service";
+import {ghostNodeTouchMove} from "@/services/FeatureModel/dragAndDrop.service";
 
 function updateFeatureNodes(d3Data, visibleD3Nodes) {
     const featureNode = d3Data.container.featureNodesContainer.selectAll('g.node').data(
@@ -17,12 +18,19 @@ function updateFeatureNodes(d3Data, visibleD3Nodes) {
         .append('g')
         .classed('node', true)
         .call(d3Data.drag.listener)
+        // Highlight and reset highlighting of ghost-nodes during drag and drop of feature-nodes.
+        .on('touchmove', event => ghostNodeTouchMove(event, d3Data), true)
+        // Open contextmenu with right-click on d3Node.
         .on('contextmenu', (event, d3Node) => {
             event.preventDefault();
             d3Data.contextMenu.selectedD3Node = d3Node;
             d3Data.contextMenu.event = event;
-        }) // Open contextmenu with right-click on d3Node.
-        .on('click', (event, d3Node) => collapse.collapseShortcut(d3Data, event, d3Node)); // Collapse d3Node with Ctrl + left-click on d3Node.
+        })
+        // Toggle collapsing on double-clock on feature-node.
+        .on('click', (event, d3Node) => {
+            dblClickEvent(event, d3Data, d3Node);
+            collapse.collapseShortcut(d3Data, event, d3Node); // Collapse d3Node with Ctrl + left-click on d3Node.
+        });
 
     const rectAndTextEnter = featureNodeEnter.append('g').classed('rect-and-text', true);
     rectAndTextEnter.append('rect').attr('height', CONSTANTS.RECT_HEIGHT);
@@ -292,17 +300,35 @@ export function updateSvg(d3Data) {
 
 // Calculates rect-width dependent on font-size dynamically.
 export function calcRectWidth(d3Data, d3Node) {
-    let width;
     if (d3Node.data instanceof FeatureNode) {
-        width = (d3Data.isShortenedName
+        return (d3Data.isShortenedName
             ? d3Node.data.displayName.length
             : d3Node.data.name.length) *
         (CONSTANTS.FEATURE_FONT_SIZE * CONSTANTS.MONOSPACE_HEIGHT_WIDTH_FACTOR) +
         CONSTANTS.RECT_MARGIN.left +
         CONSTANTS.RECT_MARGIN.right;
-    } else if (d3Node.data instanceof PseudoNode) {
-        width = CONSTANTS.PSEUDO_NODE_SIZE * 2;
+    } else {
+        return CONSTANTS.PSEUDO_NODE_SIZE * 2;
     }
+}
 
-    return width;
+
+let touchtime = 0;
+function dblClickEvent(event, d3Data, d3Node) {
+    if (touchtime === 0) {
+        // set first click
+        touchtime = new Date().getTime();
+    } else {
+        // compare first click to this click and see if they occurred within double click threshold
+        if ((new Date().getTime()) - touchtime < 300) {
+            // double click occurred
+            event.preventDefault();
+            d3Node.data.toggleCollapse();
+            updateSvg(d3Data);
+            touchtime = 0;
+        } else {
+            // not a double click so set as a new first click
+            touchtime = new Date().getTime();
+        }
+    }
 }

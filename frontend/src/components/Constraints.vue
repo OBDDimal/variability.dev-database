@@ -116,7 +116,7 @@ export default Vue.extend({
 
     computed: {
         tableConstraints() {
-            return this.constraints.map((e) => ({
+            return this.constraints.map(e => ({
                 constraint: e,
                 formula: e.toString(),
                 checked: false,
@@ -179,9 +179,9 @@ export default Vue.extend({
                 }
             } else {
                 if (this.$vuetify.theme.dark) {
-                    return "#fff"
+                    return "#fff";
                 }
-                return "#000"
+                return "#000";
             }
         },
 

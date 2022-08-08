@@ -7,8 +7,8 @@ export class SwapCommand extends FeatureNodeCommand {
         this.dstIndex = dstIndex;
 
         // Properties for undo.
-        this.srcParent = undefined;
-        this.srcIndex = undefined;
+        this.srcParent = null;
+        this.srcIndex = null;
     }
 
     execute() {

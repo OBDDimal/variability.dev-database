@@ -3,10 +3,15 @@
         <feature-model-tree
             v-if="rootNode"
             ref="featureModelTree"
+            :key="reloadKey"
             :rootNode="rootNode"
             @exportToXML="exportToXML"
-            @update-constraints="updateConstraints">
+            @reset="reset"
+            @save="save"
+            @update-constraints="updateConstraints"
+        >
         </feature-model-tree>
+
         <v-btn
             absolute
             bottom
@@ -66,26 +71,41 @@ export default Vue.extend({
         comments: [],
         featureOrder: undefined,
         rootNode: undefined,
+        reloadKey: 0,
     }),
 
     created() {
-        api.get(`${process.env.VUE_APP_DOMAIN}files/${this.id}/`)
-            .then((data) => {
-                api.get(data.data.local_file)
-                    .then((data) => {
-                        const formattedJson = beautify(data.data)
-                        const json = this.xmlToJson(formattedJson)
-                        this.constraints = json.constraints;
-                        this.properties = json.properties;
-                        this.calculations = json.calculations;
-                        this.comments = json.comments;
-                        this.featureOrder = json.featureOrder;
-                        this.rootNode = json.rootNode;
-                    })
-            });
+        this.initData();
     },
 
     methods: {
+        save() {
+            // TODO: Axios post request to update the xml file in the backend.
+        },
+
+        reset() {
+            // TODO: Transpile the xml file new and restart viewer.
+            this.initData();
+            this.reloadKey++;
+        },
+
+        initData() {
+            api.get(`${process.env.VUE_APP_DOMAIN}files/${this.id}/`)
+                .then((data) => {
+                    api.get(data.data.local_file)
+                        .then((data) => {
+                            const formattedJson = beautify(data.data)
+                            const json = this.xmlToJson(formattedJson)
+                            this.constraints = json.constraints;
+                            this.properties = json.properties;
+                            this.calculations = json.calculations;
+                            this.comments = json.comments;
+                            this.featureOrder = json.featureOrder;
+                            this.rootNode = json.rootNode;
+                        })
+                });
+        },
+
         updateFeatureModel() {
             update.updateSvg(this.$refs.featureModelTree.d3Data);
         },
@@ -235,8 +255,8 @@ export default Vue.extend({
             xml += `<struct>${this.nodeToXML(root)}</struct>`;
 
             xml += `<constraints>${this.constraints.reduce(
-                (prev, constraint) => prev + '<rule>' + constraint.toStringXML() + '</rule>',
-                ''
+                (prev, constraint) => `${prev}<rule>${this.constraintToXML(constraint)}</rule>`,
+                '',
             )}</constraints>`;
 
             if (this.calculations) {
@@ -281,7 +301,7 @@ export default Vue.extend({
                     node.isMandatory ? 'mandatory="true" ' : ''
                 }name="${node.name}">`;
 
-                node.children.forEach((childNode) => {
+                node.children.forEach(childNode => {
                     toReturn += this.nodeToXML(childNode);
                 });
 

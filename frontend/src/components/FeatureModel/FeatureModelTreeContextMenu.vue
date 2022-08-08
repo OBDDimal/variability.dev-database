@@ -5,6 +5,7 @@
         :close-on-content-click="false"
         :position-x="d3NodeEvent ? d3NodeEvent.pageX : 0"
         :position-y="d3NodeEvent ? d3NodeEvent.pageY : 0"
+        max-height="80%"
         absolute
         offset-y
         transition="scroll-y-transition"

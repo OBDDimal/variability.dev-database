@@ -7,7 +7,7 @@ export class EditCommand extends FeatureNodeCommand {
         this.newData = newData;
 
         // Properties for undo.
-        this.oldData = undefined;
+        this.oldData = null;
     }
 
     execute() {
