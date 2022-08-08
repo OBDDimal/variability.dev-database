@@ -7,11 +7,17 @@
                 elevation="9"
                 style="border: 2px solid white"
             >
-                <v-btn icon>
+                <v-btn
+                    icon
+                    :disabled="search.foundNodeIndex === 0"
+                    @click="onChangeFoundNodeIndex(--search.foundNodeIndex)">
                     <v-icon>mdi-chevron-left</v-icon>
                 </v-btn>
 
-                <v-btn icon>
+                <v-btn
+                    icon
+                    :disabled="search.foundNodeDistances.length === search.foundNodeIndex"
+                    @click="onChangeFoundNodeIndex(++search.foundNodeIndex)">
                     <v-icon>mdi-chevron-right</v-icon>
                 </v-btn>
 
@@ -31,16 +37,17 @@
                 </v-combobox>-->
 
                 <v-text-field
-                    v-if="showSearch"
-                    v-model="searchText"
+                    v-if="search.showSearch"
+                    v-model="search.searchText"
                     class="px-4"
                     clearable
                     hide-details
                     placeholder="Search"
                     single-line
+                    @input="onChangeSearchText"
                 ></v-text-field>
 
-                <v-btn icon @click="showSearch = !showSearch">
+                <v-btn icon @click="search.showSearch = !search.showSearch">
                     <v-icon>mdi-magnify</v-icon>
                 </v-btn>
             </v-toolbar>
@@ -167,8 +174,13 @@ export default Vue.extend({
         showAddDialog: false,
         showEditDialog: false,
         editNode: undefined,
-        searchText: undefined,
-        showSearch: false,
+        search: {
+            showSearch: false,
+            searchText: undefined,
+            selectedNode: undefined,
+            foundNodeIndex: 0,
+            foundNodeDistances: [],
+        },
     }),
 
     mounted() {
@@ -189,8 +201,21 @@ export default Vue.extend({
             update.updateSvg(this.d3Data);
         },
 
-        onChangeSearch(searchText) {
-            search.search(this.d3Data, searchText);
+        onChangeFoundNodeIndex(index) {
+            if (index < this.search.foundNodeDistances.length) {
+                this.search.selectedNode = this.search.foundNodeDistances[index].node;
+                search.markNodeAsSearched(this.d3Data, this.search.selectedNode);
+            }
+        },
+
+        onChangeSearchText(searchText) {
+            this.search.foundNodeDistances = search.search(this.d3Data, searchText);
+            if (this.search.foundNodeDistances.length) {
+                this.onChangeFoundNodeIndex(0);
+            } else {
+                search.resetSearch(this.d3Data);
+                update.updateSvg(this.d3Data);
+            }
         },
 
         updateSvg() {
@@ -340,12 +365,6 @@ export default Vue.extend({
             }
         }
     },
-
-    watch: {
-        searchText() {
-            this.onChangeSearch(this.searchText);
-        }
-    }
 });
 </script>
 
