@@ -90,15 +90,13 @@ class User(AbstractBaseUser, PermissionsMixin):
             'timestamp': str(timezone.now()),
             'purpose': 'upload_confirm',
         }
-        protocol = 'http'
         user = self
         html_message = render_to_string('email/user_upload_email.html', {
             'user': str(user.email),
-            'protocol': protocol,
             'file_domain': str(data.get('local_file')),
             'file_name': str(data.get('local_file')).split('/')[-1],
-            'confirm_link': f"{protocol}://{env('FRONTEND_URL')}/files/uploaded/unconfirmed/confirm/{encode_user_to_token(token)}",
-            'delete_link': f"{protocol}://{env('FRONTEND_URL')}/files/uploaded/unconfirmed/{data.get('id')}",
+            'confirm_link': f"{env('FRONTEND_URL')}/files/uploaded/unconfirmed/confirm/{encode_user_to_token(token)}",
+            'delete_link': f"{env('FRONTEND_URL')}/files/uploaded/unconfirmed/{data.get('id')}",
         })
         plain_message = strip_tags(html_message)
 
@@ -116,7 +114,7 @@ class User(AbstractBaseUser, PermissionsMixin):
             'timestamp': str(timezone.now()),
             'purpose': 'user_activation'
         }
-        link = f"http://{env('FRONTEND_URL')}/register/{encode_user_to_token(extended_user)}"
+        link = f"{env('FRONTEND_URL')}/register/{encode_user_to_token(extended_user)}"
         html_message = render_to_string('email/user_activation_email.html', {
             'user': str(user.email),
             'link': link

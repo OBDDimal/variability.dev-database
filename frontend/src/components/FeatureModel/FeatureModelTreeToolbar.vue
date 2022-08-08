@@ -95,69 +95,81 @@
                     </v-list>
                 </v-menu>
 
-                <v-menu :close-on-content-click="false" offset-y>
-                    <template v-slot:activator="{ on, attrs }">
-                        <v-list-item v-bind="attrs" v-on="on">
-                            <v-list-item-icon>
-                                <v-icon>mdi-eye</v-icon>
-                            </v-list-item-icon>
+            <v-menu offset-y>
+                <template v-slot:activator="{ on, attrs }">
+                    <v-list-item v-bind="attrs" v-on="on">
+                        <v-list-item-icon>
+                            <v-icon>mdi-eye</v-icon>
+                        </v-list-item-icon>
+
+                        <v-list-item-content>
+                            <v-list-item-title>View</v-list-item-title>
+                        </v-list-item-content>
+                    </v-list-item>
+                </template>
+                <v-list>
+                    <v-subheader>View</v-subheader>
+
+                    <v-list-item class="clickable" @click="$emit('fitToView')">
+                        <v-list-item-content>
+                            <v-list-item-title>Fit to view</v-list-item-title>
+                        </v-list-item-content>
+                    </v-list-item>
+                    <v-list-item class="clickable" @click="$emit('toggleDirection')">
+                        <v-list-item-content>
+                            <v-list-item-title>{{direction === 'v' ? 'Change direction to horizontally' : 'Change direction to vertically'}}</v-list-item-title>
+                        </v-list-item-content>
+                    </v-list-item>
+                    <v-list-item
+                        class="clickable"
+                        @click="$emit('resetView', levels, maxChildren)"
+                    >
+                        <v-list-item-content>
+                            <v-list-item-title>Reset view</v-list-item-title>
+                        </v-list-item-content>
+                    </v-list-item>
+                    <v-list-item class="clickable" @click="$store.commit('openConstraints', true)">
+                        <v-list-item-content>
+                            <v-list-item-title>Show Constraints</v-list-item-title>
+                        </v-list-item-content>
+                    </v-list-item>
+                    <v-list-item>
+                        <template v-slot:default="{ active }">
+                            <v-list-item-action>
+                                <v-checkbox
+                                    v-model="isShortName"
+                                    :input-value="active"
+                                    color="primary"
+                                ></v-checkbox>
+                            </v-list-item-action>
 
                             <v-list-item-content>
-                                <v-list-item-title>View</v-list-item-title>
+                                <v-list-item-title>Short Name</v-list-item-title>
                             </v-list-item-content>
-                        </v-list-item>
-                    </template>
-                    <v-list>
-                        <v-list-item v-fullscreen class="clickable">
-                            <v-list-item-content>
-                                <v-list-item-title>Fullscreen</v-list-item-title>
-                            </v-list-item-content>
-                        </v-list-item>
-                        <v-list-item class="clickable" @click="$emit('fitToView')">
-                            <v-list-item-content>
-                                <v-list-item-title>Fit to view</v-list-item-title>
-                            </v-list-item-content>
-                        </v-list-item>
-                        <v-list-item
-                            class="clickable"
-                            @click="$emit('resetView', levels, maxChildren)"
-                        >
-                            <v-list-item-content>
-                                <v-list-item-title>Reset view</v-list-item-title>
-                            </v-list-item-content>
-                        </v-list-item>
-                        <v-list-item class="clickable" @click="$store.commit('openConstraints', true)">
-                            <v-list-item-content>
-                                <v-list-item-title>Show Constraints</v-list-item-title>
-                            </v-list-item-content>
-                        </v-list-item>
-                        <v-list-item>
-                            <template v-slot:default="{ active }">
-                                <v-list-item-action>
-                                    <v-checkbox
-                                        v-model="isShortName"
-                                        :input-value="active"
-                                        color="primary"
-                                    ></v-checkbox>
-                                </v-list-item-action>
-
-                                <v-list-item-content>
-                                    <v-list-item-title>Short Name</v-list-item-title>
-                                </v-list-item-content>
-                            </template>
-                        </v-list-item>
-                        <v-subheader>Spacing</v-subheader>
-                        <v-list-item>
-                            <v-slider
-                                v-model="verticalSpacing"
-                                hide-details
-                                max="300"
-                                min="40"
-                                style="width: 200px"
-                            ></v-slider>
-                        </v-list-item>
-                    </v-list>
-                </v-menu>
+                        </template>
+                    </v-list-item>
+                    <v-subheader>Space parent -> child</v-subheader>
+                    <v-list-item>
+                        <v-slider
+                            v-model="spaceBetweenParentChild"
+                            hide-details
+                            max="300"
+                            min="40"
+                            style="width: 200px"
+                        ></v-slider>
+                    </v-list-item>
+                    <v-subheader>Space between siblings</v-subheader>
+                    <v-list-item>
+                        <v-slider
+                            v-model="spaceBetweenSiblings"
+                            hide-details
+                            max="300"
+                            min="5"
+                            style="width: 200px"
+                        ></v-slider>
+                    </v-list-item>
+                </v-list>
+            </v-menu>
 
                 <v-list-item @click="$emit('export')">
                     <v-list-item-icon>
@@ -226,6 +238,7 @@ export default Vue.extend({
     props: {
         isUndoAvailable: Boolean,
         isRedoAvailable: Boolean,
+        direction: String,
     },
 
     data: () => ({
@@ -233,7 +246,8 @@ export default Vue.extend({
         selectedView: undefined,
         levels: 4,
         maxChildren: 3,
-        verticalSpacing: 75,
+        spaceBetweenParentChild: 75,
+        spaceBetweenSiblings: 20,
         itemsColoring: ["Count", "Direct Children", "Total Children"],
         isShortName: false,
         semanticEditing: false,
@@ -249,8 +263,11 @@ export default Vue.extend({
         isShortName: function (newValue) {
             this.$emit("shortName", newValue);
         },
-        verticalSpacing: function (newValue) {
-            this.$emit("verticalSpacing", newValue);
+        spaceBetweenParentChild: function (newValue) {
+            this.$emit("spaceBetweenParentChild", newValue);
+        },
+        spaceBetweenSiblings: function (newValue) {
+            this.$emit("spaceBetweenSiblings", newValue);
         },
         levels: function (newValue) {
             this.$emit("levels", newValue);

@@ -41,6 +41,7 @@
         <feature-model-tree-toolbar
             :is-redo-available="d3Data.commandManager.isRedoAvailable()"
             :is-undo-available="d3Data.commandManager.isUndoAvailable()"
+            :direction="d3Data.direction"
             @coloring="coloringIndex => coloring(coloringIndex)"
             @export="$emit('exportToXML')"
             @fitToView="fitToView"
@@ -51,7 +52,9 @@
             @semanticEditing="value => d3Data.semanticEditing = value"
             @shortName="changeShortName"
             @undo="undo"
-            @verticalSpacing="changeVerticalSpacing"
+            @spaceBetweenParentChild="changeSpaceBetweenParentChild"
+            @spaceBetweenSiblings="changeSpaceBetweenSiblings"
+            @toggleDirection="toggleDirection"
         ></feature-model-tree-toolbar>
         <div id="svg-container"></div>
 
@@ -102,8 +105,8 @@ import * as init from '@/services/FeatureModel/init.service.js';
 import * as view from "@/services/FeatureModel/view.service.js";
 import * as search from "@/services/FeatureModel/search.service.js";
 import {CommandManager} from "@/classes/Commands/CommandManager";
-import {AddCommand} from "@/classes/Commands/AddCommand";
-import {EditCommand} from "@/classes/Commands/EditCommand";
+import {AddCommand} from "@/classes/Commands/FeatureModel/AddCommand";
+import {EditCommand} from "@/classes/Commands/FeatureModel/EditCommand";
 import * as update_service from "@/services/FeatureModel/update.service";
 
 export default Vue.extend({
@@ -151,10 +154,13 @@ export default Vue.extend({
             updateTrigger: {
                 coloring: false,
             },
-            verticalSpacing: 75,
+            spaceBetweenParentChild: 75,
+            spaceBetweenSiblings: 20,
             d3ParentOfAddNode: undefined,
             coloringIndex: -1,
             semanticEditing: false,
+            direction: 'v', // h = horizontally, v = vertically
+            maxHorizontallyLevelWidth: [],
         },
         showAddDialog: false,
         showEditDialog: false,
@@ -209,6 +215,11 @@ export default Vue.extend({
 
         fitToView() {
             view.zoomFit(this.d3Data);
+        },
+
+        toggleDirection() {
+            this.d3Data.direction = this.d3Data.direction === 'v' ? 'h' : 'v';
+            update.updateSvg(this.d3Data);
         },
 
         hideCurrentNode(d3Node) {
@@ -275,8 +286,13 @@ export default Vue.extend({
             update.updateSvg(this.d3Data);
         },
 
-        changeVerticalSpacing(verticalSpacing) {
-            this.d3Data.verticalSpacing = verticalSpacing;
+        changeSpaceBetweenParentChild(spacing) {
+            this.d3Data.spaceBetweenParentChild = spacing;
+            update.updateSvg(this.d3Data);
+        },
+
+        changeSpaceBetweenSiblings(spacing) {
+            this.d3Data.spaceBetweenSiblings = spacing;
             update.updateSvg(this.d3Data);
         },
 

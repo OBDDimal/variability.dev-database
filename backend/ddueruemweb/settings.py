@@ -196,3 +196,10 @@ LOGGING = {
     'version': 1,  # the dictConfig format version
     'disable_existing_loggers': False,  # retain the default loggers
 }
+
+SECURE_SSL_REDIRECT = env("USE_SSL") == True
+SECURE_PROXY_SSL_HEADER = None
+
+if env("USE_SSL"):
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+

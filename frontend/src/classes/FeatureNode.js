@@ -14,7 +14,6 @@ export class FeatureNode {
         this.isAbstract = abstract;
         this.colorValue = CONSTANTS.NODE_COLOR;
         this.constraints = [];
-        this.constraintsHighlighted = [];
         this.isCollapsed = false;
         this.isHidden = false;
         this.d3Node = null;
@@ -28,6 +27,14 @@ export class FeatureNode {
             return CONSTANTS.NODE_ABSTRACT_COLOR;
         } else {
             return this.colorValue;
+        }
+    }
+
+    level() {
+        if (this.isRoot) {
+            return 0;
+        } else {
+            return this.parent.level() + 1;
         }
     }
 
@@ -159,6 +166,7 @@ export class FeatureNode {
         }
 
         const leftSiblings = this.getLeftSiblings();
+        if (!leftSiblings.length) return;
         leftSiblings.forEach(node => node.isHidden = true);
 
         const leftD3Siblings = leftSiblings.map(node => node.d3Node);
@@ -177,6 +185,7 @@ export class FeatureNode {
         }
 
         const rightSiblings = this.getRightSiblings();
+        if (!rightSiblings.length) return;
         rightSiblings.forEach(node => node.isHidden = true);
 
         const rightD3Siblings = rightSiblings.map(node => node.d3Node);
@@ -329,6 +338,14 @@ export class FeatureNode {
 
     unmarkAsEdited() {
         this.markedAsEdited = false;
+    }
+
+    getHighlightedConstraints() {
+        return this.constraints.filter((constraint) => constraint.isHighlighted);
+    }
+
+    highlightConstraints() {
+        this.constraints.forEach((constraint) => constraint.isHighlighted = true);
     }
 }
 

@@ -1,5 +1,14 @@
 <template>
     <v-bottom-sheet v-model="$store.state.openConstraints" hide-overlay>
+        <constraint-add-edit-dialog
+            :all-nodes="rootNode ? rootNode.descendants() : undefined"
+            :constraint="constraintAddEdit"
+            :mode="modeAddEdit"
+            :show="showAddEditDialog"
+            @close="closeAddEditDialog"
+            @save="(newConstraint) => save(newConstraint)"
+        ></constraint-add-edit-dialog>
+
         <v-data-table
             :key="updateKey"
             :headers="headers"
@@ -8,7 +17,6 @@
             :search="search"
             hide-default-header
             style="padding: 10px"
-            @click:row="highlightConstraint"
         >
             <template v-slot:top>
                 <div class="d-flex justify-center align-center">
@@ -18,19 +26,56 @@
                         label="Search"
                         prepend-inner-icon="mdi-magnify"
                     ></v-text-field>
+
+                    <v-btn
+                        rounded
+                        @click="openAddEditDialog('Add', undefined)">
+                        <v-icon>mdi-plus</v-icon>
+                    </v-btn>
+
+                    <v-btn
+                        :disabled="!commandManager.isUndoAvailable()"
+                        rounded
+                        @click="undo">
+                        <v-icon>mdi-undo</v-icon>
+                    </v-btn>
+
+                    <v-btn
+                        :disabled="!commandManager.isRedoAvailable()"
+                        rounded
+                        @click="redo">
+                        <v-icon>mdi-redo</v-icon>
+                    </v-btn>
+
                     <v-btn icon @click="$store.commit('openConstraints', false)">
                         <v-icon>mdi-close</v-icon>
                     </v-btn>
                 </div>
             </template>
+
             <template v-slot:item.formula="{ item }">
                 <v-chip
                     v-model="item.checked"
                     :color="item.constraint.color"
                     :style="`color: ${computeColor(item.constraint.color)}`"
+                    @click="highlightConstraint(item)"
                 >
                     {{ item.formula }}
                 </v-chip>
+            </template>
+
+            <template v-slot:item.actions="{ item }">
+                <v-icon
+                    class="mr-6"
+                    @click="openAddEditDialog('Edit', item.constraint)"
+                >
+                    mdi-pencil
+                </v-icon>
+                <v-icon
+                    @click="deleteConstraint(item.constraint)"
+                >
+                    mdi-delete
+                </v-icon>
             </template>
         </v-data-table>
     </v-bottom-sheet>
@@ -38,20 +83,35 @@
 
 <script>
 import Vue from "vue";
+import ConstraintAddEditDialog from '@/components/ConstraintAddEditDialog';
+import {AddCommand} from "@/classes/Commands/Constraints/AddCommand";
+import {CommandManager} from "@/classes/Commands/CommandManager";
+import {EditCommand} from "@/classes/Commands/Constraints/EditCommand";
+import {DeleteCommand} from "@/classes/Commands/Constraints/DeleteCommand";
 
 export default Vue.extend({
     name: "Constraints",
 
-    components: {},
+    components: {
+        ConstraintAddEditDialog: ConstraintAddEditDialog,
+    },
 
     props: {
         constraints: undefined,
+        rootNode: undefined,
     },
 
     data: () => ({
-        headers: [{text: "Constraint", value: "formula"}],
+        headers: [
+            {text: "Constraint", value: "formula", width: "50%"},
+            {text: "Actions", value: "actions", width: "50%"},
+        ],
         search: "",
+        showAddEditDialog: false,
+        modeAddEdit: undefined,
+        constraintAddEdit: undefined,
         updateKey: 0,
+        commandManager: new CommandManager(),
     }),
 
     computed: {
@@ -65,14 +125,41 @@ export default Vue.extend({
     },
 
     methods: {
-        highlightConstraint(item) {
-            item.checked = !item.checked;
-            item.constraint.toggleHighlighted();
+        highlightConstraint(constraintRow) {
+            constraintRow.checked = !constraintRow.checked;
+            constraintRow.constraint.toggleHighlighted();
+            constraintRow.constraint.getFeatureNodes().forEach((node) => node.uncollapse());
             this.$emit("update-feature-model");
         },
 
         update() {
             this.updateKey++;
+        },
+
+        save(newConstraintItem) {
+            let command;
+            if (this.modeAddEdit === 'Add') {
+                command = new AddCommand(
+                    this.constraints,
+                    newConstraintItem
+                );
+            } else {
+                command = new EditCommand(
+                    this.constraints,
+                    this.constraintAddEdit,
+                    newConstraintItem
+                );
+            }
+            this.closeAddEditDialog();
+            this.commandManager.execute(command);
+        },
+
+        deleteConstraint(constraint) {
+            const command = new DeleteCommand(
+                this.constraints,
+                constraint
+            );
+            this.commandManager.execute(command);
         },
 
         computeColor(bg) {
@@ -96,6 +183,25 @@ export default Vue.extend({
                 }
                 return "#000";
             }
+        },
+
+        openAddEditDialog(mode, constraint) {
+            this.showAddEditDialog = true;
+            this.modeAddEdit = mode;
+            this.constraintAddEdit = constraint;
+        },
+
+        closeAddEditDialog() {
+            this.showAddEditDialog = false;
+            this.constraintAddEdit = undefined;
+        },
+
+        undo() {
+            this.commandManager.undo();
+        },
+
+        redo() {
+            this.commandManager.redo();
         },
     },
 });

@@ -13,7 +13,7 @@ services:
       - "--providers.docker.exposedbydefault=false"
       - "--entrypoints.websecure.address=:443"
       - "--certificatesresolvers.myresolver.acme.tlschallenge=true"
-      # - "--certificatesresolvers.myresolver.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory"
+      #- "--certificatesresolvers.myresolver.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory"
       - "--certificatesresolvers.myresolver.acme.email=tobias.hess@uni-ulm.com"
       - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
     labels:
@@ -53,6 +53,8 @@ services:
       - "traefik.http.routers.backend.rule=Host(`doener.tobiasbetz.de`)"
       - "traefik.http.routers.backend.entrypoints=websecure"
       - "traefik.http.routers.backend.tls.certresolver=myresolver"
+      - "traefik.http.middlewares.testHeader.headers.customrequestheaders.HTTP_X_FORWARDED_PROTO=https"
+
 
   frontend:
     build: ./frontend
