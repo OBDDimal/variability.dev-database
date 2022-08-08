@@ -32,9 +32,16 @@
                     @input="onChangeSearchText"
                 ></v-text-field>
 
+                <v-badge
+                    inline
+                    v-if="search.foundNodeDistances.length"
+                    :content="search.foundNodeIndex + 1 + '/' + search.foundNodeDistances.length"
+                ></v-badge>
+
                 <v-btn icon @click="search.showSearch = !search.showSearch">
                     <v-icon>mdi-magnify</v-icon>
                 </v-btn>
+
             </v-toolbar>
         </div>
 

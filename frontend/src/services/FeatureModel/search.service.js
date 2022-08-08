@@ -37,5 +37,6 @@ export function search(d3Data, searchText) {
 
             return {node: node, distance: levenshtein(node.name.toLowerCase(), searchText.toLowerCase())};
         })
+        .filter(d => d.distance <= 2)
         .sort((a, b) => a.distance - b.distance);
 }
