@@ -17,14 +17,18 @@ export class FeatureNode {
         this.constraintsHighlighted = [];
         this.isCollapsed = false;
         this.isHidden = false;
-        this.d3Node = undefined;
+        this.d3Node = null;
         this.markedAsEdited = false;
     }
 
     color() {
-        if (this.markedAsEdited) return CONSTANTS.NODE_EDITED_COLOR;
-        else if (this.isAbstract) return CONSTANTS.NODE_ABSTRACT_COLOR;
-        else return this.colorValue;
+        if (this.markedAsEdited) {
+            return CONSTANTS.NODE_EDITED_COLOR;
+        } else if (this.isAbstract) {
+            return CONSTANTS.NODE_ABSTRACT_COLOR;
+        } else {
+            return this.colorValue;
+        }
     }
 
     childrenCount() {
@@ -40,7 +44,7 @@ export class FeatureNode {
             return 0;
         } else {
             let totalSubnodesCount = this.children.length;
-            this.children.forEach((node) => {
+            this.children.forEach(node => {
                 totalSubnodesCount += node.totalSubnodesCount();
             });
             return totalSubnodesCount;
@@ -103,24 +107,32 @@ export class FeatureNode {
 
     getLeftSibling() {
         const index = this.parent.children.indexOf(this);
-        if (index === 0) return null;
+        if (index === 0) {
+            return null;
+        }
         return this.parent.children[index - 1];
     }
 
     getRightSibling() {
         const index = this.parent.children.indexOf(this);
-        if (index === this.parent.children.length - 1) return null;
+        if (index === this.parent.children.length - 1) {
+            return null;
+        }
         return this.parent.children[index + 1];
     }
 
     getLeftSiblings() {
-        if (this.isRoot) return [];
+        if (this.isRoot) {
+            return [];
+        }
         const index = this.parent.children.indexOf(this);
         return this.parent.children.slice(0, index);
     }
 
     getRightSiblings() {
-        if (this.isRoot) return [];
+        if (this.isRoot) {
+            return [];
+        }
         const index = this.parent.children.indexOf(this);
         return this.parent.children.slice(index + 1);
     }
@@ -142,12 +154,14 @@ export class FeatureNode {
     }
 
     hideLeftSiblings() {
-        if (this.isRoot) return;
+        if (this.isRoot) {
+            return;
+        }
 
         const leftSiblings = this.getLeftSiblings();
-        leftSiblings.forEach((node) => node.isHidden = true);
+        leftSiblings.forEach(node => node.isHidden = true);
 
-        const leftD3Siblings = leftSiblings.map((node) => node.d3Node);
+        const leftD3Siblings = leftSiblings.map(node => node.d3Node);
         const pseudoNode = new PseudoNode(this.parent, leftD3Siblings);
         const d3PseudoNode = d3.hierarchy(pseudoNode);
         pseudoNode.d3Node = d3PseudoNode;
@@ -158,12 +172,14 @@ export class FeatureNode {
     }
 
     hideRightSiblings() {
-        if (this.isRoot) return;
+        if (this.isRoot) {
+            return;
+        }
 
         const rightSiblings = this.getRightSiblings();
-        rightSiblings.forEach((node) => node.isHidden = true);
+        rightSiblings.forEach(node => node.isHidden = true);
 
-        const rightD3Siblings = rightSiblings.map((node) => node.d3Node);
+        const rightD3Siblings = rightSiblings.map(node => node.d3Node);
         const pseudoNode = new PseudoNode(this.parent, rightD3Siblings);
         const d3PseudoNode = d3.hierarchy(pseudoNode);
         pseudoNode.d3Node = d3PseudoNode;
@@ -174,31 +190,37 @@ export class FeatureNode {
     }
 
     unhideLeftSiblings() {
-        if (this.isRoot) return;
+        if (this.isRoot) {
+            return;
+        }
 
         const leftSiblings = this.getLeftSiblings();
-        leftSiblings.forEach((node) => node.isHidden = false);
+        leftSiblings.forEach(node => node.isHidden = false);
 
         const index = this.parent.d3Node.children.indexOf(this.d3Node);
         const rightD3Siblings = this.parent.d3Node.children.slice(index + 1);
-        const leftD3Siblings = leftSiblings.map((node) => node.d3Node);
+        const leftD3Siblings = leftSiblings.map(node => node.d3Node);
         this.parent.d3Node.children = [...leftD3Siblings, this.d3Node, ...rightD3Siblings];
     }
 
     unhideRightSiblings() {
-        if (this.isRoot) return;
+        if (this.isRoot) {
+            return;
+        }
 
         const rightSiblings = this.getRightSiblings();
-        rightSiblings.forEach((node) => node.isHidden = false);
+        rightSiblings.forEach(node => node.isHidden = false);
 
         const index = this.parent.d3Node.children.indexOf(this.d3Node);
         const leftD3Siblings = this.parent.d3Node.children.slice(index + 1);
-        const rightD3Siblings = rightSiblings.map((node) => node.d3Node);
+        const rightD3Siblings = rightSiblings.map(node => node.d3Node);
         this.parent.d3Node.children = [...leftD3Siblings, this.d3Node, ...rightD3Siblings];
     }
 
     hide() {
-        if (this.isRoot) return;
+        if (this.isRoot) {
+            return;
+        }
 
         const index = this.parent.d3Node.children.indexOf(this.d3Node);
 
@@ -248,14 +270,16 @@ export class FeatureNode {
 
     hideAllOtherNodes() {
         this.collapse();
-        this.getAllNodesToRoot().forEach((node) => node.hideAllNodesOnThisLevel());
+        this.getAllNodesToRoot().forEach(node => node.hideAllNodesOnThisLevel());
     }
 
     unhideChildren() {
-        if (this.isLeaf()) return;
+        if (this.isLeaf()) {
+            return;
+        }
 
-        this.children.forEach((node) => node.isHidden = false);
-        this.d3Node.children = this.children.map((node) => node.d3Node);
+        this.children.forEach(node => node.isHidden = false);
+        this.d3Node.children = this.children.map(node => node.d3Node);
     }
 
     insertChildAtIndex(child, index) {
@@ -276,18 +300,18 @@ export class FeatureNode {
     }
 
     removeChild(child) {
-        this.children = this.children.filter((node) => node !== child);
-        this.d3Node.children = this.getD3Children().filter((d3Node) => d3Node.data !== child);
+        this.children = this.children.filter(node => node !== child);
+        this.d3Node.children = this.getD3Children().filter(d3Node => d3Node.data !== child);
     }
 
     getD3Children() {
-        return this.children.map((node) => node.d3Node);
+        return this.children.map(node => node.d3Node);
     }
 
     each(func) {
         func(this);
         if (!this.isLeaf()) {
-            this.children.forEach((node) => node.each(func));
+            this.children.forEach(node => node.each(func));
         }
     }
 
@@ -295,7 +319,7 @@ export class FeatureNode {
         if (this.isLeaf()) {
             return [this];
         } else {
-            return [this, ...this.children.map((node) => node.descendants()).flat()];
+            return [this, ...this.children.map(node => node.descendants()).flat()];
         }
     }
 

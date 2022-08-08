@@ -121,7 +121,7 @@ export default Vue.extend({
                         child.getAttribute('name'),
                         child.tagName,
                         child.getAttribute('mandatory') === 'true',
-                        child.getAttribute('abstract') === 'true'
+                        child.getAttribute('abstract') === 'true',
                     );
                     toAppend.children = this.getChildrenOfFeature(child, toAppend);
 
@@ -139,7 +139,7 @@ export default Vue.extend({
             for (const rule of constraints.childNodes) {
                 // To remove #text nodes, as they don't have a tagName
                 if (rule.tagName) {
-                    const constraint = new Constraint([...rule.childNodes].filter((e) => e.tagName)[0], this.featureMap);
+                    const constraint = new Constraint([...rule.childNodes].filter(e => e.tagName)[0], this.featureMap);
                     toReturn.push(constraint);
                 }
             }
@@ -158,8 +158,8 @@ export default Vue.extend({
             let xml = `<?xml version="1.0" encoding="UTF-8" standalone="no"?><featureModel>`;
             xml += `<struct>${this.nodeToXML(root)}</struct>`;
             xml += `<constraints>${this.constraints.reduce(
-                (prev, constraint) => prev + '<rule>' + this.constraintToXML(constraint) + '</rule>',
-                ''
+                (prev, constraint) => `${prev}<rule>${this.constraintToXML(constraint)}</rule>`,
+                '',
             )}</constraints>`;
             xml += `</featureModel>`;
 
@@ -185,7 +185,7 @@ export default Vue.extend({
                     node.isMandatory ? 'mandatory="true" ' : ''
                 }name="${node.name}">`;
 
-                node.children.forEach((childNode) => {
+                node.children.forEach(childNode => {
                     toReturn += this.nodeToXML(childNode);
                 });
 
@@ -197,9 +197,9 @@ export default Vue.extend({
         constraintToXML(constraint) {
             if (constraint instanceof VarConstraint) {
                 return `<var>${constraint.featureNode.name}</var>`;
-            } else if (constraint instanceof Constraint) {
+            } else {
                 let toReturn = `<${constraint.xmlOperator}>`;
-                constraint.children.forEach((childConstraint) => {
+                constraint.children.forEach(childConstraint => {
                     toReturn += this.constraintToXML(childConstraint);
                 });
                 toReturn += `</${constraint.xmlOperator}>`;

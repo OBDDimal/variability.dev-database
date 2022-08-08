@@ -210,19 +210,6 @@
                         </v-list-item>
                     </v-list>
                 </v-menu>
-                <!--<v-list-group no-action prepend-icon="mdi-palette">
-                    <template v-slot:activator>
-                        <v-list-item-title>Coloring</v-list-item-title>
-                    </template>
-
-                    <v-list-item-group v-model="selectedColoring">
-                        <v-list-item v-for="(item, i) in itemsColoring" :key="i">
-                            <v-list-item-content>
-                                <v-list-item-title>{{item}}</v-list-item-title>
-                            </v-list-item-content>
-                        </v-list-item>
-                    </v-list-item-group>
-                </v-list-group>-->
             </v-list>
         </v-navigation-drawer>
     </div>

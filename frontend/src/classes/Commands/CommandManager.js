@@ -9,8 +9,9 @@ export class CommandManager {
         command.execute();
 
         // Mark last change
-        if (this.historyCommands.length)
+        if (this.historyCommands.length) {
             this.historyCommands.at(-1).unmarkChanges();
+        }
         command.markChanges();
 
         this.historyCommands.push(command);
@@ -27,8 +28,9 @@ export class CommandManager {
 
             // Mark last change
             undoCommand.unmarkChanges();
-            if (this.historyCommands.length)
+            if (this.historyCommands.length) {
                 this.historyCommands.at(-1).markChanges();
+            }
 
             // After that push it to stack that only holds redo-commands.
             this.futureCommands.push(undoCommand);
@@ -42,8 +44,9 @@ export class CommandManager {
             redoCommand.execute();
 
             // Mark last change
-            if (this.historyCommands.length)
+            if (this.historyCommands.length) {
                 this.historyCommands.at(-1).unmarkChanges();
+            }
             redoCommand.markChanges();
 
             // After that push it to stack that only holds undo-commands.

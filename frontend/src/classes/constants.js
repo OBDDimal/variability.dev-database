@@ -55,4 +55,4 @@ export const operators = {
     disj: "∨",
     eq: "⇔",
     not: "¬",
-}
+};

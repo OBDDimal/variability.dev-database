@@ -1,4 +1,4 @@
-import * as CONSTANTS from "@/classes/constants"
+import * as CONSTANTS from "@/classes/constants";
 
 // Helper functions for drawing alternative-group and and-group paths
 const MOVE = 'M', LINE = 'L', ARC = 'A', CLOSE = 'Z';
@@ -7,7 +7,7 @@ function polarToCartesian(point, radius, degrees) {
     const rad = degrees * Math.PI / 180.0;
     return {
         x: point.x + (radius * Math.cos(rad)),
-        y: point.y + (radius * Math.sin(rad))
+        y: point.y + (radius * Math.sin(rad)),
     };
 }
 

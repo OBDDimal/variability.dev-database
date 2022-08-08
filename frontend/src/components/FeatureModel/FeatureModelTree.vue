@@ -21,21 +21,6 @@
                     <v-icon>mdi-chevron-right</v-icon>
                 </v-btn>
 
-                <!--<v-combobox
-                    v-if="showSearch"
-                    v-model="searchText"
-                    :item-text="(node) => node.name"
-                    :item-value="(node) => node.name"
-                    :items="allNodes"
-                    class="px-4"
-                    clearable
-                    hide-details
-                    label="Search"
-                    placeholder="Search"
-                    single-line
-                >
-                </v-combobox>-->
-
                 <v-text-field
                     v-if="search.showSearch"
                     v-model="search.searchText"
@@ -56,14 +41,14 @@
         <feature-model-tree-toolbar
             :is-redo-available="d3Data.commandManager.isRedoAvailable()"
             :is-undo-available="d3Data.commandManager.isUndoAvailable()"
-            @coloring="(coloringIndex) => coloring(coloringIndex)"
+            @coloring="coloringIndex => coloring(coloringIndex)"
             @export="$emit('exportToXML')"
             @fitToView="fitToView"
             @redo="redo"
             @reset="$emit('reset')"
             @resetView="(levels, maxChildren) => resetView(levels, maxChildren)"
             @save="$emit('save')"
-            @semanticEditing="(value) => d3Data.semanticEditing = value"
+            @semanticEditing="value => d3Data.semanticEditing = value"
             @shortName="changeShortName"
             @undo="undo"
             @verticalSpacing="changeVerticalSpacing"
@@ -73,31 +58,31 @@
         <feature-model-tree-context-menu
             :d3Node="d3Data.contextMenu.selectedD3Node"
             :d3NodeEvent="d3Data.contextMenu.event"
-            @addAsChild="(d3Node) => openAddAsChildDialog(d3Node)"
-            @addAsSibling="(d3Node) => openAddAsSiblingDialog(d3Node)"
+            @addAsChild="d3Node => openAddAsChildDialog(d3Node)"
+            @addAsSibling="d3Node => openAddAsSiblingDialog(d3Node)"
             @close="d3Data.contextMenu.selectedD3Node = undefined"
             @collapse="collapse"
-            @edit="(d3Node) => openEditDialog(d3Node)"
-            @hideAllNodesOnThisLevel="(d3Node) => hideAllNodesOnThisLevel(d3Node)"
-            @hideAllOtherNodes="(d3Node) => hideAllOtherNodes(d3Node)"
-            @hideCurrentNode="(d3Node) => hideCurrentNode(d3Node)"
-            @hideLeftSiblings="(d3Node) => hideLeftSiblings(d3Node)"
-            @hideRightSiblings="(d3Node) => hideRightSiblings(d3Node)"
-            @highlightConstraints="(d3Node) => highlightConstraints(d3Node)"
-            @resetHighlightConstraints="(d3Node) => resetHighlightConstraints(d3Node)"
+            @edit="d3Node => openEditDialog(d3Node)"
+            @hideAllNodesOnThisLevel="d3Node => hideAllNodesOnThisLevel(d3Node)"
+            @hideAllOtherNodes="d3Node => hideAllOtherNodes(d3Node)"
+            @hideCurrentNode="d3Node => hideCurrentNode(d3Node)"
+            @hideLeftSiblings="d3Node => hideLeftSiblings(d3Node)"
+            @hideRightSiblings="d3Node => hideRightSiblings(d3Node)"
+            @highlightConstraints="d3Node => highlightConstraints(d3Node)"
+            @resetHighlightConstraints="d3Node => resetHighlightConstraints(d3Node)"
         ></feature-model-tree-context-menu>
 
         <feature-model-tree-edit-dialog
             :node="editNode"
             :show="showEditDialog"
             @close="showEditDialog = false"
-            @edit="(data) => edit(data)">
+            @edit="data => edit(data)">
         </feature-model-tree-edit-dialog>
 
         <feature-model-tree-add-dialog
             :parent="d3Data.d3ParentOfAddNode ? d3Data.d3ParentOfAddNode.data : undefined"
             :show="showAddDialog"
-            @add="(data) => add(data)"
+            @add="data => add(data)"
             @close="showAddDialog = false"
         ></feature-model-tree-add-dialog>
     </div>
@@ -262,7 +247,7 @@ export default Vue.extend({
         },
 
         closeContextMenu() {
-            this.d3Data.contextMenu.selectedD3Node = undefined;
+            this.d3Data.contextMenu.selectedD3Node = null;
         },
 
         collapse(d3Node) {
@@ -278,7 +263,7 @@ export default Vue.extend({
             const editCommand = new EditCommand(
                 this.d3Data,
                 this.editNode,
-                newData
+                newData,
             );
             this.d3Data.commandManager.execute(editCommand);
 
@@ -305,7 +290,7 @@ export default Vue.extend({
                 this.d3Data,
                 parent,
                 parent.children ? parent.children.length : 0,
-                newNode
+                newNode,
             );
             this.d3Data.commandManager.execute(addCommand);
 
@@ -340,13 +325,13 @@ export default Vue.extend({
         },
 
         highlightConstraints(d3Node) {
-            d3Node.data.constraints.forEach((constraint) => constraint.highlight());
+            d3Node.data.constraints.forEach(constraint => constraint.highlight());
             update.updateSvg(this.d3Data);
             this.updateConstraints();
         },
 
         resetHighlightConstraints(d3Node) {
-            d3Node.data.constraints.forEach((constraint) => constraint.resetHighlight());
+            d3Node.data.constraints.forEach(constraint => constraint.resetHighlight());
             update.updateSvg(this.d3Data);
             this.updateConstraints();
         },
@@ -363,7 +348,7 @@ export default Vue.extend({
             } else {
                 return [];
             }
-        }
+        },
     },
 });
 </script>
