@@ -1,80 +1,47 @@
 import {Peer} from "peerjs";
 
 export default class Connector {
-    constructor(featureModelId) {
-        this.connectionId = "ConnectionHost" + featureModelId;
-        this.config = {
-            iceServers: [
-                {
-                    urls: "stun:openrelay.metered.ca:80",
-                },
-                {
-                    urls: "turn:openrelay.metered.ca:80",
-                    username: "openrelayproject",
-                    credential: "openrelayproject",
-                },
-                {
-                    urls: "turn:openrelay.metered.ca:443",
-                    username: "openrelayproject",
-                    credential: "openrelayproject",
-                },
-                {
-                    urls: "turn:openrelay.metered.ca:443?transport=tcp",
-                    username: "openrelayproject",
-                    credential: "openrelayproject",
-                },
-            ],
-        }
-        this.options = {host: "localhost", port: 9000, path: "/myapp", config: this.config, debug: 0};
-        this.hostPeerInstance = new Peer(this.connectionId, this.options);
+    constructor(id) {
+        this.featureModelId = id;
+        this.hostname = 'host';
+        this.connection = null;
+        this.options = {
+            host: "localhost", port: 9000, path: "/myapp", pingInterval: 5000, debug: 0,
+        };
+    }
 
-        this.isHost = true;
-        this.hostPeerInstance.on('error', () => {
-            this.isHost = false;
-            this.connectorPeerInstance = new Peer("ConnectionReceiver" + featureModelId, this.options)
-
-            this.connectorPeerInstance.on('open', id => {
-                console.log('My peer ID is: ' + id);
+    connect() {
+        // Try to connect as host
+        const peer = new Peer(this.hostname, this.options);
+        peer.on('open', id => {
+            console.log('id', id);
+            peer.on('connection', conn => {
+                this.connection = conn;
+                console.log('New client connected', conn.peer);
+                conn.on('data', data => this.onReceive(data));
             });
-            this.connectorPeerInstance.on('connection', function (conn) {
-                console.log("CONNECTED:" + conn)
-            });
-
-            this.connectToPeer();
         });
 
-        this.hostPeerInstance.on('open', id => {
-            console.log('My peer ID is: ' + id);
-        });
+        // Connect as client
+        peer.on('error', () => {
+            let peer = new Peer(this.options);
 
-        this.hostPeerInstance.on('connection', conn => {
-            this.connectionInstance = conn;// Receive messages
-            console.log(this.connectionInstance)
-            this.connectionInstance.on('data', function (data) {
-                console.log('Received', data);
+            peer.on('open', id => {
+                console.log('id', id);
+                const conn = peer.connect(this.hostname);
+                conn.on('open', () => {
+                    this.connection = conn;
+                    conn.on('data', data => this.onReceive(data));
+                });
             });
         });
     }
 
-    connectToPeer() {
-        this.connectionInstance = this.connectorPeerInstance.connect(this.connectionId);
-        this.connectionInstance.on('open', () => {
-            // Receive messages
-            this.connectionInstance.on('data', function (data) {
-                console.log('Received', data);
-            });
-        });
+    onReceive(data) {
+        console.log(data);
     }
 
-    sendData() {
-        console.log(this)
-        this.connectionInstance.send({
-            strings: 'hi!',
-            numbers: 150,
-            arrays: [1, 2, 3],
-            evenBinary: new Blob([1, 2, 3]),
-            andMore: {bool: true}
-        });
+    sendData(data) {
+        this.connection.send(data);
     }
-
 }

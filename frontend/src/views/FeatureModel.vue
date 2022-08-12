@@ -5,6 +5,7 @@
             ref="featureModelTree"
             :key="reloadKey"
             :rootNode="rootNode"
+            :command-manager="featureModelCommandManager"
             @exportToXML="exportToXML"
             @reset="reset"
             @save="save"
@@ -25,14 +26,13 @@
         >
             <v-icon>mdi-format-list-checks</v-icon>
         </v-btn>
-        <v-btn absolute right top @click="connectAsHost">Connect As Host</v-btn>
-        <v-btn absolute left bottom @click="connectAsClient">Connect As Client</v-btn>
 
         <constraints
             v-if="constraints"
             ref="constraints"
             :constraints="constraints"
             :rootNode="rootNode"
+            :command-manager="constraintCommandManager"
             @update-feature-model="updateFeatureModel"
         ></constraints>
     </div>
@@ -52,8 +52,8 @@ import {Implication} from "@/classes/Constraint/Implication";
 import {Negation} from "@/classes/Constraint/Negation";
 import api from "@/services/api.service";
 import beautify from "xml-beautifier";
-//import Connector from "@/classes/connector";
-import {Peer} from "peerjs";
+import CollaborationManager from "@/classes/CollaborationManager";
+import {CommandManager} from "@/classes/Commands/CommandManager";
 
 export default Vue.extend({
     name: 'FeatureModel',
@@ -77,63 +77,18 @@ export default Vue.extend({
         rootNode: undefined,
         reloadKey: 0,
         connector: undefined,
-        options: {
-            host: "localhost", port: 9000, path: "/myapp", config:
-                {
-                    iceServers: [
-                        {
-                            urls: "stun:openrelay.metered.ca:80",
-                        },
-                        {
-                            urls: "turn:openrelay.metered.ca:80",
-                            username: "openrelayproject",
-                            credential: "openrelayproject",
-                        },
-                        {
-                            urls: "turn:openrelay.metered.ca:443",
-                            username: "openrelayproject",
-                            credential: "openrelayproject",
-                        },
-                        {
-                            urls: "turn:openrelay.metered.ca:443?transport=tcp",
-                            username: "openrelayproject",
-                            credential: "openrelayproject",
-                        },
-                    ],
-                }, debug: 0
-        },
+        featureModelCommandManager: new CommandManager(),
+        constraintCommandManager: new CommandManager(),
+        collaborationManager: null,
     }),
 
     created() {
         this.initData();
+
+        this.collaborationManager = new CollaborationManager(this.id, this.featureModelCommandManager, this.constraintCommandManager);
     },
 
     methods: {
-        connectAsHost() {
-            const host = new Peer('host2', this.options);
-            host.on('open', id => console.log('open: ' + id));
-            host.on('connection', client => {
-                console.log('connected client: ', client);
-                client.send({message: 'send from client'});
-            });
-            host.on('data', data => console.log('received', data));
-        },
-
-        connectAsClient() {
-            const client = new Peer('client2', this.options);
-            client.on('open', id => {
-                console.log('open: ' + id)
-
-                client.on('data', function (data) {
-                    console.log('Received', data);
-                });
-            });
-            const host = client.connect('host2');
-
-            //client.send('Hello with this.client!');
-            host.send('Hello with this.host!');
-        },
-
         save() {
             // TODO: Axios post request to update the xml file in the backend.
         },

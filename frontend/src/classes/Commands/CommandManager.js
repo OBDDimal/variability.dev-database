@@ -2,13 +2,17 @@ export class CommandManager {
     constructor() {
         this.historyCommands = [];
         this.futureCommands = [];
+        this.collaborationManager = null;
+        this.type = null;
     }
 
     execute(command) {
+        this.collaborationManager.send(this.type, 'execute');
+
         // Execute current command and push it on stack.
         command.execute();
 
-        // Mark last change
+        // Mark last change'
         if (this.historyCommands.length) {
             this.historyCommands.at(-1).unmarkChanges();
         }
@@ -22,6 +26,8 @@ export class CommandManager {
 
     undo() {
         if (this.historyCommands.length) {
+            this.collaborationManager.send('undo');
+
             // Remove last command from stack and undo it.
             const undoCommand = this.historyCommands.pop();
             undoCommand.undo();
@@ -39,6 +45,8 @@ export class CommandManager {
 
     redo() {
         if (this.futureCommands.length) {
+            this.collaborationManager.send('redo');
+
             // Remove last command from stack and execute it once again.
             const redoCommand = this.futureCommands.pop();
             redoCommand.execute();

@@ -46,8 +46,8 @@
         </div>
 
         <feature-model-tree-toolbar
-            :is-redo-available="d3Data.commandManager.isRedoAvailable()"
-            :is-undo-available="d3Data.commandManager.isUndoAvailable()"
+            :is-redo-available="commandManager && commandManager.isRedoAvailable()"
+            :is-undo-available="commandManager && commandManager.isUndoAvailable()"
             :direction="d3Data.direction"
             @coloring="coloringIndex => coloring(coloringIndex)"
             @export="$emit('exportToXML')"
@@ -127,12 +127,12 @@ export default Vue.extend({
     },
 
     props: {
+        commandManager: CommandManager,
         rootNode: undefined,
     },
 
     data: () => ({
         d3Data: {
-            commandManager: new CommandManager(),
             root: undefined,
             flexLayout: undefined,
             zoom: undefined,
@@ -283,7 +283,7 @@ export default Vue.extend({
                 this.editNode,
                 newData,
             );
-            this.d3Data.commandManager.execute(editCommand);
+            this.commandManager.execute(editCommand);
 
             update.updateSvg(this.d3Data);
         },
@@ -315,7 +315,7 @@ export default Vue.extend({
                 parent.children ? parent.children.length : 0,
                 newNode,
             );
-            this.d3Data.commandManager.execute(addCommand);
+            this.commandManager.execute(addCommand);
 
             update.updateSvg(this.d3Data);
             this.addType = "";
@@ -338,12 +338,12 @@ export default Vue.extend({
         },
 
         undo() {
-            this.d3Data.commandManager.undo();
+            this.commandManager.undo();
             update.updateSvg(this.d3Data);
         },
 
         redo() {
-            this.d3Data.commandManager.redo();
+            this.commandManager.redo();
             update.updateSvg(this.d3Data);
         },
 

@@ -97,6 +97,7 @@ export default Vue.extend({
     },
 
     props: {
+        commandManager: CommandManager,
         constraints: undefined,
         rootNode: undefined,
     },
@@ -111,7 +112,6 @@ export default Vue.extend({
         modeAddEdit: undefined,
         constraintAddEdit: undefined,
         updateKey: 0,
-        commandManager: new CommandManager(),
     }),
 
     computed: {
