@@ -1,13 +1,14 @@
 import {Peer} from "peerjs";
 
 export default class Connector {
-    constructor(id) {
+    constructor(id, collaborationManager) {
         this.featureModelId = id;
         this.hostname = 'host';
         this.connection = null;
         this.options = {
             host: "localhost", port: 9000, path: "/myapp", pingInterval: 5000, debug: 0,
         };
+        this.receiver = collaborationManager;
     }
 
     connect() {
@@ -38,7 +39,9 @@ export default class Connector {
     }
 
     onReceive(data) {
-        console.log(data);
+        if (this.receiver) {
+            this.receiver.receive(data.type, data.action, data.data);
+        }
     }
 
     sendData(data) {

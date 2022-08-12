@@ -6,8 +6,10 @@ export class CommandManager {
         this.type = null;
     }
 
-    execute(command) {
-        this.collaborationManager.send(this.type, 'execute');
+    execute(command, initiator = true) {
+        if (initiator) {
+            this.collaborationManager.send(this.type, 'execute', command.createDTO());
+        }
 
         // Execute current command and push it on stack.
         command.execute();
@@ -24,9 +26,11 @@ export class CommandManager {
         this.futureCommands = [];
     }
 
-    undo() {
+    undo(initiator = true) {
         if (this.historyCommands.length) {
-            this.collaborationManager.send('undo');
+            if (initiator) {
+                this.collaborationManager.send(this.type, 'undo');
+            }
 
             // Remove last command from stack and undo it.
             const undoCommand = this.historyCommands.pop();
@@ -43,9 +47,11 @@ export class CommandManager {
         }
     }
 
-    redo() {
+    redo(initiator = true) {
         if (this.futureCommands.length) {
-            this.collaborationManager.send('redo');
+            if (initiator) {
+                this.collaborationManager.send(this.type, 'redo');
+            }
 
             // Remove last command from stack and execute it once again.
             const redoCommand = this.futureCommands.pop();

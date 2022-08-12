@@ -217,13 +217,8 @@ function updateLinks(d3Data, visibleD3Nodes) {
 }
 
 function updateColoring(d3Data) {
-    if (!d3Data.updateTrigger.coloring) {
-        return;
-    }
-
     const allNodes = d3Data.root.data.descendants();
     count.colorNodes(allNodes, d3Data.coloringIndex);
-    d3Data.updateTrigger.coloring = false;
 }
 
 function updateSegments(d3Data, visibleD3Nodes) {

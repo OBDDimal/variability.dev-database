@@ -84,8 +84,6 @@ export default Vue.extend({
 
     created() {
         this.initData();
-
-        this.collaborationManager = new CollaborationManager(this.id, this.featureModelCommandManager, this.constraintCommandManager);
     },
 
     methods: {
@@ -112,6 +110,9 @@ export default Vue.extend({
                             this.comments = json.comments;
                             this.featureOrder = json.featureOrder;
                             this.rootNode = json.rootNode;
+
+                            this.collaborationManager = new CollaborationManager(this.id, this.featureModelCommandManager, this.constraintCommandManager);
+                            this.collaborationManager.rootNode = this.rootNode;
                         })
                 });
         },

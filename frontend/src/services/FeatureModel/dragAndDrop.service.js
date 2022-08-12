@@ -150,7 +150,7 @@ function calcGhostCircleTransform(d3Data, ghostNode) {
     return `translate(${x + dx}, ${y + dy})`;
 }
 
-export function init(d3Data) {
+export function init(d3Data, commandManager) {
     d3Data.drag.listener = d3
         .drag()
         .on('start', (_, d3Node) => {
@@ -214,12 +214,11 @@ export function init(d3Data) {
 
                 if (valid) {
                     const swapCommand = new SwapCommand(
-                        d3Data,
                         d3Node.data,
                         dstParent,
                         dstIndex,
                     );
-                    d3Data.commandManager.execute(swapCommand);
+                    commandManager.execute(swapCommand);
                 }
 
                 d3Data.drag.selectedGhostNode = null;

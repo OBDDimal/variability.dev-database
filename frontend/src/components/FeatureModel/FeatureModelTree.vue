@@ -158,9 +158,6 @@ export default Vue.extend({
                 featureNodesContainer: undefined,
                 dragContainer: undefined,
             },
-            updateTrigger: {
-                coloring: false,
-            },
             spaceBetweenParentChild: 75,
             spaceBetweenSiblings: 20,
             d3ParentOfAddNode: undefined,
@@ -183,9 +180,11 @@ export default Vue.extend({
 
     mounted() {
         init.initialize(this.d3Data, this.rootNode);
-        dragAndDrop.init(this.d3Data);
+        dragAndDrop.init(this.d3Data, this.commandManager);
         view.reset(this.d3Data);
         update.updateSvg(this.d3Data);
+
+        this.commandManager.d3Data = this.d3Data;
     },
 
     methods: {
@@ -195,7 +194,6 @@ export default Vue.extend({
 
         coloring(coloringIndex) {
             this.d3Data.coloringIndex = coloringIndex;
-            this.d3Data.updateTrigger.coloring = true;
             update.updateSvg(this.d3Data);
         },
 
@@ -279,7 +277,6 @@ export default Vue.extend({
             this.showEditDialog = false;
 
             const editCommand = new EditCommand(
-                this.d3Data,
                 this.editNode,
                 newData,
             );
@@ -310,7 +307,6 @@ export default Vue.extend({
 
             const parent = this.d3Data.d3ParentOfAddNode.data;
             const addCommand = new AddCommand(
-                this.d3Data,
                 parent,
                 parent.children ? parent.children.length : 0,
                 newNode,

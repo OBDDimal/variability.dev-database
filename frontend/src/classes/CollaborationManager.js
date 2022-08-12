@@ -1,4 +1,6 @@
 import Connector from "@/classes/connector";
+import * as commandFactory from "@/classes/Commands/CommandFactory";
+import * as update from '@/services/FeatureModel/update.service.js';
 
 export default class CollaborationManager {
     constructor(featureModelId, featureModelCommandManager, constraintCommandManager) {
@@ -12,12 +14,13 @@ export default class CollaborationManager {
         this.constraintCommandManager.collaborationManager = this;
         this.constraintCommandManager.type = 'constraint';
 
-        this.connection = new Connector(this.featureModelId);
+        this.connection = new Connector(this.featureModelId, this);
         this.connection.connect();
+
+        this.rootNode = null;
     }
 
     receive(type, action, data) {
-        console.log('received', type, action, data);
         let commandManager;
         if (type === 'constraint') {
             commandManager = this.constraintCommandManager;
@@ -26,22 +29,25 @@ export default class CollaborationManager {
         }
 
         if (action === 'execute') {
-            const command = null;
-            commandManager.execute(command);
+            const command = commandFactory.create(this.rootNode, data);
+            commandManager.execute(command, false);
         } else if (action === 'undo') {
-            commandManager.undo();
+            commandManager.undo(false);
         } else if (action === 'redo') {
-            commandManager.redo();
+            commandManager.redo(false);
+        }
+
+        if (type === 'featureModel') {
+            update.updateSvg(this.featureModelCommandManager.d3Data);
         }
     }
 
-    send(type, action) {
+    send(type, action, data) {
         if (this.connection) {
-            console.log('send', type, action);
             const toSend = {
                 type: type,
                 action: action,
-                data: null,
+                data: data,
             }
 
             this.connection.sendData(toSend);
