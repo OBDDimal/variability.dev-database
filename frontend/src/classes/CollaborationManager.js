@@ -29,7 +29,7 @@ export default class CollaborationManager {
         }
 
         if (action === 'execute') {
-            const command = commandFactory.create(this.rootNode, data);
+            const command = commandFactory.create(this.rootNode, this.allConstraints, type, data);
             commandManager.execute(command, false);
         } else if (action === 'undo') {
             commandManager.undo(false);

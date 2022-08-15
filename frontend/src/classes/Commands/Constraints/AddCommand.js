@@ -17,4 +17,11 @@ export class AddCommand extends ConstraintCommand {
         const index = this.allConstraints.indexOf(this.constraint);
         this.allConstraints.splice(index, 1);
     }
+
+    createDTO() {
+        return {
+            commandType: 'add',
+            constraintItemInfix: this.constraint.toStringForEdit(),
+        };
+    }
 }

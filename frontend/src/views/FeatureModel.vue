@@ -113,6 +113,7 @@ export default Vue.extend({
 
                             this.collaborationManager = new CollaborationManager(this.id, this.featureModelCommandManager, this.constraintCommandManager);
                             this.collaborationManager.rootNode = this.rootNode;
+                            this.collaborationManager.allConstraints = this.constraints;
                         })
                 });
         },
