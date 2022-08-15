@@ -188,6 +188,9 @@ class ConfirmedFileViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin, m
         indicating if the user which has sent the request is the owner.
         """
         queryset = File.objects.filter(is_confirmed=True)
+        familyId = self.request.query_params.get('family')
+        if familyId is not None:
+            queryset = queryset.filter(family__id=familyId).order_by('version')
         files = FilesSerializer(queryset, many=True).data
         anonymized_files = []
         for file in files:

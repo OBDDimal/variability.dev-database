@@ -124,12 +124,12 @@ class FileAdmin(ModelAdmin):
     """
     model = File
     list_display = (
-    'id', 'new_version_of', 'is_confirmed_ex', 'mirrored', 'family', 'local_file', 'owner', 'uploaded_at')
+    'id', 'version', 'is_confirmed_ex', 'mirrored', 'family', 'local_file', 'owner', 'uploaded_at')
     fieldsets = [
         (None, {'fields': ['owner']}),
         ('Information',
          {'fields': ['label', 'description', 'is_confirmed', 'mirrored', 'family', 'local_file', 'license', 'tags',
-                     'new_version_of']}),
+                     'version']}),
         ('Important dates', {'fields': ['uploaded_at']}),
         ('Transpiler Output', {'fields': ['transpiled_file']})
     ]

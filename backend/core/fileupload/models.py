@@ -104,8 +104,8 @@ class FileManager(models.Manager):
             family_id = family.split(':')[0]
             kwargs.update({'family': Family.objects.get(id=int(family_id))})
         # get file from id
-        if kwargs.get('new_version_of', None) is not None:
-            kwargs.update({'new_version_of': File.objects.get(id=kwargs['new_version_of'])})
+        if kwargs.get('version', None) is None:
+            raise TypeError('Version is not set')
         # get license from id
         if kwargs.get('license', None) is None:
             raise TypeError('License not set!')
@@ -150,7 +150,7 @@ class File(models.Model):
     uploaded_at = models.DateTimeField(auto_now_add=True)
     license = models.ForeignKey(License, on_delete=models.CASCADE)
     tags = models.ManyToManyField(Tag)
-    new_version_of = models.ForeignKey('self', null=True, blank=True, on_delete=models.RESTRICT)
+    version = models.CharField(blank=False, null=False, max_length=16)
     transpiled_file = models.FileField(null=True, blank=True, upload_to=relative_upload_dir)
     mirrored = models.BooleanField(default=False)  # indicates if the file was already mirrored to GitHub
     is_confirmed = models.BooleanField(default=False)  # indicates if the user confirmed the upload
