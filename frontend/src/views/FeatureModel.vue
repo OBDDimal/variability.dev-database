@@ -197,7 +197,7 @@ export default Vue.extend({
         },
 
         getProperties(properties) {
-            if (!properties) return null;
+            if (!properties) return [];
 
             return [...properties.childNodes]
                 .filter((element) => element.tagName)
@@ -221,7 +221,7 @@ export default Vue.extend({
         },
 
         getComments(commentsSection) {
-            if (!commentsSection) return null;
+            if (!commentsSection) return [];
 
             return [...commentsSection.childNodes]
                 .filter((element) => element.tagName)
@@ -255,7 +255,7 @@ export default Vue.extend({
             xml += `<struct>${this.nodeToXML(root)}</struct>`;
 
             xml += `<constraints>${this.constraints.reduce(
-                (prev, constraint) => `${prev}<rule>${this.constraintToXML(constraint)}</rule>`,
+                (prev, constraint) => `${prev}<rule>${constraint.toStringXML()}</rule>`,
                 '',
             )}</constraints>`;
 
