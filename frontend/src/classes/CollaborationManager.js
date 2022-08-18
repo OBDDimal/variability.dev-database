@@ -1,8 +1,8 @@
-import Connector from "@/classes/connector";
 import * as commandFactory from "@/classes/Commands/CommandFactory";
 import * as update from '@/services/FeatureModel/update.service.js';
 import beautify from "xml-beautifier";
 import {jsonToXML, xmlToJson} from "@/services/xmlTranspiler.service";
+import {Peer} from "peerjs";
 
 export default class CollaborationManager {
     constructor(featureModelCommandManager, constraintCommandManager, featureModelData, store) {
@@ -14,7 +14,8 @@ export default class CollaborationManager {
         this.constraintCommandManager.collaborationManager = this;
         this.constraintCommandManager.type = 'constraint';
 
-        this.connection = new Connector(this);
+        this.connections = [];
+        this.options = {host: "localhost", port: 9000, path: "/myapp", pingInterval: 5000, debug: 0};
 
         this.collaborationKey = null;
         this.featureModelData = featureModelData;
@@ -24,20 +25,47 @@ export default class CollaborationManager {
     createCollaboration() {
         this.collaborationKey = this.generateUUID();
 
-        this.connection.create(this.collaborationKey,);
+        const peer = new Peer(this.collaborationKey, this.options);
+        peer.on('open', () => {
+            this.showSnackbarMessage(`Created collaboration session on ${this.collaborationKey}\nLink copied`);
+
+            peer.on('connection', conn => {
+                this.connections.push(conn);
+                conn.on('data', data => this.receive(conn, data.type, data.action, data.data));
+                conn.on('open', () => {
+                    this.sendInitData(conn);
+                    this.showSnackbarMessage('New client joined to collaboration session');
+                });
+                conn.on('close', () => {
+                    this.showSnackbarMessage('Client disconnected');
+                    this.connections = this.connections.filter(c => c !== conn);
+                });
+            });
+
+        });
         return this.collaborationKey;
     }
 
     joinCollaboration(key) {
         this.collaborationKey = key;
-        this.connection.connect(this.collaborationKey, this);
+
+        let peer = new Peer(this.options);
+        peer.on('open', () => {
+            const conn = peer.connect(key);
+            conn.on('open', () => {
+                this.showSnackbarMessage('Joined collaboration session');
+                this.connections.push(conn);
+                conn.on('data', data => this.receive(conn, data.type, data.action, data.data));
+            });
+        });
     }
 
-    receive(type, action, data) {
+    receive(sender, type, action, data) {
         if (type === 'initialize') {
             const formattedJson = beautify(data);
             xmlToJson(formattedJson, this.featureModelData);
         } else {
+            this.sendExcluded(sender, type, action, data);
             let commandManager;
             if (type === 'constraint') {
                 commandManager = this.constraintCommandManager;
@@ -67,19 +95,27 @@ export default class CollaborationManager {
     }
 
     send(type, action, data) {
-        if (this.connection) {
-            const toSend = {
-                type: type,
-                action: action,
-                data: data,
-            };
+        const toSend = {
+            type: type,
+            action: action,
+            data: data,
+        };
 
-            this.connection.send(toSend);
-        }
+        this.connections.forEach(conn => conn.send(toSend));
     }
 
-    sendInitData() {
-        this.connection.send({
+    sendExcluded(excluded, type, action, data) {
+        const toSend = {
+            type: type,
+            action: action,
+            data: data,
+        };
+
+        this.connections.filter(conn => conn !== excluded).forEach(conn => conn.send(toSend));
+    }
+
+    sendInitData(connection) {
+        connection.send({
             type: "initialize",
             action: null,
             data: jsonToXML(this.featureModelData),

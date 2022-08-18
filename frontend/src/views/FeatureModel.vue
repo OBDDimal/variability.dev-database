@@ -74,7 +74,6 @@ export default Vue.extend({
             rootNode: undefined,
         },
         reloadKey: 0,
-        connector: undefined,
         featureModelCommandManager: new CommandManager(),
         constraintCommandManager: new CommandManager(),
         collaborationManager: null,
