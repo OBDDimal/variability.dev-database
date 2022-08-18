@@ -8,6 +8,7 @@ from django.utils.html import strip_tags
 from core.auth.tokens import encode_user_to_token
 from ddueruemweb.settings import env
 
+from threading import Thread
 
 class UserManager(BaseUserManager):
     use_in_migrations = True
@@ -124,9 +125,24 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def _email_user(self, subject, message, from_email="noreply@uni-ulm.de", **kwargs):
         """
-        Sends an email to this user
+        Sends an email to this user asynchronously
         """
-        send_mail(subject, message, from_email, [self.email], **kwargs)
+
+        #TODO: It might be better to do this using a job scheduler. django-mailer seems to be the standard choice, but it requires setting up a cron job.
+        class SendEmailThread(Thread):
+            def __init__(self, subject, message, from_email, recipients, **kwargs):
+                Thread.__init__(self)
+                self.subject = subject
+                self.message = message
+                self.from_email = from_email
+                self.recipients = recipients
+                self.kwargs = kwargs
+
+            def run(self):
+                send_mail(self.subject, self.message, self.from_email, self.recipients, **self.kwargs)
+
+        email_thread = SendEmailThread(subject, message, from_email, [self.email], **kwargs)
+        email_thread.start()
 
     def __str__(self):
         return f"{self.email}"
