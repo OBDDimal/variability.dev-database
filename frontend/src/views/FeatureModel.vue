@@ -108,12 +108,9 @@ export default Vue.extend({
 
         initData() {
             api.get(`${process.env.VUE_APP_DOMAIN}files/${this.id}/`)
-                .then((data) => {
+                .then(data => {
                     api.get(data.data.local_file)
-                        .then((data) => {
-                            const formattedJson = beautify(data.data);
-                            this.xmlToJson(formattedJson);
-                        });
+                        .then(xml => xmlTranspiler.xmlToJson(beautify(xml.data), this.data));
                 });
         },
 
@@ -129,20 +126,17 @@ export default Vue.extend({
             xmlTranspiler.downloadXML(this.data);
         },
 
-        xmlToJson(xml) {
-            xmlTranspiler.xmlToJson(xml, this.data);
-        },
-
         createCollaboration() {
-            this.collaborationManager = new CollaborationManager(this.featureModelCommandManager, this.constraintCommandManager, this.data);
+            this.collaborationManager = new CollaborationManager(this.featureModelCommandManager, this.constraintCommandManager, this.data, this.$store);
             const key = this.collaborationManager.createCollaboration();
             navigator.clipboard.writeText(`${process.env.VUE_APP_DOMAIN_FRONTEND}collaboration/${key}`);
         },
 
         joinCollaboration() {
-            this.collaborationManager = new CollaborationManager(this.featureModelCommandManager, this.constraintCommandManager, this.data);
+            this.collaborationManager = new CollaborationManager(this.featureModelCommandManager, this.constraintCommandManager, this.data, this.$store);
             this.collaborationManager.joinCollaboration(this.collaborationKey);
         },
+
     },
 });
 </script>

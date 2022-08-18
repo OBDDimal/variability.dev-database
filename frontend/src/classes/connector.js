@@ -11,25 +11,29 @@ export default class Connector {
 
     create(key) {
         const peer = new Peer(key, this.options);
-        peer.on('open', id => {
-            console.log('Created new collaboration-session with key', id);
+        peer.on('open', () => {
+            this.collaborationManager.showSnackbarMessage('Created collaboration session on ' + key + '\nLink copied');
+
             peer.on('connection', conn => {
                 this.connection = conn;
-                console.log('New client connected', conn.peer);
                 conn.on('data', data => this.collaborationManager.receive(data.type, data.action, data.data));
-                conn.on('open', () => this.collaborationManager.sendInitData());
+                conn.on('open', () => {
+                    this.collaborationManager.sendInitData();
+                    this.collaborationManager.showSnackbarMessage('New client joined to collaboration session');
+                });
+                conn.on('close', () => this.collaborationManager.showSnackbarMessage('Client disconnected'));
             });
+
         });
     }
 
     connect(key) {
         let peer = new Peer(this.options);
 
-        peer.on('open', id => {
-            console.log('id', id);
+        peer.on('open', () => {
             const conn = peer.connect(key);
             conn.on('open', () => {
-                console.log('Successfully connected to collaboration-session with key: ', key);
+                this.collaborationManager.showSnackbarMessage('Joined collaboration session');
                 this.connection = conn;
                 conn.on('data', data => this.collaborationManager.receive(data.type, data.action, data.data));
             });

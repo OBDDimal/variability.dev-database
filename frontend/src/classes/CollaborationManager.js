@@ -5,7 +5,7 @@ import beautify from "xml-beautifier";
 import {jsonToXML, xmlToJson} from "@/services/xmlTranspiler.service";
 
 export default class CollaborationManager {
-    constructor(featureModelCommandManager, constraintCommandManager, featureModelData) {
+    constructor(featureModelCommandManager, constraintCommandManager, featureModelData, store) {
         this.featureModelCommandManager = featureModelCommandManager;
         this.featureModelCommandManager.collaborationManager = this;
         this.featureModelCommandManager.type = 'featureModel';
@@ -18,6 +18,7 @@ export default class CollaborationManager {
 
         this.collaborationKey = null;
         this.featureModelData = featureModelData;
+        this.store = store;
     }
 
     createCollaboration() {
@@ -102,5 +103,14 @@ export default class CollaborationManager {
         });
 
         return uuid + (Array.from(uuid).reduce((last, curr) => parseInt(last, 16) + parseInt(curr, 16)) % 16).toString(16);
+    }
+
+    showSnackbarMessage(message) {
+        this.store.commit("updateSnackbar", {
+            message: message,
+            variant: "success",
+            timeout: 5000,
+            show: true,
+        });
     }
 }
