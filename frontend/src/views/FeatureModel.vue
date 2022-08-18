@@ -86,11 +86,11 @@ export default Vue.extend({
         } else if (this.collaborationKey) {
             const uuid = this.collaborationKey.substring(0, this.collaborationKey.length - 1);
             const checksum = this.collaborationKey.slice(-1);
-            const condition = checksum === (Array.from(uuid).reduce((last, curr) => parseInt(last, 16) + parseInt(curr, 16)) % 16).toString(16)
+            const condition = checksum === (Array.from(uuid).reduce((last, curr) => parseInt(last, 16) + parseInt(curr, 16)) % 16).toString(16);
             if (condition) {
                 this.joinCollaboration();
             } else {
-                alert("Wrong key!")
+                alert("Wrong key!");
             }
         }
     },
@@ -111,9 +111,9 @@ export default Vue.extend({
                 .then((data) => {
                     api.get(data.data.local_file)
                         .then((data) => {
-                            const formattedJson = beautify(data.data)
-                            this.xmlToJson(formattedJson)
-                        })
+                            const formattedJson = beautify(data.data);
+                            this.xmlToJson(formattedJson);
+                        });
                 });
         },
 
@@ -136,17 +136,12 @@ export default Vue.extend({
         createCollaboration() {
             this.collaborationManager = new CollaborationManager(this.featureModelCommandManager, this.constraintCommandManager, this.data);
             const key = this.collaborationManager.createCollaboration();
-            navigator.clipboard.writeText(process.env.VUE_APP_DOMAIN + "collaboration/" + key);
-            //this.collaborationManager.send('initialize', null, {rootNode: this.rootNode, constraints: this.constraints})
-            this.collaborationManager.rootNode = this.rootNode;
-            this.collaborationManager.allConstraints = this.constraints;
+            navigator.clipboard.writeText(`${process.env.VUE_APP_DOMAIN_FRONTEND}collaboration/${key}`);
         },
 
         joinCollaboration() {
             this.collaborationManager = new CollaborationManager(this.featureModelCommandManager, this.constraintCommandManager, this.data);
-            this.collaborationManager.joinCollaboration(this.collaborationKey)
-            this.rootNode = this.collaborationManager.rootNode;
-            this.constraints = this.collaborationManager.allConstraints;
+            this.collaborationManager.joinCollaboration(this.collaborationKey);
         },
     },
 });

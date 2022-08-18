@@ -130,7 +130,6 @@ function getFeatureOrder(featureOrder) {
 export function jsonToXML(data) {
     let root = {};
 
-    console.log(data);
     Object.entries(data.featureMap).forEach(([, node]) => {
         if (node.isRoot) {
             root = node;

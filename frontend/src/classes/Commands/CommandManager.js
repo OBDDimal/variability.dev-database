@@ -7,7 +7,7 @@ export class CommandManager {
     }
 
     execute(command, initiator = true) {
-        if (initiator) {
+        if (initiator && this.collaborationManager) {
             this.collaborationManager.send(this.type, 'execute', command.createDTO());
         }
 
@@ -28,7 +28,7 @@ export class CommandManager {
 
     undo(initiator = true) {
         if (this.historyCommands.length) {
-            if (initiator) {
+            if (initiator && this.collaborationManager) {
                 this.collaborationManager.send(this.type, 'undo');
             }
 
@@ -49,7 +49,7 @@ export class CommandManager {
 
     redo(initiator = true) {
         if (this.futureCommands.length) {
-            if (initiator) {
+            if (initiator && this.collaborationManager) {
                 this.collaborationManager.send(this.type, 'redo');
             }
 

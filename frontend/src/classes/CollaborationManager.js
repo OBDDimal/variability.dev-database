@@ -16,8 +16,6 @@ export default class CollaborationManager {
 
         this.connection = new Connector(this);
 
-        this.rootNode = null;
-        this.allConstraints = null;
         this.collaborationKey = null;
         this.featureModelData = featureModelData;
     }
@@ -25,42 +23,40 @@ export default class CollaborationManager {
     createCollaboration() {
         this.collaborationKey = this.generateUUID();
 
-        this.connection.create(this.collaborationKey, this.receive, () => {
-            this.connection.send({
-                type: "initialize",
-                action: null,
-                data: jsonToXML(this.featureModelData),
-            });
-        });
+        this.connection.create(this.collaborationKey,);
         return this.collaborationKey;
     }
 
     joinCollaboration(key) {
         this.collaborationKey = key;
-        this.connection.connect(this.collaborationKey, this.receive);
+        this.connection.connect(this.collaborationKey, this);
     }
 
     receive(type, action, data) {
-        console.log('init');
         if (type === 'initialize') {
-            console.log(data);
             const formattedJson = beautify(data);
-            xmlToJson(formattedJson, this.featureModelData)
+            xmlToJson(formattedJson, this.featureModelData);
         } else {
             let commandManager;
             if (type === 'constraint') {
                 commandManager = this.constraintCommandManager;
-            } else {
+            } else if (type === 'featureModel') {
                 commandManager = this.featureModelCommandManager;
+            } else {
+                console.error('Unknown command');
+                return;
             }
 
             if (action === 'execute') {
-                const command = commandFactory.create(this.rootNode, this.allConstraints, type, data);
+                const command = commandFactory.create(this.featureModelData.rootNode, this.featureModelData.constraints, type, data);
                 commandManager.execute(command, false);
             } else if (action === 'undo') {
                 commandManager.undo(false);
             } else if (action === 'redo') {
                 commandManager.redo(false);
+            } else {
+                console.error('Unknown command');
+                return;
             }
 
             if (type === 'featureModel') {
@@ -75,10 +71,18 @@ export default class CollaborationManager {
                 type: type,
                 action: action,
                 data: data,
-            }
+            };
 
             this.connection.send(toSend);
         }
+    }
+
+    sendInitData() {
+        this.connection.send({
+            type: "initialize",
+            action: null,
+            data: jsonToXML(this.featureModelData),
+        });
     }
 
     generateUUID() {
@@ -97,6 +101,6 @@ export default class CollaborationManager {
             return (c === 'x' ? r : (r & 0x7 | 0x8)).toString(16);
         });
 
-        return uuid + (Array.from(uuid).reduce((last, curr) => parseInt(last, 16) + parseInt(curr, 16)) % 16).toString(16)
+        return uuid + (Array.from(uuid).reduce((last, curr) => parseInt(last, 16) + parseInt(curr, 16)) % 16).toString(16);
     }
 }
