@@ -62,6 +62,7 @@
             @spaceBetweenParentChild="changeSpaceBetweenParentChild"
             @spaceBetweenSiblings="changeSpaceBetweenSiblings"
             @toggleDirection="toggleDirection"
+            @collaboration="$emit('collaboration')"
         ></feature-model-tree-toolbar>
         <div id="svg-container"></div>
 
