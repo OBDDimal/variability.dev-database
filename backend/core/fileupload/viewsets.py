@@ -259,14 +259,14 @@ class TagsViewSet(viewsets.GenericViewSet, mixins.ListModelMixin, mixins.CreateM
     serializer_class = TagsSerializer
     permission_classes = [IsAuthenticatedOrReadOnly, IsOwnerOrIsAdminOrReadOnly, IsAdminToAddPublicTag]
 
-    def public_or_owner(self, tag, request):
+    def public_or_owner_or_admin(self, tag, request):
         user_email = "" if request.user.is_anonymous else request.user.email
-        return tag['is_public'] or tag['owner'] == user_email
+        return tag['is_public'] or tag['owner'] == user_email or request.user.is_staff
 
     def remove_private_tags(self, tags, request):
         public_tags = []
         for tag in tags:
-            if self.public_or_owner(tag, request):
+            if self.public_or_owner_or_admin(tag, request):
                 public_tags.append(tag)
         return public_tags
 
@@ -296,7 +296,7 @@ class TagsViewSet(viewsets.GenericViewSet, mixins.ListModelMixin, mixins.CreateM
     def retrieve(self, request, *args, **kwargs):
         instance = self.get_object()
         serializer = self.get_serializer(instance)
-        if not self.public_or_owner(serializer.data, request):
+        if not self.public_or_owner_or_admin(serializer.data, request):
             return Response({"detail": "Not found."}, status.HTTP_404_NOT_FOUND)
         anonymized_tag = self.anonymize_tag(serializer.data, request)
         return Response(anonymized_tag)
