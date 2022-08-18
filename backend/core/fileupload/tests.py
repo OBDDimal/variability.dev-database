@@ -252,6 +252,17 @@ class TagTest(APITestCase):
         self.assertEqual(json["owner"], True)
         self.assertEqual(json["is_public"], False)
 
+    def test_tag_create_logged_out(self):
+        # Tags with is_public=True can not be created by an unauthenticated user
+        self.client.force_authenticate(None)
+        res = self.client.post("/tags/", {"label": "testlabel", "description": "testdescription", "is_public": True})
+        self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
+
+        # Tags with is_public=False can not be created by an unauthenticated user
+        self.client.force_authenticate(None)
+        res = self.client.post("/tags/", {"label": "testlabel", "description": "testdescription", "is_public": False})
+        self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
+
     def test_tag_destroy_logged_out(self):
         # Tags are not destroyable by an unauthenticated user
         res = self.client.delete("/tags/1/")
@@ -424,21 +435,21 @@ class LicenseTest(APITestCase):
         json = res.json()
         self.assertEqual(len(json), 2)
 
-    def test_license_list_logged_in_admin(self):
+    def test_license_retrieve_logged_in_admin(self):
         # License is retrievable when logged in
         self.client.force_authenticate(self.admin)
         res = self.client.get("/licenses/1/")
         json = res.json()
         self.assertEqual(json["label"], self.license_label)
 
-    def test_license_list_logged_in_user(self):
+    def test_license_retrieve_logged_in_user(self):
         # License is retrievable when logged in with non-admin user
         self.client.force_authenticate(self.user)
         res = self.client.get("/licenses/1/")
         json = res.json()
         self.assertEqual(json["label"], self.license_label)
 
-    def test_license_list_logged_out(self):
+    def test_license_retrieve_logged_out(self):
         # License is also retrievable when logged out
         self.client.force_authenticate(None)
         res = self.client.get("/licenses/1/")
@@ -517,7 +528,7 @@ class FileUploadWithTagsTests(APITestCase):
             "license": 1,
             # only the tag ids are used internally. labels wont be checked and will be overwritten by the tag labels
             # in database
-            "tags": '[{"id": "2", "label": "Tobi"},{"id": "1", "label": "Eric Test"}]'}
+            "tags": [{"id": "2", "label": "Tobi"},{"id": "1", "label": "Eric Test"}]'}
         msg_as_multipart = encode_multipart(data=raw_data, boundary=BOUNDARY)
         # MULTIPART_CONTENT == multipart/form-data; boundary=BoUnDaRyStRiNg
         # print(f"Raw data to user: {raw_data}")
