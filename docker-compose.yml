@@ -53,8 +53,8 @@ services:
       - "traefik.http.routers.backend.rule=Host(`doener.tobiasbetz.de`)"
       - "traefik.http.routers.backend.entrypoints=websecure"
       - "traefik.http.routers.backend.tls.certresolver=myresolver"
-      - "traefik.http.middlewares.testHeader.headers.customrequestheaders.HTTP_X_FORWARDED_PROTO=https"
-
+      - "traefik.http.middlewares.redirector.redirectscheme.scheme=https"
+      - "traefik.http.middlewares.redirector.redirectscheme.permanent=true"
 
   frontend:
     build: ./frontend
@@ -65,6 +65,8 @@ services:
       - "traefik.http.routers.frontend.rule=Host(`ddueruem.tobiasbetz.de`)"
       - "traefik.http.routers.frontend.entrypoints=websecure"
       - "traefik.http.routers.frontend.tls.certresolver=myresolver"
+      - "traefik.http.middlewares.redirector.redirectscheme.scheme=https"
+      - "traefik.http.middlewares.redirector.redirectscheme.permanent=true"
 
 volumes:
   postgresdata:
