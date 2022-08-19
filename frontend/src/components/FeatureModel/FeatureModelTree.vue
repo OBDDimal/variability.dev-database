@@ -16,7 +16,7 @@
 
                 <v-btn
                     icon
-                    :disabled="search.foundNodeDistances.length === search.foundNodeIndex"
+                    :disabled="search.foundNodeDistances.length <= search.foundNodeIndex + 1"
                     @click="onChangeFoundNodeIndex(++search.foundNodeIndex)">
                     <v-icon>mdi-chevron-right</v-icon>
                 </v-btn>
@@ -207,10 +207,10 @@ export default Vue.extend({
 
         onChangeSearchText(searchText) {
             this.search.foundNodeDistances = search.search(this.d3Data, searchText);
+            search.resetSearch(this.d3Data);
             if (this.search.foundNodeDistances.length) {
                 this.onChangeFoundNodeIndex(0);
             } else {
-                search.resetSearch(this.d3Data);
                 update.updateSvg(this.d3Data);
             }
         },

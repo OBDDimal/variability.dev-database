@@ -126,13 +126,13 @@ export default Vue.extend({
         },
 
         createCollaboration() {
-            this.collaborationManager = new CollaborationManager(this.featureModelCommandManager, this.constraintCommandManager, this.data, this.$store);
+            this.collaborationManager = new CollaborationManager(this.featureModelCommandManager, this.constraintCommandManager, this.data, this);
             const key = this.collaborationManager.createCollaboration();
             navigator.clipboard.writeText(`${process.env.VUE_APP_DOMAIN_FRONTEND}collaboration/${key}`);
         },
 
         joinCollaboration() {
-            this.collaborationManager = new CollaborationManager(this.featureModelCommandManager, this.constraintCommandManager, this.data, this.$store);
+            this.collaborationManager = new CollaborationManager(this.featureModelCommandManager, this.constraintCommandManager, this.data, this);
             this.collaborationManager.joinCollaboration(this.collaborationKey);
         },
 

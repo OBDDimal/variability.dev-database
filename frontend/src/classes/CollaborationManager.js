@@ -5,7 +5,7 @@ import {jsonToXML, xmlToJson} from "@/services/xmlTranspiler.service";
 import {Peer} from "peerjs";
 
 export default class CollaborationManager {
-    constructor(featureModelCommandManager, constraintCommandManager, featureModelData, store) {
+    constructor(featureModelCommandManager, constraintCommandManager, featureModelData, featureModel) {
         this.featureModelCommandManager = featureModelCommandManager;
         this.featureModelCommandManager.collaborationManager = this;
         this.featureModelCommandManager.type = 'featureModel';
@@ -19,7 +19,7 @@ export default class CollaborationManager {
 
         this.collaborationKey = null;
         this.featureModelData = featureModelData;
-        this.store = store;
+        this.featureModel = featureModel;
     }
 
     createCollaboration() {
@@ -37,7 +37,7 @@ export default class CollaborationManager {
                     this.showSnackbarMessage('New client joined to collaboration session');
                 });
                 conn.on('close', () => {
-                    this.showSnackbarMessage('Client disconnected');
+                    this.showSnackbarMessage('Client disconnected', 'info');
                     this.connections = this.connections.filter(c => c !== conn);
                 });
             });
@@ -56,6 +56,11 @@ export default class CollaborationManager {
                 this.showSnackbarMessage('Joined collaboration session');
                 this.connections.push(conn);
                 conn.on('data', data => this.receive(conn, data.type, data.action, data.data));
+                conn.on('close', () => {
+                    this.showSnackbarMessage('Lost connection to collaboration session', 'error');
+                    this.connections = this.connections.filter(c => c !== conn);
+                    this.featureModel.$router.push('/');
+                });
             });
         });
     }
@@ -64,6 +69,9 @@ export default class CollaborationManager {
         if (type === 'initialize') {
             const formattedJson = beautify(data);
             xmlToJson(formattedJson, this.featureModelData);
+        } else if (type === 'close') {
+            this.showSnackbarMessage('Host has closed collaboration session', 'info');
+            this.featureModel.$router.push('/');
         } else {
             this.sendExcluded(sender, type, action, data);
             let commandManager;
@@ -141,10 +149,10 @@ export default class CollaborationManager {
         return uuid + (Array.from(uuid).reduce((last, curr) => parseInt(last, 16) + parseInt(curr, 16)) % 16).toString(16);
     }
 
-    showSnackbarMessage(message) {
-        this.store.commit("updateSnackbar", {
+    showSnackbarMessage(message, variant='success') {
+        this.featureModel.$store.commit("updateSnackbar", {
             message: message,
-            variant: "success",
+            variant: variant,
             timeout: 5000,
             show: true,
         });
