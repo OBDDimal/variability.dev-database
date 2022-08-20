@@ -375,7 +375,7 @@ class FileUploadWithTagsTests(APITestCase):
             "local_file": parent_file,
             "family": 1,
             "license": 1,
-            "tags": '[{"id": "2", "label": "Tobi"},{"id": "1", "label": "Eric Test"}]'}
+            "tags": [2, 1]}
         msg_as_multipart = encode_multipart(data=raw_data, boundary=BOUNDARY)
         # print(f"Raw data to user: {raw_data}")
         # print("Sending first file to backend...")
@@ -392,7 +392,7 @@ class FileUploadWithTagsTests(APITestCase):
             "family": 1,
             "license": 1,
             "new_version_of": 1,
-            "tags": '[]'}
+            "tags": []}
         msg_as_multipart = encode_multipart(data=raw_data, boundary=BOUNDARY)
         # print(f"Raw data to user: {raw_data}")
         # print("Sending new version of first file to backend...")
@@ -414,7 +414,7 @@ class FileUploadWithTagsTests(APITestCase):
             "license": 1,
             # only the tag ids are used internally. labels wont be checked and will be overwritten by the tag labels
             # in database
-            "tags": '[{"id": "2", "label": "Tobi"},{"id": "1", "label": "Eric Test"}]'}
+            "tags": [2, 1]}
         msg_as_multipart = encode_multipart(data=raw_data, boundary=BOUNDARY)
         # MULTIPART_CONTENT == multipart/form-data; boundary=BoUnDaRyStRiNg
         # print(f"Raw data to user: {raw_data}")
@@ -438,7 +438,7 @@ class FileUploadWithTagsTests(APITestCase):
             "local_file": file,
             "family": 1,
             "license": 1,
-            "tags": '[{"id": "2", "label": "short"},{"id": "1", "label": "cool"}]'}
+            "tags": [2, 1]}
         msg_as_multipart = encode_multipart(data=raw_data, boundary=BOUNDARY)
         # MULTIPART_CONTENT == multipart/form-data; boundary=BoUnDaRyStRiNg
         # print(f"Raw data to user: {raw_data}")
