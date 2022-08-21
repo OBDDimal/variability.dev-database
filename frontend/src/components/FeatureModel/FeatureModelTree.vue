@@ -49,7 +49,7 @@
             :direction="d3Data.direction"
             :is-redo-available="commandManager && commandManager.isRedoAvailable()"
             :is-undo-available="commandManager && commandManager.isUndoAvailable()"
-            @collaboration="$emit('collaboration')"
+            @show-collaboration-dialog="$emit('show-collaboration-dialog')"
             @coloring="coloringIndex => coloring(coloringIndex)"
             @export="$emit('exportToXML')"
             @fitToView="fitToView"

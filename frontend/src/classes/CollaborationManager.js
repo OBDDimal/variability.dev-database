@@ -26,7 +26,7 @@ export default class CollaborationManager {
 
         const peer = new Peer(this.collaborationKey, this.options);
         peer.on('open', () => {
-            this.showSnackbarMessage(`Created collaboration session on ${this.collaborationKey}\nLink copied`);
+            this.showSnackbarMessage(`Created collaboration session`);
 
             peer.on('connection', conn => {
                 this.connections.push(conn);
@@ -62,6 +62,19 @@ export default class CollaborationManager {
                 });
             });
         });
+    }
+
+    closeCollaboration() {
+        this.connections.forEach(conn => {
+                conn.send({
+                    type: "close",
+                    action: null,
+                    data: null,
+                });
+            },
+        );
+
+        this.collaborationKey = null;
     }
 
     receive(sender, type, action, data) {
@@ -126,10 +139,26 @@ export default class CollaborationManager {
             action: null,
             data: {
                 xml: this.featureModel.xml,
-                featureModelHistoryCommands: this.featureModelCommandManager.historyCommands.map(command => ({type: 'featureModel', action: null, data: command.createDTO()})),
-                featureModelFutureCommands: this.featureModelCommandManager.futureCommands.map(command => ({type: 'featureModel', action: null, data: command.createDTO()})),
-                constraintHistoryCommands: this.constraintCommandManager.historyCommands.map(command => ({type: 'constraint', action: null, data: command.createDTO()})),
-                constraintFutureCommands: this.constraintCommandManager.futureCommands.map(command => ({type: 'constraint', action: null, data: command.createDTO()})),
+                featureModelHistoryCommands: this.featureModelCommandManager.historyCommands.map(command => ({
+                    type: 'featureModel',
+                    action: null,
+                    data: command.createDTO(),
+                })),
+                featureModelFutureCommands: this.featureModelCommandManager.futureCommands.map(command => ({
+                    type: 'featureModel',
+                    action: null,
+                    data: command.createDTO(),
+                })),
+                constraintHistoryCommands: this.constraintCommandManager.historyCommands.map(command => ({
+                    type: 'constraint',
+                    action: null,
+                    data: command.createDTO(),
+                })),
+                constraintFutureCommands: this.constraintCommandManager.futureCommands.map(command => ({
+                    type: 'constraint',
+                    action: null,
+                    data: command.createDTO(),
+                })),
             },
         });
     }
@@ -165,7 +194,7 @@ export default class CollaborationManager {
         return uuid + (Array.from(uuid).reduce((last, curr) => parseInt(last, 16) + parseInt(curr, 16)) % 16).toString(16);
     }
 
-    showSnackbarMessage(message, variant='success') {
+    showSnackbarMessage(message, variant = 'success') {
         this.featureModel.$store.commit("updateSnackbar", {
             message: message,
             variant: variant,

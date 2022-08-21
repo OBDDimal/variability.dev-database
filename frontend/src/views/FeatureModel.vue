@@ -2,16 +2,16 @@
     <div>
         <feature-model-tree
             v-if="data.rootNode"
-            ref="featureModelTree"
             :key="reloadKey"
-            :rootNode="data.rootNode"
-            :constraints="data.constraints"
+            ref="featureModelTree"
             :command-manager="featureModelCommandManager"
+            :constraints="data.constraints"
+            :rootNode="data.rootNode"
             @exportToXML="exportToXML"
             @reset="reset"
             @save="save"
             @update-constraints="updateConstraints"
-            @collaboration="createCollaboration"
+            @show-collaboration-dialog="showCollaborationDialog = true"
         >
         </feature-model-tree>
 
@@ -32,11 +32,17 @@
         <constraints
             v-if="data.constraints"
             ref="constraints"
+            :command-manager="constraintCommandManager"
             :constraints="data.constraints"
             :rootNode="data.rootNode"
-            :command-manager="constraintCommandManager"
             @update-feature-model="updateFeatureModel"
         ></constraints>
+
+        <collaboration-dialog
+            @close="showCollaborationDialog = false"
+            :show="showCollaborationDialog"
+            :collaborationManager="collaborationManager">
+        </collaboration-dialog>
     </div>
 </template>
 
@@ -50,6 +56,7 @@ import beautify from "xml-beautifier";
 import CollaborationManager from "@/classes/CollaborationManager";
 import {CommandManager} from "@/classes/Commands/CommandManager";
 import * as xmlTranspiler from "@/services/xmlTranspiler.service";
+import CollaborationDialog from "@/components/CollaborationDialog";
 
 export default Vue.extend({
     name: 'FeatureModel',
@@ -57,6 +64,7 @@ export default Vue.extend({
     components: {
         FeatureModelTree,
         Constraints,
+        CollaborationDialog,
     },
 
     props: {
@@ -79,9 +87,12 @@ export default Vue.extend({
         featureModelCommandManager: new CommandManager(),
         constraintCommandManager: new CommandManager(),
         collaborationManager: null,
+        showCollaborationDialog: false,
     }),
 
     created() {
+        this.collaborationManager = new CollaborationManager(this.featureModelCommandManager, this.constraintCommandManager, this);
+
         if (this.id) {
             this.initData();
         } else if (this.collaborationKey) {
@@ -132,13 +143,11 @@ export default Vue.extend({
         },
 
         createCollaboration() {
-            this.collaborationManager = new CollaborationManager(this.featureModelCommandManager, this.constraintCommandManager, this);
             const key = this.collaborationManager.createCollaboration();
             navigator.clipboard.writeText(`${process.env.VUE_APP_DOMAIN_FRONTEND}collaboration/${key}`);
         },
 
         joinCollaboration() {
-            this.collaborationManager = new CollaborationManager(this.featureModelCommandManager, this.constraintCommandManager, this);
             this.collaborationManager.joinCollaboration(this.collaborationKey);
         },
 
