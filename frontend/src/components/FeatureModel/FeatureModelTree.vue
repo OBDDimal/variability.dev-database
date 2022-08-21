@@ -2,21 +2,21 @@
     <div>
         <div class="float-right mt-2 mr-3" style="position: absolute; right: 0;">
             <v-toolbar
-                height="auto"
                 class="rounded-pill"
                 elevation="9"
+                height="auto"
                 style="border: 2px solid white"
             >
                 <v-btn
-                    icon
                     :disabled="search.foundNodeIndex === 0"
+                    icon
                     @click="onChangeFoundNodeIndex(--search.foundNodeIndex)">
                     <v-icon>mdi-chevron-left</v-icon>
                 </v-btn>
 
                 <v-btn
-                    icon
                     :disabled="search.foundNodeDistances.length <= search.foundNodeIndex + 1"
+                    icon
                     @click="onChangeFoundNodeIndex(++search.foundNodeIndex)">
                     <v-icon>mdi-chevron-right</v-icon>
                 </v-btn>
@@ -33,9 +33,9 @@
                 ></v-text-field>
 
                 <v-badge
-                    inline
                     v-if="search.foundNodeDistances.length"
                     :content="search.foundNodeIndex + 1 + '/' + search.foundNodeDistances.length"
+                    inline
                 ></v-badge>
 
                 <v-btn icon @click="search.showSearch = !search.showSearch">
@@ -46,9 +46,10 @@
         </div>
 
         <feature-model-tree-toolbar
+            :direction="d3Data.direction"
             :is-redo-available="commandManager && commandManager.isRedoAvailable()"
             :is-undo-available="commandManager && commandManager.isUndoAvailable()"
-            :direction="d3Data.direction"
+            @collaboration="$emit('collaboration')"
             @coloring="coloringIndex => coloring(coloringIndex)"
             @export="$emit('exportToXML')"
             @fitToView="fitToView"
@@ -58,11 +59,10 @@
             @save="$emit('save')"
             @semanticEditing="value => d3Data.semanticEditing = value"
             @shortName="changeShortName"
-            @undo="undo"
             @spaceBetweenParentChild="changeSpaceBetweenParentChild"
             @spaceBetweenSiblings="changeSpaceBetweenSiblings"
             @toggleDirection="toggleDirection"
-            @collaboration="$emit('collaboration')"
+            @undo="undo"
         ></feature-model-tree-toolbar>
         <div id="svg-container"></div>
 
@@ -129,7 +129,9 @@ export default Vue.extend({
 
     props: {
         commandManager: CommandManager,
+        remoteCommands: undefined,
         rootNode: undefined,
+        constraints: undefined,
     },
 
     data: () => ({
@@ -183,9 +185,10 @@ export default Vue.extend({
         init.initialize(this.d3Data, this.rootNode);
         dragAndDrop.init(this.d3Data, this.commandManager);
         view.reset(this.d3Data);
-        update.updateSvg(this.d3Data);
 
         this.commandManager.d3Data = this.d3Data;
+        this.commandManager.executeRemoteCommands(this.rootNode, this.constraints);
+        update.updateSvg(this.d3Data);
     },
 
     methods: {

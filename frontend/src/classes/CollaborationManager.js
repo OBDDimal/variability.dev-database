@@ -1,11 +1,11 @@
 import * as commandFactory from "@/classes/Commands/CommandFactory";
 import * as update from '@/services/FeatureModel/update.service.js';
 import beautify from "xml-beautifier";
-import {jsonToXML, xmlToJson} from "@/services/xmlTranspiler.service";
+import {xmlToJson} from "@/services/xmlTranspiler.service";
 import {Peer} from "peerjs";
 
 export default class CollaborationManager {
-    constructor(featureModelCommandManager, constraintCommandManager, featureModelData, featureModel) {
+    constructor(featureModelCommandManager, constraintCommandManager, featureModel) {
         this.featureModelCommandManager = featureModelCommandManager;
         this.featureModelCommandManager.collaborationManager = this;
         this.featureModelCommandManager.type = 'featureModel';
@@ -18,7 +18,6 @@ export default class CollaborationManager {
         this.options = {host: "localhost", port: 9000, path: "/myapp", pingInterval: 5000, debug: 0};
 
         this.collaborationKey = null;
-        this.featureModelData = featureModelData;
         this.featureModel = featureModel;
     }
 
@@ -67,8 +66,7 @@ export default class CollaborationManager {
 
     receive(sender, type, action, data) {
         if (type === 'initialize') {
-            const formattedJson = beautify(data);
-            xmlToJson(formattedJson, this.featureModelData);
+            this.initData(data);
         } else if (type === 'close') {
             this.showSnackbarMessage('Host has closed collaboration session', 'info');
             this.featureModel.$router.push('/');
@@ -85,7 +83,7 @@ export default class CollaborationManager {
             }
 
             if (action === 'execute') {
-                const command = commandFactory.create(this.featureModelData.rootNode, this.featureModelData.constraints, type, data);
+                const command = commandFactory.create(this.featureModel.data.rootNode, this.featureModel.data.constraints, type, data);
                 commandManager.execute(command, false);
             } else if (action === 'undo') {
                 commandManager.undo(false);
@@ -126,8 +124,26 @@ export default class CollaborationManager {
         connection.send({
             type: "initialize",
             action: null,
-            data: jsonToXML(this.featureModelData),
+            data: {
+                xml: this.featureModel.xml,
+                featureModelHistoryCommands: this.featureModelCommandManager.historyCommands.map(command => ({type: 'featureModel', action: null, data: command.createDTO()})),
+                featureModelFutureCommands: this.featureModelCommandManager.futureCommands.map(command => ({type: 'featureModel', action: null, data: command.createDTO()})),
+                constraintHistoryCommands: this.constraintCommandManager.historyCommands.map(command => ({type: 'constraint', action: null, data: command.createDTO()})),
+                constraintFutureCommands: this.constraintCommandManager.futureCommands.map(command => ({type: 'constraint', action: null, data: command.createDTO()})),
+            },
         });
+    }
+
+    initData(data) {
+        xmlToJson(beautify(data.xml), this.featureModel.data);
+        this.featureModelCommandManager.remoteCommands = {
+            historyCommands: data.featureModelHistoryCommands,
+            futureCommands: data.featureModelFutureCommands,
+        };
+        this.constraintCommandManager.remoteCommands = {
+            historyCommands: data.constraintHistoryCommands,
+            futureCommands: data.constraintFutureCommands,
+        };
     }
 
     generateUUID() {

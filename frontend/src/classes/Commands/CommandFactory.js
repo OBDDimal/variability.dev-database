@@ -13,6 +13,7 @@ export function create(rootNode, allConstraints, type, data) {
             return new AddCommand(dstParent, data.dstIndex, data.data);
         } else if (data.commandType === 'edit') {
             const node = rootNode.descendants().find(node => node.name === data.nodeName);
+            console.log(type, data, node);
             return new EditCommand(node, data.newData);
         } else if (data.commandType === 'swap') {
             const node = rootNode.descendants().find(node => node.name === data.nodeName);

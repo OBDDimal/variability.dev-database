@@ -42,7 +42,7 @@ export class EditCommand extends FeatureNodeCommand {
     createDTO() {
         return {
             commandType: 'edit',
-            nodeName: this.node.name,
+            nodeName: this.oldData.name,
             newData: this.newData,
         };
     }

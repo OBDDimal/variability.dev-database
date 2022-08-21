@@ -1,9 +1,12 @@
+import * as commandFactory from "@/classes/Commands/CommandFactory";
+
 export class CommandManager {
     constructor() {
         this.historyCommands = [];
         this.futureCommands = [];
         this.collaborationManager = null;
         this.type = null;
+        this.remoteCommands = null;
     }
 
     execute(command, initiator = true) {
@@ -14,7 +17,7 @@ export class CommandManager {
         // Execute current command and push it on stack.
         command.execute();
 
-        // Mark last change'
+        // Mark last change
         if (this.historyCommands.length) {
             this.historyCommands.at(-1).unmarkChanges();
         }
@@ -79,5 +82,21 @@ export class CommandManager {
 
     isRedoAvailable() {
         return this.futureCommands.length >= 1;
+    }
+
+    executeRemoteCommands(rootNode, constraints) {
+        if (this.remoteCommands) {
+            this.remoteCommands.historyCommands.forEach(commandData => {
+                const command = commandFactory.create(rootNode, constraints, commandData.type, commandData.data);
+                this.execute(command, false);
+            });
+
+            this.remoteCommands.futureCommands.forEach(commandData => {
+                const command = commandFactory.create(rootNode, constraints, commandData.type, commandData.data);
+                this.execute(command, false);
+            });
+
+            this.remoteCommands.futureCommands.forEach(() => this.undo(false));
+        }
     }
 }

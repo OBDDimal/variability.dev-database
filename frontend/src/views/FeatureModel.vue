@@ -5,6 +5,7 @@
             ref="featureModelTree"
             :key="reloadKey"
             :rootNode="data.rootNode"
+            :constraints="data.constraints"
             :command-manager="featureModelCommandManager"
             @exportToXML="exportToXML"
             @reset="reset"
@@ -73,6 +74,7 @@ export default Vue.extend({
             featureOrder: undefined,
             rootNode: undefined,
         },
+        xml: undefined,
         reloadKey: 0,
         featureModelCommandManager: new CommandManager(),
         constraintCommandManager: new CommandManager(),
@@ -109,7 +111,11 @@ export default Vue.extend({
             api.get(`${process.env.VUE_APP_DOMAIN}files/${this.id}/`)
                 .then(data => {
                     api.get(data.data.local_file)
-                        .then(xml => xmlTranspiler.xmlToJson(beautify(xml.data), this.data));
+                        .then(rawData => {
+                            const xml = beautify(rawData.data);
+                            xmlTranspiler.xmlToJson(xml, this.data);
+                            this.xml = xml;
+                        });
                 });
         },
 
@@ -126,13 +132,13 @@ export default Vue.extend({
         },
 
         createCollaboration() {
-            this.collaborationManager = new CollaborationManager(this.featureModelCommandManager, this.constraintCommandManager, this.data, this);
+            this.collaborationManager = new CollaborationManager(this.featureModelCommandManager, this.constraintCommandManager, this);
             const key = this.collaborationManager.createCollaboration();
             navigator.clipboard.writeText(`${process.env.VUE_APP_DOMAIN_FRONTEND}collaboration/${key}`);
         },
 
         joinCollaboration() {
-            this.collaborationManager = new CollaborationManager(this.featureModelCommandManager, this.constraintCommandManager, this.data, this);
+            this.collaborationManager = new CollaborationManager(this.featureModelCommandManager, this.constraintCommandManager, this);
             this.collaborationManager.joinCollaboration(this.collaborationKey);
         },
 
