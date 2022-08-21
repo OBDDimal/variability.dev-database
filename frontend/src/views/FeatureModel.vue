@@ -7,6 +7,7 @@
             :command-manager="featureModelCommandManager"
             :constraints="data.constraints"
             :rootNode="data.rootNode"
+            :editRights="editRights"
             @exportToXML="exportToXML"
             @reset="reset"
             @save="save"
@@ -35,14 +36,38 @@
             :command-manager="constraintCommandManager"
             :constraints="data.constraints"
             :rootNode="data.rootNode"
+            :editRights="editRights"
             @update-feature-model="updateFeatureModel"
         ></constraints>
 
         <collaboration-dialog
-            @close="showCollaborationDialog = false"
+            :collaborationManager="collaborationManager"
             :show="showCollaborationDialog"
-            :collaborationManager="collaborationManager">
+            @close="showCollaborationDialog = false">
         </collaboration-dialog>
+
+        <v-dialog v-model="showClaimDialog" persistent>
+            <v-card>
+                <v-card-title>Claim collaboration edit rights</v-card-title>
+                <v-card-actions>
+                    <v-btn
+                        color="green darken-1"
+                        text
+                        @click="editRightsResponse(false)"
+                    >
+                        Disagree
+                    </v-btn>
+
+                    <v-btn
+                        color="green darken-1"
+                        text
+                        @click="editRightsResponse(true)"
+                    >
+                        Agree
+                    </v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
     </div>
 </template>
 
@@ -88,6 +113,8 @@ export default Vue.extend({
         constraintCommandManager: new CommandManager(),
         collaborationManager: null,
         showCollaborationDialog: false,
+        showClaimDialog: false,
+        editRights: false,
     }),
 
     created() {
@@ -151,6 +178,10 @@ export default Vue.extend({
             this.collaborationManager.joinCollaboration(this.collaborationKey);
         },
 
+        editRightsResponse(response) {
+            this.showClaimDialog = false;
+            this.collaborationManager.sendToSingle(this.collaborationManager.lastSender, 'claimEditRights', 'response', response);
+        },
     },
 });
 </script>

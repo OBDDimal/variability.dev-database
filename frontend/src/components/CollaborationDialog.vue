@@ -20,7 +20,8 @@
                     </v-btn>
                 </v-row>
 
-                <v-btn class="green" v-if="!status" @click="create">Create collaboration</v-btn>
+                <v-btn class="green" v-if="!collaborationManager.isHost || status" @click="claimEditRights">Claim edit rights</v-btn>
+                <v-btn class="green" v-if="!collaborationManager.isClient && !status" @click="create">Create collaboration</v-btn>
                 <v-btn class="red" v-if="status" @click="close">Close collaboration</v-btn>
             </v-card-text>
 
@@ -93,6 +94,10 @@ export default Vue.extend({
         close() {
             this.collaborationManager.closeCollaboration();
             this.status = false;
+        },
+
+        claimEditRights() {
+            this.collaborationManager.claimEditRights();
         },
     },
 });

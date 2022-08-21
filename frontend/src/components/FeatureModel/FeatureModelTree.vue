@@ -49,6 +49,7 @@
             :direction="d3Data.direction"
             :is-redo-available="commandManager && commandManager.isRedoAvailable()"
             :is-undo-available="commandManager && commandManager.isUndoAvailable()"
+            :editRights="editRights"
             @show-collaboration-dialog="$emit('show-collaboration-dialog')"
             @coloring="coloringIndex => coloring(coloringIndex)"
             @export="$emit('exportToXML')"
@@ -69,6 +70,7 @@
         <feature-model-tree-context-menu
             :d3Node="d3Data.contextMenu.selectedD3Node"
             :d3NodeEvent="d3Data.contextMenu.event"
+            :editRights="editRights"
             @addAsChild="d3Node => openAddAsChildDialog(d3Node)"
             @addAsSibling="d3Node => openAddAsSiblingDialog(d3Node)"
             @close="d3Data.contextMenu.selectedD3Node = undefined"
@@ -132,6 +134,7 @@ export default Vue.extend({
         remoteCommands: undefined,
         rootNode: undefined,
         constraints: undefined,
+        editRights: undefined,
     },
 
     data: () => ({

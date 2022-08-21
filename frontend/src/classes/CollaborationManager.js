@@ -19,6 +19,10 @@ export default class CollaborationManager {
 
         this.collaborationKey = null;
         this.featureModel = featureModel;
+
+        this.isHost = false;
+        this.isClient = false;
+        this.lastSender = null;
     }
 
     createCollaboration() {
@@ -42,6 +46,9 @@ export default class CollaborationManager {
             });
 
         });
+        this.isHost = true;
+        this.isClient = false;
+        this.featureModel.editRights = true;
         return this.collaborationKey;
     }
 
@@ -62,6 +69,9 @@ export default class CollaborationManager {
                 });
             });
         });
+        this.isHost = false;
+        this.isClient = true;
+        this.featureModel.editRights = false;
     }
 
     closeCollaboration() {
@@ -83,6 +93,28 @@ export default class CollaborationManager {
         } else if (type === 'close') {
             this.showSnackbarMessage('Host has closed collaboration session', 'info');
             this.featureModel.$router.push('/');
+        } else if (type === 'claimEditRights') {
+            if (this.isHost) {
+                if (action === 'request' && this.featureModel.showClaimDialog) {
+                    this.sendToSingle(sender, 'claimEditRights', 'response', false);
+                } else if (action === 'request') {
+                    this.featureModel.showClaimDialog = true;
+                    this.lastSender = sender;
+                }
+            } else {
+                if (action === 'response') {
+                    const tmp = this.featureModel.editRights;
+                    this.featureModel.editRights = data;
+
+                    if (tmp !== this.featureModel.editRights) {
+                        if (this.featureModel.editRights) {
+                            this.showSnackbarMessage('You claimed edit rights successfully', 'success') ;
+                        } else {
+                            this.showSnackbarMessage('You lost edit rights', 'info') ;
+                        }
+                    }
+                }
+            }
         } else {
             this.sendExcluded(sender, type, action, data);
             let commandManager;
@@ -121,6 +153,16 @@ export default class CollaborationManager {
         };
 
         this.connections.forEach(conn => conn.send(toSend));
+    }
+
+    sendToSingle(sender, type, action, data) {
+        const toSend = {
+            type: type,
+            action: action,
+            data: data,
+        };
+
+        sender.send(toSend);
     }
 
     sendExcluded(excluded, type, action, data) {
@@ -162,6 +204,15 @@ export default class CollaborationManager {
             },
         });
     }
+
+    claimEditRights() {
+        if (this.isHost) {
+            this.send('claimEditRights', 'response', false);
+        } else {
+            this.send('claimEditRights', 'request', null);
+        }
+    }
+
 
     initData(data) {
         xmlToJson(beautify(data.xml), this.featureModel.data);
