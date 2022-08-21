@@ -184,15 +184,46 @@
                     </v-list-item-content>
                 </v-list-item>
 
-                <v-list-item @click="$emit('collaboration')">
-                    <v-list-item-icon>
-                        <v-icon>mdi-account-multiple</v-icon>
-                    </v-list-item-icon>
+                <v-menu offset-y>
+                    <template v-slot:activator="{ on, attrs }">
+                        <v-list-item v-bind="attrs" v-on="on" @click="$emit('collaboration')">
+                            <v-list-item-icon>
+                                <v-icon>mdi-account-multiple</v-icon>
+                            </v-list-item-icon>
 
-                    <v-list-item-content>
-                        <v-list-item-title>Start collaboration session</v-list-item-title>
-                    </v-list-item-content>
-                </v-list-item>
+                            <v-list-item-content>
+                                <v-list-item-title>Collaboration</v-list-item-title>
+                            </v-list-item-content>
+                        </v-list-item>
+                    </template>
+                    <v-list>
+                        <v-subheader>Collaboration</v-subheader>
+
+                        <v-list-item class="clickable" @click="$emit('startCollaboration')">
+                            <v-list-item-content>
+                                <v-list-item-title>Start Collaboration</v-list-item-title>
+                            </v-list-item-content>
+                        </v-list-item>
+
+                        <v-list-item class="clickable" @click="$emit('closeCollaboration')">
+                            <v-list-item-content>
+                                <v-list-item-title>Close Collaboration</v-list-item-title>
+                            </v-list-item-content>
+                        </v-list-item>
+
+                        <v-list-item class="clickable" @click="$emit('leaveCollaboration')">
+                            <v-list-item-content>
+                                <v-list-item-title>Leave Collaboration</v-list-item-title>
+                            </v-list-item-content>
+                        </v-list-item>
+
+                        <v-list-item class="clickable" @click="$emit('claimEditRights')">
+                            <v-list-item-content>
+                                <v-list-item-title>Claim edit rights</v-list-item-title>
+                            </v-list-item-content>
+                        </v-list-item>
+                    </v-list>
+                </v-menu>
 
                 <v-menu :close-on-content-click="false" offset-y>
                     <template v-slot:activator="{ on, attrs }">
