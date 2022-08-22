@@ -53,7 +53,7 @@
                     <v-btn
                         color="green darken-1"
                         text
-                        @click="editRightsResponse(false)"
+                        @click="collaborationManager.sendClaimEditRightsResponse(false)"
                     >
                         Disagree
                     </v-btn>
@@ -61,7 +61,7 @@
                     <v-btn
                         color="green darken-1"
                         text
-                        @click="editRightsResponse(true)"
+                        @click="collaborationManager.sendClaimEditRightsResponse(true)"
                     >
                         Agree
                     </v-btn>
@@ -176,15 +176,6 @@ export default Vue.extend({
 
         joinCollaboration() {
             this.collaborationManager.joinCollaboration(this.collaborationKey);
-        },
-
-        editRightsResponse(response) {
-            this.showClaimDialog = false;
-            this.collaborationManager.sendToSingle(this.collaborationManager.lastSender, 'claimEditRights', 'response', response);
-
-            if (response) {
-                this.editRights = false;
-            }
         },
     },
 });

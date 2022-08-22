@@ -42,6 +42,7 @@ export default class CollaborationManager {
                 conn.on('close', () => {
                     this.showSnackbarMessage('Client disconnected', 'info');
                     this.connections = this.connections.filter(c => c !== conn);
+                    this.featureModel.editRights = !this.connections.find(conn => conn.editRights);
                 });
             });
 
@@ -119,6 +120,14 @@ export default class CollaborationManager {
         this.featureModel.$router.push('/');
     }
 
+    receiveClaimEditRights(sender, action, data) {
+        if (this.isHost) {
+            this.receiveClaimEditRightsAsHost(sender, action);
+        } else {
+            this.receiveClaimEditRightsAsClient(action, data);
+        }
+    }
+
     receiveClaimEditRightsAsHost(sender, action) {
         if (action === 'request' && this.featureModel.showClaimDialog) {
             this.sendToSingle(sender, 'claimEditRights', 'response', false);
@@ -128,7 +137,7 @@ export default class CollaborationManager {
         }
     }
 
-    receiveClaimEditRightsAsClient(sender, action, data) {
+    receiveClaimEditRightsAsClient(action, data) {
         if (action === 'response') {
             const tmp = this.featureModel.editRights;
             this.featureModel.editRights = data;
@@ -140,14 +149,6 @@ export default class CollaborationManager {
                     this.showSnackbarMessage('You lost edit rights', 'info');
                 }
             }
-        }
-    }
-
-    receiveClaimEditRights(sender, action, data) {
-        if (this.isHost) {
-            this.receiveClaimEditRightsAsHost(sender, action);
-        } else {
-            this.receiveClaimEditRightsAsClient(sender, action, data);
         }
     }
 
@@ -240,12 +241,24 @@ export default class CollaborationManager {
         });
     }
 
-    sendClaimEditRights() {
+    sendClaimEditRightsRequest() {
         if (this.isHost) {
             this.send('claimEditRights', 'response', false);
             this.featureModel.editRights = true;
+            this.connections.forEach(conn => conn.editRights = false);
         } else {
             this.send('claimEditRights', 'request', null);
+        }
+    }
+
+    sendClaimEditRightsResponse(response) {
+        this.featureModel.showClaimDialog = false;
+        this.sendToSingle(this.lastSender, 'claimEditRights', 'response', response);
+        this.connections.forEach(conn => conn.editRights = false);
+        this.lastSender.editRights = response;
+
+        if (response) {
+            this.featureModel.editRights = false;
         }
     }
 

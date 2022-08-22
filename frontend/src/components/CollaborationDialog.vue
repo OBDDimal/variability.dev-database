@@ -97,7 +97,7 @@ export default Vue.extend({
         },
 
         claimEditRights() {
-            this.collaborationManager.sendClaimEditRights();
+            this.collaborationManager.sendClaimEditRightsRequest();
         },
     },
 });
