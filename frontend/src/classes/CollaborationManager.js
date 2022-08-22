@@ -23,16 +23,17 @@ export default class CollaborationManager {
         this.isHost = false;
         this.isClient = false;
         this.lastSender = null;
+        this.peer = null;
     }
 
     createCollaboration() {
         this.collaborationKey = this.generateUUID();
 
-        const peer = new Peer(this.collaborationKey, this.options);
-        peer.on('open', () => {
+        this.peer = new Peer(this.collaborationKey, this.options);
+        this.peer.on('open', () => {
             this.showSnackbarMessage(`Created collaboration session`);
 
-            peer.on('connection', conn => {
+            this.peer.on('connection', conn => {
                 this.connections.push(conn);
                 conn.on('data', data => this.receive(conn, data.type, data.action, data.data));
                 conn.on('open', () => {
@@ -42,7 +43,7 @@ export default class CollaborationManager {
                 conn.on('close', () => {
                     this.showSnackbarMessage('Client disconnected', 'info');
                     this.connections = this.connections.filter(c => c !== conn);
-                    this.featureModel.editRights = !this.connections.find(conn => conn.editRights);
+                    this.featureModel.editRights = !this.connections.find(c => c.editRights);
                 });
             });
 
@@ -56,9 +57,9 @@ export default class CollaborationManager {
     joinCollaboration(key) {
         this.collaborationKey = key;
 
-        let peer = new Peer(this.options);
-        peer.on('open', () => {
-            const conn = peer.connect(key);
+        this.peer = new Peer(this.options);
+        this.peer.on('open', () => {
+            const conn = this.peer.connect(key);
             conn.on('open', () => {
                 this.showSnackbarMessage('Joined collaboration session');
                 this.connections.push(conn);
@@ -69,6 +70,10 @@ export default class CollaborationManager {
                     this.featureModel.$router.push('/');
                 });
             });
+
+        });
+        this.peer.on('error', () => {
+            this.showSnackbarMessage('Cannot connect to collaboration session', 'error');
         });
         this.isHost = false;
         this.isClient = true;
@@ -89,6 +94,7 @@ export default class CollaborationManager {
         this.featureModel.editRights = true;
         this.isHost = false;
         this.isClient = false;
+        this.peer.close();
     }
 
     receive(sender, type, action, data) {
