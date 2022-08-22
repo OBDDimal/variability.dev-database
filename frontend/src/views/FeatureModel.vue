@@ -181,6 +181,10 @@ export default Vue.extend({
         editRightsResponse(response) {
             this.showClaimDialog = false;
             this.collaborationManager.sendToSingle(this.collaborationManager.lastSender, 'claimEditRights', 'response', response);
+
+            if (response) {
+                this.editRights = false;
+            }
         },
     },
 });

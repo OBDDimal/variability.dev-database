@@ -17,10 +17,10 @@
                     </v-list-item-content>
                 </v-list-item>
 
-                <v-list-item :disabled="!isUndoAvailable" @click="$emit('save')">
+                <v-list-item :disabled="!isUndoAvailable || !editRights" @click="$emit('save')">
                     <v-list-item-icon>
                         <v-icon v-if="!isUndoAvailable" disabled>mdi-content-save</v-icon>
-                        <v-icon v-else>mdi-content-save-edit</v-icon>
+                        <v-icon v-else :disabled="!editRights">mdi-content-save-edit</v-icon>
                     </v-list-item-icon>
 
                     <v-list-item-content>
@@ -30,9 +30,9 @@
 
                 <v-dialog persistent v-model="discardChangesConfirmDialog" width="400">
                     <template v-slot:activator="{ on, attrs }">
-                        <v-list-item :disabled="!isUndoAvailable" v-bind="attrs" v-on="on">
+                        <v-list-item :disabled="!isUndoAvailable || !editRights" v-bind="attrs" v-on="on">
                             <v-list-item-icon>
-                                <v-icon :disabled="!isUndoAvailable">mdi-backup-restore</v-icon>
+                                <v-icon :disabled="!isUndoAvailable || !editRights">mdi-backup-restore</v-icon>
                             </v-list-item-icon>
 
                             <v-list-item-content>
@@ -53,9 +53,9 @@
                     </v-card>
                 </v-dialog>
 
-                <v-list-item :disabled="!isUndoAvailable" @click="$emit('undo')">
+                <v-list-item :disabled="!isUndoAvailable || !editRights" @click="$emit('undo')">
                     <v-list-item-icon>
-                        <v-icon :disabled="!isUndoAvailable">mdi-undo</v-icon>
+                        <v-icon :disabled="!isUndoAvailable || !editRights">mdi-undo</v-icon>
                     </v-list-item-icon>
 
                     <v-list-item-content>
@@ -63,9 +63,9 @@
                     </v-list-item-content>
                 </v-list-item>
 
-                <v-list-item :disabled="!isRedoAvailable" @click="$emit('redo')">
+                <v-list-item :disabled="!isRedoAvailable || !editRights" @click="$emit('redo')">
                     <v-list-item-icon>
-                        <v-icon :disabled="!isRedoAvailable">mdi-redo</v-icon>
+                        <v-icon :disabled="!isRedoAvailable || !editRights">mdi-redo</v-icon>
                     </v-list-item-icon>
 
                     <v-list-item-content>
@@ -252,6 +252,7 @@ export default Vue.extend({
         isUndoAvailable: Boolean,
         isRedoAvailable: Boolean,
         direction: String,
+        editRights: undefined,
     },
 
     data: () => ({

@@ -376,6 +376,15 @@ export default Vue.extend({
             }
         },
     },
+
+    watch: {
+        editRights() {
+            if (!this.editRights) {
+                this.showAddDialog = false;
+                this.showEditDialog = false;
+            }
+        },
+    },
 });
 </script>
 

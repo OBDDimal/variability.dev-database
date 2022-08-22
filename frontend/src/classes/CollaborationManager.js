@@ -85,63 +85,98 @@ export default class CollaborationManager {
         );
 
         this.collaborationKey = null;
+        this.featureModel.editRights = true;
+        this.isHost = false;
+        this.isClient = false;
     }
 
     receive(sender, type, action, data) {
         if (type === 'initialize') {
-            this.initData(data);
+            this.receiveInitialize(data);
         } else if (type === 'close') {
-            this.showSnackbarMessage('Host has closed collaboration session', 'info');
-            this.featureModel.$router.push('/');
+            this.receiveClose();
         } else if (type === 'claimEditRights') {
-            if (this.isHost) {
-                if (action === 'request' && this.featureModel.showClaimDialog) {
-                    this.sendToSingle(sender, 'claimEditRights', 'response', false);
-                } else if (action === 'request') {
-                    this.featureModel.showClaimDialog = true;
-                    this.lastSender = sender;
-                }
-            } else {
-                if (action === 'response') {
-                    const tmp = this.featureModel.editRights;
-                    this.featureModel.editRights = data;
-
-                    if (tmp !== this.featureModel.editRights) {
-                        if (this.featureModel.editRights) {
-                            this.showSnackbarMessage('You claimed edit rights successfully', 'success') ;
-                        } else {
-                            this.showSnackbarMessage('You lost edit rights', 'info') ;
-                        }
-                    }
-                }
-            }
+            this.receiveClaimEditRights(sender, action, data);
         } else {
-            this.sendExcluded(sender, type, action, data);
-            let commandManager;
-            if (type === 'constraint') {
-                commandManager = this.constraintCommandManager;
-            } else if (type === 'featureModel') {
-                commandManager = this.featureModelCommandManager;
-            } else {
-                console.error('Unknown command');
-                return;
-            }
+            this.receiveCommand(sender, type, action, data);
+        }
+    }
 
-            if (action === 'execute') {
-                const command = commandFactory.create(this.featureModel.data.rootNode, this.featureModel.data.constraints, type, data);
-                commandManager.execute(command, false);
-            } else if (action === 'undo') {
-                commandManager.undo(false);
-            } else if (action === 'redo') {
-                commandManager.redo(false);
-            } else {
-                console.error('Unknown command');
-                return;
-            }
+    receiveInitialize(data) {
+        xmlToJson(beautify(data.xml), this.featureModel.data);
+        this.featureModelCommandManager.remoteCommands = {
+            historyCommands: data.featureModelHistoryCommands,
+            futureCommands: data.featureModelFutureCommands,
+        };
+        this.constraintCommandManager.remoteCommands = {
+            historyCommands: data.constraintHistoryCommands,
+            futureCommands: data.constraintFutureCommands,
+        };
+    }
 
-            if (type === 'featureModel') {
-                update.updateSvg(this.featureModelCommandManager.d3Data);
+    receiveClose() {
+        this.showSnackbarMessage('Host has closed collaboration session', 'info');
+        this.featureModel.$router.push('/');
+    }
+
+    receiveClaimEditRightsAsHost(sender, action) {
+        if (action === 'request' && this.featureModel.showClaimDialog) {
+            this.sendToSingle(sender, 'claimEditRights', 'response', false);
+        } else if (action === 'request') {
+            this.featureModel.showClaimDialog = true;
+            this.lastSender = sender;
+        }
+    }
+
+    receiveClaimEditRightsAsClient(sender, action, data) {
+        if (action === 'response') {
+            const tmp = this.featureModel.editRights;
+            this.featureModel.editRights = data;
+
+            if (tmp !== this.featureModel.editRights) {
+                if (this.featureModel.editRights) {
+                    this.showSnackbarMessage('You claimed edit rights successfully', 'success');
+                } else {
+                    this.showSnackbarMessage('You lost edit rights', 'info');
+                }
             }
+        }
+    }
+
+    receiveClaimEditRights(sender, action, data) {
+        if (this.isHost) {
+            this.receiveClaimEditRightsAsHost(sender, action);
+        } else {
+            this.receiveClaimEditRightsAsClient(sender, action, data);
+        }
+    }
+
+    receiveCommand(sender, type, action, data) {
+        this.sendExcluded(sender, type, action, data);
+        let commandManager;
+        if (type === 'constraint') {
+            commandManager = this.constraintCommandManager;
+        } else if (type === 'featureModel') {
+            commandManager = this.featureModelCommandManager;
+        } else {
+            console.error('Unknown command');
+            return;
+        }
+
+        if (action === 'execute') {
+            const command = commandFactory.create(this.featureModel.data.rootNode, this.featureModel.data.constraints, type, data);
+            commandManager.execute(command, false);
+        } else if (action === 'undo') {
+            commandManager.undo(false);
+        } else if (action === 'redo') {
+            commandManager.redo(false);
+        } else {
+            console.error('Unknown command');
+            return;
+        }
+
+        if (type === 'featureModel') {
+            update.updateSvg(this.featureModelCommandManager.d3Data);
         }
     }
 
@@ -205,25 +240,13 @@ export default class CollaborationManager {
         });
     }
 
-    claimEditRights() {
+    sendClaimEditRights() {
         if (this.isHost) {
             this.send('claimEditRights', 'response', false);
+            this.featureModel.editRights = true;
         } else {
             this.send('claimEditRights', 'request', null);
         }
-    }
-
-
-    initData(data) {
-        xmlToJson(beautify(data.xml), this.featureModel.data);
-        this.featureModelCommandManager.remoteCommands = {
-            historyCommands: data.featureModelHistoryCommands,
-            futureCommands: data.featureModelFutureCommands,
-        };
-        this.constraintCommandManager.remoteCommands = {
-            historyCommands: data.constraintHistoryCommands,
-            futureCommands: data.constraintFutureCommands,
-        };
     }
 
     generateUUID() {
