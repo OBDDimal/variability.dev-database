@@ -42,6 +42,7 @@ export default class CollaborationManager {
                 });
                 conn.on('close', () => {
                     this.showSnackbarMessage('Client disconnected', 'info');
+                    conn.close();
                     this.connections = this.connections.filter(c => c !== conn);
                     this.featureModel.editRights = !this.connections.find(c => c.editRights);
                 });
@@ -94,7 +95,8 @@ export default class CollaborationManager {
         this.featureModel.editRights = true;
         this.isHost = false;
         this.isClient = false;
-        this.peer.close();
+        this.peer.destroy();
+        this.peer = null;
     }
 
     receive(sender, type, action, data) {

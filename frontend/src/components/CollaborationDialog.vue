@@ -3,7 +3,7 @@
         <v-card>
             <v-card-title class="text-h5 grey lighten-2">Collaboration Menu</v-card-title>
 
-            <qrcode-vue class="text-center pa-6" v-if="status" :value="link" size="300"></qrcode-vue>
+            <qrcode-vue class="text-center pa-6" v-if="status" :value="link()" size="300"></qrcode-vue>
 
             <v-card-text>
                 <v-row v-if="status">
@@ -14,7 +14,7 @@
                 </v-row>
 
                 <v-row v-if="status">
-                    <v-text-field disabled :value="link"></v-text-field>
+                    <v-text-field disabled :value="link()"></v-text-field>
                     <v-btn @click="copyLink">
                         <v-icon>mdi-content-copy</v-icon>
                     </v-btn>
@@ -59,13 +59,13 @@ export default Vue.extend({
                 return this.show;
             },
         },
-
-        link() {
-            return `${process.env.VUE_APP_DOMAIN_FRONTEND}collaboration/${this.collaborationManager.collaborationKey}`;
-        },
     },
 
     methods: {
+        link() {
+            return `${process.env.VUE_APP_DOMAIN_FRONTEND}collaboration/${this.collaborationManager.collaborationKey}`;
+        },
+
         copyCollaborationKey() {
             navigator.clipboard.writeText(this.collaborationManager.collaborationKey);
             this.$store.commit("updateSnackbar", {
@@ -77,7 +77,7 @@ export default Vue.extend({
         },
 
         copyLink() {
-            navigator.clipboard.writeText(this.link);
+            navigator.clipboard.writeText(this.link());
             this.$store.commit("updateSnackbar", {
                 message: 'Link copied',
                 variant: 'success',
