@@ -71,11 +71,6 @@ export class CommandManager {
         }
     }
 
-    clear() {
-        this.historyCommands.clear();
-        this.futureCommands.clear();
-    }
-
     isUndoAvailable() {
         return this.historyCommands.length >= 1;
     }

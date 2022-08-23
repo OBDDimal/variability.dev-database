@@ -12,7 +12,7 @@ export function resetSearch(d3Data) {
 }
 
 export function markNodeAsSearched(d3Data, foundNode) {
-    this.resetSearch(d3Data);
+    resetSearch(d3Data);
 
     foundNode.getAllNodesToRoot().forEach(node => node.isSearched = true);
     foundNode.uncollapse(true);

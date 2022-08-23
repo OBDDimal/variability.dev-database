@@ -99,6 +99,11 @@ export default class CollaborationManager {
         this.peer = null;
     }
 
+    leaveCollaboration() {
+        this.featureModel.showClaimDialog = false;
+        this.connections.forEach(conn => conn.close());
+    }
+
     receive(sender, type, action, data) {
         if (type === 'initialize') {
             this.receiveInitialize(data);
@@ -261,6 +266,7 @@ export default class CollaborationManager {
 
     sendClaimEditRightsResponse(response) {
         this.featureModel.showClaimDialog = false;
+        this.sendExcluded(this.lastSender, 'claimEditRights', 'response', false);
         this.sendToSingle(this.lastSender, 'claimEditRights', 'response', response);
         this.connections.forEach(conn => conn.editRights = false);
         this.lastSender.editRights = response;

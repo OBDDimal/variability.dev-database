@@ -23,6 +23,7 @@
                 <v-btn class="primary" v-if="collaborationManager.isHost || collaborationManager.isClient" :disabled="collaborationManager.featureModel.editRights" @click="claimEditRights">Claim edit rights</v-btn>
                 <v-btn class="green" v-if="!collaborationManager.isClient && !status" @click="create">Create collaboration</v-btn>
                 <v-btn class="red" v-if="status" @click="close">Close collaboration</v-btn>
+                <v-btn class="red" v-if="collaborationManager.isClient" @click="leave">Leave collaboration</v-btn>
             </v-card-text>
 
             <v-card-actions>
@@ -93,6 +94,11 @@ export default Vue.extend({
 
         close() {
             this.collaborationManager.closeCollaboration();
+            this.status = false;
+        },
+
+        leave() {
+            this.collaborationManager.leaveCollaboration();
             this.status = false;
         },
 

@@ -127,7 +127,7 @@ export default Vue.extend({
             const checksum = this.collaborationKey.slice(-1);
             const condition = checksum === (Array.from(uuid).reduce((last, curr) => parseInt(last, 16) + parseInt(curr, 16)) % 16).toString(16);
             if (condition) {
-                this.joinCollaboration();
+                this.collaborationManager.joinCollaboration(this.collaborationKey);
             } else {
                 alert("Wrong key!");
             }
@@ -167,15 +167,6 @@ export default Vue.extend({
 
         exportToXML() {
             xmlTranspiler.downloadXML(this.data);
-        },
-
-        createCollaboration() {
-            const key = this.collaborationManager.createCollaboration();
-            navigator.clipboard.writeText(`${process.env.VUE_APP_DOMAIN_FRONTEND}collaboration/${key}`);
-        },
-
-        joinCollaboration() {
-            this.collaborationManager.joinCollaboration(this.collaborationKey);
         },
     },
 });
