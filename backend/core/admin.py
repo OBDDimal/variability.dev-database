@@ -95,7 +95,7 @@ class FamilyAdmin(ModelAdmin):
         ('Information',
          {'fields': ['label', 'description']}),
     ]
-    prepopulated_fields = {"slug": ("label",)}
+    #prepopulated_fields = {"slug": ("label",)}
     search_fields = ('owner', 'id')
     ordering = ('owner',)
     filter_horizontal = ()
@@ -124,7 +124,7 @@ class FileAdmin(ModelAdmin):
     """
     model = File
     list_display = (
-    'id', 'version', 'is_confirmed_ex', 'mirrored', 'family', 'local_file', 'owner', 'uploaded_at')
+    'id', 'version', 'is_confirmed_ex', 'mirrored', 'family', 'local_file', 'owner', 'uploaded_at', 'slug')
     fieldsets = [
         (None, {'fields': ['owner']}),
         ('Information',
@@ -134,6 +134,7 @@ class FileAdmin(ModelAdmin):
         ('Transpiler Output', {'fields': ['transpiled_file']})
     ]
     readonly_fields = ('uploaded_at',)
+    #prepopulated_fields = {"slug": ("label",)}
     search_fields = ('owner', 'family')
     ordering = ('owner', 'uploaded_at')
     filter_horizontal = ()

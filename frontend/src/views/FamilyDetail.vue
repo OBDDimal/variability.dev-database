@@ -4,7 +4,11 @@
 		<h5 class="text-h5 mb-4">Details and more information</h5>
 		<v-row justify="space-between">
 			<v-col cols="12" sm="6" md="3">
-				<v-sheet
+				<bar-chart
+					:data="numberOfFeaturesData"
+					@hovered-element="onElementHover"
+				></bar-chart>
+				<!--				<v-sheet
 					:color="`grey ${
 						$vuetify.theme.dark ? 'darken-2' : 'lighten-4'
 					}`"
@@ -15,7 +19,7 @@
 						max-width="300"
 						type="card"
 					></v-skeleton-loader>
-				</v-sheet>
+				</v-sheet>-->
 			</v-col>
 			<v-col cols="12" sm="6" md="3">
 				<v-sheet
@@ -76,6 +80,7 @@
 import Vue from 'vue'
 import api from '@/services/api.service'
 import FeatureModelTable from '@/components/FeatureModelTable'
+import BarChart from '@/components/Charts/BarChart'
 
 const API_URL = process.env.VUE_APP_DOMAIN
 
@@ -84,6 +89,7 @@ export default Vue.extend({
 
 	components: {
 		FeatureModelTable,
+		BarChart,
 	},
 
 	props: {},
@@ -92,6 +98,10 @@ export default Vue.extend({
 		family: {},
 		files: [],
 		loadingTable: true,
+		numberOfFeaturesData: {
+			labels: [],
+			datasets: [],
+		},
 	}),
 
 	async mounted() {
@@ -118,10 +128,43 @@ export default Vue.extend({
 		async fetchFeatureModelOfFamily(value) {
 			await api
 				.get(`${API_URL}files/uploaded/confirmed/?family=${value}`)
-				.then((response) => {
+				.then(async (response) => {
 					this.files = response.data
+					this.numberOfFeaturesData.labels = response.data.map(
+						(elem) => elem.version
+					)
+					let data = []
+					for (let i = 0; i < response.data.length; i++) {
+						const elem = response.data[i]
+						const amount = await this.getNumberOfFeaturesFromFile(
+							elem.local_file
+						)
+						data.push(amount)
+					}
+					this.numberOfFeaturesData.datasets = [
+						{
+							label: 'Number of Features',
+							backgroundColor: 'green',
+							data,
+						},
+					]
 					this.loadingTable = false
 				})
+		},
+		async getNumberOfFeaturesFromFile(path) {
+			return await api
+				.get(`${API_URL.slice(0, -1)}${path}`)
+				.then((response) => {
+					const parser = new DOMParser()
+					const xmlDocument = parser.parseFromString(
+						response.data,
+						'text/xml'
+					)
+					return xmlDocument.getElementsByTagName('feature').length
+				})
+		},
+		onElementHover(elem) {
+			console.log(elem)
 		},
 	},
 })

@@ -6,6 +6,8 @@
 				:headers="headers"
 				:items="items"
 				:search="search"
+				@click:row="handleClick"
+				@mouseover="setHovered"
 			>
 				<template v-slot:top>
 					<v-toolbar flat>
@@ -122,7 +124,7 @@
 					<v-chip
 						v-for="(tag, index) in item.tags"
 						:key="index"
-						class="mx-1"
+						class="ma-1"
 					>
 						{{ tag.label }}
 					</v-chip>
@@ -273,6 +275,15 @@ export default Vue.extend({
 			this.editedIndex = this.items.indexOf(item)
 			this.editedItem = Object.assign({}, item)
 			this.dialogDelete = true
+		},
+		handleClick(value) {
+			this.$router.push({
+				name: 'FileDetail',
+				params: { id: value.id, slug: value.slug },
+			})
+		},
+		setHovered() {
+			console.log('hi')
 		},
 		/*showAnalysis(item) {
       this.editedIndex = this.featureModels.indexOf(item);

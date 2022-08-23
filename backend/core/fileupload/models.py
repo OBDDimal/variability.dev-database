@@ -154,7 +154,13 @@ class File(models.Model):
     transpiled_file = models.FileField(null=True, blank=True, upload_to=relative_upload_dir)
     mirrored = models.BooleanField(default=False)  # indicates if the file was already mirrored to GitHub
     is_confirmed = models.BooleanField(default=False)  # indicates if the user confirmed the upload
+    slug = models.SlugField(null=True)
 
     def __str__(self):
         # do not change that
         return f"{self.id}"
+
+    def save(self, *args, **kwargs):  # new
+        if not self.slug:
+            self.slug = slugify(self.label)
+        return super().save(*args, **kwargs)
