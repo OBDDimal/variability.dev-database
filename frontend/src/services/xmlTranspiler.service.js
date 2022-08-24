@@ -128,14 +128,6 @@ function getFeatureOrder(featureOrder) {
 }
 
 export function jsonToXML(data) {
-    let root = {};
-
-    Object.entries(data.featureMap).forEach(([, node]) => {
-        if (node.isRoot) {
-            root = node;
-        }
-    });
-
     let xml = `<?xml version="1.0" encoding="UTF-8" standalone="no"?><featureModel>`;
 
     xml += `<properties>${data.properties.reduce(
@@ -143,7 +135,7 @@ export function jsonToXML(data) {
         ''
     )}</properties>`;
 
-    xml += `<struct>${nodeToXML(root)}</struct>`;
+    xml += `<struct>${nodeToXML(data.rootNode)}</struct>`;
 
     xml += `<constraints>${data.constraints.reduce(
         (prev, constraint) => `${prev}<rule>${constraint.toStringXML()}</rule>`,

@@ -82,6 +82,8 @@ import CollaborationManager from "@/classes/CollaborationManager";
 import {CommandManager} from "@/classes/Commands/CommandManager";
 import * as xmlTranspiler from "@/services/xmlTranspiler.service";
 import CollaborationDialog from "@/components/CollaborationDialog";
+import {FeatureNode} from "@/classes/FeatureNode";
+import {jsonToXML} from "@/services/xmlTranspiler.service";
 
 export default Vue.extend({
     name: 'FeatureModel',
@@ -120,7 +122,14 @@ export default Vue.extend({
     created() {
         this.collaborationManager = new CollaborationManager(this.featureModelCommandManager, this.constraintCommandManager, this);
 
-        if (this.id) {
+        if (this.id === 'local') {
+            const xml = beautify(localStorage.featureModelData);
+            xmlTranspiler.xmlToJson(xml, this.data);
+            this.xml = xml;
+        } else if (this.id === 'new') {
+            this.data.rootNode = new FeatureNode(null, 'Root', 'and', false, false);
+            this.xml = jsonToXML(this.data);
+        } else if (this.id) {
             this.initData();
         } else if (this.collaborationKey) {
             const uuid = this.collaborationKey.substring(0, this.collaborationKey.length - 1);
@@ -136,7 +145,9 @@ export default Vue.extend({
 
     methods: {
         save() {
-            // TODO: Axios post request to update the xml file in the backend.
+            // TODO: Axios post request to update the xml file in the backend ???
+            const xml = jsonToXML(this.data);
+            localStorage.featureModelData = xml;
         },
 
         reset() {
