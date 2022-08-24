@@ -154,14 +154,14 @@ export function init(d3Data, commandManager) {
     d3Data.drag.listener = d3
         .drag()
         .on('start', (_, d3Node) => {
-            if (d3Node === d3Data.root) {
+            if (!commandManager.collaborationManager.featureModel.editRights || d3Node === d3Data.root) {
                 return;
             }
             d3Data.drag.selectedD3Node = d3Node;
             d3Data.drag.hasStarted = true;
         })
         .on('drag', (event, d3Node) => {
-            if (d3Node === d3Data.root) {
+            if (!commandManager.collaborationManager.featureModel.editRights || d3Node === d3Data.root) {
                 return;
             }
 

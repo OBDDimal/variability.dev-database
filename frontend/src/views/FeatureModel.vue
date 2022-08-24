@@ -114,7 +114,7 @@ export default Vue.extend({
         collaborationManager: null,
         showCollaborationDialog: false,
         showClaimDialog: false,
-        editRights: false,
+        editRights: true,
     }),
 
     created() {

@@ -273,6 +273,7 @@ export default class CollaborationManager {
 
         if (response) {
             this.featureModel.editRights = false;
+            this.showSnackbarMessage('You lost edit rights', 'info');
         }
     }
 
