@@ -47,10 +47,11 @@
 
         <feature-model-tree-toolbar
             :direction="d3Data.direction"
-            :is-redo-available="commandManager && commandManager.isRedoAvailable()"
-            :is-undo-available="commandManager && commandManager.isUndoAvailable()"
             :editRights="editRights"
-            @show-collaboration-dialog="$emit('show-collaboration-dialog')"
+            :is-redo-available="commandManager && commandManager.isRedoAvailable()"
+            :is-save-available="(commandManager && commandManager.isUndoAvailable())
+                || (commandManager.collaborationManager.constraintCommandManager.isUndoAvailable())"
+            :is-undo-available="commandManager && commandManager.isUndoAvailable()"
             @coloring="coloringIndex => coloring(coloringIndex)"
             @export="$emit('exportToXML')"
             @fitToView="fitToView"
@@ -64,6 +65,7 @@
             @spaceBetweenSiblings="changeSpaceBetweenSiblings"
             @toggleDirection="toggleDirection"
             @undo="undo"
+            @show-collaboration-dialog="$emit('show-collaboration-dialog')"
         ></feature-model-tree-toolbar>
         <div id="svg-container"></div>
 

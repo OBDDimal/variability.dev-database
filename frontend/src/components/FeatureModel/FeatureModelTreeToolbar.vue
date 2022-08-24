@@ -17,9 +17,9 @@
                     </v-list-item-content>
                 </v-list-item>
 
-                <v-list-item :disabled="!isUndoAvailable || !editRights" @click="$emit('save')">
+                <v-list-item :disabled="!isSaveAvailable || !editRights" @click="$emit('save')">
                     <v-list-item-icon>
-                        <v-icon v-if="!isUndoAvailable" disabled>mdi-content-save</v-icon>
+                        <v-icon v-if="!isSaveAvailable" disabled>mdi-content-save</v-icon>
                         <v-icon v-else :disabled="!editRights">mdi-content-save-edit</v-icon>
                     </v-list-item-icon>
 
@@ -251,6 +251,7 @@ export default Vue.extend({
     props: {
         isUndoAvailable: Boolean,
         isRedoAvailable: Boolean,
+        isSaveAvailable: Boolean,
         direction: String,
         editRights: undefined,
     },
