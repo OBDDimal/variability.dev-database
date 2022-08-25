@@ -112,7 +112,7 @@
 
             <v-divider></v-divider>
 
-            <v-list-item @click="$emit('edit', d3Node)">
+            <v-list-item :disabled='!editRights' @click="$emit('edit', d3Node)">
                 <v-list-item-icon>
                     <v-icon>mdi-pencil</v-icon>
                 </v-list-item-icon>
@@ -126,13 +126,13 @@
                     <v-list-item-title>Add</v-list-item-title>
                 </template>
 
-                <v-list-item @click="$emit('addAsChild', d3Node)">
+                <v-list-item :disabled='!editRights' @click="$emit('addAsChild', d3Node)">
                     <v-list-item-content>
                         <v-list-item-title>Add as child</v-list-item-title>
                     </v-list-item-content>
                 </v-list-item>
 
-                <v-list-item :disabled="d3Node && d3Node.data.isRoot"
+                <v-list-item :disabled="(d3Node && d3Node.data.isRoot) || !editRights"
                              @click="$emit('addAsSibling', d3Node)">
                     <v-list-item-content>
                         <v-list-item-title>Add as sibling</v-list-item-title>
@@ -153,6 +153,7 @@ export default Vue.extend({
     props: {
         d3Node: undefined,
         d3NodeEvent: undefined,
+        editRights: undefined,
     },
 
     computed: {
