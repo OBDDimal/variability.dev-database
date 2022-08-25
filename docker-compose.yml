@@ -31,7 +31,7 @@ services:
 
   db:
     image: postgres
-    restart: always
+    restart: unless-stopped
     environment:
       POSTGRES_USER: ddueruem
       POSTGRES_PASSWORD: ddueruem
@@ -39,9 +39,21 @@ services:
     volumes:
       - postgresdata:/var/lib/postgresql
 
+  peerjs:
+    image: peerjs/peerjs-server    
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.peerjs.rule=Host(`boerek.tobiasbetz.de`)"
+      - "traefik.http.routers.peerjs.entrypoints=websecure"
+      - "traefik.http.routers.peerjs.tls.certresolver=myresolver"
+      - "traefik.http.middlewares.redirector.redirectscheme.scheme=https"
+      - "traefik.http.middlewares.redirector.redirectscheme.permanent=true"
+
   backend:
     build: ./backend
     privileged: true
+    restart: unless-stopped
     volumes:
       - djangomedia:/api/media
       - /var/run/docker.sock:/var/run/docker.sock
@@ -58,6 +70,7 @@ services:
 
   frontend:
     build: ./frontend
+    restart: unless-stopped
     depends_on:
       - backend
     labels:
