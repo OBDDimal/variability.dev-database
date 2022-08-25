@@ -20,10 +20,10 @@
                     </v-btn>
                 </v-row>
 
-                <v-btn class="primary" v-if="collaborationManager.isHost || collaborationManager.isClient" :disabled="collaborationManager.featureModel.editRights" @click="claimEditRights">Claim edit rights</v-btn>
-                <v-btn class="green" v-if="!collaborationManager.isClient && !status" @click="create">Create collaboration</v-btn>
-                <v-btn class="red" v-if="status" @click="close">Close collaboration</v-btn>
-                <v-btn class="red" v-if="collaborationManager.isClient" @click="leave">Leave collaboration</v-btn>
+                <v-btn class="primary ma-2" v-if="collaborationManager.isHost || collaborationManager.isClient" :disabled="collaborationManager.featureModel.editRights || claimButtonClickDisabled" @click="claimEditRights">Claim edit rights</v-btn>
+                <v-btn class="green ma-2" v-if="!collaborationManager.isClient && !status" @click="create">Create collaboration</v-btn>
+                <v-btn class="red ma-2" v-if="status" @click="close">Close collaboration</v-btn>
+                <v-btn class="red ma-2" v-if="collaborationManager.isClient" @click="leave">Leave collaboration</v-btn>
             </v-card-text>
 
             <v-card-actions>
@@ -52,6 +52,7 @@ export default Vue.extend({
 
     data: () => ({
         status: false,
+        claimButtonClickDisabled: false,
     }),
 
     computed: {
@@ -104,6 +105,8 @@ export default Vue.extend({
 
         claimEditRights() {
             this.collaborationManager.sendClaimEditRightsRequest();
+            this.claimButtonClickDisabled = true;
+            setTimeout(() => this.claimButtonClickDisabled = false, 5000);
         },
     },
 });

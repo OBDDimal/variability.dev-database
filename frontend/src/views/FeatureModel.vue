@@ -46,12 +46,12 @@
             @close="showCollaborationDialog = false">
         </collaboration-dialog>
 
-        <v-dialog v-model="showClaimDialog" persistent>
+        <v-dialog v-model="showClaimDialog" persistent width="500">
             <v-card>
                 <v-card-title>Claim collaboration edit rights</v-card-title>
                 <v-card-actions>
                     <v-btn
-                        color="green darken-1"
+                        color="red darken-1"
                         text
                         @click="collaborationManager.sendClaimEditRightsResponse(false)"
                     >
@@ -59,7 +59,7 @@
                     </v-btn>
 
                     <v-btn
-                        color="green darken-1"
+                        color="primary darken-1"
                         text
                         @click="collaborationManager.sendClaimEditRightsResponse(true)"
                     >
@@ -118,7 +118,10 @@ export default Vue.extend({
     }),
 
     created() {
+
         this.collaborationManager = new CollaborationManager(this.featureModelCommandManager, this.constraintCommandManager, this);
+        this.featureModelCommandManager.commandEvent = this.commandEvent;
+        this.constraintCommandManager.commandEvent = this.commandEvent;
 
         if (this.id) {
             this.initData();
@@ -134,9 +137,34 @@ export default Vue.extend({
         }
     },
 
+
+    beforeRouteLeave(to, from, next) {
+        // If session gets closed by host, don't ask for confirmation
+        if (this.collaborationManager.noConfirm) {
+            const answer = window.confirm('Do you really want to leave the page? Collaboration sessions will be closed and data will be lost!')
+
+            if (answer) {
+                // If user wants to close page
+                if (this.collaborationManager.isHost) {
+                    this.collaborationManager.closeCollaboration();
+                } else {
+                    this.collaborationManager.leaveCollaboration();
+                }
+                next()
+            } else {
+                // If user doesn't want to close page
+                next(false)
+            }
+        } else {
+            // Don't prevent default site changes without collaboration
+            next();
+        }
+    },
+
     methods: {
         save() {
             // TODO: Axios post request to update the xml file in the backend.
+            window.onbeforeunload = null;
         },
 
         reset() {
@@ -167,6 +195,13 @@ export default Vue.extend({
 
         exportToXML() {
             xmlTranspiler.downloadXML(this.data);
+        },
+
+        commandEvent() {
+            // Can't override text for Chrome & Edge
+            window.onbeforeunload = function () {
+                return "Do you really want to leave the page? Collaboration sessions will be closed and data will be lost!";
+            };
         },
     },
 });

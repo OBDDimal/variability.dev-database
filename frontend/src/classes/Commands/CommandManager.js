@@ -4,9 +4,11 @@ export class CommandManager {
     constructor() {
         this.historyCommands = [];
         this.futureCommands = [];
+        this.isDirty = false;
         this.collaborationManager = null;
         this.type = null;
         this.remoteCommands = null;
+        this.commandEvent = null;
     }
 
     execute(command, initiator = true) {
@@ -27,6 +29,8 @@ export class CommandManager {
 
         // Reset stack of future commands because a new command was already executed.
         this.futureCommands = [];
+
+        this.commandEvent();
     }
 
     undo(initiator = true) {
@@ -47,6 +51,8 @@ export class CommandManager {
 
             // After that push it to stack that only holds redo-commands.
             this.futureCommands.push(undoCommand);
+
+            this.commandEvent();
         }
     }
 
@@ -68,6 +74,8 @@ export class CommandManager {
 
             // After that push it to stack that only holds undo-commands.
             this.historyCommands.push(redoCommand);
+
+            this.commandEvent();
         }
     }
 

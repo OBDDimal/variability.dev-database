@@ -24,6 +24,8 @@ export default class CollaborationManager {
         this.isClient = false;
         this.lastSender = null;
         this.peer = null;
+
+        this.noConfirm = false;
     }
 
     createCollaboration() {
@@ -68,6 +70,7 @@ export default class CollaborationManager {
                 conn.on('close', () => {
                     this.showSnackbarMessage('Lost connection to collaboration session', 'error');
                     this.connections = this.connections.filter(c => c !== conn);
+                    this.noConfirm = true;
                     this.featureModel.$router.push('/');
                 });
             });
@@ -100,8 +103,13 @@ export default class CollaborationManager {
     }
 
     leaveCollaboration() {
+        console.log('leave')
         this.featureModel.showClaimDialog = false;
         this.connections.forEach(conn => conn.close());
+        this.isHost = false;
+        this.isClient = false;
+        this.peer.destroy();
+        this.peer = null;
     }
 
     receive(sender, type, action, data) {
@@ -130,6 +138,7 @@ export default class CollaborationManager {
 
     receiveClose() {
         this.showSnackbarMessage('Host has closed collaboration session', 'info');
+        this.noConfirm = true;
         this.featureModel.$router.push('/');
     }
 
