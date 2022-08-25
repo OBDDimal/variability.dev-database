@@ -15,7 +15,7 @@ export default class CollaborationManager {
         this.constraintCommandManager.type = 'constraint';
 
         this.connections = [];
-        this.options = {host: process.env.VUE_APP_DOMAIN_WEBSOCKET, port: process.env.VUE_APP_WEBSOCKET_PORT, path: "/myapp", pingInterval: 5000, debug: 0};
+        this.options = {host: process.env.VUE_APP_DOMAIN_WEBSOCKET, port: process.env.VUE_APP_DOMAIN_WEBSOCKET_PORT, path: "/myapp", pingInterval: 5000, debug: 0};
 
         this.collaborationKey = null;
         this.featureModel = featureModel;
