@@ -82,6 +82,12 @@ const routes = [
         component: FeatureModel,
         props: true
     },
+    {
+        path: '/collaboration/:collaborationKey',
+        name: 'FeatureModel',
+        component: FeatureModel,
+        props: true
+    }
 ]
 
 const router = new VueRouter({

@@ -29,19 +29,20 @@
 
                     <v-btn
                         rounded
+                        :disabled="!editRights"
                         @click="openAddEditDialog('Add', undefined)">
-                        <v-icon>mdi-plus</v-icon>
+                        <v-icon :disabled="!editRights">mdi-plus</v-icon>
                     </v-btn>
 
                     <v-btn
-                        :disabled="!commandManager.isUndoAvailable()"
+                        :disabled="!commandManager.isUndoAvailable() || !editRights"
                         rounded
                         @click="undo">
                         <v-icon>mdi-undo</v-icon>
                     </v-btn>
 
                     <v-btn
-                        :disabled="!commandManager.isRedoAvailable()"
+                        :disabled="!commandManager.isRedoAvailable() || !editRights"
                         rounded
                         @click="redo">
                         <v-icon>mdi-redo</v-icon>
@@ -68,11 +69,13 @@
                 <v-icon
                     class="mr-6"
                     @click="openAddEditDialog('Edit', item.constraint)"
+                    :disabled="!editRights"
                 >
                     mdi-pencil
                 </v-icon>
                 <v-icon
                     @click="deleteConstraint(item.constraint)"
+                    :disabled="!editRights"
                 >
                     mdi-delete
                 </v-icon>
@@ -97,8 +100,10 @@ export default Vue.extend({
     },
 
     props: {
+        commandManager: CommandManager,
         constraints: undefined,
         rootNode: undefined,
+        editRights: undefined,
     },
 
     data: () => ({
@@ -111,7 +116,6 @@ export default Vue.extend({
         modeAddEdit: undefined,
         constraintAddEdit: undefined,
         updateKey: 0,
-        commandManager: new CommandManager(),
     }),
 
     computed: {
@@ -128,7 +132,7 @@ export default Vue.extend({
         highlightConstraint(constraintRow) {
             constraintRow.checked = !constraintRow.checked;
             constraintRow.constraint.toggleHighlighted();
-            constraintRow.constraint.getFeatureNodes().forEach((node) => node.uncollapse());
+            constraintRow.constraint.getFeatureNodes().forEach(node => node.uncollapse());
             this.$emit("update-feature-model");
         },
 
@@ -141,13 +145,13 @@ export default Vue.extend({
             if (this.modeAddEdit === 'Add') {
                 command = new AddCommand(
                     this.constraints,
-                    newConstraintItem
+                    newConstraintItem,
                 );
             } else {
                 command = new EditCommand(
                     this.constraints,
                     this.constraintAddEdit,
-                    newConstraintItem
+                    newConstraintItem,
                 );
             }
             this.closeAddEditDialog();
@@ -157,7 +161,7 @@ export default Vue.extend({
         deleteConstraint(constraint) {
             const command = new DeleteCommand(
                 this.constraints,
-                constraint
+                constraint,
             );
             this.commandManager.execute(command);
         },
@@ -202,6 +206,14 @@ export default Vue.extend({
 
         redo() {
             this.commandManager.redo();
+        },
+    },
+
+    watch: {
+        editRights() {
+            if (!this.editRights) {
+                this.showAddEditDialog = false;
+            }
         },
     },
 });

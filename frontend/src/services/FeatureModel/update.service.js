@@ -217,13 +217,8 @@ function updateLinks(d3Data, visibleD3Nodes) {
 }
 
 function updateColoring(d3Data) {
-    if (!d3Data.updateTrigger.coloring) {
-        return;
-    }
-
     const allNodes = d3Data.root.data.descendants();
     count.colorNodes(allNodes, d3Data.coloringIndex);
-    d3Data.updateTrigger.coloring = false;
 }
 
 function updateSegments(d3Data, visibleD3Nodes) {
@@ -266,13 +261,16 @@ export function updateSvg(d3Data) {
     // Calculate rect widths of all d3Nodes once for better performance instead of repeatedly during update.
     d3Data.root.descendants().forEach(d3Node => {
         d3Node.width = calcRectWidth(d3Data, d3Node);
-        const level = d3Node.data.level();
-        if (d3Data.maxHorizontallyLevelWidth.length <= level) {
-            d3Data.maxHorizontallyLevelWidth.push(0);
-        }
 
-        if (d3Data.maxHorizontallyLevelWidth[level] < d3Node.width) {
-            d3Data.maxHorizontallyLevelWidth[level] = d3Node.width;
+        if (d3Node.data instanceof FeatureNode) {
+            const level = d3Node.data.level();
+            if (d3Data.maxHorizontallyLevelWidth.length <= level) {
+                d3Data.maxHorizontallyLevelWidth.push(0);
+            }
+
+            if (d3Data.maxHorizontallyLevelWidth[level] < d3Node.width) {
+                d3Data.maxHorizontallyLevelWidth[level] = d3Node.width;
+            }
         }
     });
 

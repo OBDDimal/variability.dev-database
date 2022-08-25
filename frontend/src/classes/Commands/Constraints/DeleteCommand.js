@@ -16,4 +16,11 @@ export class DeleteCommand extends ConstraintCommand {
         this.allConstraints.splice(this.index, 0, this.constraint);
         this.constraint.rule.setConstraint(this.constraint);
     }
+
+    createDTO() {
+        return {
+            commandType: 'delete',
+            index: this.index,
+        };
+    }
 }

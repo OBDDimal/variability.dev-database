@@ -17,4 +17,12 @@ export class EditCommand extends ConstraintCommand {
         this.constraint.rule = this.oldConstraintItem;
         this.constraint.rule.setConstraint(this.constraint);
     }
+
+    createDTO() {
+        return {
+            commandType: 'edit',
+            constraintItemInfix: this.oldConstraintItem.toStringForEdit(),
+            newConstraintItemInfix: this.newConstraintItem.toStringForEdit(),
+        };
+    }
 }
