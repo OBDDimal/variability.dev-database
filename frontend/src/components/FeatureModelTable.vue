@@ -116,8 +116,10 @@
 					</v-btn>
 					<!-- <v-btn small rounded color="error" class="mr-2"> <v-icon>mdi-delete</v-icon></v-btn> -->
 				</template>
-				<template v-slot:item.id="{ index }">
-					{{ index + 1 }}
+				<template v-slot:item.id="{ index, item }">
+					<v-chip :color="item.active ? 'primary' : 'transparent'">{{
+						index + 1
+					}}</v-chip>
 				</template>
 				<template v-slot:no-data> {{ noDataText }} </template>
 				<template v-slot:item.tags="{ item }">
@@ -293,3 +295,12 @@ export default Vue.extend({
 	},
 })
 </script>
+
+<style>
+.highlighted {
+	background-color: green;
+	height: 100%;
+	width: 3px;
+	display: inline-block;
+}
+</style>

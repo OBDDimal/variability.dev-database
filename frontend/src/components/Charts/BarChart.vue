@@ -24,7 +24,7 @@ import {
 	CategoryScale,
 	LinearScale,
 } from 'chart.js'
-//import { getRelativePosition } from 'chart.js/helpers'
+import { getRelativePosition } from 'chart.js/helpers'
 
 ChartJS.register(Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale)
 
@@ -79,13 +79,17 @@ export default {
 			hoveredElement: undefined,
 			chartOptions: {
 				responsive: true,
-				onHover: () => {
-					/*const chart = this.$children[0]._data._chart
-					const canvasPosition = getRelativePosition(e, chart)*/
-					/*const dataX = chart.scales.x.getValueForPixel(
-						canvasPosition.x
-					)*/
-					//this.hoveredElement = chart.data.labels[Math.abs(dataX)]
+				onHover: (e, elements) => {
+					if (elements && elements.length > 0) {
+						const chart = this.$children[0]._data._chart
+						const canvasPosition = getRelativePosition(e, chart)
+						const dataX = chart.scales.x.getValueForPixel(
+							canvasPosition.x
+						)
+						this.hoveredElement = chart.data.labels[Math.abs(dataX)]
+					} else {
+						this.hoveredElement = undefined
+					}
 					//console.log(chart.data.labels[Math.abs(dataX)])
 				},
 			},
@@ -100,6 +104,11 @@ export default {
 			chart.setActiveElements([{ datasetIndex: 0, index: newValue }])
 			chart.update()
 		},
+	},
+	mounted() {
+		/*this.$refs.bar.$on('mouseleave', () => {
+			console.log('hello')
+		})*/
 	},
 }
 </script>

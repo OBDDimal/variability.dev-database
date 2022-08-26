@@ -41,7 +41,7 @@
 
 						<v-list-item-content>
 							<v-list-item-title>
-								{{ file.label }}
+								{{ loading ? '...' : file.label }}
 							</v-list-item-title>
 							<v-list-item-subtitle>Label</v-list-item-subtitle>
 						</v-list-item-content>
@@ -58,7 +58,7 @@
 
 						<v-list-item-content>
 							<v-list-item-title>
-								{{ file.description }}
+								{{ loading ? '...' : file.description }}
 							</v-list-item-title>
 							<v-list-item-subtitle
 								>Description</v-list-item-subtitle
@@ -81,7 +81,7 @@
 
 						<v-list-item-content>
 							<v-list-item-title>
-								{{ file.license.label }}
+								{{ loading ? '...' : file.license.label }}
 							</v-list-item-title>
 							<v-list-item-subtitle>License</v-list-item-subtitle>
 						</v-list-item-content>
@@ -154,7 +154,9 @@
 
 						<v-list-item-content>
 							<v-list-item-title>
-								{{ file.family.label }} ({{ file.version }})
+								{{ loading ? '...' : file.family.label }} ({{
+									loading ? '...' : file.version
+								}})
 							</v-list-item-title>
 							<v-list-item-subtitle
 								>Family and version</v-list-item-subtitle

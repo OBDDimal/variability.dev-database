@@ -1,14 +1,20 @@
 <template>
 	<div class="mainView">
-		<h3 class="text-h3 mb-2 mt-8">Family: {{ family.label }}</h3>
+		<h3 class="text-h3 mb-2 mt-8">
+			Family:
+			<span v-if="loadingTable"
+				><v-progress-circular
+					color="primary"
+					indeterminate
+				></v-progress-circular
+			></span>
+			<span v-else>{{ family.label }}</span>
+		</h3>
 		<h5 class="text-h5 mb-4">Details and more information</h5>
-		<v-row justify="space-between">
+		<v-row justify="space-between" ref="barview">
 			<v-col cols="12" sm="6" md="3">
-				<bar-chart
-					:data="numberOfFeaturesData"
-					@hovered-element="onElementHover"
-				></bar-chart>
-				<!--				<v-sheet
+				<v-sheet
+					v-if="loadingTable"
 					:color="`grey ${
 						$vuetify.theme.dark ? 'darken-2' : 'lighten-4'
 					}`"
@@ -19,7 +25,12 @@
 						max-width="300"
 						type="card"
 					></v-skeleton-loader>
-				</v-sheet>-->
+				</v-sheet>
+				<bar-chart
+					v-else
+					:data="numberOfFeaturesData"
+					@hovered-element="onElementHover"
+				></bar-chart>
 			</v-col>
 			<v-col cols="12" sm="6" md="3">
 				<v-sheet
@@ -129,7 +140,10 @@ export default Vue.extend({
 			await api
 				.get(`${API_URL}files/uploaded/confirmed/?family=${value}`)
 				.then(async (response) => {
-					this.files = response.data
+					this.files = response.data.map((elem) => ({
+						...elem,
+						active: false,
+					}))
 					this.numberOfFeaturesData.labels = response.data.map(
 						(elem) => elem.version
 					)
@@ -164,7 +178,11 @@ export default Vue.extend({
 				})
 		},
 		onElementHover(elem) {
-			console.log(elem)
+			if (elem !== undefined) {
+				this.files.find((file) => file.version === elem).active = true
+			} else {
+				this.files.forEach((file) => (file.active = false))
+			}
 		},
 	},
 })
