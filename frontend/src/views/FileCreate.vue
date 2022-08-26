@@ -310,6 +310,7 @@ export default Vue.extend({
 		gottenFiles: [],
 
 		version: '',
+		allVersions: [],
 		versionRules: [(v) => !!v || 'Version is required'],
 
 		family: null,
@@ -390,6 +391,12 @@ export default Vue.extend({
 		},
 		tags: function (newValue) {
 			console.log(newValue)
+		},
+		allVersions: function (newValue) {
+			this.versionRules = [
+				(v) => !!v || 'Version is required',
+				(v) => !newValue.includes(v) || 'Version already exists',
+			]
 		},
 	},
 
@@ -495,6 +502,9 @@ export default Vue.extend({
 						this.latestFeatureModelVersion = null
 					} else {
 						this.numberOfModelsInFamily = response.data.length
+						this.allVersions = response.data.map(
+							(item) => item.version
+						)
 						this.latestFeatureModelVersion =
 							response.data[response.data.length - 1].version
 					}
