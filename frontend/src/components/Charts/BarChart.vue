@@ -1,6 +1,6 @@
 <template>
 	<Bar
-		ref="bar"
+		:chartId="chartId"
 		:chart-options="chartOptions"
 		:chart-data="data"
 		:chart-id="chartId"
@@ -15,6 +15,7 @@
 
 <script>
 import { Bar } from 'vue-chartjs/legacy'
+
 import {
 	Chart as ChartJS,
 	Title,
@@ -99,11 +100,11 @@ export default {
 		hoveredElement: function (newValue) {
 			this.$emit('hovered-element', newValue)
 		},
-		selected: function (newValue) {
+		/*selected: function (newValue) {
 			const chart = this.$children[0]._data._chart
 			chart.setActiveElements([{ datasetIndex: 0, index: newValue }])
 			chart.update()
-		},
+		},*/
 	},
 	mounted() {
 		/*this.$refs.bar.$on('mouseleave', () => {

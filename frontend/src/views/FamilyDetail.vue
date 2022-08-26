@@ -28,12 +28,14 @@
 				</v-sheet>
 				<bar-chart
 					v-else
+					chartId="featureChart"
 					:data="numberOfFeaturesData"
 					@hovered-element="onElementHover"
 				></bar-chart>
 			</v-col>
 			<v-col cols="12" sm="6" md="3">
 				<v-sheet
+					v-if="loadingTable"
 					:color="`grey ${
 						$vuetify.theme.dark ? 'darken-2' : 'lighten-4'
 					}`"
@@ -45,6 +47,12 @@
 						type="card"
 					></v-skeleton-loader>
 				</v-sheet>
+				<bar-chart
+					v-else
+					chartId="constraintChart"
+					:data="numberOfConstraintsData"
+					@hovered-element="onElementHover"
+				></bar-chart>
 			</v-col>
 			<v-col cols="12" sm="6" md="3">
 				<v-sheet
@@ -113,6 +121,10 @@ export default Vue.extend({
 			labels: [],
 			datasets: [],
 		},
+		numberOfConstraintsData: {
+			labels: [],
+			datasets: [],
+		},
 	}),
 
 	async mounted() {
@@ -144,16 +156,18 @@ export default Vue.extend({
 						...elem,
 						active: false,
 					}))
-					this.numberOfFeaturesData.labels = response.data.map(
-						(elem) => elem.version
-					)
+					const labels = response.data.map((elem) => elem.version)
+					this.numberOfFeaturesData.labels = labels
+					this.numberOfConstraintsData.labels = labels
 					let data = []
+					let dataConstraints = []
 					for (let i = 0; i < response.data.length; i++) {
 						const elem = response.data[i]
-						const amount = await this.getNumberOfFeaturesFromFile(
+						const res = await this.getNumbersFromFile(
 							elem.local_file
 						)
-						data.push(amount)
+						data.push(res.amountFeatures)
+						dataConstraints.push(res.amountConstraints)
 					}
 					this.numberOfFeaturesData.datasets = [
 						{
@@ -162,10 +176,22 @@ export default Vue.extend({
 							data,
 						},
 					]
+
+					this.numberOfConstraintsData.datasets = [
+						{
+							label: 'Number of Constraints',
+							backgroundColor: 'blue',
+							data: dataConstraints,
+						},
+					]
+					console.log('feat')
+					console.log(this.numberOfFeaturesData)
+					console.log('constr')
+					console.log(this.numberOfConstraintsData)
 					this.loadingTable = false
 				})
 		},
-		async getNumberOfFeaturesFromFile(path) {
+		async getNumbersFromFile(path) {
 			return await api
 				.get(`${API_URL.slice(0, -1)}${path}`)
 				.then((response) => {
@@ -174,7 +200,13 @@ export default Vue.extend({
 						response.data,
 						'text/xml'
 					)
-					return xmlDocument.getElementsByTagName('feature').length
+					let result = {
+						amountFeatures:
+							xmlDocument.getElementsByTagName('feature').length,
+						amountConstraints:
+							xmlDocument.getElementsByTagName('rule').length,
+					}
+					return result
 				})
 		},
 		onElementHover(elem) {

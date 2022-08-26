@@ -45,5 +45,11 @@
                 <var>HarvestSkills</var>
             </imp>
         </rule>
+        <rule>
+            <imp>
+                <var>Warrior</var>
+                <var>HarvestSkills</var>
+            </imp>
+        </rule>
     </constraints>
 </featureModel>

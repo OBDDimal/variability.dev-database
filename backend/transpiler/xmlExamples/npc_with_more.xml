@@ -48,11 +48,5 @@
                 <var>Friendly</var>
             </imp>
         </rule>
-        <rule>
-            <imp>
-                <var>Farmer</var>
-                <var>HarvestSkills</var>
-            </imp>
-        </rule>
     </constraints>
 </featureModel>
