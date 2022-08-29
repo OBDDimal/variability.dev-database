@@ -1,8 +1,8 @@
 import {FeatureNodeCommand} from "@/classes/Commands/FeatureModel/FeatureNodeCommand";
 
 export class SwapCommand extends FeatureNodeCommand {
-    constructor(d3Data, node, dstParent, dstIndex) {
-        super(d3Data, node);
+    constructor(node, dstParent, dstIndex) {
+        super(node);
         this.dstParent = dstParent;
         this.dstIndex = dstIndex;
 
@@ -26,8 +26,6 @@ export class SwapCommand extends FeatureNodeCommand {
 
         this.srcParent.removeChild(this.node);
         this.dstParent.insertChildAtIndex(this.node, this.dstIndex - tmp);
-
-        this.d3Data.updateTrigger.coloring = true;
     }
 
     undo() {
@@ -36,7 +34,14 @@ export class SwapCommand extends FeatureNodeCommand {
 
         this.dstParent.removeChild(this.node);
         this.srcParent.insertChildAtIndex(this.node, this.srcIndex);
+    }
 
-        this.d3Data.updateTrigger.coloring = true;
+    createDTO() {
+        return {
+            commandType: 'swap',
+            nodeName: this.node.name,
+            dstParentName: this.dstParent.name,
+            dstIndex: this.dstIndex,
+        };
     }
 }

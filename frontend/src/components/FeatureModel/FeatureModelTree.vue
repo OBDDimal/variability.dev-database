@@ -2,21 +2,21 @@
     <div>
         <div class="float-right mt-2 mr-3" style="position: absolute; right: 0;">
             <v-toolbar
-                height="auto"
                 class="rounded-pill"
                 elevation="9"
+                height="auto"
                 style="border: 2px solid white"
             >
                 <v-btn
-                    icon
                     :disabled="search.foundNodeIndex === 0"
+                    icon
                     @click="onChangeFoundNodeIndex(--search.foundNodeIndex)">
                     <v-icon>mdi-chevron-left</v-icon>
                 </v-btn>
 
                 <v-btn
+                    :disabled="search.foundNodeDistances.length <= search.foundNodeIndex + 1"
                     icon
-                    :disabled="search.foundNodeDistances.length === search.foundNodeIndex"
                     @click="onChangeFoundNodeIndex(++search.foundNodeIndex)">
                     <v-icon>mdi-chevron-right</v-icon>
                 </v-btn>
@@ -33,9 +33,9 @@
                 ></v-text-field>
 
                 <v-badge
-                    inline
                     v-if="search.foundNodeDistances.length"
                     :content="search.foundNodeIndex + 1 + '/' + search.foundNodeDistances.length"
+                    inline
                 ></v-badge>
 
                 <v-btn icon @click="search.showSearch = !search.showSearch">
@@ -46,9 +46,12 @@
         </div>
 
         <feature-model-tree-toolbar
-            :is-redo-available="d3Data.commandManager.isRedoAvailable()"
-            :is-undo-available="d3Data.commandManager.isUndoAvailable()"
             :direction="d3Data.direction"
+            :editRights="editRights"
+            :is-redo-available="commandManager && commandManager.isRedoAvailable()"
+            :is-save-available="(commandManager && commandManager.isUndoAvailable())
+                || (commandManager.collaborationManager.constraintCommandManager.isUndoAvailable())"
+            :is-undo-available="commandManager && commandManager.isUndoAvailable()"
             @coloring="coloringIndex => coloring(coloringIndex)"
             @export="$emit('exportToXML')"
             @fitToView="fitToView"
@@ -58,16 +61,18 @@
             @save="$emit('save')"
             @semanticEditing="value => d3Data.semanticEditing = value"
             @shortName="changeShortName"
-            @undo="undo"
             @spaceBetweenParentChild="changeSpaceBetweenParentChild"
             @spaceBetweenSiblings="changeSpaceBetweenSiblings"
             @toggleDirection="toggleDirection"
+            @undo="undo"
+            @show-collaboration-dialog="$emit('show-collaboration-dialog')"
         ></feature-model-tree-toolbar>
         <div id="svg-container"></div>
 
         <feature-model-tree-context-menu
             :d3Node="d3Data.contextMenu.selectedD3Node"
             :d3NodeEvent="d3Data.contextMenu.event"
+            :editRights="editRights"
             @addAsChild="d3Node => openAddAsChildDialog(d3Node)"
             @addAsSibling="d3Node => openAddAsSiblingDialog(d3Node)"
             @close="d3Data.contextMenu.selectedD3Node = undefined"
@@ -127,12 +132,15 @@ export default Vue.extend({
     },
 
     props: {
+        commandManager: CommandManager,
+        remoteCommands: undefined,
         rootNode: undefined,
+        constraints: undefined,
+        editRights: undefined,
     },
 
     data: () => ({
         d3Data: {
-            commandManager: new CommandManager(),
             root: undefined,
             flexLayout: undefined,
             zoom: undefined,
@@ -158,9 +166,6 @@ export default Vue.extend({
                 featureNodesContainer: undefined,
                 dragContainer: undefined,
             },
-            updateTrigger: {
-                coloring: false,
-            },
             spaceBetweenParentChild: 75,
             spaceBetweenSiblings: 20,
             d3ParentOfAddNode: undefined,
@@ -183,8 +188,11 @@ export default Vue.extend({
 
     mounted() {
         init.initialize(this.d3Data, this.rootNode);
-        dragAndDrop.init(this.d3Data);
+        dragAndDrop.init(this.d3Data, this.commandManager);
         view.reset(this.d3Data);
+
+        this.commandManager.d3Data = this.d3Data;
+        this.commandManager.executeRemoteCommands(this.rootNode, this.constraints);
         update.updateSvg(this.d3Data);
     },
 
@@ -195,7 +203,6 @@ export default Vue.extend({
 
         coloring(coloringIndex) {
             this.d3Data.coloringIndex = coloringIndex;
-            this.d3Data.updateTrigger.coloring = true;
             update.updateSvg(this.d3Data);
         },
 
@@ -208,10 +215,10 @@ export default Vue.extend({
 
         onChangeSearchText(searchText) {
             this.search.foundNodeDistances = search.search(this.d3Data, searchText);
+            search.resetSearch(this.d3Data);
             if (this.search.foundNodeDistances.length) {
                 this.onChangeFoundNodeIndex(0);
             } else {
-                search.resetSearch(this.d3Data);
                 update.updateSvg(this.d3Data);
             }
         },
@@ -279,11 +286,10 @@ export default Vue.extend({
             this.showEditDialog = false;
 
             const editCommand = new EditCommand(
-                this.d3Data,
                 this.editNode,
                 newData,
             );
-            this.d3Data.commandManager.execute(editCommand);
+            this.commandManager.execute(editCommand);
 
             update.updateSvg(this.d3Data);
         },
@@ -310,12 +316,11 @@ export default Vue.extend({
 
             const parent = this.d3Data.d3ParentOfAddNode.data;
             const addCommand = new AddCommand(
-                this.d3Data,
                 parent,
                 parent.children ? parent.children.length : 0,
                 newNode,
             );
-            this.d3Data.commandManager.execute(addCommand);
+            this.commandManager.execute(addCommand);
 
             update.updateSvg(this.d3Data);
             this.addType = "";
@@ -338,12 +343,12 @@ export default Vue.extend({
         },
 
         undo() {
-            this.d3Data.commandManager.undo();
+            this.commandManager.undo();
             update.updateSvg(this.d3Data);
         },
 
         redo() {
-            this.d3Data.commandManager.redo();
+            this.commandManager.redo();
             update.updateSvg(this.d3Data);
         },
 
@@ -370,6 +375,15 @@ export default Vue.extend({
                 return this.d3Data.root.data.descendants();
             } else {
                 return [];
+            }
+        },
+    },
+
+    watch: {
+        editRights() {
+            if (!this.editRights) {
+                this.showAddDialog = false;
+                this.showEditDialog = false;
             }
         },
     },
