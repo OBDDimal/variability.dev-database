@@ -127,22 +127,111 @@ class User(AbstractBaseUser, PermissionsMixin):
         """
         Sends an email to this user asynchronously
         """
-
-        #TODO: It might be better to do this using a job scheduler. django-mailer seems to be the standard choice, but it requires setting up a cron job.
-        class SendEmailThread(Thread):
-            def __init__(self, subject, message, from_email, recipients, **kwargs):
-                Thread.__init__(self)
-                self.subject = subject
-                self.message = message
-                self.from_email = from_email
-                self.recipients = recipients
-                self.kwargs = kwargs
-
-            def run(self):
-                send_mail(self.subject, self.message, self.from_email, self.recipients, **self.kwargs)
-
-        email_thread = SendEmailThread(subject, message, from_email, [self.email], **kwargs)
-        email_thread.start()
+        if 'html_message' in kwargs:
+            html_message = kwargs['html_message']
+        else:
+            html_message = message
+        email_sender = EmailSendTask(subject=subject, message=message, from_email=from_email, recipient=self.email, html_message=html_message, attempts=5, repeat=60)
+        email_sender.save()
 
     def __str__(self):
         return f"{self.email}"
+
+
+class BackgroundTask(models.Model):
+    """
+    This model represents a task that is to be executed in the background.
+
+    It has the following properties:
+    `locked`: Whether the task is executed right now.
+    """
+    locked = models.BooleanField(default=False)
+
+    def run(self):
+        # This code technically has a race condition, but I'm unsure how this
+        # race condition can be avoided using the tools offered by django.
+        if self.locked:
+            return
+        self.locked = True
+        self.save()
+        try:
+            self.do()
+        finally:
+            self.locked = False
+            self.save()
+
+    def do(self):
+        ...
+
+    class Meta:
+        abstract = True
+
+
+class RetryTask(BackgroundTask):
+    """
+    This model represents a task that is to be retried a certain number of times.
+
+    It has the following properties:
+    `runs`: The number of times this task has been executed already.
+    `attempts`: The number of times this task should be executed.
+    `last_run_at`: The last time this task was executed.
+    `repeat`: The time to wait before this task should be retried in minutes.
+    """
+    runs = models.PositiveIntegerField(default=0)
+    attempts = models.PositiveIntegerField(null=False)
+    last_run_at = models.DateTimeField(null=True)
+    repeat = models.PositiveIntegerField(null=False)
+
+    def do(self):
+        if self.attempts >= self.runs:
+            # We already ran the required number of times
+            self.cleanup()
+            self.delete()
+        if datetime.now() >= self.last_run_at + timedelta(minutes=self.repeat):
+            # We should update the number of runs and the timestamp of the last run and then retry
+            self.runs += 1
+            self.last_run_at = datetime.now()
+            self.save()
+            if self.retry():
+                # Retry was successful
+                self.delete()
+
+    def retry(self):
+        """
+        This method is called every time the task is retried.
+        """
+        ...
+
+    def cleanup(self):
+        """
+        This method is called after the number of required retries was reached and before the task is deleted from the database.
+        """
+        ...
+
+    class Meta:
+        abstract = True
+
+
+class EmailSendTask(RetryTask):
+    """
+    This model represents a task that will retry sending an email.
+
+    It has the following properties:
+    `subject`: The subject line of the email.
+    `message`: The plaintext message of the email.
+    `from_email`: The sender of the email.
+    `recipient`: The receiver of the email.
+    `html_message`: The message contents in HTML.
+    """
+    subject = models.CharField(blank=False, max_length=255)
+    message = models.TextField(blank=True)
+    from_email = models.CharField(blank=False, max_length=255)
+    recipient = models.CharField(blank=False, max_length=255)
+    html_message = models.TextField(blank=False)
+
+    def retry(self):
+        try:
+            send_mail(self.subject, self.message, self.from_email, self.recipients, html_message=self.html_message)
+            return True
+        except:
+            return False

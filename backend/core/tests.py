@@ -95,22 +95,6 @@ class UserModelTests(TestCase):
         self.assertIsNotNone(user.institute)
         self.assertIsNotNone(user.bio)
 
-    def test_create_and_email_user(self):
-        expected_receiver_email = "newu@s.er"
-        expected_pw = "12345678!"
-        expected_sender_email = "sender@ema.il"
-        expected_subject = "Subject: Test"
-        expected_message = "Hello World"
-
-        user = User.objects.create_user(email=expected_receiver_email, password=expected_pw)
-        self.assertEqual(user.email, expected_receiver_email)
-        user._email_user(subject=expected_subject, message=expected_message, from_email=expected_sender_email)
-        self.assertEqual(len(mail.outbox), 1)
-        self.assertEqual(mail.outbox[0].from_email, expected_sender_email)
-        self.assertEqual(mail.outbox[0].to, [expected_receiver_email])
-        self.assertEqual(mail.outbox[0].subject, expected_subject)
-        self.assertEqual(mail.outbox[0].body, expected_message)
-
     def test_delete_expired_users(self):
         expected_email = "newu@s.er"
         # join date is exactly PASSWORD_RESET_TIMEOUT_DAYS days ago
