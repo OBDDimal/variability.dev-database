@@ -38,6 +38,51 @@ describe('Navigation tests', () => {
             })
 
         })
+        
+        beforeEach(() => {
+            //cy.exec('Get-ExecutionPolicy')
+            //cy.exec('Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy Unrestricted')
+            cy.exec('python ../backend/manage.py runscript create_test_user')
+            const testMail = 'cypress@uni-ulm.de';
+            const testPassword = 'testingIsFun1';
+
+            const API_URL = `${process.env.VUE_APP_DOMAIN}auth/`;
+
+            cy.request('POST', `${API_URL}login/`, {testMail, testPassword}).then((response) => {
+
+                if (response.data.access && response.data.refresh) {
+                    localStorage.setItem('access', JSON.stringify(response.data.access));
+                    localStorage.setItem(
+                        'refresh',
+                        JSON.stringify(response.data.refresh),
+                    );
+                    localStorage.setItem('user', JSON.stringify(response.data.user));
+                }
+
+                return response.data;
+            })
+        })
+
+        it('logs in programmatically without using the UI', function () {
+            // destructuring assignment of the this.currentUser object
+            const { username, password } = this.currentUser
+
+            // programmatically log us in without needing the UI
+            cy.request('POST', '/login', {
+            username,
+            password,
+            })
+
+            // now that we're logged in, we can visit
+            // any kind of restricted route!
+            cy.visit('/dashboard')
+
+            // our auth cookie should be present
+            cy.getCookie('your-session-cookie').should('exist')
+
+            // UI should reflect this user being logged in
+            cy.get('h1').should('contain', 'jane.lane')
+        })
 
         // TODO: figure out programmatical login (https://docs.cypress.io/guides/end-to-end-testing/testing-your-app#Bypassing-your-UI)
         // describe('Logged-in navigations', () => {
