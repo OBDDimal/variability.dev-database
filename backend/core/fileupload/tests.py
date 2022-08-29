@@ -528,7 +528,7 @@ class FileUploadWithTagsTests(APITestCase):
             "license": 1,
             # only the tag ids are used internally. labels wont be checked and will be overwritten by the tag labels
             # in database
-            "tags": [{"id": "2", "label": "Tobi"},{"id": "1", "label": "Eric Test"}]'}
+            "tags": '[{"id": "2", "label": "Tobi"},{"id": "1", "label": "Eric Test"}]'}
         msg_as_multipart = encode_multipart(data=raw_data, boundary=BOUNDARY)
         # MULTIPART_CONTENT == multipart/form-data; boundary=BoUnDaRyStRiNg
         # print(f"Raw data to user: {raw_data}")
