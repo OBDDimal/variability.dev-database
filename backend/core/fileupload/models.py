@@ -163,6 +163,19 @@ class BackgroundTask(models.Model):
     locked = models.BooleanField(default=False)
 
     def run(self):
+        # This code technically has a race condition, but I'm unsure how this
+        # race condition can be avoided using the tools offered by django.
+        if self.locked:
+            return
+        self.locked = True
+        self.save()
+        try:
+            self.do()
+        finally:
+            self.locked = False
+            self.save()
+
+    def do(self):
         ...
 
     class Meta:
@@ -184,7 +197,7 @@ class RetryTask(BackgroundTask):
     last_run_at = models.DateTimeField(null=True)
     repeat = models.PositiveIntegerField(null=False)
 
-    def run(self):
+    def do(self):
         if self.attempts >= self.runs:
             # We already ran the required number of times
             self.cleanup()
