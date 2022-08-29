@@ -7,6 +7,7 @@ django-coverage-plugin==2.0.2
 django-environ==0.8.1
 django-extensions==3.1.5
 django-rest-auth==0.9.5
+django-seed==0.3.1
 djangorestframework==3.12.4
 djangorestframework-simplejwt==5.0.0
 psycopg2-binary==2.9.2
