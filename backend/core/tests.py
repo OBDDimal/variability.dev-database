@@ -5,11 +5,8 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.test import TestCase, Client
 from django.utils import timezone
 
-from core.fileupload.models import Tag
-from core.fileupload.models import Family
-from core.fileupload.models import File
-from core.fileupload.models import License
-from core.user.models import User
+from core.fileupload.models import Tag, Family, File, License
+from core.user.models import User, EmailSendTask, run_tasks
 from ddueruemweb.settings import PASSWORD_RESET_TIMEOUT_DAYS
 from core.jobs.hourly.check_user_activation_period_expired import Job as InactiveUserJob
 
@@ -94,6 +91,26 @@ class UserModelTests(TestCase):
         self.assertTrue(timezone.now() - timedelta(seconds=1) <= user.date_joined <= timezone.now())
         self.assertIsNotNone(user.institute)
         self.assertIsNotNone(user.bio)
+
+    def test_create_and_email_user(self):
+        expected_receiver_email = "newu@s.er"
+        expected_pw = "12345678!"
+        expected_sender_email = "sender@ema.il"
+        expected_subject = "Subject: Test"
+        expected_message = "Hello World"
+
+        user = User.objects.create_user(email=expected_receiver_email, password=expected_pw)
+        self.assertEqual(user.email, expected_receiver_email)
+        user._email_user(subject=expected_subject, message=expected_message, from_email=expected_sender_email)
+        # run_tasks is usually executed regularly by a background process, but we have to run it manually during tests
+        run_tasks()
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertEqual(len(EmailSendTask.objects.all()), 0)
+
+        self.assertEqual(mail.outbox[0].from_email, expected_sender_email)
+        self.assertEqual(mail.outbox[0].to, [expected_receiver_email])
+        self.assertEqual(mail.outbox[0].subject, expected_subject)
+        self.assertEqual(mail.outbox[0].body, expected_message)
 
     def test_delete_expired_users(self):
         expected_email = "newu@s.er"

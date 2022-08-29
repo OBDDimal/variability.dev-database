@@ -8,7 +8,7 @@ from django.utils.html import strip_tags
 from core.auth.tokens import encode_user_to_token
 from ddueruemweb.settings import env
 
-from threading import Thread
+from datetime import datetime, timedelta
 
 class UserManager(BaseUserManager):
     use_in_migrations = True
@@ -157,8 +157,10 @@ class BackgroundTask(models.Model):
         try:
             self.do()
         finally:
-            self.locked = False
-            self.save()
+            if self.pk is not None:
+                # Only save the object if it hasn't been deleted
+                self.locked = False
+                self.save()
 
     def do(self):
         ...
@@ -187,10 +189,10 @@ class RetryTask(BackgroundTask):
             # We already ran the required number of times
             self.cleanup()
             self.delete()
-        if datetime.now() >= self.last_run_at + timedelta(minutes=self.repeat):
+        if self.last_run_at is None or timezone.now() >= self.last_run_at + timedelta(minutes=self.repeat):
             # We should update the number of runs and the timestamp of the last run and then retry
             self.runs += 1
-            self.last_run_at = datetime.now()
+            self.last_run_at = timezone.now()
             self.save()
             if self.retry():
                 # Retry was successful
@@ -231,7 +233,25 @@ class EmailSendTask(RetryTask):
 
     def retry(self):
         try:
-            send_mail(self.subject, self.message, self.from_email, self.recipients, html_message=self.html_message)
+            send_mail(self.subject, self.message, self.from_email, [self.recipient], html_message=self.html_message)
             return True
         except:
             return False
+
+
+def all_subclasses(cls):
+    to_visit = set([cls])
+    visited = set()
+    while len(to_visit):
+        n = to_visit.pop()
+        if n not in visited:
+            to_visit = to_visit.union(n.__subclasses__())
+            visited.add(n)
+    return visited
+
+
+def run_tasks():
+    non_abstract_task_classes = {task for task in all_subclasses(BackgroundTask) if not task._meta.abstract}
+    for task_class in non_abstract_task_classes:
+        for task in task_class.objects.all():
+            task.run()
