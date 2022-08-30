@@ -110,9 +110,9 @@
                 </v-list-item-content>
             </v-list-item>
 
-            <v-divider></v-divider>
+            <v-divider v-if="editRights"></v-divider>
 
-            <v-list-item :disabled='!editRights' @click="$emit('edit', d3Node)">
+            <v-list-item v-if="editRights" @click="$emit('edit', d3Node)">
                 <v-list-item-icon>
                     <v-icon>mdi-pencil</v-icon>
                 </v-list-item-icon>
@@ -121,18 +121,18 @@
                 </v-list-item-content>
             </v-list-item>
 
-            <v-list-group no-action prepend-icon="mdi-plus">
+            <v-list-group v-if="editRights" no-action prepend-icon="mdi-plus">
                 <template v-slot:activator>
                     <v-list-item-title>Add</v-list-item-title>
                 </template>
 
-                <v-list-item :disabled='!editRights' @click="$emit('addAsChild', d3Node)">
+                <v-list-item @click="$emit('addAsChild', d3Node)">
                     <v-list-item-content>
                         <v-list-item-title>Add as child</v-list-item-title>
                     </v-list-item-content>
                 </v-list-item>
 
-                <v-list-item :disabled="(d3Node && d3Node.data.isRoot) || !editRights"
+                <v-list-item :disabled="(d3Node && d3Node.data.isRoot)"
                              @click="$emit('addAsSibling', d3Node)">
                     <v-list-item-content>
                         <v-list-item-title>Add as sibling</v-list-item-title>
