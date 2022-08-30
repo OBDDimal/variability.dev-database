@@ -6,8 +6,8 @@
             ref="featureModelTree"
             :command-manager="featureModelCommandManager"
             :constraints="data.constraints"
-            :rootNode="data.rootNode"
             :editRights="editRights"
+            :rootNode="data.rootNode"
             @exportToXML="exportToXML"
             @reset="reset"
             @save="save"
@@ -15,6 +15,77 @@
             @show-collaboration-dialog="showCollaborationDialog = true"
         >
         </feature-model-tree>
+
+        <v-row class="mt-2" justify="center">
+            <v-toolbar
+                absolute
+                class="rounded-pill mt-3"
+                elevation="9"
+                height="auto"
+                style="border: 2px solid white"
+            >
+                <v-chip-group mandatory active-class="primary">
+                    <v-chip>Me</v-chip>
+                    <v-chip v-for="client in collaborationManager.connections"
+                            :key="client.connectionId">
+                        {{ client.name }}
+                    </v-chip>
+                </v-chip-group>
+
+                <v-tooltip bottom>
+                    <template v-slot:activator="{ on, attrs }">
+                        <v-btn
+                            icon
+                            v-bind="attrs"
+                            v-on="on"
+                        >
+                            <v-icon>mdi-access-point</v-icon>
+                        </v-btn>
+                    </template>
+                    <span>Claim edit rights</span>
+                </v-tooltip>
+
+                <v-tooltip bottom>
+                    <template v-slot:activator="{ on, attrs }">
+                        <v-btn
+                            icon
+                            v-bind="attrs"
+                            v-on="on"
+                        >
+                            <v-icon>mdi-qrcode</v-icon>
+                        </v-btn>
+                    </template>
+                    <span>Show qr code</span>
+                </v-tooltip>
+
+                <v-tooltip bottom>
+                    <template v-slot:activator="{ on, attrs }">
+                        <v-btn
+                            icon
+                            v-bind="attrs"
+                            v-on="on"
+                        >
+                            <v-icon>mdi-content-copy</v-icon>
+                        </v-btn>
+                    </template>
+                    <span>Copy invitation link</span>
+                </v-tooltip>
+
+                <v-tooltip bottom>
+                    <template v-slot:activator="{ on, attrs }">
+                        <v-btn
+                            color="red"
+                            icon
+                            v-bind="attrs"
+                            v-on="on"
+                        >
+                            <v-icon>mdi-close</v-icon>
+                        </v-btn>
+                    </template>
+                    <span>Close session</span>
+                </v-tooltip>
+            </v-toolbar>
+        </v-row>
 
         <v-btn
             absolute
@@ -35,8 +106,8 @@
             ref="constraints"
             :command-manager="constraintCommandManager"
             :constraints="data.constraints"
-            :rootNode="data.rootNode"
             :editRights="editRights"
+            :rootNode="data.rootNode"
             @update-feature-model="updateFeatureModel"
         ></constraints>
 

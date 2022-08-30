@@ -103,7 +103,6 @@ export default class CollaborationManager {
     }
 
     leaveCollaboration() {
-        console.log('leave')
         this.featureModel.showClaimDialog = false;
         this.connections.forEach(conn => conn.close());
         this.isHost = false;
