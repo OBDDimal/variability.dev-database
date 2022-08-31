@@ -8,11 +8,11 @@
                 height="auto"
                 style="border: 2px solid white"
             >
-                <v-chip-group active-class="primary" mandatory>
-                    <v-chip>Me</v-chip>
-                    <v-chip v-for="client in collaborationManager.connections"
-                            :key="client.connectionId">
-                        {{ client.name }}
+                <v-chip-group mandatory>
+                    <v-chip :color="collaborationManager.featureModel.editRights ? 'primary' : 'none'" @click="collaborationManager.sendMemberData(collaborationManager.peer._id)">Me</v-chip>
+                    <v-chip :color="collaborationManager.editorId === member.id ? 'primary' : 'none'" v-for="member in collaborationManager.members"
+                            :key="member.id" @click="collaborationManager.sendMemberData(member.id)">
+                        {{ member.name }}
                     </v-chip>
                 </v-chip-group>
 

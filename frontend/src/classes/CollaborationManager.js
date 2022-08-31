@@ -26,10 +26,15 @@ export default class CollaborationManager {
         this.peer = null;
 
         this.noConfirm = false;
+
+        // List of all clients inclusive host with { id, name }
+        this.members = [];
+        this.editorId = undefined;
     }
 
     createCollaboration() {
         this.collaborationKey = this.generateUUID();
+        this.editorId = this.collaborationKey;
 
         this.peer = new Peer(this.collaborationKey, this.options);
         this.peer.on('open', () => {
@@ -37,6 +42,8 @@ export default class CollaborationManager {
             this.isClient = false;
             this.featureModel.editRights = true;
             this.featureModel.collaborationStatus = true;
+            this.name = this.peer._id;
+            this.editorId = this.peer._id;
             this.showSnackbarMessage(`Created collaboration session and copied invitation link.`);
 
             this.peer.on('connection', conn => {
@@ -69,9 +76,14 @@ export default class CollaborationManager {
                 this.isClient = true;
                 this.featureModel.editRights = false;
                 this.featureModel.collaborationStatus = true;
+                this.name = this.peer._id;
 
                 this.showSnackbarMessage('Joined collaboration session');
                 this.connections.push(conn);
+
+                // Send own name at first
+                this.send('name', this.peer._id, this.peer._id);
+
                 conn.on('data', data => this.receive(conn, data.type, data.action, data.data));
                 conn.on('close', () => {
                     this.showSnackbarMessage('Lost connection to collaboration session', 'error');
@@ -123,9 +135,27 @@ export default class CollaborationManager {
             this.receiveClose();
         } else if (type === 'claimEditRights') {
             this.receiveClaimEditRights(sender, action, data);
+        } else if (type === 'name') {
+            this.receiveName(action, data);
+        } else if (type === 'members') {
+            this.receiveMembers(action, data);
         } else {
             this.receiveCommand(sender, type, action, data);
         }
+    }
+
+    receiveName(id, name) {
+        this.members = this.members.filter(m => m.id !== id);
+        this.members.push({id: id, name: name});
+
+        this.sendMemberData();
+    }
+
+    receiveMembers(editorId, members) {
+        this.editorId = editorId;
+        this.featureModel.editRights = this.peer._id === editorId;
+        this.members = members.filter(m => m.id !== this.peer._id);
+        this.featureModel.collaborationReloadKey++;
     }
 
     receiveInitialize(data) {
@@ -205,6 +235,17 @@ export default class CollaborationManager {
         if (type === 'featureModel') {
             update.updateSvg(this.featureModelCommandManager.d3Data);
         }
+    }
+
+    sendMemberData(newEditorId = undefined) {
+        if (newEditorId) {
+            this.editorId = newEditorId;
+            this.featureModel.editRights = this.peer._id === this.editorId;
+        }
+
+        const members = [...this.members, { id: this.peer._id, name: this.name}];
+        this.send('members', this.editorId, members);
+        this.featureModel.collaborationReloadKey++;
     }
 
     send(type, action, data) {

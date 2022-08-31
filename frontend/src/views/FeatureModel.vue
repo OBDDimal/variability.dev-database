@@ -40,7 +40,7 @@
             @update-feature-model="updateFeatureModel"
         ></constraints>
 
-        <collaboration-toolbar v-if="collaborationStatus" :collaboration-manager="collaborationManager"></collaboration-toolbar>
+        <collaboration-toolbar :key="collaborationReloadKey" v-if="collaborationStatus" :collaboration-manager="collaborationManager"></collaboration-toolbar>
 
         <v-dialog v-model="showStartCollaborationSessionDialog" persistent width="auto">
             <v-card>
@@ -105,6 +105,7 @@ export default Vue.extend({
         },
         xml: undefined,
         reloadKey: 0,
+        collaborationReloadKey: 10000,
         featureModelCommandManager: new CommandManager(),
         constraintCommandManager: new CommandManager(),
         collaborationManager: null,
