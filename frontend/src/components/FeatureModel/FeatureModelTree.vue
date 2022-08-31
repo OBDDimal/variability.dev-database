@@ -67,6 +67,7 @@
             @undo="undo"
             @show-collaboration-dialog="$emit('show-collaboration-dialog')"
         ></feature-model-tree-toolbar>
+
         <div id="svg-container"></div>
 
         <feature-model-tree-context-menu

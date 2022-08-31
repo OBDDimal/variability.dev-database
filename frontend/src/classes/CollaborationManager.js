@@ -33,7 +33,11 @@ export default class CollaborationManager {
 
         this.peer = new Peer(this.collaborationKey, this.options);
         this.peer.on('open', () => {
-            this.showSnackbarMessage(`Created collaboration session`);
+            this.isHost = true;
+            this.isClient = false;
+            this.featureModel.editRights = true;
+            this.featureModel.collaborationStatus = true;
+            this.showSnackbarMessage(`Created collaboration session and copied invitation link.`);
 
             this.peer.on('connection', conn => {
                 this.connections.push(conn);
@@ -51,9 +55,6 @@ export default class CollaborationManager {
             });
 
         });
-        this.isHost = true;
-        this.isClient = false;
-        this.featureModel.editRights = true;
         return this.collaborationKey;
     }
 
@@ -64,6 +65,11 @@ export default class CollaborationManager {
         this.peer.on('open', () => {
             const conn = this.peer.connect(key);
             conn.on('open', () => {
+                this.isHost = false;
+                this.isClient = true;
+                this.featureModel.editRights = false;
+                this.featureModel.collaborationStatus = true;
+
                 this.showSnackbarMessage('Joined collaboration session');
                 this.connections.push(conn);
                 conn.on('data', data => this.receive(conn, data.type, data.action, data.data));
@@ -79,9 +85,6 @@ export default class CollaborationManager {
         this.peer.on('error', () => {
             this.showSnackbarMessage('Cannot connect to collaboration session', 'error');
         });
-        this.isHost = false;
-        this.isClient = true;
-        this.featureModel.editRights = false;
     }
 
     closeCollaboration() {
@@ -100,6 +103,7 @@ export default class CollaborationManager {
         this.isClient = false;
         this.peer.destroy();
         this.peer = null;
+        this.featureModel.collaborationStatus = false;
     }
 
     leaveCollaboration() {
@@ -109,6 +113,7 @@ export default class CollaborationManager {
         this.isClient = false;
         this.peer.destroy();
         this.peer = null;
+        this.featureModel.collaborationStatus = false;
     }
 
     receive(sender, type, action, data) {

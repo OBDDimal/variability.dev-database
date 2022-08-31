@@ -12,80 +12,9 @@
             @reset="reset"
             @save="save"
             @update-constraints="updateConstraints"
-            @show-collaboration-dialog="showCollaborationDialog = true"
+            @show-collaboration-dialog="showStartCollaborationSessionDialog = true"
         >
         </feature-model-tree>
-
-        <v-row class="mt-2" justify="center">
-            <v-toolbar
-                absolute
-                class="rounded-pill mt-3"
-                elevation="9"
-                height="auto"
-                style="border: 2px solid white"
-            >
-                <v-chip-group mandatory active-class="primary">
-                    <v-chip>Me</v-chip>
-                    <v-chip v-for="client in collaborationManager.connections"
-                            :key="client.connectionId">
-                        {{ client.name }}
-                    </v-chip>
-                </v-chip-group>
-
-                <v-tooltip bottom>
-                    <template v-slot:activator="{ on, attrs }">
-                        <v-btn
-                            icon
-                            v-bind="attrs"
-                            v-on="on"
-                        >
-                            <v-icon>mdi-access-point</v-icon>
-                        </v-btn>
-                    </template>
-                    <span>Claim edit rights</span>
-                </v-tooltip>
-
-                <v-tooltip bottom>
-                    <template v-slot:activator="{ on, attrs }">
-                        <v-btn
-                            icon
-                            v-bind="attrs"
-                            v-on="on"
-                        >
-                            <v-icon>mdi-qrcode</v-icon>
-                        </v-btn>
-                    </template>
-                    <span>Show qr code</span>
-                </v-tooltip>
-
-                <v-tooltip bottom>
-                    <template v-slot:activator="{ on, attrs }">
-                        <v-btn
-                            icon
-                            v-bind="attrs"
-                            v-on="on"
-                        >
-                            <v-icon>mdi-content-copy</v-icon>
-                        </v-btn>
-                    </template>
-                    <span>Copy invitation link</span>
-                </v-tooltip>
-
-                <v-tooltip bottom>
-                    <template v-slot:activator="{ on, attrs }">
-                        <v-btn
-                            color="red"
-                            icon
-                            v-bind="attrs"
-                            v-on="on"
-                        >
-                            <v-icon>mdi-close</v-icon>
-                        </v-btn>
-                    </template>
-                    <span>Close session</span>
-                </v-tooltip>
-            </v-toolbar>
-        </v-row>
 
         <v-btn
             absolute
@@ -111,30 +40,26 @@
             @update-feature-model="updateFeatureModel"
         ></constraints>
 
-        <collaboration-dialog
-            :collaborationManager="collaborationManager"
-            :show="showCollaborationDialog"
-            @close="showCollaborationDialog = false">
-        </collaboration-dialog>
+        <collaboration-toolbar v-if="collaborationStatus" :collaboration-manager="collaborationManager"></collaboration-toolbar>
 
-        <v-dialog v-model="showClaimDialog" persistent width="500">
+        <v-dialog v-model="showStartCollaborationSessionDialog" persistent width="auto">
             <v-card>
-                <v-card-title>Claim collaboration edit rights</v-card-title>
+                <v-card-title>Do you want to start a new collaboration session?</v-card-title>
                 <v-card-actions>
                     <v-btn
                         color="red darken-1"
                         text
-                        @click="collaborationManager.sendClaimEditRightsResponse(false)"
+                        @click="showStartCollaborationSessionDialog = false"
                     >
-                        Disagree
+                        Cancel
                     </v-btn>
 
                     <v-btn
                         color="primary darken-1"
                         text
-                        @click="collaborationManager.sendClaimEditRightsResponse(true)"
+                        @click="createCollaboration"
                     >
-                        Agree
+                        Start
                     </v-btn>
                 </v-card-actions>
             </v-card>
@@ -152,15 +77,15 @@ import beautify from "xml-beautifier";
 import CollaborationManager from "@/classes/CollaborationManager";
 import {CommandManager} from "@/classes/Commands/CommandManager";
 import * as xmlTranspiler from "@/services/xmlTranspiler.service";
-import CollaborationDialog from "@/components/CollaborationDialog";
+import CollaborationToolbar from "@/components/CollaborationToolbar";
 
 export default Vue.extend({
     name: 'FeatureModel',
 
     components: {
+        CollaborationToolbar,
         FeatureModelTree,
         Constraints,
-        CollaborationDialog,
     },
 
     props: {
@@ -183,13 +108,12 @@ export default Vue.extend({
         featureModelCommandManager: new CommandManager(),
         constraintCommandManager: new CommandManager(),
         collaborationManager: null,
-        showCollaborationDialog: false,
-        showClaimDialog: false,
         editRights: true,
+        showStartCollaborationSessionDialog: false,
+        collaborationStatus: false,
     }),
 
     created() {
-
         this.collaborationManager = new CollaborationManager(this.featureModelCommandManager, this.constraintCommandManager, this);
         this.featureModelCommandManager.commandEvent = this.commandEvent;
         this.constraintCommandManager.commandEvent = this.commandEvent;
@@ -273,6 +197,12 @@ export default Vue.extend({
             window.onbeforeunload = function () {
                 return "Do you really want to leave the page? Collaboration sessions will be closed and data will be lost!";
             };
+        },
+
+        createCollaboration() {
+            this.showStartCollaborationSessionDialog = false;
+            this.collaborationManager.createCollaboration();
+            navigator.clipboard.writeText(`${process.env.VUE_APP_DOMAIN_FRONTEND}collaboration/${this.collaborationManager.collaborationKey}`);
         },
     },
 });
