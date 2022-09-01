@@ -52,6 +52,7 @@
             :is-save-available="(commandManager && commandManager.isUndoAvailable())
                 || (commandManager.collaborationManager.constraintCommandManager.isUndoAvailable())"
             :is-undo-available="commandManager && commandManager.isUndoAvailable()"
+            :collaborationStatus="collaborationStatus"
             @coloring="coloringIndex => coloring(coloringIndex)"
             @export="$emit('exportToXML')"
             @fitToView="fitToView"
@@ -67,6 +68,7 @@
             @undo="undo"
             @show-collaboration-dialog="$emit('show-collaboration-dialog')"
         ></feature-model-tree-toolbar>
+
         <div id="svg-container"></div>
 
         <feature-model-tree-context-menu
@@ -137,6 +139,7 @@ export default Vue.extend({
         rootNode: undefined,
         constraints: undefined,
         editRights: undefined,
+        collaborationStatus: undefined,
     },
 
     data: () => ({

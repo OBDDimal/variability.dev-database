@@ -184,9 +184,9 @@
                     </v-list-item-content>
                 </v-list-item>
 
-                <v-list-item @click="$emit('show-collaboration-dialog')">
+                <v-list-item :disabled="collaborationStatus" @click="$emit('show-collaboration-dialog')">
                     <v-list-item-icon>
-                        <v-icon>mdi-account-multiple</v-icon>
+                        <v-icon :disabled="collaborationStatus">mdi-account-multiple</v-icon>
                     </v-list-item-icon>
 
                     <v-list-item-content>
@@ -254,6 +254,7 @@ export default Vue.extend({
         isSaveAvailable: Boolean,
         direction: String,
         editRights: undefined,
+        collaborationStatus: undefined,
     },
 
     data: () => ({
