@@ -8,11 +8,13 @@
             :constraints="data.constraints"
             :editRights="editRights"
             :rootNode="data.rootNode"
+            :collaborationStatus="collaborationStatus"
             @exportToXML="exportToXML"
             @reset="reset"
             @save="save"
             @update-constraints="updateConstraints"
             @show-collaboration-dialog="showStartCollaborationSessionDialog = true"
+            @show-claim-dialog="showClaimDialog"
         >
         </feature-model-tree>
 
@@ -40,7 +42,7 @@
             @update-feature-model="updateFeatureModel"
         ></constraints>
 
-        <collaboration-toolbar :key="collaborationReloadKey" v-if="collaborationStatus" :collaboration-manager="collaborationManager"></collaboration-toolbar>
+        <collaboration-toolbar :show-claim-dialog="showClaimDialog" :key="collaborationReloadKey" v-if="collaborationStatus" :collaboration-manager="collaborationManager"></collaboration-toolbar>
 
         <v-dialog v-model="showStartCollaborationSessionDialog" persistent width="auto">
             <v-card>
@@ -64,6 +66,8 @@
                 </v-card-actions>
             </v-card>
         </v-dialog>
+
+        <collaboration-name-dialog v-if="collaborationKey" @change-name="name => collaborationManager.sendName(name)"></collaboration-name-dialog>
     </div>
 </template>
 
@@ -78,6 +82,7 @@ import CollaborationManager from "@/classes/CollaborationManager";
 import {CommandManager} from "@/classes/Commands/CommandManager";
 import * as xmlTranspiler from "@/services/xmlTranspiler.service";
 import CollaborationToolbar from "@/components/CollaborationToolbar";
+import CollaborationNameDialog from "@/components/CollaborationNameDialog";
 
 export default Vue.extend({
     name: 'FeatureModel',
@@ -86,6 +91,7 @@ export default Vue.extend({
         CollaborationToolbar,
         FeatureModelTree,
         Constraints,
+        CollaborationNameDialog,
     },
 
     props: {
@@ -111,7 +117,9 @@ export default Vue.extend({
         collaborationManager: null,
         editRights: true,
         showStartCollaborationSessionDialog: false,
+        showClaimDialog: false,
         collaborationStatus: false,
+
     }),
 
     created() {

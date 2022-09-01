@@ -3,6 +3,7 @@ import * as update from '@/services/FeatureModel/update.service.js';
 import beautify from "xml-beautifier";
 import {xmlToJson} from "@/services/xmlTranspiler.service";
 import {Peer} from "peerjs";
+import {adjectives, animals, colors, uniqueNamesGenerator} from 'unique-names-generator';
 
 export default class CollaborationManager {
     constructor(featureModelCommandManager, constraintCommandManager, featureModel) {
@@ -13,23 +14,35 @@ export default class CollaborationManager {
         this.constraintCommandManager = constraintCommandManager;
         this.constraintCommandManager.collaborationManager = this;
         this.constraintCommandManager.type = 'constraint';
+        this.blockEditRequests = false;
 
         this.connections = [];
-        this.options = {host: process.env.VUE_APP_DOMAIN_WEBSOCKET, port: process.env.VUE_APP_DOMAIN_WEBSOCKET_PORT, path: "/myapp", pingInterval: 5000, debug: 0};
+        this.options = {
+            host: process.env.VUE_APP_DOMAIN_WEBSOCKET,
+            port: process.env.VUE_APP_DOMAIN_WEBSOCKET_PORT,
+            path: "/myapp",
+            pingInterval: 5000,
+            debug: 0
+        };
 
         this.collaborationKey = null;
         this.featureModel = featureModel;
 
         this.isHost = false;
         this.isClient = false;
-        this.lastSender = null;
+        this.claimerId = null;
         this.peer = null;
+        this.name = uniqueNamesGenerator({
+            dictionaries: [adjectives, colors, animals],
+            style: 'capital',
+            separator: " "
+        });
 
         this.noConfirm = false;
 
         // List of all clients inclusive host with { id, name }
         this.members = [];
-        this.editorId = undefined;
+        this.editorId = null;
     }
 
     createCollaboration() {
@@ -42,7 +55,7 @@ export default class CollaborationManager {
             this.isClient = false;
             this.featureModel.editRights = true;
             this.featureModel.collaborationStatus = true;
-            this.name = this.peer._id;
+            this.name = 'Host';
             this.editorId = this.peer._id;
             this.showSnackbarMessage(`Created collaboration session and copied invitation link.`);
 
@@ -58,6 +71,14 @@ export default class CollaborationManager {
                     conn.close();
                     this.connections = this.connections.filter(c => c !== conn);
                     this.featureModel.editRights = !this.connections.find(c => c.editRights);
+
+                    this.members = this.members.filter(m => m.id !== conn.peer);
+                    this.featureModel.collaborationReloadKey++;
+                    if (this.editorId === conn.peer) {
+                        this.sendMemberData(this.collaborationKey);
+                    } else {
+                        this.sendMemberData();
+                    }
                 });
             });
 
@@ -76,13 +97,11 @@ export default class CollaborationManager {
                 this.isClient = true;
                 this.featureModel.editRights = false;
                 this.featureModel.collaborationStatus = true;
-                this.name = this.peer._id;
 
                 this.showSnackbarMessage('Joined collaboration session');
                 this.connections.push(conn);
 
-                // Send own name at first
-                this.send('name', this.peer._id, this.peer._id);
+                this.sendName();
 
                 conn.on('data', data => this.receive(conn, data.type, data.action, data.data));
                 conn.on('close', () => {
@@ -134,11 +153,11 @@ export default class CollaborationManager {
         } else if (type === 'close') {
             this.receiveClose();
         } else if (type === 'claimEditRights') {
-            this.receiveClaimEditRights(sender, action, data);
+            this.receiveClaimEditRights(sender);
         } else if (type === 'name') {
             this.receiveName(action, data);
         } else if (type === 'members') {
-            this.receiveMembers(action, data);
+            this.receiveMembers(data);
         } else {
             this.receiveCommand(sender, type, action, data);
         }
@@ -151,10 +170,11 @@ export default class CollaborationManager {
         this.sendMemberData();
     }
 
-    receiveMembers(editorId, members) {
-        this.editorId = editorId;
-        this.featureModel.editRights = this.peer._id === editorId;
-        this.members = members.filter(m => m.id !== this.peer._id);
+    receiveMembers(data) {
+        this.blockEditRequests = data.blockEditRequests;
+        this.editorId = data.editorId;
+        this.featureModel.editRights = this.peer._id === data.editorId;
+        this.members = data.members.filter(m => m.id !== this.peer._id);
         this.featureModel.collaborationReloadKey++;
     }
 
@@ -176,35 +196,10 @@ export default class CollaborationManager {
         this.featureModel.$router.push('/');
     }
 
-    receiveClaimEditRights(sender, action, data) {
-        if (this.isHost) {
-            this.receiveClaimEditRightsAsHost(sender, action);
-        } else {
-            this.receiveClaimEditRightsAsClient(action, data);
-        }
-    }
-
-    receiveClaimEditRightsAsHost(sender, action) {
-        if (action === 'request' && this.featureModel.showClaimDialog) {
-            this.sendToSingle(sender, 'claimEditRights', 'response', false);
-        } else if (action === 'request') {
+    receiveClaimEditRights(sender) {
+        if (!this.featureModel.showClaimDialog && !this.blockEditRequests) {
             this.featureModel.showClaimDialog = true;
-            this.lastSender = sender;
-        }
-    }
-
-    receiveClaimEditRightsAsClient(action, data) {
-        if (action === 'response') {
-            const tmp = this.featureModel.editRights;
-            this.featureModel.editRights = data;
-
-            if (tmp !== this.featureModel.editRights) {
-                if (this.featureModel.editRights) {
-                    this.showSnackbarMessage('You claimed edit rights successfully', 'success');
-                } else {
-                    this.showSnackbarMessage('You lost edit rights', 'info');
-                }
-            }
+            this.claimerId = sender.peer;
         }
     }
 
@@ -240,15 +235,19 @@ export default class CollaborationManager {
     sendMemberData(newEditorId = undefined) {
         if (newEditorId) {
             this.editorId = newEditorId;
-            this.featureModel.editRights = this.peer._id === this.editorId;
+            this.featureModel.editRights = this.collaborationKey === this.editorId;
         }
 
-        const members = [...this.members, { id: this.peer._id, name: this.name}];
-        this.send('members', this.editorId, members);
+        const members = [...this.members, {id: this.collaborationKey, name: this.name}];
+        this.send('members', null, {
+            members: members,
+            editorId: this.editorId,
+            blockEditRequests: this.blockEditRequests,
+        });
         this.featureModel.collaborationReloadKey++;
     }
 
-    send(type, action, data) {
+    send(type, action = null, data = null) {
         const toSend = {
             type: type,
             action: action,
@@ -258,14 +257,13 @@ export default class CollaborationManager {
         this.connections.forEach(conn => conn.send(toSend));
     }
 
-    sendToSingle(sender, type, action, data) {
-        const toSend = {
-            type: type,
-            action: action,
-            data: data,
-        };
+    sendName(name = undefined) {
+        if (name) {
+            this.name = name;
+        }
 
-        sender.send(toSend);
+        // Send own name
+        this.send('name', this.peer._id, this.name);
     }
 
     sendExcluded(excluded, type, action, data) {
@@ -309,24 +307,14 @@ export default class CollaborationManager {
     }
 
     sendClaimEditRightsRequest() {
-        if (this.isHost) {
-            this.send('claimEditRights', 'response', false);
-            this.featureModel.editRights = true;
-            this.connections.forEach(conn => conn.editRights = false);
-        } else {
-            this.send('claimEditRights', 'request', null);
-        }
+        this.send('claimEditRights');
     }
 
     sendClaimEditRightsResponse(response) {
         this.featureModel.showClaimDialog = false;
-        this.sendExcluded(this.lastSender, 'claimEditRights', 'response', false);
-        this.sendToSingle(this.lastSender, 'claimEditRights', 'response', response);
-        this.connections.forEach(conn => conn.editRights = false);
-        this.lastSender.editRights = response;
 
         if (response) {
-            this.featureModel.editRights = false;
+            this.sendMemberData(this.claimerId);
             this.showSnackbarMessage('You lost edit rights', 'info');
         }
     }
@@ -357,5 +345,9 @@ export default class CollaborationManager {
             timeout: 5000,
             show: true,
         });
+    }
+
+    getClaimerName() {
+        return this.members.find(m => m.id === this.claimerId)?.name;
     }
 }
