@@ -11,7 +11,7 @@ export class CommandManager {
         this.commandEvent = null;
     }
 
-    execute(command, initiator = true) {
+    execute(command, update, d3Data, initiator = true) {
         if (initiator && this.collaborationManager) {
             this.collaborationManager.send(this.type, 'execute', command.createDTO());
         }
@@ -31,9 +31,15 @@ export class CommandManager {
         this.futureCommands = [];
 
         this.commandEvent();
+
+        // Rerender for edits and fade them out
+        setTimeout(() => {
+            command.unmarkChanges();
+            update.updateSvg(d3Data)
+        }, 5000);
     }
 
-    undo(initiator = true) {
+    undo(update, d3Data, initiator = true) {
         if (this.historyCommands.length) {
             if (initiator && this.collaborationManager) {
                 this.collaborationManager.send(this.type, 'undo');
@@ -53,10 +59,16 @@ export class CommandManager {
             this.futureCommands.push(undoCommand);
 
             this.commandEvent();
+
+            // Rerender for edits and fade them out
+            setTimeout(() => {
+                undoCommand.unmarkChanges();
+                update.updateSvg(d3Data)
+            }, 5000);
         }
     }
 
-    redo(initiator = true) {
+    redo(update, d3Data, initiator = true) {
         if (this.futureCommands.length) {
             if (initiator && this.collaborationManager) {
                 this.collaborationManager.send(this.type, 'redo');
@@ -76,6 +88,12 @@ export class CommandManager {
             this.historyCommands.push(redoCommand);
 
             this.commandEvent();
+
+            // Rerender for edits and fade them out
+            setTimeout(() => {
+                redoCommand.unmarkChanges();
+                update.updateSvg(d3Data)
+            }, 5000);
         }
     }
 
@@ -87,16 +105,16 @@ export class CommandManager {
         return this.futureCommands.length >= 1;
     }
 
-    executeRemoteCommands(rootNode, constraints) {
+    executeRemoteCommands(rootNode, constraints, update, d3Data) {
         if (this.remoteCommands) {
             this.remoteCommands.historyCommands.forEach(commandData => {
                 const command = commandFactory.create(rootNode, constraints, commandData.type, commandData.data);
-                this.execute(command, false);
+                this.execute(command, false, update, d3Data);
             });
 
             this.remoteCommands.futureCommands.forEach(commandData => {
                 const command = commandFactory.create(rootNode, constraints, commandData.type, commandData.data);
-                this.execute(command, false);
+                this.execute(command, false, update, d3Data);
             });
 
             this.remoteCommands.futureCommands.forEach(() => this.undo(false));
