@@ -6,13 +6,15 @@
             ref="featureModelTree"
             :command-manager="featureModelCommandManager"
             :constraints="data.constraints"
-            :rootNode="data.rootNode"
             :editRights="editRights"
+            :rootNode="data.rootNode"
+            :collaborationStatus="collaborationStatus"
             @exportToXML="exportToXML"
             @reset="reset"
             @save="save"
             @update-constraints="updateConstraints"
-            @show-collaboration-dialog="showCollaborationDialog = true"
+            @show-collaboration-dialog="showStartCollaborationSessionDialog = true"
+            @show-claim-dialog="showClaimDialog"
         >
         </feature-model-tree>
 
@@ -35,39 +37,37 @@
             ref="constraints"
             :command-manager="constraintCommandManager"
             :constraints="data.constraints"
-            :rootNode="data.rootNode"
             :editRights="editRights"
+            :rootNode="data.rootNode"
             @update-feature-model="updateFeatureModel"
         ></constraints>
 
-        <collaboration-dialog
-            :collaborationManager="collaborationManager"
-            :show="showCollaborationDialog"
-            @close="showCollaborationDialog = false">
-        </collaboration-dialog>
+        <collaboration-toolbar :show-claim-dialog="showClaimDialog" :key="collaborationReloadKey" v-if="collaborationStatus" :collaboration-manager="collaborationManager"></collaboration-toolbar>
 
-        <v-dialog v-model="showClaimDialog" persistent>
+        <v-dialog v-model="showStartCollaborationSessionDialog" persistent width="auto">
             <v-card>
-                <v-card-title>Claim collaboration edit rights</v-card-title>
+                <v-card-title>Do you want to start a new collaboration session?</v-card-title>
                 <v-card-actions>
                     <v-btn
-                        color="green darken-1"
+                        color="red darken-1"
                         text
-                        @click="collaborationManager.sendClaimEditRightsResponse(false)"
+                        @click="showStartCollaborationSessionDialog = false"
                     >
-                        Disagree
+                        Cancel
                     </v-btn>
 
                     <v-btn
-                        color="green darken-1"
+                        color="primary darken-1"
                         text
-                        @click="collaborationManager.sendClaimEditRightsResponse(true)"
+                        @click="createCollaboration"
                     >
-                        Agree
+                        Start
                     </v-btn>
                 </v-card-actions>
             </v-card>
         </v-dialog>
+
+        <collaboration-name-dialog v-if="collaborationKey" @change-name="name => collaborationManager.sendName(name)"></collaboration-name-dialog>
     </div>
 </template>
 
@@ -81,7 +81,8 @@ import beautify from "xml-beautifier";
 import CollaborationManager from "@/classes/CollaborationManager";
 import {CommandManager} from "@/classes/Commands/CommandManager";
 import * as xmlTranspiler from "@/services/xmlTranspiler.service";
-import CollaborationDialog from "@/components/CollaborationDialog";
+import CollaborationToolbar from "@/components/CollaborationToolbar";
+import CollaborationNameDialog from "@/components/CollaborationNameDialog";
 import {FeatureNode} from "@/classes/FeatureNode";
 import {jsonToXML} from "@/services/xmlTranspiler.service";
 
@@ -89,9 +90,10 @@ export default Vue.extend({
     name: 'FeatureModel',
 
     components: {
+        CollaborationToolbar,
         FeatureModelTree,
         Constraints,
-        CollaborationDialog,
+        CollaborationNameDialog,
     },
 
     props: {
@@ -111,16 +113,21 @@ export default Vue.extend({
         },
         xml: undefined,
         reloadKey: 0,
+        collaborationReloadKey: 10000,
         featureModelCommandManager: new CommandManager(),
         constraintCommandManager: new CommandManager(),
         collaborationManager: null,
-        showCollaborationDialog: false,
-        showClaimDialog: false,
         editRights: true,
+        showStartCollaborationSessionDialog: false,
+        showClaimDialog: false,
+        collaborationStatus: false,
+
     }),
 
     created() {
         this.collaborationManager = new CollaborationManager(this.featureModelCommandManager, this.constraintCommandManager, this);
+        this.featureModelCommandManager.commandEvent = this.commandEvent;
+        this.constraintCommandManager.commandEvent = this.commandEvent;
 
         if (this.id === 'local') {
             const xml = beautify(localStorage.featureModelData);
@@ -143,11 +150,36 @@ export default Vue.extend({
         }
     },
 
+
+    beforeRouteLeave(to, from, next) {
+        // If session gets closed by host, don't ask for confirmation
+        if (this.collaborationManager.noConfirm) {
+            const answer = window.confirm('Do you really want to leave the page? Collaboration sessions will be closed and data will be lost!')
+
+            if (answer) {
+                // If user wants to close page
+                if (this.collaborationManager.isHost) {
+                    this.collaborationManager.closeCollaboration();
+                } else {
+                    this.collaborationManager.leaveCollaboration();
+                }
+                next()
+            } else {
+                // If user doesn't want to close page
+                next(false)
+            }
+        } else {
+            // Don't prevent default site changes without collaboration
+            next();
+        }
+    },
+
     methods: {
         save() {
             // TODO: Axios post request to update the xml file in the backend ???
             const xml = jsonToXML(this.data);
             localStorage.featureModelData = xml;
+            window.onbeforeunload = null;
         },
 
         reset() {
@@ -178,6 +210,19 @@ export default Vue.extend({
 
         exportToXML() {
             xmlTranspiler.downloadXML(this.data);
+        },
+
+        commandEvent() {
+            // Can't override text for Chrome & Edge
+            window.onbeforeunload = function () {
+                return "Do you really want to leave the page? Collaboration sessions will be closed and data will be lost!";
+            };
+        },
+
+        createCollaboration() {
+            this.showStartCollaborationSessionDialog = false;
+            this.collaborationManager.createCollaboration();
+            navigator.clipboard.writeText(`${process.env.VUE_APP_DOMAIN_FRONTEND}collaboration/${this.collaborationManager.collaborationKey}`);
         },
     },
 });

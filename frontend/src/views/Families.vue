@@ -8,6 +8,7 @@
             :loading="loading"
             :search="search"
             class="elevation-1"
+            @click:row="handleClick"
         >
             <template v-slot:top>
                 <v-toolbar flat>
@@ -233,6 +234,9 @@ export default Vue.extend({
             }
             this.close();
         },
+        handleClick(value) {
+          this.$router.push({ name: 'FamilyDetail', params: { id: value.id, slug: value.slug } })
+        }
     },
 
     mounted() {

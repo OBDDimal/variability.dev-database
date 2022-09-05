@@ -18,7 +18,7 @@ class FamiliesSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Family
-        fields = ['id', 'owner', 'label', 'description', 'date_created']
+        fields = ['id', 'owner', 'label', 'description', 'date_created', 'slug']
 
 
 class LicensesSerializer(serializers.ModelSerializer):
@@ -53,7 +53,7 @@ class FilesSerializer(serializers.ModelSerializer):
     family = FamiliesSerializer()
     license = LicensesSerializer()
     analysis = serializers.SerializerMethodField(method_name='get_analysis_state')
-    new_version_of = 'self'
+    # version = 'self'
 
     def get_analysis_state(self, file):
         """
@@ -81,7 +81,7 @@ class FilesSerializer(serializers.ModelSerializer):
     class Meta:
         model = File
         fields = ['id', 'label', 'description', 'local_file', 'family', 'license', 'tags', 'owner', 'uploaded_at',
-                  'new_version_of', 'transpiled_file', 'analysis']
+                  'version', 'transpiled_file', 'analysis', 'slug']
         read_only_fields = ['mirrored', 'is_confirmed']
 
     def create(self, validated_data):
@@ -106,7 +106,6 @@ class FilesSerializer(serializers.ModelSerializer):
         instance.label = validated_data.get('label', instance.label)
         instance.description = validated_data.get('description', instance.description)
         instance.tags = validated_data.get('tags', instance.tags)
-        instance.new_version_of = validated_data.get('new_version_of', instance.new_version_of)
         instance.save()
         return instance
 
@@ -126,8 +125,6 @@ class FilesSerializer(serializers.ModelSerializer):
         for tag in tags_as_json:
             tags_from_db.append(Tag.objects.get(id=tag['id']))
         internal_rep['tags'] = tags_from_db
-        if internal_rep.get('family', None) is None:
-            new_version_of = internal_rep.get('new_version_of')
-            if new_version_of is not None:
-                internal_rep.update({'family': str(File.objects.get(id=new_version_of).family)})
+        version = internal_rep.get('version')
+
         return internal_rep.dict()

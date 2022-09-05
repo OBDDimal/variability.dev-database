@@ -5,11 +5,13 @@
     "scripts": {
         "serve": "vue-cli-service serve",
         "build": "vue-cli-service build",
-        "lint": "vue-cli-service lint"
+        "lint": "vue-cli-service lint",
+        "prettier": "prettier --write \"{src}/**/*.{js,ts,jsx,tsx,css,scss,json,html,vue}\""
     },
     "dependencies": {
         "@types/d3": "^7.4.0",
         "axios": "^0.27.2",
+        "chart.js": "^3.9.1",
         "core-js": "^3.6.5",
         "cypress": "^10.3.1",
         "d3": "^7.4.4",
@@ -20,8 +22,11 @@
         "qrcode.vue": "^1.7.0",
         "register-service-worker": "^1.7.2",
         "serve": "^14.0.1",
+        "unique-names-generator": "^4.7.1",
+        "prettier": "^2.7.1",
         "vue": "^2.6.11",
         "vue-fullscreen": "^2.6.1",
+        "vue-chartjs": "^4.1.1",
         "vue-router": "^3.2.0",
         "vue-scroll-snap": "^0.1.11",
         "vuetify": "^2.6.0",

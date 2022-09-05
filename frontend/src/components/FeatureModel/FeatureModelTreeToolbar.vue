@@ -17,9 +17,9 @@
                     </v-list-item-content>
                 </v-list-item>
 
-                <v-list-item :disabled="!isUndoAvailable || !editRights" @click="$emit('save')">
+                <v-list-item :disabled="!isSaveAvailable || !editRights" @click="$emit('save')">
                     <v-list-item-icon>
-                        <v-icon v-if="!isUndoAvailable" disabled>mdi-content-save</v-icon>
+                        <v-icon v-if="!isSaveAvailable" disabled>mdi-content-save</v-icon>
                         <v-icon v-else :disabled="!editRights">mdi-content-save-edit</v-icon>
                     </v-list-item-icon>
 
@@ -184,9 +184,9 @@
                     </v-list-item-content>
                 </v-list-item>
 
-                <v-list-item @click="$emit('show-collaboration-dialog')">
+                <v-list-item :disabled="collaborationStatus" @click="$emit('show-collaboration-dialog')">
                     <v-list-item-icon>
-                        <v-icon>mdi-account-multiple</v-icon>
+                        <v-icon :disabled="collaborationStatus">mdi-account-multiple</v-icon>
                     </v-list-item-icon>
 
                     <v-list-item-content>
@@ -251,8 +251,10 @@ export default Vue.extend({
     props: {
         isUndoAvailable: Boolean,
         isRedoAvailable: Boolean,
+        isSaveAvailable: Boolean,
         direction: String,
         editRights: undefined,
+        collaborationStatus: undefined,
     },
 
     data: () => ({
