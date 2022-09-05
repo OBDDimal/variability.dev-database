@@ -47,7 +47,7 @@
 			<v-spacer></v-spacer>
 			<div class="hidden-md-and-up">
 				<v-btn
-					class="mr-3"
+					class="mr-1"
 					icon
 					@click="$vuetify.theme.dark = !$vuetify.theme.dark"
 				>
@@ -56,11 +56,7 @@
 					>
 					<v-icon v-else> mdi-brightness-4</v-icon>
 				</v-btn>
-				<v-btn
-					class="mr-3"
-					icon
-					v-fullscreen
-				>
+				<v-btn class="mr-1" icon v-fullscreen>
 					<v-icon> mdi-fullscreen</v-icon>
 				</v-btn>
 				<v-btn icon @click.stop="drawer = !drawer">
@@ -99,7 +95,7 @@
 					<v-icon v-else> mdi-brightness-4</v-icon>
 				</v-btn>
 				<v-btn
-					class="mr-3"
+					:class="$vuetify.breakpoint.smAndDown ? 'mr-3' : ''"
 					icon
 					v-fullscreen
 				>
@@ -182,23 +178,23 @@
 </template>
 
 <script>
-import Vue from "vue";
+import Vue from 'vue'
 
 export default Vue.extend({
-    name: "Navigation",
+	name: 'Navigation',
 
-    components: {},
+	components: {},
 
-    props: {
-        title: {
-            type: String,
-            required: true,
-        },
-    },
+	props: {
+		title: {
+			type: String,
+			required: true,
+		},
+	},
 
-    data: () => ({
-        drawer: false,
-        /*navItems: [
+	data: () => ({
+		drawer: false,
+		/*navItems: [
           {
             name: "Home",
             to: "/",
@@ -236,17 +232,17 @@ export default Vue.extend({
             protected: false,
           }
         ]*/
-    }),
+	}),
 
-    computed: {},
+	computed: {},
 
-    methods: {
-        logoutAndRedirect() {
-            if (this.$route.path !== "/") {
-                this.$router.push("/");
-            }
-            this.$store.dispatch("logout");
-        },
-    },
-});
+	methods: {
+		logoutAndRedirect() {
+			if (this.$route.path !== '/') {
+				this.$router.push('/')
+			}
+			this.$store.dispatch('logout')
+		},
+	},
+})
 </script>
