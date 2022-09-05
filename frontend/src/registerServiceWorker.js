@@ -1,8 +1,9 @@
 /* eslint-disable no-console */
+/* eslint-disable no-constant-condition */
 
 import { register } from 'register-service-worker'
 
-if (process.env.NODE_ENV === 'production') {
+if (1 == 1 /*process.env.NODE_ENV === 'production'*/) {
   register(`${process.env.BASE_URL}service-worker.js`, {
     ready () {
       console.log(

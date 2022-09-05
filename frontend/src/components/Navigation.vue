@@ -1,6 +1,6 @@
 <template>
     <div>
-        <v-app-bar app color="primary" dark>
+        <v-app-bar app :color="isOnline ? 'primary' : 'red'" dark>
             <h1 class="mr-6">{{ title }}</h1>
             <div class="hidden-md-and-down">
                 <v-btn class="mx-1" text to="/">
@@ -203,47 +203,17 @@ export default Vue.extend({
 
     data: () => ({
         drawer: false,
-        /*navItems: [
-          {
-            name: "Home",
-            to: "/",
-            icon: "mdi-home",
-            protected: false,
-          },
-          {
-            name: "Profile",
-            to: "/profile",
-            icon: "mdi-account",
-            protected: true,
-          },
-          {
-            name: "Files",
-            to: "/files",
-            icon: "mdi-file",
-            protected: true,
-          },
-          {
-            name: "Tags",
-            to: "/tags",
-            icon: "mdi-tag",
-            protected: true,
-          },
-          {
-            name: "Families",
-            to: "/families",
-            icon: "mdi-human-male-female-child",
-            protected: true,
-          },
-          {
-            name: "DSGVO",
-            to: "/dsgvo",
-            icon: "mdi-scale-balance",
-            protected: false,
-          }
-        ]*/
+        isOnline: true,
     }),
 
-    computed: {},
+    mounted() {
+        window.addEventListener('online', this.updateOnlineStatus);
+        window.addEventListener('offline', this.updateOnlineStatus);
+    },
+    beforeDestroy() {
+        window.removeEventListener('online', this.updateOnlineStatus);
+        window.removeEventListener('offline', this.updateOnlineStatus);
+    },
 
     methods: {
         logoutAndRedirect() {
@@ -252,6 +222,9 @@ export default Vue.extend({
             }
             this.$store.dispatch("logout");
         },
+        updateOnlineStatus() {
+            this.isOnline = !this.isOnline;
+        }
     },
 });
 </script>
