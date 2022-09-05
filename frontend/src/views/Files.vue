@@ -10,7 +10,10 @@
 		/>
 		<template>
 			<v-container v-if="!$store.state.isOnline">
-				<div class="d-flex justify-space-around align-center">
+				<div
+					class="d-flex justify-space-around align-center"
+					:class="$vuetify.breakpoint.smAndDown ? 'flex-column' : ''"
+				>
 					<v-btn
 						class="mb-2 ml-4"
 						color="success"
