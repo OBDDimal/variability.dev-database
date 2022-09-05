@@ -197,14 +197,6 @@ export default Vue.extend({
         isOnline: true,
     }),
 
-    mounted() {
-        window.addEventListener('online', this.updateOnlineStatus);
-        window.addEventListener('offline', this.updateOnlineStatus);
-    },
-    beforeDestroy() {
-        window.removeEventListener('online', this.updateOnlineStatus);
-        window.removeEventListener('offline', this.updateOnlineStatus);
-    },
 
     methods: {
         logoutAndRedirect() {
@@ -213,9 +205,6 @@ export default Vue.extend({
             }
             this.$store.dispatch("logout");
         },
-        updateOnlineStatus() {
-            this.isOnline = !this.isOnline;
-        }
     },
 });
 </script>

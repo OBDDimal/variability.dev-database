@@ -28,16 +28,60 @@
 							single-line
 						>
 						</v-text-field>
-						<v-btn
-							v-if="addable"
-							class="mb-2 ml-4"
-							color="primary"
-							rounded
-							@click="createDialog = true"
-						>
-							<v-icon left> mdi-plus</v-icon>
-							Upload Model
-						</v-btn>
+						<v-tooltip top>
+							<template v-slot:activator="{ on, attrs }">
+								<v-btn
+									v-if="addable"
+									class="mb-2 ml-4"
+									color="primary"
+									fab
+									small
+									v-bind="attrs"
+									v-on="on"
+									@click="createDialog = true"
+								>
+									<v-icon> mdi-upload</v-icon>
+								</v-btn>
+							</template>
+							<span>Upload feature model</span>
+						</v-tooltip>
+						<v-tooltip top>
+							<template v-slot:activator="{ on, attrs }">
+								<v-btn
+									v-if="addable"
+									class="mb-2 ml-4"
+									color="success"
+									fab
+									small
+									v-bind="attrs"
+									v-on="on"
+									link
+									to="/feature-model/new"
+								>
+									<v-icon> mdi-plus</v-icon>
+								</v-btn>
+							</template>
+							<span>Create feature model</span>
+						</v-tooltip>
+						<v-tooltip top>
+							<template v-slot:activator="{ on, attrs }">
+								<v-btn
+									v-if="addable"
+									:disabled="!checkLocalStorage"
+									class="mb-2 ml-4"
+									color="secondary"
+									fab
+									small
+									v-bind="attrs"
+									v-on="on"
+									link
+									to="/feature-model/local"
+								>
+									<v-icon> mdi-server</v-icon>
+								</v-btn>
+							</template>
+							<span>Upload from local storage</span>
+						</v-tooltip>
 						<v-dialog v-model="dialogDelete" max-width="400px">
 							<v-card>
 								<v-card-title
@@ -219,7 +263,11 @@ export default Vue.extend({
 		dialogAnalysis: false,
 	}),
 
-	computed: {},
+	computed: {
+		checkLocalStorage() {
+			return !!localStorage.featureModelData
+		},
+	},
 
 	methods: {
 		deleteItemConfirm() {

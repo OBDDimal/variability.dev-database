@@ -414,6 +414,7 @@ export default Vue.extend({
     }
 
     rect {
+        transition: all .75s;
         stroke: #888;
         stroke-width: 1px;
     }

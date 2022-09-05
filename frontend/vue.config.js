@@ -4,6 +4,7 @@ module.exports = {
   ],
   pwa: {
     themeColor: '#1976d2',
-    name: 'DDueruem Web'
+    name: 'DDueruem Web',
+    display: 'fullscreen'
   }
 }

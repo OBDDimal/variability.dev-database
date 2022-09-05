@@ -25,6 +25,7 @@ export default new Vuex.Store({
 		featureModels: [],
 		searchedNodes: '',
 		openConstraints: false,
+        isOnline: true,
 	},
 	actions: {
 		logout({ commit }) {
@@ -174,6 +175,9 @@ export default new Vuex.Store({
 		openConstraints(state, open) {
 			state.openConstraints = open
 		},
+        setOnlineState(state, isOnline) {
+            state.isOnline = isOnline;
+        }
 	},
 	modules: {},
 })

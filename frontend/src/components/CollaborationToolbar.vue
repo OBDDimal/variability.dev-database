@@ -19,7 +19,7 @@
                     <v-chip v-for="member in collaborationManager.members"
                             :key="member.id"
                             :class="collaborationManager.isClient ? 'collaboration-pill-disabled' : ''"
-                            :color="member.name === 'Host' ? 'light-green' : 'none'"
+                            :color="member.name === 'Host' ? 'success' : 'none'"
                             :disabled="collaborationManager.isClient"
                             @click="collaborationManager.sendMemberData(member.id)">
                         {{ member.name }}

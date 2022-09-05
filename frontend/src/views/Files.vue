@@ -3,10 +3,38 @@
 		<h3 class="text-h3 mb-2 mt-8">My Feature Models</h3>
 		<h5 class="text-h5 mb-4">Here you can add new Feature Models</h5>
 		<feature-model-table
+			v-if="$store.state.isOnline"
 			:items="featureModelsComp"
 			:loading="loading"
 			:addable="true"
 		/>
+		<template>
+			<v-container v-if="!$store.state.isOnline">
+				<div class="d-flex justify-space-around align-center">
+					<v-btn
+						class="mb-2 ml-4"
+						color="success"
+						rounded
+						link
+						to="/feature-model/new"
+					>
+						<v-icon left> mdi-plus</v-icon>
+						Create new model
+					</v-btn>
+					<v-btn
+						:disabled="!checkLocalStorage"
+						class="mb-2 ml-4"
+						color="secondary"
+						rounded
+						link
+						to="/feature-model/local"
+					>
+						<v-icon left> mdi-server</v-icon>
+						Edit Model from local storage
+					</v-btn>
+				</div>
+			</v-container>
+		</template>
 	</div>
 </template>
 
@@ -84,6 +112,7 @@ export default Vue.extend({
 		check3: false,
 		removeLoading: false,
 		loading: false,
+		isOnline: true,
 	}),
 
 	created() {
@@ -99,6 +128,9 @@ export default Vue.extend({
 		},
 		featureModelsComp() {
 			return this.$store.state.featureModels
+		},
+		checkLocalStorage() {
+			return !!localStorage.featureModelData
 		},
 	},
 

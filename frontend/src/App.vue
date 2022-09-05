@@ -56,7 +56,16 @@ export default Vue.extend({
 
 	data: () => ({}),
 
-	methods: {},
+    mounted() {
+        window.addEventListener('online', () => this.updateOnlineStatus(true));
+        window.addEventListener('offline', () => this.updateOnlineStatus(false));
+    },
+
+	methods: {
+        updateOnlineStatus(isOnline) {
+            this.$store.commit('setOnlineState', isOnline);
+        }
+    },
 })
 </script>
 
