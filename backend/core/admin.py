@@ -89,12 +89,13 @@ class FamilyAdmin(ModelAdmin):
     Class for defining the backend Feature Model Family admin panel.
     """
     model = Family
-    list_display = ('id', 'label', 'owner')
+    list_display = ('id', 'label', 'owner', 'slug')
     fieldsets = [
         (None, {'fields': ['owner']}),
         ('Information',
          {'fields': ['label', 'description']}),
     ]
+    #prepopulated_fields = {"slug": ("label",)}
     search_fields = ('owner', 'id')
     ordering = ('owner',)
     filter_horizontal = ()
@@ -123,16 +124,17 @@ class FileAdmin(ModelAdmin):
     """
     model = File
     list_display = (
-    'id', 'new_version_of', 'is_confirmed_ex', 'mirrored', 'family', 'local_file', 'owner', 'uploaded_at')
+    'id', 'version', 'is_confirmed_ex', 'mirrored', 'family', 'local_file', 'owner', 'uploaded_at', 'slug')
     fieldsets = [
         (None, {'fields': ['owner']}),
         ('Information',
          {'fields': ['label', 'description', 'is_confirmed', 'mirrored', 'family', 'local_file', 'license', 'tags',
-                     'new_version_of']}),
+                     'version']}),
         ('Important dates', {'fields': ['uploaded_at']}),
         ('Transpiler Output', {'fields': ['transpiled_file']})
     ]
     readonly_fields = ('uploaded_at',)
+    #prepopulated_fields = {"slug": ("label",)}
     search_fields = ('owner', 'family')
     ordering = ('owner', 'uploaded_at')
     filter_horizontal = ()
