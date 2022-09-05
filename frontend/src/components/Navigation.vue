@@ -1,20 +1,26 @@
 <template>
 	<div>
-		<v-app-bar app :color="isOnline ? 'primary' : 'error'" dark>
+		<v-app-bar
+			app
+			:color="$store.state.isOnline ? 'primary' : 'error'"
+			dark
+		>
 			<h1 class="mr-1">
 				{{ title }}
 			</h1>
 			<v-expand-x-transition>
-				<sup v-show="!isOnline" class="text-body-1"> offline </sup>
+				<sup v-show="!$store.state.isOnline" class="text-body-1">
+					offline
+				</sup>
 			</v-expand-x-transition>
 
 			<div class="hidden-sm-and-down ml-5">
-				<v-btn v-if="isOnline" class="mx-1" text to="/">
+				<v-btn v-if="$store.state.isOnline" class="mx-1" text to="/">
 					<v-icon left> mdi-home</v-icon>
 					Home
 				</v-btn>
 				<v-btn
-					v-if="$store.state.loggedIn && isOnline"
+					v-if="$store.state.loggedIn && $store.state.isOnline"
 					class="mx-1"
 					text
 					to="/profile"
@@ -23,7 +29,7 @@
 					Profile
 				</v-btn>
 				<v-btn
-					v-if="$store.state.loggedIn || !isOnline"
+					v-if="$store.state.loggedIn || !$store.state.isOnline"
 					class="mx-1"
 					text
 					to="/files"
@@ -32,7 +38,7 @@
 					Files
 				</v-btn>
 				<v-btn
-					v-if="$store.state.loggedIn && isOnline"
+					v-if="$store.state.loggedIn && $store.state.isOnline"
 					class="mx-1"
 					text
 					to="/tags"
@@ -41,7 +47,7 @@
 					Tags
 				</v-btn>
 				<v-btn
-					v-if="$store.state.loggedIn && isOnline"
+					v-if="$store.state.loggedIn && $store.state.isOnline"
 					class="mx-1"
 					text
 					to="/families"
@@ -67,7 +73,7 @@
 			</div>
 			<div class="hidden-sm-and-down">
 				<v-btn
-					v-if="!$store.state.loggedIn && isOnline"
+					v-if="!$store.state.loggedIn && $store.state.isOnline"
 					text
 					to="/register"
 				>
@@ -75,7 +81,7 @@
 					Register
 				</v-btn>
 				<v-btn
-					v-if="!$store.state.loggedIn && isOnline"
+					v-if="!$store.state.loggedIn && $store.state.isOnline"
 					text
 					to="/login"
 				>
@@ -83,7 +89,7 @@
 					Login
 				</v-btn>
 				<v-btn
-					v-if="$store.state.loggedIn && isOnline"
+					v-if="$store.state.loggedIn && $store.state.isOnline"
 					:text="!$vuetify.breakpoint.mdAndDown"
 					:icon="$vuetify.breakpoint.mdAndDown"
 					@click="logoutAndRedirect()"
@@ -115,14 +121,14 @@
 		</v-app-bar>
 		<v-navigation-drawer v-model="drawer" app temporary>
 			<v-list>
-				<v-list-item link to="/" v-if="isOnline">
+				<v-list-item link to="/" v-if="$store.state.isOnline">
 					<v-list-item-icon>
 						<v-icon left> mdi-home</v-icon>
 					</v-list-item-icon>
 					Home
 				</v-list-item>
 				<v-list-item
-					v-if="$store.state.loggedIn && isOnline"
+					v-if="$store.state.loggedIn && $store.state.isOnline"
 					link
 					to="/profile"
 				>
@@ -132,7 +138,7 @@
 					Profile
 				</v-list-item>
 				<v-list-item
-					v-if="$store.state.loggedIn || !isOnline"
+					v-if="$store.state.loggedIn || !$store.state.isOnline"
 					link
 					to="/files"
 				>
@@ -142,7 +148,7 @@
 					Files
 				</v-list-item>
 				<v-list-item
-					v-if="$store.state.loggedIn && isOnline"
+					v-if="$store.state.loggedIn && $store.state.isOnline"
 					link
 					to="/tags"
 				>
@@ -152,7 +158,7 @@
 					Tags
 				</v-list-item>
 				<v-list-item
-					v-if="$store.state.loggedIn && isOnline"
+					v-if="$store.state.loggedIn && $store.state.isOnline"
 					link
 					to="/families"
 				>
@@ -165,7 +171,7 @@
 			<v-divider></v-divider>
 			<v-list>
 				<v-list-item
-					v-if="!$store.state.loggedIn && isOnline"
+					v-if="!$store.state.loggedIn && $store.state.isOnline"
 					link
 					to="/register"
 				>
@@ -175,7 +181,7 @@
 					Register
 				</v-list-item>
 				<v-list-item
-					v-if="!$store.state.loggedIn && isOnline"
+					v-if="!$store.state.loggedIn && $store.state.isOnline"
 					link
 					to="/login"
 				>
@@ -185,7 +191,7 @@
 					Login
 				</v-list-item>
 				<v-list-item
-					v-if="$store.state.loggedIn && isOnline"
+					v-if="$store.state.loggedIn && $store.state.isOnline"
 					link
 					@click="logoutAndRedirect()"
 				>
@@ -228,7 +234,6 @@ export default Vue.extend({
 
 	data: () => ({
 		drawer: false,
-		isOnline: true,
 	}),
 
 	methods: {
@@ -237,27 +242,6 @@ export default Vue.extend({
 				this.$router.push('/')
 			}
 			this.$store.dispatch('logout')
-		},
-	},
-
-	mounted() {
-		window.addEventListener('online', this.updateOnlineStatus)
-		window.addEventListener('offline', this.updateOnlineStatus)
-	},
-	beforeDestroy() {
-		window.removeEventListener('online', this.updateOnlineStatus)
-		window.removeEventListener('offline', this.updateOnlineStatus)
-	},
-
-	methods: {
-		logoutAndRedirect() {
-			if (this.$route.path !== '/') {
-				this.$router.push('/')
-			}
-			this.$store.dispatch('logout')
-		},
-		updateOnlineStatus() {
-			this.isOnline = !this.isOnline
 		},
 	},
 })
