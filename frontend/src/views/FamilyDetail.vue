@@ -13,27 +13,56 @@
 		<h5 class="text-h5 mb-4">Details and more information</h5>
 		<v-row justify="space-between" ref="barview">
 			<v-col cols="12" sm="6" md="3">
-				<v-sheet
-					v-if="loadingTable"
-					:color="`grey ${
+        <div v-if="$vuetify.breakpoint.mdAndUp">
+          <v-sheet
+              v-if="loadingTable"
+              :color="`grey ${
 						$vuetify.theme.dark ? 'darken-2' : 'lighten-4'
 					}`"
-					class="pa-3"
-				>
-					<v-skeleton-loader
-						class="mx-auto"
-						max-width="300"
-						type="card"
-					></v-skeleton-loader>
-				</v-sheet>
-				<bar-chart
-					v-else
-					chartId="featureChart"
-					:data="numberOfFeaturesData"
-					@hovered-element="onElementHover"
-				></bar-chart>
+              class="pa-3"
+          >
+            <v-skeleton-loader
+                class="mx-auto"
+                max-width="300"
+                type="card"
+            ></v-skeleton-loader>
+          </v-sheet>
+          <bar-chart
+              v-else
+              chartId="featureChart"
+              :data="numberOfFeaturesData"
+              @hovered-element="onElementHover"
+          ></bar-chart>
+        </div>
+        <v-expansion-panels v-else>
+          <v-expansion-panel>
+            <v-expansion-panel-header>Number of Features</v-expansion-panel-header>
+            <v-expansion-panel-content>
+              <v-sheet
+                  v-if="loadingTable"
+                  :color="`grey ${
+              $vuetify.theme.dark ? 'darken-2' : 'lighten-4'
+            }`"
+                  class="pa-3"
+              >
+                <v-skeleton-loader
+                    class="mx-auto"
+                    max-width="300"
+                    type="card"
+                ></v-skeleton-loader>
+              </v-sheet>
+              <bar-chart
+                  v-else
+                  chartId="featureChart"
+                  :data="numberOfFeaturesData"
+                  @hovered-element="onElementHover"
+              ></bar-chart>
+            </v-expansion-panel-content>
+          </v-expansion-panel>
+        </v-expansion-panels>
 			</v-col>
 			<v-col cols="12" sm="6" md="3">
+        <div v-if="$vuetify.breakpoint.mdAndUp">
 				<v-sheet
 					v-if="loadingTable"
 					:color="`grey ${
@@ -53,8 +82,36 @@
 					:data="numberOfConstraintsData"
 					@hovered-element="onElementHover"
 				></bar-chart>
+        </div>
+        <v-expansion-panels v-else>
+          <v-expansion-panel>
+            <v-expansion-panel-header>Number of Constraints</v-expansion-panel-header>
+            <v-expansion-panel-content>
+              <v-sheet
+                  v-if="loadingTable"
+                  :color="`grey ${
+              $vuetify.theme.dark ? 'darken-2' : 'lighten-4'
+            }`"
+                  class="pa-3"
+              >
+                <v-skeleton-loader
+                    class="mx-auto"
+                    max-width="300"
+                    type="card"
+                ></v-skeleton-loader>
+              </v-sheet>
+              <bar-chart
+                  v-else
+                  chartId="featureChart"
+                  :data="numberOfConstraintsData"
+                  @hovered-element="onElementHover"
+              ></bar-chart>
+            </v-expansion-panel-content>
+          </v-expansion-panel>
+        </v-expansion-panels>
 			</v-col>
 			<v-col cols="12" sm="6" md="3">
+        <div v-if="$vuetify.breakpoint.mdAndUp">
 				<v-sheet
 					:color="`grey ${
 						$vuetify.theme.dark ? 'darken-2' : 'lighten-4'
@@ -67,8 +124,29 @@
 						type="card"
 					></v-skeleton-loader>
 				</v-sheet>
+        </div>
+        <v-expansion-panels v-else>
+          <v-expansion-panel>
+            <v-expansion-panel-header>tba</v-expansion-panel-header>
+            <v-expansion-panel-content>
+              <v-sheet
+                  :color="`grey ${
+						$vuetify.theme.dark ? 'darken-2' : 'lighten-4'
+					}`"
+                  class="pa-3"
+              >
+                <v-skeleton-loader
+                    class="mx-auto"
+                    max-width="300"
+                    type="card"
+                ></v-skeleton-loader>
+              </v-sheet>
+            </v-expansion-panel-content>
+          </v-expansion-panel>
+        </v-expansion-panels>
 			</v-col>
 			<v-col cols="12" sm="6" md="3">
+        <div v-if="$vuetify.breakpoint.mdAndUp">
 				<v-sheet
 					:color="`grey ${
 						$vuetify.theme.dark ? 'darken-2' : 'lighten-4'
@@ -81,6 +159,26 @@
 						type="card"
 					></v-skeleton-loader>
 				</v-sheet>
+        </div>
+        <v-expansion-panels v-else>
+          <v-expansion-panel>
+            <v-expansion-panel-header>tba</v-expansion-panel-header>
+            <v-expansion-panel-content>
+              <v-sheet
+                  :color="`grey ${
+						$vuetify.theme.dark ? 'darken-2' : 'lighten-4'
+					}`"
+                  class="pa-3"
+              >
+                <v-skeleton-loader
+                    class="mx-auto"
+                    max-width="300"
+                    type="card"
+                ></v-skeleton-loader>
+              </v-sheet>
+            </v-expansion-panel-content>
+          </v-expansion-panel>
+        </v-expansion-panels>
 			</v-col>
 		</v-row>
 		<div class="mt-5">
