@@ -318,7 +318,15 @@ export default Vue.extend({
 	},
 
 	mounted() {
-		if (!this.$store.state.loggedIn || !this.$store.state.currentUser) {
+		if (
+			(this.$store.state.loggedIn && this.$store.state.currentUser) ||
+			!this.$store.state.isOnline
+		) {
+			this.loading = true
+			this.$store.dispatch('fetchFeatureModels')
+			this.featureModels = this.$store.state.featureModels
+			this.loading = false
+		} else {
 			this.$store.commit('updateSnackbar', {
 				message: 'Please log in to view this page',
 				variant: 'info',
@@ -326,11 +334,6 @@ export default Vue.extend({
 				show: true,
 			})
 			this.$router.push('/login')
-		} else {
-			this.loading = true
-			this.$store.dispatch('fetchFeatureModels')
-			this.featureModels = this.$store.state.featureModels
-			this.loading = false
 		}
 	},
 })
