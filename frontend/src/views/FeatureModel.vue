@@ -81,9 +81,9 @@ import beautify from "xml-beautifier";
 import CollaborationManager from "@/classes/CollaborationManager";
 import {CommandManager} from "@/classes/Commands/CommandManager";
 import * as xmlTranspiler from "@/services/xmlTranspiler.service";
+import {EXAMPLE_FEATURE_MODEL_XML} from "@/classes/constants";
 import CollaborationToolbar from "@/components/CollaborationToolbar";
 import CollaborationNameDialog from "@/components/CollaborationNameDialog";
-import {FeatureNode} from "@/classes/FeatureNode";
 import {jsonToXML} from "@/services/xmlTranspiler.service";
 
 export default Vue.extend({
@@ -134,8 +134,9 @@ export default Vue.extend({
             xmlTranspiler.xmlToJson(xml, this.data);
             this.xml = xml;
         } else if (this.id === 'new') {
-            this.data.rootNode = new FeatureNode(null, 'Root', 'and', false, false);
-            this.xml = jsonToXML(this.data);
+            const xml = beautify(EXAMPLE_FEATURE_MODEL_XML);
+            xmlTranspiler.xmlToJson(xml, this.data);
+            this.xml = xml;
         } else if (this.id) {
             this.initData();
         } else if (this.collaborationKey) {
