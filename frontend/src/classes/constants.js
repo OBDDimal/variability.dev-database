@@ -54,3 +54,28 @@ export const operators = {
     eq: "⇔",
     not: "¬",
 };
+
+export const EXAMPLE_FEATURE_MODEL_XML = `
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<featureModel>
+    <properties/>
+        <struct>
+            <and name="Root">
+                <or abstract="true" mandatory="true" name="Algorithm">
+                    <feature mandatory="true" name="Shortest"/>
+                    <feature mandatory="true" name="Connected"/>
+                </or>
+                <alt abstract="true" name="Direction">
+                    <feature mandatory="true" name="Directed"/>
+                    <feature mandatory="true" name="Undirected"/>
+                </alt>
+                <alt abstract="true" mandatory="true" name="Weight">
+                    <feature mandatory="true" name="Weighted"/>
+                    <feature mandatory="true" name="Unweighted"/>
+                </alt>
+            </and>
+        </struct>
+    <constraints/>
+    <comments/>
+</featureModel>
+`;
