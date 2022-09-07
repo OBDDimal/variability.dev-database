@@ -195,7 +195,7 @@ export default Vue.extend({
         view.reset(this.d3Data);
 
         this.commandManager.d3Data = this.d3Data;
-        this.commandManager.executeRemoteCommands(this.rootNode, this.constraints, update, this.d3Data);
+        this.commandManager.executeRemoteCommands(this.rootNode, this.constraints);
         update.updateSvg(this.d3Data);
     },
 
@@ -292,7 +292,7 @@ export default Vue.extend({
                 this.editNode,
                 newData,
             );
-            this.commandManager.execute(editCommand, update, this.d3Data);
+            this.commandManager.execute(editCommand);
             update.updateSvg(this.d3Data);
         },
 
@@ -322,7 +322,7 @@ export default Vue.extend({
                 parent.children ? parent.children.length : 0,
                 newNode,
             );
-            this.commandManager.execute(addCommand, update, this.d3Data);
+            this.commandManager.execute(addCommand);
             update.updateSvg(this.d3Data);
         },
 
@@ -343,12 +343,12 @@ export default Vue.extend({
         },
 
         undo() {
-            this.commandManager.undo(update, this.d3Data);
+            this.commandManager.undo();
             update.updateSvg(this.d3Data);
         },
 
         redo() {
-            this.commandManager.redo(update, this.d3Data);
+            this.commandManager.redo();
             update.updateSvg(this.d3Data);
         },
 
