@@ -131,7 +131,7 @@
             </v-card>
         </v-dialog>
 
-        <!-- Claim dialog that only visible for host -->
+        <!-- Claim dialog that is only visible for host -->
         <v-dialog v-model="showClaimDialog" persistent width="500">
             <v-card>
                 <v-card-title>{{collaborationManager.getClaimerName()}} wants to claim edit rights</v-card-title>

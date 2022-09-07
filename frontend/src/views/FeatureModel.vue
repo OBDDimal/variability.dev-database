@@ -4,11 +4,11 @@
             v-if="data.rootNode"
             :key="reloadKey"
             ref="featureModelTree"
+            :collaborationStatus="collaborationStatus"
             :command-manager="featureModelCommandManager"
             :constraints="data.constraints"
             :editRights="editRights"
             :rootNode="data.rootNode"
-            :collaborationStatus="collaborationStatus"
             @exportToXML="exportToXML"
             @reset="reset"
             @save="save"
@@ -42,7 +42,9 @@
             @update-feature-model="updateFeatureModel"
         ></constraints>
 
-        <collaboration-toolbar :show-claim-dialog="showClaimDialog" :key="collaborationReloadKey" v-if="collaborationStatus" :collaboration-manager="collaborationManager"></collaboration-toolbar>
+        <collaboration-toolbar v-if="collaborationStatus" :key="collaborationReloadKey"
+                               :collaboration-manager="collaborationManager"
+                               :show-claim-dialog="showClaimDialog"></collaboration-toolbar>
 
         <v-dialog v-model="showStartCollaborationSessionDialog" persistent width="auto">
             <v-card>
@@ -67,7 +69,14 @@
             </v-card>
         </v-dialog>
 
-        <collaboration-name-dialog v-if="collaborationKey" @change-name="name => collaborationManager.sendName(name)"></collaboration-name-dialog>
+        <collaboration-name-dialog v-if="collaborationKey"
+                                   @change-name="name => collaborationManager.sendName(name)"></collaboration-name-dialog>
+
+        <collaboration-continue-editing-dialog
+            :show="showContinueEditingDialog"
+            @close="closeFeatureModel"
+            @continue-editing="continueEditing">
+        </collaboration-continue-editing-dialog>
     </div>
 </template>
 
@@ -81,15 +90,17 @@ import beautify from "xml-beautifier";
 import CollaborationManager from "@/classes/CollaborationManager";
 import {CommandManager} from "@/classes/Commands/CommandManager";
 import * as xmlTranspiler from "@/services/xmlTranspiler.service";
+import {jsonToXML} from "@/services/xmlTranspiler.service";
 import CollaborationToolbar from "@/components/CollaborationToolbar";
 import CollaborationNameDialog from "@/components/CollaborationNameDialog";
 import {FeatureNode} from "@/classes/FeatureNode";
-import {jsonToXML} from "@/services/xmlTranspiler.service";
+import CollaborationContinueEditingDialog from "@/components/CollaborationContinueEditingDialog";
 
 export default Vue.extend({
     name: 'FeatureModel',
 
     components: {
+        CollaborationContinueEditingDialog,
         CollaborationToolbar,
         FeatureModelTree,
         Constraints,
@@ -120,6 +131,7 @@ export default Vue.extend({
         editRights: true,
         showStartCollaborationSessionDialog: false,
         showClaimDialog: false,
+        showContinueEditingDialog: false,
         collaborationStatus: false,
 
     }),
@@ -223,6 +235,19 @@ export default Vue.extend({
             this.showStartCollaborationSessionDialog = false;
             this.collaborationManager.createCollaboration();
             navigator.clipboard.writeText(`${process.env.VUE_APP_DOMAIN_FRONTEND}collaboration/${this.collaborationManager.collaborationKey}`);
+        },
+
+        continueEditing() {
+            this.showContinueEditingDialog = false;
+            this.collaborationManager.closeCollaboration();
+            this.editRights = true;
+        },
+
+        closeFeatureModel() {
+            this.showContinueEditingDialog = false;
+            this.collaborationManager.closeCollaboration();
+            this.collaborationManager.noConfirm = false;
+            this.$router.push('/');
         },
     },
 });
