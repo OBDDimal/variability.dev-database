@@ -95,6 +95,7 @@ import CollaborationToolbar from "@/components/CollaborationToolbar";
 import CollaborationNameDialog from "@/components/CollaborationNameDialog";
 import {FeatureNode} from "@/classes/FeatureNode";
 import CollaborationContinueEditingDialog from "@/components/CollaborationContinueEditingDialog";
+import {EXAMPLE_FEATURE_MODEL_XML} from "@/classes/constants";
 
 export default Vue.extend({
     name: 'FeatureModel',
@@ -146,8 +147,9 @@ export default Vue.extend({
             xmlTranspiler.xmlToJson(xml, this.data);
             this.xml = xml;
         } else if (this.id === 'new') {
-            this.data.rootNode = new FeatureNode(null, 'Root', 'and', false, false);
-            this.xml = jsonToXML(this.data);
+            const xml = beautify(EXAMPLE_FEATURE_MODEL_XML);
+            xmlTranspiler.xmlToJson(xml, this.data);
+            this.xml = xml;
         } else if (this.id) {
             this.initData();
         } else if (this.collaborationKey) {
