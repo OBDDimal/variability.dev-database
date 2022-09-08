@@ -22,7 +22,7 @@ export default class CollaborationManager {
             port: process.env.VUE_APP_DOMAIN_WEBSOCKET_PORT,
             path: "/myapp",
             pingInterval: 5000,
-            debug: 0
+            debug: 0,
         };
 
         this.collaborationKey = null;
@@ -35,7 +35,7 @@ export default class CollaborationManager {
         this.name = uniqueNamesGenerator({
             dictionaries: [adjectives, colors, animals],
             style: 'capital',
-            separator: " "
+            separator: " ",
         });
 
         this.noConfirm = false;
@@ -105,10 +105,8 @@ export default class CollaborationManager {
 
                 conn.on('data', data => this.receive(conn, data.type, data.action, data.data));
                 conn.on('close', () => {
-                    this.showSnackbarMessage('Lost connection to collaboration session', 'error');
                     this.connections = this.connections.filter(c => c !== conn);
-                    this.noConfirm = true;
-                    this.featureModel.$router.push('/');
+                    this.receiveClose();
                 });
             });
 
@@ -119,30 +117,18 @@ export default class CollaborationManager {
     }
 
     closeCollaboration() {
-        this.connections.forEach(conn => {
-                conn.send({
-                    type: "close",
-                    action: null,
-                    data: null,
-                });
-            },
-        );
-
+        this.members = [];
+        this.connections.forEach(conn => conn.close());
+        this.connections = [];
         this.collaborationKey = null;
         this.featureModel.editRights = true;
+        this.claimerId = null;
+        this.editorId = null;
+        if (this.isHost) {
+            this.peer.destroy();
+        }
         this.isHost = false;
         this.isClient = false;
-        this.peer.destroy();
-        this.peer = null;
-        this.featureModel.collaborationStatus = false;
-    }
-
-    leaveCollaboration() {
-        this.featureModel.showClaimDialog = false;
-        this.connections.forEach(conn => conn.close());
-        this.isHost = false;
-        this.isClient = false;
-        this.peer.destroy();
         this.peer = null;
         this.featureModel.collaborationStatus = false;
     }
@@ -179,7 +165,9 @@ export default class CollaborationManager {
     }
 
     receiveInitialize(data) {
-        xmlToJson(beautify(data.xml), this.featureModel.data);
+        const xml = beautify(data.xml);
+        this.featureModel.xml = xml;
+        xmlToJson(beautify(xml), this.featureModel.data);
         this.featureModelCommandManager.remoteCommands = {
             historyCommands: data.featureModelHistoryCommands,
             futureCommands: data.featureModelFutureCommands,
@@ -191,9 +179,11 @@ export default class CollaborationManager {
     }
 
     receiveClose() {
-        this.showSnackbarMessage('Host has closed collaboration session', 'info');
-        this.noConfirm = true;
-        this.featureModel.$router.push('/');
+        if (this.isClient) {
+            this.showSnackbarMessage('Host has closed collaboration session', 'info');
+            this.noConfirm = true;
+            this.featureModel.showContinueEditingDialog = true;
+        }
     }
 
     receiveClaimEditRights(sender) {
