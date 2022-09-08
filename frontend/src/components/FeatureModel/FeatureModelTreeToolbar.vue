@@ -194,6 +194,16 @@
                     </v-list-item-content>
                 </v-list-item>
 
+                <v-list-item @click="$emit('show-tutorial')" id="tutorial-mode">
+                    <v-list-item-icon>
+                        <v-icon>mdi-school</v-icon>
+                    </v-list-item-icon>
+
+                    <v-list-item-content>
+                        <v-list-item-title>Tutorial</v-list-item-title>
+                    </v-list-item-content>
+                </v-list-item>
+
                 <v-menu :close-on-content-click="false" offset-y>
                     <template v-slot:activator="{ on, attrs }">
                         <v-list-item v-bind="attrs" v-on="on">

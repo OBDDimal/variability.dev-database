@@ -14,7 +14,7 @@
             @save="save"
             @update-constraints="updateConstraints"
             @show-collaboration-dialog="showStartCollaborationSessionDialog = true"
-            @show-claim-dialog="showClaimDialog"
+            @show-tutorial="showTutorial = true"
         >
         </feature-model-tree>
 
@@ -77,6 +77,10 @@
             @close="closeFeatureModel"
             @continue-editing="continueEditing">
         </collaboration-continue-editing-dialog>
+
+        <tutorial-mode :show="showTutorial" @close="showTutorial= false">
+
+        </tutorial-mode>
     </div>
 </template>
 
@@ -95,11 +99,13 @@ import CollaborationToolbar from "@/components/CollaborationToolbar";
 import CollaborationNameDialog from "@/components/CollaborationNameDialog";
 import CollaborationContinueEditingDialog from "@/components/CollaborationContinueEditingDialog";
 import {EXAMPLE_FEATURE_MODEL_XML} from "@/classes/constants";
+import TutorialMode from "@/components/TutorialMode";
 
 export default Vue.extend({
     name: 'FeatureModel',
 
     components: {
+        TutorialMode,
         CollaborationContinueEditingDialog,
         CollaborationToolbar,
         FeatureModelTree,
@@ -133,7 +139,7 @@ export default Vue.extend({
         showClaimDialog: false,
         showContinueEditingDialog: false,
         collaborationStatus: false,
-
+        showTutorial: false,
     }),
 
     created() {

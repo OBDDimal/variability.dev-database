@@ -67,6 +67,7 @@
             @toggleDirection="toggleDirection"
             @undo="undo"
             @show-collaboration-dialog="$emit('show-collaboration-dialog')"
+            @show-tutorial="$emit('show-tutorial')"
         ></feature-model-tree-toolbar>
 
         <div id="svg-container"></div>
