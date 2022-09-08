@@ -93,7 +93,6 @@ import * as xmlTranspiler from "@/services/xmlTranspiler.service";
 import {jsonToXML} from "@/services/xmlTranspiler.service";
 import CollaborationToolbar from "@/components/CollaborationToolbar";
 import CollaborationNameDialog from "@/components/CollaborationNameDialog";
-import {FeatureNode} from "@/classes/FeatureNode";
 import CollaborationContinueEditingDialog from "@/components/CollaborationContinueEditingDialog";
 import {EXAMPLE_FEATURE_MODEL_XML} from "@/classes/constants";
 

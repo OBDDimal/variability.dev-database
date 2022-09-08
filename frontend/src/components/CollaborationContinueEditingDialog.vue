@@ -21,14 +21,6 @@ export default Vue.extend({
         show: Boolean,
     },
 
-    data: () => ({
-        name: undefined,
-        nameRules: [
-            v => !!v || 'Name is required',
-            v => v.length <= 15 || 'Name must be less than 10 characters',
-        ],
-    }),
-
     computed: {
         showDialog: {
             get() {
