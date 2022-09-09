@@ -141,7 +141,7 @@
 						color="primary"
 						rounded
 						small
-						to="/feature-model"
+						:to="'/feature-model/' + item.id"
 					>
 						<v-icon>mdi-eye</v-icon>
 					</v-btn>
