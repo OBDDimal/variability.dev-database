@@ -77,7 +77,7 @@ function updateFeatureNodes(d3Data, visibleD3Nodes) {
 function updateChildrenCount(d3Data, featureNodeUpdate) {
     // Enter triangle with number of direct and total children.
     const childrenCount = featureNodeUpdate.selectAll('g.children-count').data(
-        d => d.data.isLeaf() ? [] : [d],
+        d => d.data.isLeaf() || !d.data.isCollapsed ? [] : [d],
         d => d.id,
     );
 
