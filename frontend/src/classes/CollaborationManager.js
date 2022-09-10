@@ -3,7 +3,7 @@ import * as update from '@/services/FeatureModel/update.service.js';
 import beautify from "xml-beautifier";
 import {xmlToJson} from "@/services/xmlTranspiler.service";
 import {Peer} from "peerjs";
-import {adjectives, animals, colors, uniqueNamesGenerator} from 'unique-names-generator';
+import {animals, colors, uniqueNamesGenerator} from 'unique-names-generator';
 
 export default class CollaborationManager {
     constructor(featureModelCommandManager, constraintCommandManager, featureModel) {
@@ -33,7 +33,7 @@ export default class CollaborationManager {
         this.claimerId = null;
         this.peer = null;
         this.name = uniqueNamesGenerator({
-            dictionaries: [adjectives, colors, animals],
+            dictionaries: [colors, animals],
             style: 'capital',
             separator: " ",
         });
