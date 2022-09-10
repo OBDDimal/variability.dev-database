@@ -61,18 +61,8 @@ export const EXAMPLE_FEATURE_MODEL_XML = `
     <properties/>
         <struct>
             <and name="Root">
-                <or abstract="true" mandatory="true" name="Algorithm">
-                    <feature mandatory="true" name="Shortest"/>
-                    <feature mandatory="true" name="Connected"/>
-                </or>
-                <alt abstract="true" name="Direction">
-                    <feature mandatory="true" name="Directed"/>
-                    <feature mandatory="true" name="Undirected"/>
-                </alt>
-                <alt abstract="true" mandatory="true" name="Weight">
-                    <feature mandatory="true" name="Weighted"/>
-                    <feature mandatory="true" name="Unweighted"/>
-                </alt>
+                <feature mandatory="true" name="Feature A"/>
+                <feature mandatory="false" name="Feature B"/>
             </and>
         </struct>
     <constraints/>
