@@ -1,1 +1,4 @@
-export class Command {}
+export class Command {
+    markChanges() {}
+    unmarkChanges() {}
+}

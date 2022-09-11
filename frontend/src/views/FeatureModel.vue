@@ -15,6 +15,7 @@
             @update-constraints="updateConstraints"
             @show-collaboration-dialog="showStartCollaborationSessionDialog = true"
             @show-claim-dialog="showClaimDialog"
+            @new-empty-model="newEmptyModel"
         >
         </feature-model-tree>
 
@@ -95,6 +96,7 @@ import CollaborationToolbar from "@/components/CollaborationToolbar";
 import CollaborationNameDialog from "@/components/CollaborationNameDialog";
 import CollaborationContinueEditingDialog from "@/components/CollaborationContinueEditingDialog";
 import {EXAMPLE_FEATURE_MODEL_XML} from "@/classes/constants";
+import {NewEmptyModelCommand} from "@/classes/Commands/FeatureModel/NewEmptyModelCommand";
 
 export default Vue.extend({
     name: 'FeatureModel',
@@ -200,6 +202,13 @@ export default Vue.extend({
             this.initData();
             this.reloadKey++;
         },
+
+        newEmptyModel() {
+            const command = new NewEmptyModelCommand(this, this.$refs.featureModelTree.d3Data);
+            this.featureModelCommandManager.execute(command);
+            this.updateFeatureModel();
+        },
+
 
         initData() {
             api.get(`${process.env.VUE_APP_DOMAIN}files/${this.id}/`)

@@ -5,8 +5,9 @@ import * as constraint_edit from "@/classes/Commands/Constraints/EditCommand";
 import {EditCommand} from "@/classes/Commands/FeatureModel/EditCommand";
 import {SwapCommand} from "@/classes/Commands/FeatureModel/SwapCommand";
 import {parse} from "@/services/booleanExpressionParser.service";
+import {NewEmptyModelCommand} from "@/classes/Commands/FeatureModel/NewEmptyModelCommand";
 
-export function create(rootNode, allConstraints, type, data) {
+export function create(rootNode, allConstraints, type, data, featureModelComponent) {
     if (type === 'featureModel') {
         if (data.commandType === 'add') {
             const dstParent = rootNode.descendants().find(node => node.name === data.dstParentName);
@@ -18,6 +19,8 @@ export function create(rootNode, allConstraints, type, data) {
             const node = rootNode.descendants().find(node => node.name === data.nodeName);
             const dstParent = rootNode.descendants().find(node => node.name === data.dstParentName);
             return new SwapCommand(node, dstParent, data.dstIndex);
+        } else if (data.commandType === 'new-empty-model') {
+            return new NewEmptyModelCommand(featureModelComponent);
         }
     } else {
         if (data.commandType === 'add') {
