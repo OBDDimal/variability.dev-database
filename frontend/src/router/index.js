@@ -7,10 +7,12 @@ import Tags from '../views/Tags.vue'
 import Families from '../views/Families.vue'
 import DSGVO from '../views/DSGVO.vue'
 import Register from '../views/Register.vue'
+import FamilyDetail from '@/views/FamilyDetail'
+import FileDetail from '@/views/FileDetail'
 import Login from '../views/Login.vue'
 import FileCreate from '../views/FileCreate.vue'
 import RegisterConfirmation from '../views/RegisterConfirmation.vue'
-import FileCreateConfirmation from "@/views/FileCreateConfirmation";
+import FileCreateConfirmation from '@/views/FileCreateConfirmation'
 import FeatureModel from '../views/FeatureModel.vue'
 
 Vue.use(VueRouter)
@@ -77,9 +79,26 @@ const routes = [
         component: FileCreate
     },
     {
-        path: '/feature-model',
+        path: '/feature-model/:id',
         name: 'FeatureModel',
-        component: FeatureModel
+        component: FeatureModel,
+        props: true
+    },
+    {
+        path: '/collaboration/:collaborationKey',
+        name: 'FeatureModel',
+        component: FeatureModel,
+        props: true
+    },
+    {
+        path: '/families/:id/:slug',
+        name: 'FamilyDetail',
+        component: FamilyDetail,
+    },
+    {
+        path: '/files/:id/:slug',
+        name: 'FileDetail',
+        component: FileDetail,
     },
 ]
 

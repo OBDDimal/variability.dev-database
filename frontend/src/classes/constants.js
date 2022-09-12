@@ -9,9 +9,10 @@ export const GROUP_SEGMENT_RADIUS = 25; // Radius of the segment that represents
 export const FEATURE_FONT_SIZE = 16;
 export const CHILDREN_COUNT_FONT_SIZE = 7;
 
-export const SPACE_BETWEEN_NODES_HORIZONTALLY = 20;
-
 export const PSEUDO_NODE_SIZE = 20;
+
+export const GHOST_NODE_RADIUS_MOUSE = 15;
+export const GHOST_NODE_RADIUS_TOUCH = 30;
 
 export let CONSTRAINT_HIGHLIGHT_COLORS = [
     '#B762D9',
@@ -52,4 +53,19 @@ export const operators = {
     disj: "∨",
     eq: "⇔",
     not: "¬",
-}
+};
+
+export const EXAMPLE_FEATURE_MODEL_XML = `
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<featureModel>
+    <properties/>
+        <struct>
+            <and name="Root">
+                <feature mandatory="true" name="Feature A"/>
+                <feature mandatory="false" name="Feature B"/>
+            </and>
+        </struct>
+    <constraints/>
+    <comments/>
+</featureModel>
+`;

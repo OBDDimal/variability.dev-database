@@ -29,6 +29,6 @@ jobs:
           port: 22
           script: |
             cd ddueruem-web
-            cp ~/.env backend/ddueruemweb/env.production
+            cp ~/.env backend/ddueruemweb/.env.production
             docker compose down
-            docker compose up -d --build
+            docker compose up -d --build --remove-orphans
