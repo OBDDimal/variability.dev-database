@@ -171,11 +171,7 @@ export default Vue.extend({
 
             if (answer) {
                 // If user wants to close page
-                if (this.collaborationManager.isHost) {
-                    this.collaborationManager.closeCollaboration();
-                } else {
-                    this.collaborationManager.leaveCollaboration();
-                }
+                this.collaborationManager.closeCollaboration();
                 next()
             } else {
                 // If user doesn't want to close page
@@ -189,10 +185,15 @@ export default Vue.extend({
 
     methods: {
         save() {
-            // TODO: Axios post request to update the xml file in the backend ???
-            const xml = jsonToXML(this.data);
-            localStorage.featureModelData = xml;
+            localStorage.featureModelData = jsonToXML(this.data);
             window.onbeforeunload = null;
+
+            this.$store.commit("updateSnackbar", {
+                message: "Successfully saved in local storage",
+                variant: "success",
+                timeout: 5000,
+                show: true,
+            });
         },
 
         reset() {
