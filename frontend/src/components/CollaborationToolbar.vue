@@ -1,144 +1,190 @@
 <template>
-	<div>
-		<v-row class="mt-2" justify="center">
-			<v-toolbar
-				absolute
-				class="rounded-pill mt-3"
-				elevation="9"
-				height="auto"
-				style="border: 2px solid white"
+	<div
+		:style="
+			$vuetify.breakpoint.smAndDown
+				? 'position: absolute; top: 0; left: 5rem; width: inherit'
+				: ''
+		"
+	>
+		<v-row
+			class="mt-2"
+			style="height: 60px"
+			:justify="$vuetify.breakpoint.smAndDown ? 'start' : 'center'"
+			align="center"
+		>
+			<v-btn
+				v-if="$vuetify.breakpoint.mdAndDown"
+				@click="fab = !fab"
+				color="primary"
+				dark
+				small
+				fab
+				class="mr-2"
 			>
-				<div style="max-width: 45vw">
-					<v-chip-group disabled="true" mandatory>
-						<v-chip
-							:class="
-								collaborationManager.isClient
-									? 'collaboration-pill-disabled'
-									: ''
-							"
-							color="primary"
-							:disabled="collaborationManager.isClient"
-							@click="
-								collaborationManager.sendMemberData(
-									collaborationManager.peer._id
-								)
-							"
-						>
-							Me ({{ collaborationManager.name }})
-							<v-icon
-								v-if="
-									collaborationManager.featureModel.editRights
-								"
-								>mdi-lead-pencil</v-icon
-							>
-						</v-chip>
-						<v-chip
-							v-for="member in collaborationManager.members"
-							:key="member.id"
-							:class="
-								collaborationManager.isClient
-									? 'collaboration-pill-disabled'
-									: ''
-							"
-							:color="member.name === 'Host' ? 'success' : 'none'"
-							:disabled="collaborationManager.isClient"
-							@click="
-								collaborationManager.sendMemberData(member.id)
-							"
-						>
-							{{ member.name }}
-							<v-icon
-								v-if="
-									collaborationManager.editorId === member.id
-								"
-								>mdi-lead-pencil</v-icon
-							>
-						</v-chip>
-					</v-chip-group>
-				</div>
-
-				<v-tooltip
-					v-if="
-						collaborationManager.isClient &&
-						!collaborationManager.featureModel.editRights &&
-						!collaborationManager.blockEditRequests
-					"
-					bottom
+				<v-icon v-if="fab"> mdi-close </v-icon>
+				<v-icon v-else> mdi-account-multiple </v-icon>
+			</v-btn>
+			<v-slide-x-transition>
+				<v-toolbar
+					v-show="fab || $vuetify.breakpoint.mdAndUp"
+					:absolute="!$vuetify.breakpoint.smAndDown"
+					class="rounded-pill"
+					:class="$vuetify.breakpoint.smAndDown ? '' : 'mt-2'"
+					elevation="9"
+					height="auto"
+					style="border: 2px solid white"
 				>
-					<template v-slot:activator="{ on, attrs }">
-						<v-btn
-							icon
-							v-bind="attrs"
-							v-on="on"
-							:disabled="claimButtonClickDisabled"
-							@click="claimEditRights()"
-						>
-							<v-icon>mdi-account-edit</v-icon>
-						</v-btn>
-					</template>
-					<span>Claim edit rights</span>
-				</v-tooltip>
-
-				<v-tooltip v-if="collaborationManager.isHost" bottom>
-					<template v-slot:activator="{ on, attrs }">
-						<v-btn
-							icon
-							v-bind="attrs"
-							v-on="on"
-							:color="
-								collaborationManager.blockEditRequests
-									? 'primary'
-									: ''
-							"
-							@click="blockEditRequests"
-						>
-							<v-icon>mdi-account-cancel</v-icon>
-						</v-btn>
-					</template>
-					<span>Block edit claims</span>
-				</v-tooltip>
-
-				<v-tooltip v-if="collaborationManager.isHost" bottom>
-					<template v-slot:activator="{ on, attrs }">
-						<v-btn
-							icon
-							v-bind="attrs"
-							@click="showQrCode = true"
-							v-on="on"
-						>
-							<v-icon>mdi-qrcode</v-icon>
-						</v-btn>
-					</template>
-					<span>Show qr code</span>
-				</v-tooltip>
-
-				<v-tooltip v-if="collaborationManager.isHost" bottom>
-					<template v-slot:activator="{ on, attrs }">
-						<v-btn icon v-bind="attrs" @click="copyLink" v-on="on">
-							<v-icon>mdi-content-copy</v-icon>
-						</v-btn>
-					</template>
-					<span>Copy invitation link</span>
-				</v-tooltip>
-
-				<v-tooltip bottom>
-					<template v-slot:activator="{ on, attrs }">
-						<v-btn
-							color="red"
-							icon
-							v-bind="attrs"
-							@click="showCloseDialog = true"
-							v-on="on"
-						>
-							<v-icon>mdi-close</v-icon>
-						</v-btn>
-					</template>
-					<span v-if="collaborationManager.isHost"
-						>Close session</span
+					<div
+						:style="
+							$vuetify.breakpoint.smAndDown
+								? 'max-width: 20vw'
+								: 'max-width: 45vw'
+						"
 					>
-					<span v-else>Leave session</span>
-				</v-tooltip>
-			</v-toolbar>
+						<v-chip-group disabled="true" mandatory>
+							<v-chip
+								:class="
+									collaborationManager.isClient
+										? 'collaboration-pill-disabled'
+										: ''
+								"
+								color="primary"
+								:disabled="collaborationManager.isClient"
+								@click="
+									collaborationManager.sendMemberData(
+										collaborationManager.peer._id
+									)
+								"
+							>
+								Me ({{ collaborationManager.name }})
+								<v-icon
+									right
+									v-if="
+										collaborationManager.featureModel
+											.editRights
+									"
+									>mdi-lead-pencil</v-icon
+								>
+							</v-chip>
+							<v-chip
+								v-for="member in collaborationManager.members"
+								:key="member.id"
+								:class="
+									collaborationManager.isClient
+										? 'collaboration-pill-disabled'
+										: ''
+								"
+								:color="
+									member.name === 'Host' ? 'success' : 'none'
+								"
+								:disabled="collaborationManager.isClient"
+								@click="
+									collaborationManager.sendMemberData(
+										member.id
+									)
+								"
+							>
+								{{ member.name }}
+								<v-icon
+									right
+									v-if="
+										collaborationManager.editorId ===
+										member.id
+									"
+									>mdi-lead-pencil</v-icon
+								>
+							</v-chip>
+						</v-chip-group>
+					</div>
+
+					<v-tooltip
+						v-if="
+							collaborationManager.isClient &&
+							!collaborationManager.featureModel.editRights &&
+							!collaborationManager.blockEditRequests
+						"
+						bottom
+					>
+						<template v-slot:activator="{ on, attrs }">
+							<v-btn
+								icon
+								v-bind="attrs"
+								v-on="on"
+								:disabled="claimButtonClickDisabled"
+								@click="claimEditRights()"
+							>
+								<v-icon>mdi-account-edit</v-icon>
+							</v-btn>
+						</template>
+						<span>Claim edit rights</span>
+					</v-tooltip>
+
+					<v-tooltip v-if="collaborationManager.isHost" bottom>
+						<template v-slot:activator="{ on, attrs }">
+							<v-btn
+								icon
+								v-bind="attrs"
+								v-on="on"
+								:color="
+									collaborationManager.blockEditRequests
+										? 'primary'
+										: ''
+								"
+								@click="blockEditRequests"
+							>
+								<v-icon>mdi-account-cancel</v-icon>
+							</v-btn>
+						</template>
+						<span>Block edit claims</span>
+					</v-tooltip>
+
+					<v-tooltip v-if="collaborationManager.isHost" bottom>
+						<template v-slot:activator="{ on, attrs }">
+							<v-btn
+								icon
+								v-bind="attrs"
+								@click="showQrCode = true"
+								v-on="on"
+							>
+								<v-icon>mdi-qrcode</v-icon>
+							</v-btn>
+						</template>
+						<span>Show qr code</span>
+					</v-tooltip>
+
+					<v-tooltip v-if="collaborationManager.isHost" bottom>
+						<template v-slot:activator="{ on, attrs }">
+							<v-btn
+								icon
+								v-bind="attrs"
+								@click="copyLink"
+								v-on="on"
+							>
+								<v-icon>mdi-content-copy</v-icon>
+							</v-btn>
+						</template>
+						<span>Copy invitation link</span>
+					</v-tooltip>
+
+					<v-tooltip bottom>
+						<template v-slot:activator="{ on, attrs }">
+							<v-btn
+								color="red"
+								icon
+								v-bind="attrs"
+								@click="showCloseDialog = true"
+								v-on="on"
+							>
+								<v-icon>mdi-close</v-icon>
+							</v-btn>
+						</template>
+						<span v-if="collaborationManager.isHost"
+							>Close session</span
+						>
+						<span v-else>Leave session</span>
+					</v-tooltip>
+				</v-toolbar>
+			</v-slide-x-transition>
 		</v-row>
 
 		<!-- QRCode -->
@@ -245,6 +291,7 @@ export default Vue.extend({
 		showQrCode: false,
 		showCloseDialog: false,
 		claimButtonClickDisabled: false,
+		fab: true,
 	}),
 
 	methods: {

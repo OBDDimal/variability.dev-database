@@ -4,6 +4,7 @@
 			app
 			:color="$store.state.isOnline ? 'primary' : 'error'"
 			dark
+			clipped-left
 		>
 			<h1 class="mr-1">
 				{{ title }}

@@ -34,7 +34,7 @@
 					</template>
 				</v-snackbar>
 			</v-main>
-			<Footer></Footer>
+			<Footer v-if="$route.name !== 'FeatureModel'"></Footer>
 		</v-app>
 	</vue-scroll-snap>
 </template>
@@ -56,16 +56,16 @@ export default Vue.extend({
 
 	data: () => ({}),
 
-    mounted() {
-        window.addEventListener('online', () => this.updateOnlineStatus(true));
-        window.addEventListener('offline', () => this.updateOnlineStatus(false));
-    },
+	mounted() {
+		window.addEventListener('online', () => this.updateOnlineStatus(true))
+		window.addEventListener('offline', () => this.updateOnlineStatus(false))
+	},
 
 	methods: {
-        updateOnlineStatus(isOnline) {
-            this.$store.commit('setOnlineState', isOnline);
-        }
-    },
+		updateOnlineStatus(isOnline) {
+			this.$store.commit('setOnlineState', isOnline)
+		},
+	},
 })
 </script>
 
