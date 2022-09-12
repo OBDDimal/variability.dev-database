@@ -40,9 +40,13 @@ describe('Navigation tests', () => {
         })
         
         beforeEach(() => {
-            //cy.exec('Get-ExecutionPolicy')
-            //cy.exec('Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy Unrestricted')
+            cy.exec('python -m venv venv')
+            cy.exec('source ./venv/Scripts/activate')
+            cy.exec('pip install -r requirements.txt')
             cy.exec('python ../backend/manage.py runscript create_test_user')
+
+            //cy.exec('python ../backend/manage.py runscript create_test_user')
+
             const testMail = 'cypress@uni-ulm.de';
             const testPassword = 'testingIsFun1';
 
