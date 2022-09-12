@@ -12,12 +12,6 @@ describe('Navigation tests', () => {
                 cy.url().should('eq', 'http://localhost:8080/');
             })
 
-            it(`DSGVO navigation`, () => {
-                cy.visit('localhost:8080');
-                cy.contains('dsgvo', { matchCase: false }).click();
-                cy.url().should('include', '/dsgvo');
-            })
-
             it(`Register navigation`, () => {
                 cy.visit('localhost:8080');
                 cy.contains('Register', { matchCase: false }).click();
@@ -120,13 +114,6 @@ describe('Navigation tests', () => {
                 cy.get('.drawer-button').click();
                 cy.get('.mobile-navigation').contains('Home', { matchCase: false }).click();
                 cy.url().should('eq', 'http://localhost:8080/');
-            })
-
-            it(`DSGVO navigation`, () => {
-                cy.visit('localhost:8080');
-                cy.get('.drawer-button').click();
-                cy.get('.mobile-navigation').contains('dsgvo', { matchCase: false }).click();
-                cy.url().should('include', '/dsgvo');
             })
 
             it(`Register navigation`, () => {
