@@ -38,88 +38,74 @@ describe('Navigation tests', () => {
             })
 
         })
-        
-        beforeEach(() => {
-            cy.exec('python -m venv venv')
-            cy.exec('source ./venv/Scripts/activate')
-            cy.exec('pip install -r requirements.txt')
-            cy.exec('python ../backend/manage.py runscript create_test_user')
 
-            //cy.exec('python ../backend/manage.py runscript create_test_user')
-
-            const testMail = 'cypress@uni-ulm.de';
-            const testPassword = 'testingIsFun1';
-
-            const API_URL = `${process.env.VUE_APP_DOMAIN}auth/`;
-
-            cy.request('POST', `${API_URL}login/`, {testMail, testPassword}).then((response) => {
-
-                if (response.data.access && response.data.refresh) {
-                    localStorage.setItem('access', JSON.stringify(response.data.access));
-                    localStorage.setItem(
-                        'refresh',
-                        JSON.stringify(response.data.refresh),
-                    );
-                    localStorage.setItem('user', JSON.stringify(response.data.user));
+        describe('Logged-in navigations', () => {
+            beforeEach(() => {
+                if(Cypress.platform === 'win32'){
+                    cy.exec('venv\\Scripts\\python.exe ../backend/manage.py runscript create_test_user')
+                } else {
+                    cy.exec("./venv/bin/python ../backend/manage.py runscript create_test_user")
                 }
 
-                return response.data;
+                const email = 'cypress@uni-ulm.de';
+                const password = 'testingIsFun1';
+
+                const API_URL = `${Cypress.env('BASE_URL')}auth/`;
+
+                cy.request('POST', `${API_URL}login/`, {email, password}).then((response) => {
+
+                    if (response.body.access && response.body.refresh) {
+                        localStorage.setItem('access', JSON.stringify(response.body.access));
+                        localStorage.setItem(
+                            'refresh',
+                            JSON.stringify(response.body.refresh),
+                        );
+                        localStorage.setItem('user', JSON.stringify(response.body.user));
+                    }
+
+                    return response.body;
+                })
+            })
+
+            afterEach(() => {
+                if(Cypress.platform === 'win32'){
+                    cy.exec('venv\\Scripts\\python.exe ../backend/manage.py runscript delete_test_user')
+                } else {
+                    cy.exec("./venv/bin/python ../backend/manage.py runscript delete_test_user")
+                }
+                localStorage.clear();
+            })
+
+            it(`Profile navigation`, () => {
+                cy.visit('localhost:8080');
+                cy.contains('Profile', { matchCase: false }).click();
+                cy.url().should('include', '/profile');
+            })
+
+            it(`Files navigation`, () => {
+                cy.visit('localhost:8080');
+                cy.contains('Files', { matchCase: false }).click();
+                cy.url().should('include', '/files');
+            })
+
+            it(`Tags navigation`, () => {
+                cy.visit('localhost:8080');
+                cy.contains('Tags', { matchCase: false }).click();
+                cy.url().should('include', '/tags');
+            })
+
+            it(`Families navigation`, () => {
+                cy.visit('localhost:8080');
+                cy.contains('Families', { matchCase: false }).click();
+                cy.url().should('include', '/families');
+            })
+
+            it(`Logout navigation`, () => {
+                cy.visit('localhost:8080/families');
+                cy.contains('Logout', { matchCase: false }).click();
+                cy.url().should('eq', 'http://localhost:8080/');
             })
         })
-
-        it('logs in programmatically without using the UI', function () {
-            // destructuring assignment of the this.currentUser object
-            const { username, password } = this.currentUser
-
-            // programmatically log us in without needing the UI
-            cy.request('POST', '/login', {
-            username,
-            password,
-            })
-
-            // now that we're logged in, we can visit
-            // any kind of restricted route!
-            cy.visit('/dashboard')
-
-            // our auth cookie should be present
-            cy.getCookie('your-session-cookie').should('exist')
-
-            // UI should reflect this user being logged in
-            cy.get('h1').should('contain', 'jane.lane')
-        })
-
-        // TODO: figure out programmatical login (https://docs.cypress.io/guides/end-to-end-testing/testing-your-app#Bypassing-your-UI)
-        // describe('Logged-in navigations', () => {
-        //     it(`Profile navigation`, () => {
-        //         cy.visit('localhost:8080');
-        //         cy.contains('Profile', { matchCase: false }).click();
-        //         cy.url().should('include', '/profile');
-        //     })
-
-        //     it(`Files navigation`, () => {
-        //         cy.visit('localhost:8080');
-        //         cy.contains('Files', { matchCase: false }).click();
-        //         cy.url().should('include', '/files');
-        //     })
-
-        //     it(`Tags navigation`, () => {
-        //         cy.visit('localhost:8080');
-        //         cy.contains('Tags', { matchCase: false }).click();
-        //         cy.url().should('include', '/tags');
-        //     })
-
-        //     it(`Families navigation`, () => {
-        //         cy.visit('localhost:8080');
-        //         cy.contains('Families', { matchCase: false }).click();
-        //         cy.url().should('include', '/families');
-        //     })
-
-        //     it(`Logout navigation`, () => {
-        //         cy.visit('localhost:8080/families');
-        //         cy.contains('Logout', { matchCase: false }).click();
-        //         cy.url().should('eq', 'http://localhost:8080/');
-        //     })
-        // })
     })
 
     context('Mobile resolution (360x760)', () => {
@@ -167,41 +153,77 @@ describe('Navigation tests', () => {
 
         })
 
-        // describe('Logged-in navigations', () => {
-        //     it(`Profile navigation`, () => {
-        //         cy.visit('localhost:8080');
-        //         cy.get('.drawer-button').click();
-        //         cy.contains('Profile', { matchCase: false }).click();
-        //         cy.url().should('include', '/profile');
-        //     })
+        describe('Logged-in navigations', () => {
+            beforeEach(() => {
+                if(Cypress.platform === 'win32'){
+                    cy.exec('venv\\Scripts\\python.exe ../backend/manage.py runscript create_test_user')
+                } else {
+                    cy.exec("./venv/bin/python ../backend/manage.py runscript create_test_user")
+                }
 
-        //     it(`Files navigation`, () => {
-        //         cy.visit('localhost:8080');
-        //         cy.get('.drawer-button').click();
-        //         cy.contains('Files', { matchCase: false }).click();
-        //         cy.url().should('include', '/files');
-        //     })
+                const email = 'cypress@uni-ulm.de';
+                const password = 'testingIsFun1';
 
-        //     it(`Tags navigation`, () => {
-        //         cy.visit('localhost:8080');
-        //         cy.get('.drawer-button').click();
-        //         cy.contains('Tags', { matchCase: false }).click();
-        //         cy.url().should('include', '/tags');
-        //     })
+                const API_URL = `${Cypress.env('BASE_URL')}auth/`;
 
-        //     it(`Families navigation`, () => {
-        //         cy.visit('localhost:8080');
-        //         cy.get('.drawer-button').click();
-        //         cy.contains('Families', { matchCase: false }).click();
-        //         cy.url().should('include', '/families');
-        //     })
+                cy.request('POST', `${API_URL}login/`, {email, password}).then((response) => {
+                    
+                    if (response.body.access && response.body.refresh) {
+                        localStorage.setItem('access', JSON.stringify(response.body.access));
+                        localStorage.setItem(
+                            'refresh',
+                            JSON.stringify(response.body.refresh),
+                        );
+                        localStorage.setItem('user', JSON.stringify(response.body.user));
+                    }
 
-        //     it(`Logout navigation`, () => {
-        //         cy.visit('localhost:8080/families');
-        //         cy.get('.drawer-button').click();
-        //         cy.contains('Logout', { matchCase: false }).click();
-        //         cy.url().should('eq', 'http://localhost:8080/');
-        //     })
-        // })
+                    return response.body;
+                })
+            })
+
+            afterEach(() => {
+                if(Cypress.platform === 'win32'){
+                    cy.exec('venv\\Scripts\\python.exe ../backend/manage.py runscript delete_test_user')
+                } else {
+                    cy.exec("./venv/bin/python ../backend/manage.py runscript delete_test_user")
+                }
+                localStorage.clear();
+            })
+
+            it(`Profile navigation`, () => {
+                cy.visit('localhost:8080');
+                cy.get('.drawer-button').click();
+                cy.get('.mobile-navigation').contains('Profile', { matchCase: false }).click();
+                cy.url().should('include', '/profile');
+            })
+
+            it(`Files navigation`, () => {
+                cy.visit('localhost:8080');
+                cy.get('.drawer-button').click();
+                cy.get('.mobile-navigation').contains('Files', { matchCase: false }).click();
+                cy.url().should('include', '/files');
+            })
+
+            it(`Tags navigation`, () => {
+                cy.visit('localhost:8080');
+                cy.get('.drawer-button').click();
+                cy.get('.mobile-navigation').contains('Tags', { matchCase: false }).click();
+                cy.url().should('include', '/tags');
+            })
+
+            it(`Families navigation`, () => {
+                cy.visit('localhost:8080');
+                cy.get('.drawer-button').click();
+                cy.get('.mobile-navigation').contains('Families', { matchCase: false }).click();
+                cy.url().should('include', '/families');
+            })
+
+            it(`Logout navigation`, () => {
+                cy.visit('localhost:8080/families');
+                cy.get('.drawer-button').click();
+                cy.get('.mobile-navigation').contains('Logout', { matchCase: false }).click();
+                cy.url().should('eq', 'http://localhost:8080/');
+            })
+        })
     })
 })
