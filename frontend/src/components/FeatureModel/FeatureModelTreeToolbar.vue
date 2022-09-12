@@ -16,16 +16,40 @@
                     <v-list-item-content></v-list-item-content>
                 </v-list-item>
 
-                <v-list-item @click="$emit('save')">
-                    <v-list-item-icon>
-                        <v-icon v-if="!isSaveAvailable">mdi-content-save</v-icon>
-                        <v-icon v-else>mdi-content-save-edit</v-icon>
-                    </v-list-item-icon>
+                <v-dialog
+                    v-model="saveDialog"
+                    persistent
+                    width="400"
+                >
+                    <template v-slot:activator="{ on, attrs }">
+                        <v-list-item v-bind="attrs" v-on="on">
+                            <v-list-item-icon>
+                                <v-icon v-if="!isSaveAvailable">mdi-content-save</v-icon>
+                                <v-icon v-else>mdi-content-save-edit</v-icon>
+                            </v-list-item-icon>
 
-                    <v-list-item-content>
-                        <v-list-item-title>Save</v-list-item-title>
-                    </v-list-item-content>
-                </v-list-item>
+                            <v-list-item-content>
+                                <v-list-item-title>Save</v-list-item-title>
+                            </v-list-item-content>
+                        </v-list-item>
+                    </template>
+
+                    <v-card>
+                        <v-card-title>Save?</v-card-title>
+                        <v-card-text>
+                            Do you really want to overwrite the feature-model currently saved in local storage?
+                        </v-card-text>
+                        <v-card-actions>
+                            <v-spacer></v-spacer>
+                            <v-btn text @click="saveDialog = false">
+                                Cancel
+                            </v-btn>
+                            <v-btn color="primary" text @click="() => { $emit('save'); this.saveDialog = false; }">
+                                Save
+                            </v-btn>
+                        </v-card-actions>
+                    </v-card>
+                </v-dialog>
 
                 <v-dialog
                     v-model="discardChangesConfirmDialog"
@@ -353,6 +377,7 @@ export default Vue.extend({
         drawer: false,
         miniSidebar: true,
         discardChangesConfirmDialog: false,
+        saveDialog: false,
     }),
 
     watch: {
