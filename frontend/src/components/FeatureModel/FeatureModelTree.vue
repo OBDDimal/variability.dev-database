@@ -11,6 +11,7 @@
 				<v-btn
 					:disabled="search.foundNodeIndex === 0"
 					icon
+					:small="$vuetify.breakpoint.smAndDown"
 					@click="onChangeFoundNodeIndex(--search.foundNodeIndex)"
 				>
 					<v-icon>mdi-chevron-left</v-icon>
@@ -22,12 +23,14 @@
 						search.foundNodeIndex + 1
 					"
 					icon
+					:small="$vuetify.breakpoint.smAndDown"
 					@click="onChangeFoundNodeIndex(++search.foundNodeIndex)"
 				>
 					<v-icon>mdi-chevron-right</v-icon>
 				</v-btn>
 				<v-spacer></v-spacer>
 				<v-text-field
+					:dense="$vuetify.breakpoint.smAndDown"
 					prepend-inner-icon="mdi-magnify"
 					@focus="search.showSearch = true"
 					@blur="search.showSearch = false"

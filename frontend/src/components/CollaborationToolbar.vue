@@ -8,7 +8,6 @@
 	>
 		<v-row
 			class="mt-2"
-			style="height: 60px"
 			:justify="$vuetify.breakpoint.smAndDown ? 'start' : 'center'"
 			align="center"
 		>
@@ -205,14 +204,15 @@
 		<!-- Close/Leave dialog -->
 		<v-dialog v-model="showCloseDialog" width="auto">
 			<v-card>
-				<v-card-title v-if="collaborationManager.isHost"
+				<v-card-title class="text-h5" v-if="collaborationManager.isHost"
 					>Do you really want to close the collaboration session?
 				</v-card-title>
-				<v-card-title v-else
+				<v-card-title class="text-h5" v-else
 					>Do you really want to leave the collaboration
 					session?</v-card-title
 				>
 				<v-card-actions>
+					<v-spacer></v-spacer>
 					<v-btn color="primary" text @click="showCloseDialog = false"
 						>Cancel</v-btn
 					>

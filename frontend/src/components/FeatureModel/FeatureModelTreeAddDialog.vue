@@ -2,38 +2,32 @@
 	<div class="text-center">
 		<v-dialog v-model="showDialog" persistent width="500">
 			<v-card>
-				<v-card-title class="text-h5 grey lighten-2">
-					Add Feature</v-card-title
-				>
+				<v-card-title class="text-h5"> Add Feature </v-card-title>
+
+				<v-divider></v-divider>
 
 				<v-form @submit.prevent="add" ref="form">
 					<v-card-text>
-						<v-row class="my-2">
-							<v-col class="pt-0" cols="12">
-								<template>
-									<v-text-field
-										v-model="name"
-										:rules="[
-											(value) => !!value || 'Required.',
-										]"
-										label="Name"
-									></v-text-field>
-								</template>
-							</v-col>
-						</v-row>
+						<div>
+							<v-text-field
+								v-model="name"
+								:rules="[(value) => !!value || 'Required.']"
+								label="Name"
+							></v-text-field>
+						</div>
 
-						<v-row v-if="showMandatorySelection" class="my-2">
-							<v-col cols="12">
-								<v-btn-toggle
-									v-model="mandatory"
-									dense
-									mandatory
-								>
-									<v-btn> mandatory</v-btn>
-									<v-btn> optional</v-btn>
-								</v-btn-toggle>
-							</v-col>
-						</v-row>
+						<div v-if="showMandatorySelection" class="my-2">
+							<v-btn-toggle
+								v-model="mandatory"
+								dense
+								color="primary"
+								tile
+								mandatory
+							>
+								<v-btn text> mandatory</v-btn>
+								<v-btn text> optional</v-btn>
+							</v-btn-toggle>
+						</div>
 
 						<v-checkbox
 							v-model="abstract"
@@ -45,10 +39,10 @@
 					<v-divider></v-divider>
 
 					<v-card-actions>
+						<v-spacer></v-spacer>
 						<v-btn color="secondary" text @click="discard">
 							Discard</v-btn
 						>
-						<v-spacer></v-spacer>
 						<v-btn color="primary" text type="submit"> Add</v-btn>
 					</v-card-actions>
 				</v-form>
