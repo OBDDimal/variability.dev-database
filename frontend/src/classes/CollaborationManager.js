@@ -206,7 +206,7 @@ export default class CollaborationManager {
         }
 
         if (action === 'execute') {
-            const command = commandFactory.create(this.featureModel.data.rootNode, this.featureModel.data.constraints, type, data);
+            const command = commandFactory.create(this.featureModel.data.rootNode, this.featureModel.data.constraints, type, data, this.featureModel);
             commandManager.execute(command, false);
         } else if (action === 'undo') {
             commandManager.undo(false);

@@ -16,6 +16,16 @@
                     <v-list-item-content></v-list-item-content>
                 </v-list-item>
 
+                <v-list-item @click="$emit('new-empty-model')">
+                    <v-list-item-icon>
+                        <v-icon>mdi-file-document-plus-outline</v-icon>
+                    </v-list-item-icon>
+
+                    <v-list-item-content>
+                        <v-list-item-title>New empty model</v-list-item-title>
+                    </v-list-item-content>
+                </v-list-item>
+
                 <v-dialog
                     v-model="saveDialog"
                     persistent

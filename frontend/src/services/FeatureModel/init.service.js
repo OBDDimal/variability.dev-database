@@ -3,15 +3,19 @@ import * as CONSTANTS from '@/classes/constants';
 import * as d3 from 'd3';
 import * as windowResize from '@/services/FeatureModel/windowResize.service.js';
 
-export function initialize(d3Data, data) {
-    // Flexlayout belongs to a d3-plugin that calculates the width between all nodes dynamically.
-    d3Data.flexlayout = flextree()
-        .nodeSize((d3Node) => calcNodeSize(d3Data, d3Node))
-        .spacing((d3NodeA, d3NodeB) => d3NodeA.path(d3NodeB).length);
-
+export function initData(d3Data, data) {
     // Create root-feature-node with d3 and the data of the feature-model.
     d3Data.root = d3.hierarchy(data, node => node.children);
     d3Data.root.each(d3Node => d3Node.data.d3Node = d3Node);
+}
+
+export function initialize(d3Data, data) {
+    // Flexlayout belongs to a d3-plugin that calculates the width between all nodes dynamically.
+    d3Data.flexlayout = flextree()
+        .nodeSize(d3Node => calcNodeSize(d3Data, d3Node))
+        .spacing((d3NodeA, d3NodeB) => d3NodeA.path(d3NodeB).length);
+
+    this.initData(d3Data, data);
 
     d3Data.zoom = d3
         .zoom()
