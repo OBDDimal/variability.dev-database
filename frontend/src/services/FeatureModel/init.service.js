@@ -15,7 +15,7 @@ export function initialize(d3Data, data) {
         .nodeSize(d3Node => calcNodeSize(d3Data, d3Node))
         .spacing((d3NodeA, d3NodeB) => d3NodeA.path(d3NodeB).length);
 
-    this.initData(d3Data, data);
+    initData(d3Data, data);
 
     d3Data.zoom = d3
         .zoom()
