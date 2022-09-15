@@ -61,35 +61,30 @@
 			</v-toolbar>
 		</div>
 
-		<feature-model-tree-toolbar
-			:direction="d3Data.direction"
-			:editRights="editRights"
-			:is-redo-available="
-				commandManager && commandManager.isRedoAvailable()
-			"
-			:is-save-available="
-				(commandManager && commandManager.isUndoAvailable()) ||
-				commandManager.collaborationManager.constraintCommandManager.isUndoAvailable()
-			"
-			:is-undo-available="
-				commandManager && commandManager.isUndoAvailable()
-			"
-			:collaborationStatus="collaborationStatus"
-			@coloring="(coloringIndex) => coloring(coloringIndex)"
-			@export="$emit('exportToXML')"
-			@fitToView="fitToView"
-			@redo="redo"
-			@reset="$emit('reset')"
-			@resetView="(levels, maxChildren) => resetView(levels, maxChildren)"
-			@save="$emit('save')"
-			@semanticEditing="(value) => (d3Data.semanticEditing = value)"
-			@shortName="changeShortName"
-			@spaceBetweenParentChild="changeSpaceBetweenParentChild"
-			@spaceBetweenSiblings="changeSpaceBetweenSiblings"
-			@toggleDirection="toggleDirection"
-			@undo="undo"
-			@show-collaboration-dialog="$emit('show-collaboration-dialog')"
-		></feature-model-tree-toolbar>
+        <feature-model-tree-toolbar
+            :direction="d3Data.direction"
+            :editRights="editRights"
+            :is-redo-available="commandManager && commandManager.isRedoAvailable()"
+            :is-save-available="(commandManager && commandManager.isUndoAvailable())
+                || (commandManager.collaborationManager.constraintCommandManager.isUndoAvailable())"
+            :is-undo-available="commandManager && commandManager.isUndoAvailable()"
+            :collaborationStatus="collaborationStatus"
+            @coloring="coloringIndex => coloring(coloringIndex)"
+            @export="$emit('exportToXML')"
+            @fitToView="fitToView"
+            @redo="redo"
+            @reset="$emit('reset')"
+            @resetView="(levels, maxChildren) => resetView(levels, maxChildren)"
+            @save="$emit('save')"
+            @semanticEditing="value => d3Data.semanticEditing = value"
+            @shortName="changeShortName"
+            @spaceBetweenParentChild="changeSpaceBetweenParentChild"
+            @spaceBetweenSiblings="changeSpaceBetweenSiblings"
+            @toggleDirection="toggleDirection"
+            @undo="undo"
+            @show-collaboration-dialog="$emit('show-collaboration-dialog')"
+            @new-empty-model="$emit('new-empty-model')"
+        ></feature-model-tree-toolbar>
 
 		<div id="svg-container"></div>
 

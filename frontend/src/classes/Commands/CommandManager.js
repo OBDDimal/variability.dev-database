@@ -97,12 +97,12 @@ export class CommandManager {
     executeRemoteCommands(rootNode, constraints) {
         if (this.remoteCommands) {
             this.remoteCommands.historyCommands.forEach(commandData => {
-                const command = commandFactory.create(rootNode, constraints, commandData.type, commandData.data);
+                const command = commandFactory.create(rootNode, constraints, commandData.type, commandData.data, this.collaborationManager.featureModel);
                 this.execute(command, false);
             });
 
             this.remoteCommands.futureCommands.forEach(commandData => {
-                const command = commandFactory.create(rootNode, constraints, commandData.type, commandData.data);
+                const command = commandFactory.create(rootNode, constraints, commandData.type, commandData.data, this.collaborationManager.featureModel);
                 this.execute(command, false);
             });
 

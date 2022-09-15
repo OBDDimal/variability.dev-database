@@ -1,24 +1,23 @@
 <template>
-	<div>
-		<feature-model-tree
-			v-if="data.rootNode"
-			:key="reloadKey"
-			ref="featureModelTree"
-			:collaborationStatus="collaborationStatus"
-			:command-manager="featureModelCommandManager"
-			:constraints="data.constraints"
-			:editRights="editRights"
-			:rootNode="data.rootNode"
-			@exportToXML="exportToXML"
-			@reset="reset"
-			@save="save"
-			@update-constraints="updateConstraints"
-			@show-collaboration-dialog="
-				showStartCollaborationSessionDialog = true
-			"
-			@show-claim-dialog="showClaimDialog"
-		>
-		</feature-model-tree>
+    <div>
+        <feature-model-tree
+            v-if="data.rootNode"
+            :key="reloadKey"
+            ref="featureModelTree"
+            :collaborationStatus="collaborationStatus"
+            :command-manager="featureModelCommandManager"
+            :constraints="data.constraints"
+            :editRights="editRights"
+            :rootNode="data.rootNode"
+            @exportToXML="exportToXML"
+            @reset="reset"
+            @save="save"
+            @update-constraints="updateConstraints"
+            @show-collaboration-dialog="showStartCollaborationSessionDialog = true"
+            @show-claim-dialog="showClaimDialog"
+            @new-empty-model="newEmptyModel"
+        >
+        </feature-model-tree>
 
 		<v-btn
 			absolute
@@ -96,20 +95,21 @@
 </template>
 
 <script>
-import Vue from 'vue'
-import FeatureModelTree from '../components/FeatureModel/FeatureModelTree.vue'
-import Constraints from '../components/Constraints.vue'
-import * as update from '@/services/FeatureModel/update.service'
-import api from '@/services/api.service'
-import beautify from 'xml-beautifier'
-import CollaborationManager from '@/classes/CollaborationManager'
-import { CommandManager } from '@/classes/Commands/CommandManager'
-import * as xmlTranspiler from '@/services/xmlTranspiler.service'
-import { jsonToXML } from '@/services/xmlTranspiler.service'
-import CollaborationToolbar from '@/components/CollaborationToolbar'
-import CollaborationNameDialog from '@/components/CollaborationNameDialog'
-import CollaborationContinueEditingDialog from '@/components/CollaborationContinueEditingDialog'
-import { EXAMPLE_FEATURE_MODEL_XML } from '@/classes/constants'
+import Vue from 'vue';
+import FeatureModelTree from '../components/FeatureModel/FeatureModelTree.vue';
+import Constraints from '../components/Constraints.vue';
+import * as update from "@/services/FeatureModel/update.service";
+import api from "@/services/api.service";
+import beautify from "xml-beautifier";
+import CollaborationManager from "@/classes/CollaborationManager";
+import {CommandManager} from "@/classes/Commands/CommandManager";
+import * as xmlTranspiler from "@/services/xmlTranspiler.service";
+import {jsonToXML} from "@/services/xmlTranspiler.service";
+import CollaborationToolbar from "@/components/CollaborationToolbar";
+import CollaborationNameDialog from "@/components/CollaborationNameDialog";
+import CollaborationContinueEditingDialog from "@/components/CollaborationContinueEditingDialog";
+import {EXAMPLE_FEATURE_MODEL_XML} from "@/classes/constants";
+import {NewEmptyModelCommand} from "@/classes/Commands/FeatureModel/NewEmptyModelCommand";
 
 export default Vue.extend({
 	name: 'FeatureModel',
@@ -199,31 +199,32 @@ export default Vue.extend({
 				'Do you really want to leave the page? Collaboration sessions will be closed and data will be lost!'
 			)
 
-			if (answer) {
-				// If user wants to close page
-				if (this.collaborationManager.isHost) {
-					this.collaborationManager.closeCollaboration()
-				} else {
-					this.collaborationManager.leaveCollaboration()
-				}
-				next()
-			} else {
-				// If user doesn't want to close page
-				next(false)
-			}
-		} else {
-			// Don't prevent default site changes without collaboration
-			next()
-		}
-	},
+            if (answer) {
+                // If user wants to close page
+                this.collaborationManager.closeCollaboration();
+                next()
+            } else {
+                // If user doesn't want to close page
+                next(false)
+            }
+        } else {
+            // Don't prevent default site changes without collaboration
+            next();
+        }
+    },
 
-	methods: {
-		save() {
-			// TODO: Axios post request to update the xml file in the backend ???
-			const xml = jsonToXML(this.data)
-			localStorage.featureModelData = xml
-			window.onbeforeunload = null
-		},
+    methods: {
+        save() {
+            localStorage.featureModelData = jsonToXML(this.data);
+            window.onbeforeunload = null;
+
+            this.$store.commit("updateSnackbar", {
+                message: "Successfully saved in local storage",
+                variant: "success",
+                timeout: 5000,
+                show: true,
+            });
+        },
 
 		reset() {
 			// TODO: Transpile the xml file new and restart viewer.
@@ -231,17 +232,24 @@ export default Vue.extend({
 			this.reloadKey++
 		},
 
-		initData() {
-			api.get(`${process.env.VUE_APP_DOMAIN}files/${this.id}/`).then(
-				(data) => {
-					api.get(data.data.local_file).then((rawData) => {
-						const xml = beautify(rawData.data)
-						xmlTranspiler.xmlToJson(xml, this.data)
-						this.xml = xml
-					})
-				}
-			)
-		},
+        newEmptyModel() {
+            const command = new NewEmptyModelCommand(this, this.$refs.featureModelTree.d3Data);
+            this.featureModelCommandManager.execute(command);
+            this.updateFeatureModel();
+        },
+
+
+        initData() {
+            api.get(`${process.env.VUE_APP_DOMAIN}files/${this.id}/`)
+                .then(data => {
+                    api.get(data.data.local_file)
+                        .then(rawData => {
+                            const xml = beautify(rawData.data);
+                            xmlTranspiler.xmlToJson(xml, this.data);
+                            this.xml = xml;
+                        });
+                });
+        },
 
 		updateFeatureModel() {
 			update.updateSvg(this.$refs.featureModelTree.d3Data)
