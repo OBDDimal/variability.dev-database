@@ -10,7 +10,7 @@
 				@mouseover="setHovered"
 			>
 				<template v-slot:top>
-					<v-toolbar flat>
+					<v-toolbar flat style="background-color: transparent">
 						<v-toolbar-title class="hidden-sm-and-down">{{
 							headline
 						}}</v-toolbar-title>

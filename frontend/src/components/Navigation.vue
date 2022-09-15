@@ -1,9 +1,14 @@
 <template>
 	<div>
 		<v-app-bar
+			v-if="
+				$route.name !== 'FeatureModel' ||
+				($route.name === 'FeatureModel' && !isMobileLandscape)
+			"
 			app
 			:color="$store.state.isOnline ? 'primary' : 'error'"
 			dark
+			clipped-left
 		>
 			<h1 class="mr-1">
 				{{ title }}
@@ -234,6 +239,7 @@ export default Vue.extend({
 
 	data: () => ({
 		drawer: false,
+		isMobileLandscape: false,
 	}),
 
 	methods: {
@@ -243,6 +249,33 @@ export default Vue.extend({
 			}
 			this.$store.dispatch('logout')
 		},
+
+		handleOrientationChange() {
+			const orientation = window.screen.orientation.type
+			if (orientation === 'portrait-primary') {
+				this.isMobileLandscape = false
+			} else if (
+				orientation === 'landscape-primary' &&
+				this.$vuetify.breakpoint.xsOnly
+			) {
+				if (this.$route.name === 'FeatureModel') {
+					this.$store.commit('updateSnackbar', {
+						message: 'Rotate device to see Menu',
+						variant: 'info',
+						timeout: 4000,
+						show: true,
+					})
+				}
+				this.isMobileLandscape = true
+			}
+		},
+	},
+
+	mounted() {
+		window.addEventListener(
+			'orientationchange',
+			this.handleOrientationChange
+		)
 	},
 })
 </script>
