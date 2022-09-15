@@ -19,6 +19,21 @@
         >
         </feature-model-tree>
 
+        <v-btn
+            absolute
+            bottom
+            dark
+            elevation="2"
+            icon
+            right
+            :x-large="$vuetify.breakpoint.mdAndUp"
+            style="background-color: var(--v-primary-base)"
+            @click="openInformation = !openInformation"
+            class="mr-15"
+        >
+            <v-icon>mdi-information</v-icon>
+        </v-btn>
+
 		<v-btn
 			absolute
 			bottom
@@ -28,7 +43,7 @@
 			right
 			:x-large="$vuetify.breakpoint.mdAndUp"
 			style="background-color: var(--v-primary-base)"
-			@click="$store.commit('openConstraints', true)"
+			@click="openConstraints = true"
 		>
 			<v-icon>mdi-format-list-checks</v-icon>
 		</v-btn>
@@ -36,6 +51,8 @@
 		<constraints
 			v-if="data.constraints"
 			ref="constraints"
+            :is-open="openConstraints"
+            @close="openConstraints = false"
 			:command-manager="constraintCommandManager"
 			:constraints="data.constraints"
 			:editRights="editRights"
@@ -91,6 +108,8 @@
 			@continue-editing="continueEditing"
 		>
 		</collaboration-continue-editing-dialog>
+
+        <feature-model-information v-if="openInformation"></feature-model-information>
 	</div>
 </template>
 
@@ -110,11 +129,13 @@ import CollaborationNameDialog from "@/components/CollaborationNameDialog";
 import CollaborationContinueEditingDialog from "@/components/CollaborationContinueEditingDialog";
 import {EXAMPLE_FEATURE_MODEL_XML} from "@/classes/constants";
 import {NewEmptyModelCommand} from "@/classes/Commands/FeatureModel/NewEmptyModelCommand";
+import FeatureModelInformation from "@/components/FeatureModel/FeatureModelInformation";
 
 export default Vue.extend({
 	name: 'FeatureModel',
 
 	components: {
+        FeatureModelInformation,
 		CollaborationContinueEditingDialog,
 		CollaborationToolbar,
 		FeatureModelTree,
@@ -148,6 +169,8 @@ export default Vue.extend({
 		showClaimDialog: false,
 		showContinueEditingDialog: false,
 		collaborationStatus: false,
+        openConstraints: false,
+        openInformation: false,
 	}),
 
 	created() {

@@ -1,5 +1,5 @@
 <template>
-	<v-bottom-sheet v-model="$store.state.openConstraints" hide-overlay>
+	<v-bottom-sheet v-model="isOpen" hide-overlay>
 		<constraint-add-edit-dialog
 			:all-nodes="rootNode ? rootNode.descendants() : undefined"
 			:constraint="constraintAddEdit"
@@ -119,6 +119,7 @@ export default Vue.extend({
 		constraints: undefined,
 		rootNode: undefined,
 		editRights: undefined,
+        isOpen: Boolean,
 	},
 
 	data: () => ({
