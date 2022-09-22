@@ -40,7 +40,16 @@ function updateFeatureNodes(d3Data, visibleD3Nodes) {
             }
             dblClickEvent(event, d3Data, d3Node);
             collapse.collapseShortcut(d3Data, event, d3Node); // Collapse d3Node with Ctrl + left-click on d3Node.
+        }).on('mouseover', (_, d3Node) => quickEditAction(d3Node, d3Data))
+        .on('mouseleave', () => {
+            //only on desktop devices
+            if (!('ontouchstart' in window)) {
+                if (![...document.querySelectorAll(":hover")].reduce((oldEl, newEl) => oldEl || [...newEl.classList].includes("quick-edit-action-child") || [...newEl.classList].includes("quick-edit-action-left-sibling") || [...newEl.classList].includes("quick-edit-action-right-sibling"), false)) {
+                    d3Data.container.quickEditContainer.selectAll('circle').remove();
+                }
+            }
         });
+
 
     const rectAndTextEnter = featureNodeEnter.append('g').classed('rect-and-text', true);
     rectAndTextEnter.append('rect').attr('height', CONSTANTS.RECT_HEIGHT);
@@ -50,7 +59,7 @@ function updateFeatureNodes(d3Data, visibleD3Nodes) {
 
     featureNodeEnter.append('circle').classed('and-group-circle', true).attr('r', CONSTANTS.MANDATORY_CIRCLE_RADIUS);
 
-    // Update nodes
+// Update nodes
     const featureNodeUpdate = featureNodeEnter.merge(featureNode);
     featureNodeUpdate.attr('transform', d3Node => `translate(${d3Node.x}, ${d3Node.y})`);
     featureNodeUpdate
@@ -78,7 +87,7 @@ function updateFeatureNodes(d3Data, visibleD3Nodes) {
         })
         .text(d3Node => d3Data.isShortenedName ? d3Node.data.displayName : d3Node.data.name);
 
-    // Remove old/invisible nodes.
+// Remove old/invisible nodes.
     featureNode.exit().remove();
 
     updateChildrenCount(d3Data, featureNodeUpdate);
@@ -310,11 +319,11 @@ export function updateSvg(d3Data) {
 export function calcRectWidth(d3Data, d3Node) {
     if (d3Node.data instanceof FeatureNode) {
         return (d3Data.isShortenedName
-            ? d3Node.data.displayName.length
-            : d3Node.data.name.length) *
-        (CONSTANTS.FEATURE_FONT_SIZE * CONSTANTS.MONOSPACE_HEIGHT_WIDTH_FACTOR) +
-        CONSTANTS.RECT_MARGIN.left +
-        CONSTANTS.RECT_MARGIN.right;
+                ? d3Node.data.displayName.length
+                : d3Node.data.name.length) *
+            (CONSTANTS.FEATURE_FONT_SIZE * CONSTANTS.MONOSPACE_HEIGHT_WIDTH_FACTOR) +
+            CONSTANTS.RECT_MARGIN.left +
+            CONSTANTS.RECT_MARGIN.right;
     } else {
         return CONSTANTS.PSEUDO_NODE_SIZE * 2;
     }
@@ -322,6 +331,7 @@ export function calcRectWidth(d3Data, d3Node) {
 
 
 let touchtime = 0;
+
 function dblClickEvent(event, d3Data, d3Node) {
     if (touchtime === 0) {
         // set first click
@@ -338,5 +348,84 @@ function dblClickEvent(event, d3Data, d3Node) {
             // not a double click so set as a new first click
             touchtime = new Date().getTime();
         }
+    }
+}
+
+function createQuickEditGroup(d3Data) {
+    const childGroup = d3Data.container.quickEditContainer.append("g");
+
+    childGroup.append('circle')
+        .attr("fill", "red")
+        .attr("r", CONSTANTS.QUICK_EDIT_RADIUS);
+
+    childGroup.on("mouseleave", () => {
+        d3Data.container.quickEditContainer.selectAll('g').remove();
+    });
+
+    return childGroup;
+}
+
+function quickEditAction(d3Node, d3Data) {
+    //only on desktop devices
+    if (!('ontouchstart' in window)) {
+
+        // Add as child
+        createQuickEditGroup(d3Data)
+            .attr('transform', `translate(${d3Node.x}, ${d3Node.y + 100 + CONSTANTS.RECT_HEIGHT})`)
+            .classed("quick-edit-action-child", true)
+            .on('click', () => {
+                d3Data.featureModelTree.openAddAsChildDialog(d3Node);
+            });
+
+        const childGroup = d3Data.container.quickEditContainer.append("g");
+        //childGroup.attr('transform', `translate(${d3Node.x}, ${d3Node.y})`);
+        childGroup.append('circle')
+            .attr("fill", "#4caf50")
+            .attr("r", CONSTANTS.QUICK_EDIT_RADIUS)
+            .attr("cx", d3Node.x)
+            .attr("cy", d3Node.y + CONSTANTS.RECT_HEIGHT)
+            .classed("quick-edit-action-child", true)
+            .on("mouseleave", () => {
+                d3Data.container.quickEditContainer.selectAll('g').remove();
+            })
+            .on('click', () => {
+                d3Data.featureModelTree.openAddAsChildDialog(d3Node);
+            });
+        childGroup.append("path")
+            .attr("d", `M ${d3Node.x - .5} ${d3Node.y + CONSTANTS.RECT_HEIGHT - (2 * CONSTANTS.QUICK_EDIT_RADIUS) / 3} h 1 v ${(4 * CONSTANTS.QUICK_EDIT_RADIUS) / 3} h -1 V ${(4 * CONSTANTS.QUICK_EDIT_RADIUS) / 3} z`)
+            .attr("fill", "black");
+        childGroup.append("path")
+            .attr("d", `M ${d3Node.x + CONSTANTS.RECT_HEIGHT - (2 * CONSTANTS.QUICK_EDIT_RADIUS) / 3} ${d3Node.y - .5} h ${(4 * CONSTANTS.QUICK_EDIT_RADIUS) / 3} v 1 H ${(4 * CONSTANTS.QUICK_EDIT_RADIUS) / 3} V -1 z`)
+            .attr("fill", "black");
+
+        // Add right sibling
+        d3Data.container.quickEditContainer
+            .append('circle')
+            .attr("fill", "green")
+            .attr("r", CONSTANTS.QUICK_EDIT_RADIUS)
+            .attr("cx", d3Node.x - d3Node.width / 2)
+            .attr("cy", d3Node.y + CONSTANTS.RECT_HEIGHT / 2)
+            .classed("quick-edit-action-left-sibling", true)
+            .on("mouseleave", () => {
+                d3Data.container.quickEditContainer.selectAll('circle').remove();
+            })
+            .on('click', () => {
+                d3Data.featureModelTree.openAddAsSiblingDialog(d3Node);
+            });
+
+        // Add left siblings
+        d3Data.container.quickEditContainer
+            .append('circle')
+            .attr("fill", "green")
+            .attr("r", CONSTANTS.QUICK_EDIT_RADIUS)
+            .attr("cx", d3Node.x + d3Node.width / 2)
+            .attr("cy", d3Node.y + CONSTANTS.RECT_HEIGHT / 2)
+            .classed("quick-edit-action-right-sibling", true)
+            .on("mouseleave", () => {
+                d3Data.container.quickEditContainer.selectAll('circle').remove();
+            })
+            .on('click', () => {
+                d3Data.featureModelTree.openAddAsSiblingDialog(d3Node);
+            });
     }
 }

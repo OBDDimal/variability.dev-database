@@ -42,6 +42,7 @@ export function initialize(d3Data, data) {
 
     d3Data.container.dragContainer = svgContent.append('g').classed('drag-container', true);
 
+    d3Data.container.quickEditContainer = svgContent.append('g').classed('quick-edit-container', true);
 
     // Listen to window resize.
     window.onresize = () => windowResize.update(d3Data);
