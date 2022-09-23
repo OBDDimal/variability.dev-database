@@ -1,6 +1,12 @@
 <template>
 	<div>
 		<v-app-bar app color="primary" dark>
+			<v-avatar tile class="mr-3">
+				<img
+					:src="require('@/assets/ddueruem_logo_thick2.svg')"
+					alt="logo"
+				/>
+			</v-avatar>
 			<h1 class="mr-6">{{ title }}</h1>
 			<div class="hidden-sm-and-down">
 				<v-btn class="mx-1" text to="/">

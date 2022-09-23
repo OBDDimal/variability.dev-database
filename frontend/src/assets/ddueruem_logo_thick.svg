@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">
+  <ellipse style="stroke: rgb(256,256,256); fill: none; stroke-width: 20px;" cx="250" cy="250" rx="200" ry="200"/>
+  <line style="fill: rgb(216, 216, 216); stroke: rgb(256,256,256); stroke-width: 20px;" x1="116.578" y1="100" x2="382.149" y2="100"/>
+  <line style="fill: rgb(216, 216, 216); stroke: rgb(256,256,256); stroke-width: 20px;" x1="99.146" y1="380.951" x2="100" y2="118.493"/>
+  <line style="fill: rgb(216, 216, 216); stroke: rgb(256,256,256); stroke-width: 20px;" x1="117.023" y1="399.689" x2="383.898" y2="400"/>
+  <line style="fill: rgb(216, 216, 216); stroke: rgb(256,256,256); stroke-width: 20px;" x1="400" y1="117.159" x2="400" y2="380.506"/>
+  <line style="fill: rgb(216, 216, 216); stroke: rgb(256,256,256); stroke-width: 20px;" x1="200.104" y1="100.958" x2="200" y2="400"/>
+  <line style="fill: rgb(216, 216, 216); stroke: rgb(256,256,256); stroke-width: 20px;" x1="301.061" y1="247.476" x2="400" y2="247.476"/>
+  <polyline style="stroke: rgb(256,256,256); fill: none; stroke-width: 20px;" points="200.104 100.958 300 247.476 200 400"/>
+  <line style="fill: rgb(216, 216, 216); stroke: rgb(256,256,256); stroke-width: 20px;" x1="100.152" y1="199.327" x2="200" y2="200"/>
+  <line style="fill: rgb(216, 216, 216); stroke: rgb(256,256,256); stroke-width: 20px;" x1="100.152" y1="299.327" x2="200" y2="300"/>
+</svg>
