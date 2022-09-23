@@ -22,9 +22,9 @@ import './commands'
 before(() => {
     cy.exec('python -m venv venv')
     if(Cypress.platform === 'win32'){
-        cy.exec('venv\\Scripts\\pip.exe install -r ../backend/requirements.txt', {timeout: 120000})
+        cy.exec('venv\\Scripts\\pip.exe install -r ../backend/requirements.txt', {timeout: 240000})
     } else {
-        cy.exec("./venv/bin/pip install -r ../backend/requirements.txt", {timeout: 120000})
+        cy.exec("./venv/bin/pip install -r ../backend/requirements.txt", {timeout: 240000})
     }
 })
 

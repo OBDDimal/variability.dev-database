@@ -12,8 +12,9 @@ export function parse(toParse, allNodes) {
     const inputToken = toParse
         .replaceAll('(', '( ')
         .replaceAll(')', ' )')
-        .split(' ')
-        .filter((str) => str);
+        .match(/(?:[^\s"]+|"[^"]*")+/g) // Split by space except double-quotes
+        .map(str => str.replaceAll("\"", ""))
+        .filter((str) => str); // Remove the undefined tokens
 
     const operatorStack = [];
     let outputStack = [];

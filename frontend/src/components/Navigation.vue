@@ -1,10 +1,21 @@
 <template>
 	<div>
 		<v-app-bar
+			v-if="
+				$route.name !== 'FeatureModel' ||
+				($route.name === 'FeatureModel' && !isMobileLandscape)
+			"
 			app
 			:color="$store.state.isOnline ? 'primary' : 'error'"
 			dark
+			clipped-left
 		>
+			<v-avatar tile class="mr-3">
+				<img
+					:src="require('@/assets/ddueruem_logo_thick2.svg')"
+					alt="logo"
+				/>
+			</v-avatar>
 			<h1 class="mr-1">
 				{{ title }}
 			</h1>
@@ -121,7 +132,7 @@
 		</v-app-bar>
 		<v-navigation-drawer class="mobile-navigation" v-model="drawer" app temporary>
 			<v-list>
-				<v-list-item link to="/" v-if="$store.state.isOnline">
+				<v-list-item link to="/">
 					<v-list-item-icon>
 						<v-icon left> mdi-home</v-icon>
 					</v-list-item-icon>
@@ -232,57 +243,45 @@ export default Vue.extend({
         },
     },
 
-    data: () => ({
-        drawer: false,
-        /*navItems: [
-          {
-            name: "Home",
-            to: "/",
-            icon: "mdi-home",
-            protected: false,
-          },
-          {
-            name: "Profile",
-            to: "/profile",
-            icon: "mdi-account",
-            protected: true,
-          },
-          {
-            name: "Files",
-            to: "/files",
-            icon: "mdi-file",
-            protected: true,
-          },
-          {
-            name: "Tags",
-            to: "/tags",
-            icon: "mdi-tag",
-            protected: true,
-          },
-          {
-            name: "Families",
-            to: "/families",
-            icon: "mdi-human-male-female-child",
-            protected: true,
-          },
-          {
-            name: "DSGVO",
-            to: "/dsgvo",
-            icon: "mdi-scale-balance",
-            protected: false,
-          }
-        ]*/
-    }),
+	data: () => ({
+		drawer: false,
+		isMobileLandscape: false,
+	}),
 
-    computed: {},
+	methods: {
+		logoutAndRedirect() {
+			if (this.$route.path !== '/') {
+				this.$router.push('/')
+			}
+			this.$store.dispatch('logout')
+		},
 
-    methods: {
-        logoutAndRedirect() {
-            if (this.$route.path !== "/") {
-                this.$router.push("/");
-            }
-            this.$store.dispatch("logout");
-        },
-    },
-});
+		handleOrientationChange() {
+			const orientation = window.screen.orientation.type
+			if (orientation === 'portrait-primary') {
+				this.isMobileLandscape = false
+			} else if (
+				orientation === 'landscape-primary' &&
+				this.$vuetify.breakpoint.xsOnly
+			) {
+				if (this.$route.name === 'FeatureModel') {
+					this.$store.commit('updateSnackbar', {
+						message: 'Rotate device to see Menu',
+						variant: 'info',
+						timeout: 4000,
+						show: true,
+					})
+				}
+				this.isMobileLandscape = true
+			}
+		},
+	},
+
+	mounted() {
+		window.addEventListener(
+			'orientationchange',
+			this.handleOrientationChange
+		)
+	},
+})
 </script>

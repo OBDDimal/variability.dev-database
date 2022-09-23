@@ -13,49 +13,114 @@
                         <v-icon v-else>mdi-chevron-left</v-icon>
                     </v-list-item-icon>
 
-                    <v-list-item-content>
-                    </v-list-item-content>
+                    <v-list-item-content></v-list-item-content>
                 </v-list-item>
 
-                <v-list-item :disabled="!isSaveAvailable || !editRights" @click="$emit('save')">
+                <v-list-item @click="$emit('new-empty-model')">
                     <v-list-item-icon>
-                        <v-icon v-if="!isSaveAvailable" disabled>mdi-content-save</v-icon>
-                        <v-icon v-else :disabled="!editRights">mdi-content-save-edit</v-icon>
+                        <v-icon>mdi-file-document-plus-outline</v-icon>
                     </v-list-item-icon>
 
                     <v-list-item-content>
-                        <v-list-item-title>Save</v-list-item-title>
+                        <v-list-item-title>New empty model</v-list-item-title>
                     </v-list-item-content>
                 </v-list-item>
 
-                <v-dialog persistent v-model="discardChangesConfirmDialog" width="400">
+                <v-dialog
+                    v-model="saveDialog"
+                    persistent
+                    width="400"
+                >
                     <template v-slot:activator="{ on, attrs }">
-                        <v-list-item :disabled="!isUndoAvailable || !editRights" v-bind="attrs" v-on="on">
+                        <v-list-item v-bind="attrs" v-on="on">
                             <v-list-item-icon>
-                                <v-icon :disabled="!isUndoAvailable || !editRights">mdi-backup-restore</v-icon>
+                                <v-icon v-if="!isSaveAvailable">mdi-content-save</v-icon>
+                                <v-icon v-else>mdi-content-save-edit</v-icon>
                             </v-list-item-icon>
 
                             <v-list-item-content>
-                                <v-list-item-title>Discard changes</v-list-item-title>
+                                <v-list-item-title>Save</v-list-item-title>
+                            </v-list-item-content>
+                        </v-list-item>
+                    </template>
+
+                    <v-card>
+                        <v-card-title>Save?</v-card-title>
+                        <v-card-text>
+                            Do you really want to overwrite the feature-model currently saved in local storage?
+                        </v-card-text>
+                        <v-card-actions>
+                            <v-spacer></v-spacer>
+                            <v-btn text @click="saveDialog = false">
+                                Cancel
+                            </v-btn>
+                            <v-btn color="primary" text @click="() => { $emit('save'); this.saveDialog = false; }">
+                                Save
+                            </v-btn>
+                        </v-card-actions>
+                    </v-card>
+                </v-dialog>
+
+                <v-dialog
+                    v-model="discardChangesConfirmDialog"
+                    persistent
+                    width="400"
+                >
+                    <template v-slot:activator="{ on, attrs }">
+                        <v-list-item
+                            :disabled="!isUndoAvailable || !editRights"
+                            v-bind="attrs"
+                            v-on="on"
+                        >
+                            <v-list-item-icon>
+                                <v-icon
+                                    :disabled="!isUndoAvailable || !editRights"
+                                >mdi-backup-restore
+                                </v-icon
+                                >
+                            </v-list-item-icon>
+
+                            <v-list-item-content>
+                                <v-list-item-title
+                                >Discard changes
+                                </v-list-item-title
+                                >
                             </v-list-item-content>
                         </v-list-item>
                     </template>
 
                     <v-card>
                         <v-card-title>Discard changes?</v-card-title>
-                        <v-card-text>Do you really want to discard all changes? This action can't be undone!
+                        <v-card-text
+                        >Do you really want to discard all changes? This
+                            action can't be undone!
                         </v-card-text>
                         <v-card-actions>
                             <v-spacer></v-spacer>
-                            <v-btn color="primary" text @click="discardChangesConfirmDialog = false">Cancel</v-btn>
-                            <v-btn color="primary" text @click="$emit('reset')">Discard</v-btn>
+                            <v-btn
+                                color="primary"
+                                text
+                                @click="discardChangesConfirmDialog = false"
+                            >Cancel
+                            </v-btn
+                            >
+                            <v-btn color="primary" text @click="$emit('reset')"
+                            >Discard
+                            </v-btn
+                            >
                         </v-card-actions>
                     </v-card>
                 </v-dialog>
 
-                <v-list-item :disabled="!isUndoAvailable || !editRights" @click="$emit('undo')">
+                <v-list-item
+                    :disabled="!isUndoAvailable || !editRights"
+                    @click="$emit('undo')"
+                >
                     <v-list-item-icon>
-                        <v-icon :disabled="!isUndoAvailable || !editRights">mdi-undo</v-icon>
+                        <v-icon :disabled="!isUndoAvailable || !editRights"
+                        >mdi-undo
+                        </v-icon
+                        >
                     </v-list-item-icon>
 
                     <v-list-item-content>
@@ -63,9 +128,15 @@
                     </v-list-item-content>
                 </v-list-item>
 
-                <v-list-item :disabled="!isRedoAvailable || !editRights" @click="$emit('redo')">
+                <v-list-item
+                    :disabled="!isRedoAvailable || !editRights"
+                    @click="$emit('redo')"
+                >
                     <v-list-item-icon>
-                        <v-icon :disabled="!isRedoAvailable || !editRights">mdi-redo</v-icon>
+                        <v-icon :disabled="!isRedoAvailable || !editRights"
+                        >mdi-redo
+                        </v-icon
+                        >
                     </v-list-item-icon>
 
                     <v-list-item-content>
@@ -86,10 +157,18 @@
                         </v-list-item>
                     </template>
                     <v-list>
-                        <v-list-item-group v-model="selectedColoring" color="primary">
-                            <v-list-item v-for="(item, i) in itemsColoring" :key="i">
+                        <v-list-item-group
+                            v-model="selectedColoring"
+                            color="primary"
+                        >
+                            <v-list-item
+                                v-for="(item, i) in itemsColoring"
+                                :key="i"
+                            >
                                 <v-list-item-content>
-                                    <v-list-item-title v-text="item"></v-list-item-title>
+                                    <v-list-item-title
+                                        v-text="item"
+                                    ></v-list-item-title>
                                 </v-list-item-content>
                             </v-list-item>
                         </v-list-item-group>
@@ -111,15 +190,28 @@
                     <v-list>
                         <v-subheader>View</v-subheader>
 
-                        <v-list-item class="clickable" @click="$emit('fitToView')">
+                        <v-list-item
+                            class="clickable"
+                            @click="$emit('fitToView')"
+                        >
                             <v-list-item-content>
-                                <v-list-item-title>Fit to view</v-list-item-title>
+                                <v-list-item-title
+                                >Fit to view
+                                </v-list-item-title
+                                >
                             </v-list-item-content>
                         </v-list-item>
-                        <v-list-item class="clickable" @click="$emit('toggleDirection')">
+                        <v-list-item
+                            class="clickable"
+                            @click="$emit('toggleDirection')"
+                        >
                             <v-list-item-content>
                                 <v-list-item-title>
-                                    {{ direction === 'v' ? 'Change direction to horizontally' : 'Change direction to vertically' }}
+                                    {{
+                                        direction === 'v'
+                                            ? 'Change direction to horizontally'
+                                            : 'Change direction to vertically'
+                                    }}
                                 </v-list-item-title>
                             </v-list-item-content>
                         </v-list-item>
@@ -128,12 +220,21 @@
                             @click="$emit('resetView', levels, maxChildren)"
                         >
                             <v-list-item-content>
-                                <v-list-item-title>Reset view</v-list-item-title>
+                                <v-list-item-title
+                                >Reset view
+                                </v-list-item-title
+                                >
                             </v-list-item-content>
                         </v-list-item>
-                        <v-list-item class="clickable" @click="$store.commit('openConstraints', true)">
+                        <v-list-item
+                            class="clickable"
+                            @click="$store.commit('openConstraints', true)"
+                        >
                             <v-list-item-content>
-                                <v-list-item-title>Show Constraints</v-list-item-title>
+                                <v-list-item-title
+                                >Show Constraints
+                                </v-list-item-title
+                                >
                             </v-list-item-content>
                         </v-list-item>
                         <v-list-item>
@@ -147,7 +248,10 @@
                                 </v-list-item-action>
 
                                 <v-list-item-content>
-                                    <v-list-item-title>Short Name</v-list-item-title>
+                                    <v-list-item-title
+                                    >Short Name
+                                    </v-list-item-title
+                                    >
                                 </v-list-item-content>
                             </template>
                         </v-list-item>
@@ -184,9 +288,15 @@
                     </v-list-item-content>
                 </v-list-item>
 
-                <v-list-item :disabled="collaborationStatus" @click="$emit('show-collaboration-dialog')">
+                <v-list-item
+                    :disabled="collaborationStatus"
+                    @click="$emit('show-collaboration-dialog')"
+                >
                     <v-list-item-icon>
-                        <v-icon :disabled="collaborationStatus">mdi-account-multiple</v-icon>
+                        <v-icon :disabled="collaborationStatus"
+                        >mdi-account-multiple
+                        </v-icon
+                        >
                     </v-list-item-icon>
 
                     <v-list-item-content>
@@ -215,7 +325,9 @@
                                 class="mt-0 pt-0"
                                 min="0"
                                 type="number"
-                                @change="$emit('resetView', levels, maxChildren)"
+                                @change="
+									$emit('resetView', levels, maxChildren)
+								"
                             ></v-text-field>
                         </v-list-item>
                         <v-subheader>Adjust Max Children</v-subheader>
@@ -226,12 +338,17 @@
                                 class="mt-0 pt-0"
                                 min="0"
                                 type="number"
-                                @change="$emit('resetView', levels, maxChildren)"
+                                @change="
+									$emit('resetView', levels, maxChildren)
+								"
                             ></v-text-field>
                         </v-list-item>
 
                         <v-list-item>
-                            <v-checkbox v-model="semanticEditing" label="Semantic editing"></v-checkbox>
+                            <v-checkbox
+                                v-model="semanticEditing"
+                                label="Semantic editing"
+                            ></v-checkbox>
                         </v-list-item>
                     </v-list>
                 </v-menu>
@@ -241,10 +358,10 @@
 </template>
 
 <script>
-import Vue from "vue";
+import Vue from 'vue'
 
 export default Vue.extend({
-    name: "FeatureModelTreeToolbar",
+    name: 'FeatureModelTreeToolbar',
 
     components: {},
 
@@ -264,42 +381,43 @@ export default Vue.extend({
         maxChildren: 3,
         spaceBetweenParentChild: 75,
         spaceBetweenSiblings: 20,
-        itemsColoring: ["Count", "Direct Children", "Total Children"],
+        itemsColoring: ['Count', 'Direct Children', 'Total Children'],
         isShortName: false,
         semanticEditing: false,
         drawer: false,
         miniSidebar: true,
         discardChangesConfirmDialog: false,
+        saveDialog: false,
     }),
 
     watch: {
         selectedColoring: function (newValue) {
-            this.$emit("coloring", newValue);
+            this.$emit('coloring', newValue)
         },
         isShortName: function (newValue) {
-            this.$emit("shortName", newValue);
+            this.$emit('shortName', newValue)
         },
         spaceBetweenParentChild: function (newValue) {
-            this.$emit("spaceBetweenParentChild", newValue);
+            this.$emit('spaceBetweenParentChild', newValue)
         },
         spaceBetweenSiblings: function (newValue) {
-            this.$emit("spaceBetweenSiblings", newValue);
+            this.$emit('spaceBetweenSiblings', newValue)
         },
         levels: function (newValue) {
-            this.$emit("levels", newValue);
+            this.$emit('levels', newValue)
         },
         maxChilds: function (newValue) {
-            this.$emit("maxChilds", newValue);
+            this.$emit('maxChilds', newValue)
         },
         semanticEditing: function (newValue) {
-            this.$emit("semanticEditing", newValue);
+            this.$emit('semanticEditing', newValue)
         },
     },
 
     computed: {},
 
     methods: {},
-});
+})
 </script>
 
 <style scoped>
