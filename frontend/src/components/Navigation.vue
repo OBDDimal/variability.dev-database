@@ -10,13 +10,16 @@
 			dark
 			clipped-left
 		>
-			<v-avatar tile class="mr-3">
+			<v-avatar
+				tile
+				:class="$vuetify.breakpoint.smAndUp ? 'mr-3' : 'mr-1'"
+			>
 				<img
 					:src="require('@/assets/ddueruem_logo_thick2.svg')"
 					alt="logo"
 				/>
 			</v-avatar>
-			<h1 class="mr-1">
+			<h1 class="hidden-xs-only mr-1">
 				{{ title }}
 			</h1>
 			<v-expand-x-transition>
