@@ -2,7 +2,7 @@ module.exports = {
 	transpileDependencies: ['vuetify'],
 	pwa: {
 		themeColor: '#1976d2',
-		name: 'DDueruem Web',
+		name: 'ddueruem Web',
 		display: 'fullscreen',
 		workboxOptions: {
 			navigateFallback: 'index.html',

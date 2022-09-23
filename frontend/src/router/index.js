@@ -115,11 +115,21 @@ const routes = [
 		},
 	},
 	{
-		path: '/feature-model',
+		path: '/feature-model/:id',
 		name: 'FeatureModel',
 		component: FeatureModel,
+		props: true,
 		meta: {
 			title: 'Feature Model Viewer',
+		},
+	},
+	{
+		path: '/collaboration/:collaborationKey',
+		name: 'FeatureModel',
+		component: FeatureModel,
+		props: true,
+		meta: {
+			title: 'Collaboration Mode',
 		},
 	},
 	{
