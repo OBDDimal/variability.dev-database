@@ -10,6 +10,12 @@
 			dark
 			clipped-left
 		>
+			<v-avatar tile class="mr-3">
+				<img
+					:src="require('@/assets/ddueruem_logo_thick2.svg')"
+					alt="logo"
+				/>
+			</v-avatar>
 			<h1 class="mr-1">
 				{{ title }}
 			</h1>
@@ -126,7 +132,7 @@
 		</v-app-bar>
 		<v-navigation-drawer v-model="drawer" app temporary>
 			<v-list>
-				<v-list-item link to="/" v-if="$store.state.isOnline">
+				<v-list-item link to="/">
 					<v-list-item-icon>
 						<v-icon left> mdi-home</v-icon>
 					</v-list-item-icon>
