@@ -10,16 +10,13 @@
 			dark
 			clipped-left
 		>
-			<v-avatar
-				tile
-				:class="$vuetify.breakpoint.smAndUp ? 'mr-3' : 'mr-1'"
-			>
+			<v-avatar tile class="hidden-xs-only mr-3">
 				<img
 					:src="require('@/assets/ddueruem_logo_thick2.svg')"
 					alt="logo"
 				/>
 			</v-avatar>
-			<h1 class="hidden-xs-only mr-1">
+			<h1 class="mr-1">
 				{{ title }}
 			</h1>
 			<v-expand-x-transition>
@@ -81,7 +78,11 @@
 				<v-btn icon v-fullscreen>
 					<v-icon> mdi-fullscreen</v-icon>
 				</v-btn>
-				<v-btn class="drawer-button" icon @click.stop="drawer = !drawer">
+				<v-btn
+					class="drawer-button"
+					icon
+					@click.stop="drawer = !drawer"
+				>
 					<v-icon> mdi-menu </v-icon>
 				</v-btn>
 			</div>
@@ -133,7 +134,12 @@
 				</v-btn>
 			</div>
 		</v-app-bar>
-		<v-navigation-drawer class="mobile-navigation" v-model="drawer" app temporary>
+		<v-navigation-drawer
+			class="mobile-navigation"
+			v-model="drawer"
+			app
+			temporary
+		>
 			<v-list>
 				<v-list-item link to="/">
 					<v-list-item-icon>
@@ -214,7 +220,8 @@
 					</v-list-item-icon>
 					Logout
 				</v-list-item>
-				<v-list-item class="mobile-theme-button"
+				<v-list-item
+					class="mobile-theme-button"
 					link
 					@click="$vuetify.theme.dark = !$vuetify.theme.dark"
 				>
@@ -232,19 +239,19 @@
 </template>
 
 <script>
-import Vue from "vue";
+import Vue from 'vue'
 
 export default Vue.extend({
-    name: "Navigation",
+	name: 'Navigation',
 
-    components: {},
+	components: {},
 
-    props: {
-        title: {
-            type: String,
-            required: true,
-        },
-    },
+	props: {
+		title: {
+			type: String,
+			required: true,
+		},
+	},
 
 	data: () => ({
 		drawer: false,
