@@ -16,7 +16,7 @@ django-rest-auth==0.9.5
 django-seed==0.3.1
 djangorestframework==3.12.4
 djangorestframework-simplejwt==5.0.0
-docker==5.0.3
+docker==6.0.0
 Faker==14.2.0
 idna==3.3
 psycopg2-binary==2.9.2
