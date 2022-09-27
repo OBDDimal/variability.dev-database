@@ -4,15 +4,15 @@
 		<div class="text-subtitle-1 mb-4 text-center">
 			Create an account for ddueruem-web
 		</div>
-		<v-row align="center" justify="center">
-			<v-col cols="12" sm="5">
+		<div class="d-flex justify-center align-center">
+			<div style="width: 100%; max-width: 350px">
 				<v-btn color="#333" block dark>
 					<v-icon left>mdi-github</v-icon>
 					Sign in with GitHub
 				</v-btn>
 				<!--				<v-btn color="#1da1f2" block class="mt-2" dark>
 					<v-icon left>mdi-twitter</v-icon>
-					Login via Twitter
+					Sign in with Twitter
 				</v-btn>-->
 				<div class="mt-4 d-flex justify-center align-center">
 					<v-divider></v-divider>
@@ -76,8 +76,8 @@
 						Register
 					</v-btn>
 				</v-form>
-			</v-col>
-		</v-row>
+			</div>
+		</div>
 	</div>
 </template>
 

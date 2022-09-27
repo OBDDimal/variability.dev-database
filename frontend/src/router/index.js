@@ -11,6 +11,7 @@ import FamilyDetail from '@/views/FamilyDetail'
 import FileDetail from '@/views/FileDetail'
 import Login from '../views/Login.vue'
 import FileCreate from '../views/FileCreate.vue'
+import GithubConfirm from '../views/GithubConfirm.vue'
 import RegisterConfirmation from '../views/RegisterConfirmation.vue'
 import FileCreateConfirmation from '@/views/FileCreateConfirmation'
 import FeatureModel from '../views/FeatureModel.vue'
@@ -104,6 +105,14 @@ const routes = [
 		component: Login,
 		meta: {
 			title: 'Login',
+		},
+	},
+	{
+		path: '/github_confirm',
+		name: 'GithubConfirm',
+		component: GithubConfirm,
+		meta: {
+			title: 'Please wait...',
 		},
 	},
 	{
