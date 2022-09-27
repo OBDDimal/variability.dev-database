@@ -23,13 +23,7 @@ class CallbackSerializer(SocialLoginSerializer):
     state = serializers.CharField()
 
     def validate_state(self, value):
-        try:
-            SocialLogin.verify_and_unstash_state(
-                self.context["request"],
-                value,
-            )
-        except PermissionDenied:
-            raise ValidationError("Invalid state.")
+        # TODO: Validate state.
         return value
 
 
