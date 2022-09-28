@@ -1,5 +1,9 @@
 <template>
-	<div></div>
+	<div class="mainView">
+		<v-skeleton-loader type="heading" class="mb-6 mt-8"></v-skeleton-loader>
+		<v-skeleton-loader type="sentences" class="mb-4"></v-skeleton-loader>
+		<v-skeleton-loader type="table"></v-skeleton-loader>
+	</div>
 </template>
 
 <script>
@@ -31,10 +35,17 @@ export default Vue.extend({
 				.then((response) => {
 					console.log(response.data)
 					localStorage.setItem(
-						'access_github',
-						JSON.stringify(response.data.key)
+						'access',
+						JSON.stringify(response.data.access_token)
 					)
-					localStorage.setItem('user', JSON.stringify('lu'))
+					localStorage.setItem(
+						'refresh',
+						JSON.stringify(response.data.refresh_token)
+					)
+					localStorage.setItem(
+						'user',
+						JSON.stringify(response.data.user)
+					)
 					this.$store.dispatch('login')
 					/*this.$store.commit('updateSnackbar', {
 						message: 'Register successful!',
@@ -46,14 +57,24 @@ export default Vue.extend({
 				})
 				.catch((error) => {
 					console.log(error)
-					/*console.log('Unsuccess3')
+					let errorMessage = null
+					if (error.response.status === 400) {
+						errorMessage = Object.prototype.hasOwnProperty.call(
+							error.response.data,
+							'non_field_errors'
+						)
+							? error.response.data.non_field_errors[0]
+							: 'Bad Request'
+					} else if (error.response.status === 500) {
+						errorMessage = 'Error while connecting to Auth Service'
+					}
 					this.$store.commit('updateSnackbar', {
-						message: 'Your code is not valid',
+						message: errorMessage,
 						variant: 'error',
 						timeout: 5000,
 						show: true,
 					})
-					window.location.replace('/')*/
+					this.$router.push('/')
 				})
 		},
 	},

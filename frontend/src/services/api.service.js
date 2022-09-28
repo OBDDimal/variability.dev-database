@@ -15,14 +15,10 @@ const instance = axios.create({
 // Enhance all requests to server with auth header
 instance.interceptors.request.use(
 	(config) => {
-		const token = authService.getAccessToken().token
+		const token = authService.getAccessToken()
 		const changeConfig = config
 		if (token && changeConfig.headers) {
-			if (authService.getAccessToken().isMailLogin) {
-				changeConfig.headers.Authorization = `Bearer ${token}`
-			} else {
-				changeConfig.headers.Authorization = `Token ${token}`
-			}
+			changeConfig.headers.Authorization = `Bearer ${token}`
 		}
 
 		return changeConfig

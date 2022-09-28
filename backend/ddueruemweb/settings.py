@@ -241,3 +241,5 @@ if GITHUB_AUTH:
     SOCIALACCOUNT_ADAPTER = 'core.adapter.AccountAPIAdapter'
 
     GITHUB_AUTH_CALLBACK = "http://localhost:8080/github_confirm"
+
+    #GITHUB_AUTH_CALLBACK = "https://google.com"

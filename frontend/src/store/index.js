@@ -17,7 +17,7 @@ export default new Vuex.Store({
 		},
 		loggedIn: !!authService.getCurrentUser(),
 		currentUser: authService.getCurrentUser(),
-		accessToken: authService.getAccessToken().token,
+		accessToken: authService.getAccessToken(),
 		tags: [],
 		families: [],
 		licenses: [],
@@ -168,7 +168,7 @@ export default new Vuex.Store({
 			state.currentUser = authService.getCurrentUser()
 		},
 		setAccessToken(state) {
-			state.accessToken = authService.getAccessToken().token
+			state.accessToken = authService.getAccessToken()
 		},
 		setTags(state, payload) {
 			const { tags } = payload

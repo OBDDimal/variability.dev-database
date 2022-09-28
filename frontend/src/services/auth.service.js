@@ -31,7 +31,6 @@ class AuthService {
 
 	logout() {
 		localStorage.removeItem('access')
-		localStorage.removeItem('access_github')
 		localStorage.removeItem('refresh')
 		localStorage.removeItem('user')
 	}
@@ -45,15 +44,8 @@ class AuthService {
 	}
 
 	getAccessToken() {
-		const ret = {}
-		if (localStorage.getItem('access') != null) {
-			ret.token = JSON.parse(localStorage.getItem('access'))
-			ret.isMailLogin = true
-		} else if (localStorage.getItem('access_github') != null) {
-			ret.token = JSON.parse(localStorage.getItem('access_github'))
-			ret.isMailLogin = false
-		}
-		if (ret !== {}) return ret
+		const accessToken = localStorage.getItem('access')
+		if (accessToken) return JSON.parse(accessToken)
 
 		return null
 	}
