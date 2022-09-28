@@ -9,218 +9,393 @@
 			</v-card-subtitle>
 
 			<v-card-text>
-				<v-container>
-					<v-form ref="form" v-model="valid" lazy-validation>
-						<v-row>
-							<v-col class="py-0" cols="12">
-								<v-text-field
-									v-model="label"
-									:rules="labelRules"
-									dense
-									hint="Name your feature model"
-									label="File name"
-									outlined
-									placeholder="Leave a filename"
-									required
-								></v-text-field>
-							</v-col>
-							<v-col class="py-0" cols="12">
-								<v-textarea
-									v-model="description"
-									:rules="descriptionRules"
-									counter="250"
-									dense
-									hint="Add a description to your feature model"
-									label="Description"
-									outlined
-									placeholder="Leave a comment here"
-									rows="2"
-								>
-								</v-textarea>
-							</v-col>
-							<v-col class="py-0" cols="12" md="6">
-								<v-file-input
-									v-model="file"
-									:rules="fileRules"
-									accept=".xml"
-									chips
-									dense
-									hint="Select the file as .xml"
-									label="File Upload"
-									outlined
-									required
-									show-size
-									small-chips
-								></v-file-input>
-							</v-col>
-							<v-col class="py-0" cols="12" md="6">
-								<v-select
-									v-model="license"
-									:items="getLicenses"
-									:rules="licenseRules"
-									dense
-									hint="Select the license of the feature model"
-									label="License"
-									outlined
-									required
-								>
-								</v-select>
-							</v-col>
-						</v-row>
-						<v-row align="end" justify="space-between">
-							<v-col class="py-0" cols="12" md="6">
-								<!-- Change back to v-combobox when new family upload is working properly -->
-								<v-combobox
-									v-model="family"
-									:items="gottenFamilies"
-									:required="true"
-									dense
-									hint="Add to or create new family"
-									label="Family"
-									outlined
-								></v-combobox>
-								<v-text-field
-									v-if="isNewFamily"
-									v-model="newFamilyDescription"
-									dense
-									hint="Describe your new family"
-									label="New Family Description"
-									outlined
-								></v-text-field>
-							</v-col>
-							<v-col class="py-0" cols="12" md="6">
-								<div
-									class="mb-3"
-									v-if="
-										latestFeatureModelVersion == null &&
-										family !== null
-									"
-								>
-									No feature models in this family yet
-								</div>
-								<div
-									class="mb-3"
-									v-else-if="
-										latestFeatureModelVersion !== null &&
-										family !== null
-									"
-								>
-									Currently
-									<span style="font-weight: bold">{{
-										numberOfModelsInFamily
-									}}</span>
-									{{
-										numberOfModelsInFamily === 1
-											? 'Feature Model'
-											: 'Feature Models'
-									}}
-									in
-									<span style="font-weight: bold">{{
-										this.newFamilyIsObject
-											? family.text
-											: family
-									}}</span>
-									family
-									<br />
-									Latest version:
-									<span style="font-weight: bold">{{
-										latestFeatureModelVersion
-									}}</span>
-								</div>
-								<v-text-field
-									v-model="version"
-									:rules="versionRules"
-									:required="true"
-									dense
-									hint="Version of feature model"
-									label="Version"
-									placeholder="1.0.0"
-									outlined
-								></v-text-field>
-							</v-col>
-						</v-row>
-						<v-row>
-							<v-col class="py-0" cols="12">
-								<!-- Change back to v-combobox once sequential axios requests are implemented -->
-								<v-autocomplete
-									v-model="tags"
-									:items="getTags"
-									append-outer-icon="mdi-plus"
-									chips
-									dense
-									hide-details
-									hint="Choose or create tags for your feature model"
-									label="Tags"
-									multiple
-									outlined
-									small-chips
-									@click:append-outer="
-										editTagMenu = !editTagMenu
-									"
-								></v-autocomplete>
-							</v-col>
-							<v-col class="pb-0" cols="12">
-								<v-checkbox
-									v-model="legalShare"
-									class="mt-0"
-									hide-details
-									label="I am legally allowed to share this model"
-									outlined
-									required
-								>
-								</v-checkbox>
-							</v-col>
-							<v-col class="py-0" cols="12">
-								<v-checkbox
-									v-model="userData"
-									class="mt-0"
-									hide-details
-									label="My email and a date will always be tied to the file upload (even after account deletion)"
-									outlined
-									required
-								>
-								</v-checkbox>
-							</v-col>
-							<v-col class="py-0" cols="12">
-								<v-checkbox
-									v-model="openSource"
-									class="mt-0"
-									hide-details
-									label="All information will be published according to your chosen license"
-									outlined
-									required
-								>
-								</v-checkbox>
-							</v-col>
-							<v-col class="pb-0" cols="12">
-								<div class="d-flex align-center">
-									<v-spacer></v-spacer>
-									<span
-										v-if="uploadStatus !== ''"
-										class="text-subtitle-1"
-										>{{ uploadStatus }}</span
-									>
-									<v-btn color="primary" text @click="close">
-										Cancel</v-btn
-									>
-									<v-btn
-										:disabled="
-											!valid ||
-											!openSource ||
-											!userData ||
-											!legalShare
-										"
-										:loading="loading"
-										color="primary"
-										@click="upload"
-									>
-										Upload
-									</v-btn>
-								</div>
-							</v-col>
-						</v-row>
-					</v-form>
-				</v-container>
+				<v-tabs
+					v-model="tab"
+					background-color="transparent"
+					color="primary"
+					:class="tab === 1 ? 'mb-0' : 'mb-4'"
+					centered
+				>
+					<v-tab> Single Upload </v-tab>
+					<v-tab> Bulk Upload </v-tab>
+				</v-tabs>
+
+				<v-tabs-items v-model="tab">
+					<v-tab-item>
+						<v-container>
+							<v-form ref="form" v-model="valid" lazy-validation>
+								<v-row>
+									<v-col class="py-0" cols="12">
+										<v-text-field
+											v-model="label"
+											:rules="labelRules"
+											dense
+											hint="Name your feature model"
+											label="File name"
+											outlined
+											placeholder="Leave a filename"
+											required
+										></v-text-field>
+									</v-col>
+									<v-col class="py-0" cols="12">
+										<v-textarea
+											v-model="description"
+											:rules="descriptionRules"
+											counter="250"
+											dense
+											hint="Add a description to your feature model"
+											label="Description"
+											outlined
+											placeholder="Leave a comment here"
+											rows="2"
+										>
+										</v-textarea>
+									</v-col>
+									<v-col class="py-0" cols="12" md="6">
+										<v-file-input
+											v-model="file"
+											:rules="fileRules"
+											accept=".xml"
+											chips
+											dense
+											hint="Select the file as .xml"
+											label="File Upload"
+											outlined
+											required
+											show-size
+											small-chips
+										></v-file-input>
+									</v-col>
+									<v-col class="py-0" cols="12" md="6">
+										<v-select
+											v-model="license"
+											:items="getLicenses"
+											:rules="licenseRules"
+											dense
+											hint="Select the license of the feature model"
+											label="License"
+											outlined
+											required
+										>
+										</v-select>
+									</v-col>
+								</v-row>
+								<v-row align="end" justify="space-between">
+									<v-col class="py-0" cols="12" md="6">
+										<!-- Change back to v-combobox when new family upload is working properly -->
+										<v-combobox
+											v-model="family"
+											:items="gottenFamilies"
+											:required="true"
+											dense
+											hint="Add to or create new family"
+											label="Family"
+											outlined
+										></v-combobox>
+										<v-text-field
+											v-if="isNewFamily"
+											v-model="newFamilyDescription"
+											dense
+											hint="Describe your new family"
+											label="New Family Description"
+											outlined
+										></v-text-field>
+									</v-col>
+									<v-col class="py-0" cols="12" md="6">
+										<div
+											class="mb-3"
+											v-if="
+												latestFeatureModelVersion ==
+													null && family !== null
+											"
+										>
+											No feature models in this family yet
+										</div>
+										<div
+											class="mb-3"
+											v-else-if="
+												latestFeatureModelVersion !==
+													null && family !== null
+											"
+										>
+											Currently
+											<span style="font-weight: bold">{{
+												numberOfModelsInFamily
+											}}</span>
+											{{
+												numberOfModelsInFamily === 1
+													? 'Feature Model'
+													: 'Feature Models'
+											}}
+											in
+											<span style="font-weight: bold">{{
+												this.newFamilyIsObject
+													? family.text
+													: family
+											}}</span>
+											family
+											<br />
+											Latest version:
+											<span style="font-weight: bold">{{
+												latestFeatureModelVersion
+											}}</span>
+										</div>
+										<v-text-field
+											v-model="version"
+											:rules="versionRules"
+											:required="true"
+											dense
+											hint="Version of feature model"
+											label="Version"
+											placeholder="1.0.0"
+											outlined
+										></v-text-field>
+									</v-col>
+								</v-row>
+								<v-row>
+									<v-col class="py-0" cols="12">
+										<!-- Change back to v-combobox once sequential axios requests are implemented -->
+										<v-autocomplete
+											v-model="tags"
+											:items="getTags"
+											append-outer-icon="mdi-plus"
+											chips
+											dense
+											hide-details
+											hint="Choose or create tags for your feature model"
+											label="Tags"
+											multiple
+											outlined
+											small-chips
+											@click:append-outer="
+												editTagMenu = !editTagMenu
+											"
+										></v-autocomplete>
+									</v-col>
+									<v-col class="pb-0" cols="12">
+										<v-checkbox
+											v-model="legalShare"
+											class="mt-0"
+											hide-details
+											label="I am legally allowed to share this model"
+											outlined
+											required
+										>
+										</v-checkbox>
+									</v-col>
+									<v-col class="py-0" cols="12">
+										<v-checkbox
+											v-model="userData"
+											class="mt-0"
+											hide-details
+											label="My email and a date will always be tied to the file upload (even after account deletion)"
+											outlined
+											required
+										>
+										</v-checkbox>
+									</v-col>
+									<v-col class="py-0" cols="12">
+										<v-checkbox
+											v-model="openSource"
+											class="mt-0"
+											hide-details
+											label="All information will be published according to your chosen license"
+											outlined
+											required
+										>
+										</v-checkbox>
+									</v-col>
+									<v-col class="pb-0" cols="12">
+										<div class="d-flex align-center">
+											<v-spacer></v-spacer>
+											<span
+												v-if="uploadStatus !== ''"
+												class="text-subtitle-1"
+												>{{ uploadStatus }}</span
+											>
+											<v-btn
+												color="primary"
+												text
+												@click="close"
+											>
+												Cancel</v-btn
+											>
+											<v-btn
+												:disabled="
+													!valid ||
+													!openSource ||
+													!userData ||
+													!legalShare
+												"
+												:loading="loading"
+												color="primary"
+												@click="upload"
+											>
+												Upload
+											</v-btn>
+										</div>
+									</v-col>
+								</v-row>
+							</v-form>
+						</v-container>
+					</v-tab-item>
+					<v-tab-item>
+						<v-container>
+							<div class="mb-6">
+								<b>Name: </b> The name of the Feature Model is
+								derived from the individual file name. <br />
+								<b>Description: </b> The description of the
+								Feature Model will be left blank. <br />
+								<b>License: </b> The choosen license will be
+								applied to each individual Feature Model. <br />
+								<b>Version: </b> Versioning will start from
+								1.0.0 and from there on incrementing the major
+								number (2.0.0, 3.0.0, etc). <br />
+								<b>Tags: </b> The choosen tags will be applied
+								to each individual Feature Model. <br />
+							</div>
+							<v-form
+								ref="bulkform"
+								v-model="valid_bulk"
+								lazy-validation
+							>
+								<v-row>
+									<v-col class="py-0" cols="12" md="6">
+										<v-file-input
+											v-model="file_bulk"
+											:rules="fileRules"
+											accept=".xml, .zip"
+											multiple
+											dense
+											hint="Select the files as .xml"
+											label="File Upload"
+											outlined
+											required
+											show-size
+										></v-file-input>
+									</v-col>
+									<v-col class="py-0" cols="12" md="6">
+										<v-select
+											v-model="license_bulk"
+											:items="getLicenses"
+											:rules="licenseRules"
+											dense
+											hint="Select the license of the feature model"
+											label="License"
+											outlined
+											required
+										>
+										</v-select>
+									</v-col>
+									<v-col class="py-0" cols="12" md="6">
+										<!-- Change back to v-combobox when new family upload is working properly -->
+										<v-text-field
+											v-model="family_bulk"
+											:required="true"
+											dense
+											hint="Create new family"
+											label="New Family"
+											outlined
+										></v-text-field>
+									</v-col>
+									<v-col class="py-0" cols="12" md="6">
+										<v-text-field
+											v-model="newFamilyDescription_bulk"
+											dense
+											hint="Describe your new family"
+											label="New Family Description"
+											outlined
+										></v-text-field>
+									</v-col>
+								</v-row>
+								<v-row>
+									<v-col class="py-0" cols="12">
+										<!-- Change back to v-combobox once sequential axios requests are implemented -->
+										<v-autocomplete
+											v-model="tags_bulk"
+											:items="getTags"
+											append-outer-icon="mdi-plus"
+											chips
+											dense
+											hide-details
+											hint="Choose or create tags for your feature model"
+											label="Tags"
+											multiple
+											outlined
+											small-chips
+											@click:append-outer="
+												editTagMenu = !editTagMenu
+											"
+										></v-autocomplete>
+									</v-col>
+									<v-col class="pb-0" cols="12">
+										<v-checkbox
+											v-model="legalShare_bulk"
+											class="mt-0"
+											hide-details
+											label="I am legally allowed to share this model"
+											outlined
+											required
+										>
+										</v-checkbox>
+									</v-col>
+									<v-col class="py-0" cols="12">
+										<v-checkbox
+											v-model="userData_bulk"
+											class="mt-0"
+											hide-details
+											label="My email and a date will always be tied to the file upload (even after account deletion)"
+											outlined
+											required
+										>
+										</v-checkbox>
+									</v-col>
+									<v-col class="py-0" cols="12">
+										<v-checkbox
+											v-model="openSource_bulk"
+											class="mt-0"
+											hide-details
+											label="All information will be published according to your chosen license"
+											outlined
+											required
+										>
+										</v-checkbox>
+									</v-col>
+									<v-col class="pb-0" cols="12">
+										<div class="d-flex align-center">
+											<v-spacer></v-spacer>
+											<span
+												v-if="uploadStatus !== ''"
+												class="text-subtitle-1"
+												>{{ uploadStatus }}</span
+											>
+											<v-btn
+												color="primary"
+												text
+												@click="close"
+											>
+												Cancel</v-btn
+											>
+											<v-btn
+												:disabled="
+													!valid_bulk ||
+													!openSource_bulk ||
+													!userData_bulk ||
+													!legalShare_bulk
+												"
+												:loading="loading"
+												color="primary"
+												@click="upload"
+											>
+												Upload
+											</v-btn>
+										</div>
+									</v-col>
+								</v-row>
+							</v-form>
+						</v-container>
+					</v-tab-item>
+				</v-tabs-items>
 			</v-card-text>
 		</v-card>
 		<v-dialog v-model="editTagMenu" max-width="350">
@@ -289,6 +464,7 @@ export default Vue.extend({
 
 	data: () => ({
 		valid: false,
+		valid_bulk: false,
 
 		label: '',
 		labelRules: [(v) => !!v || 'Label is required'],
@@ -300,10 +476,12 @@ export default Vue.extend({
 		],
 
 		file: null,
+		file_bulk: null,
 		fileRules: [(v) => !!v || 'File is required'],
 
 		gottenLicenses: [],
 		license: '',
+		license_bulk: '',
 		licenseRules: [(v) => !!v || 'License is required'],
 
 		gottenFamilies: [],
@@ -314,16 +492,23 @@ export default Vue.extend({
 		versionRules: [(v) => !!v || 'Version is required'],
 
 		family: null,
+		family_bulk: null,
 		newFamilyDescription: '',
+		newFamilyDescription_bulk: '',
 		isNewFamily: false,
 
 		gottenTags: [],
 		tags: [],
+		tags_bulk: [],
 		newTag: { label: '', description: '', is_public: false },
 
 		legalShare: false,
 		userData: false,
 		openSource: false,
+
+		legalShare_bulk: false,
+		userData_bulk: false,
+		openSource_bulk: false,
 
 		loading: false,
 		uploadStatus: '',
@@ -334,6 +519,8 @@ export default Vue.extend({
 		latestFeatureModelVersion: null,
 		numberOfModelsInFamily: 0,
 		newFamilyIsObject: false,
+
+		tab: 0,
 
 		/* gottenFiles: [],
         newVersionOf: "",
