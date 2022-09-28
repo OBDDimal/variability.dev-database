@@ -23,6 +23,7 @@ class CallbackSerializer(SocialLoginSerializer):
     state = serializers.CharField()
 
     def validate_state(self, value):
+        # TODO: Validate state.
         return value
 
 
