@@ -229,7 +229,7 @@
 												"
 												:loading="loading"
 												color="primary"
-												@click="upload"
+												@click="uploadSingle"
 											>
 												Upload
 											</v-btn>
@@ -245,14 +245,15 @@
 								<b>Name: </b> The name of the Feature Model is
 								derived from the individual file name. <br />
 								<b>Description: </b> The description of the
-								Feature Model will be left blank. <br />
-								<b>License: </b> The choosen license will be
+								Feature Model will be a static notice with a
+								timestamp. <br />
+								<b>License: </b> The chosen license will be
 								applied to each individual Feature Model. <br />
 								<b>Version: </b> Versioning will start from
 								1.0.0 and from there on incrementing the major
 								number (2.0.0, 3.0.0, etc). <br />
-								<b>Tags: </b> The choosen tags will be applied
-								to each individual Feature Model. <br />
+								<b>Tags: </b> The chosen tags will be applied to
+								each individual Feature Model. <br />
 							</div>
 							<v-form
 								ref="bulkform"
@@ -374,8 +375,8 @@
 												text
 												@click="close"
 											>
-												Cancel</v-btn
-											>
+												Cancel
+											</v-btn>
 											<v-btn
 												:disabled="
 													!valid_bulk ||
@@ -385,7 +386,7 @@
 												"
 												:loading="loading"
 												color="primary"
-												@click="upload"
+												@click="uploadBulk()"
 											>
 												Upload
 											</v-btn>
@@ -476,7 +477,7 @@ export default Vue.extend({
 		],
 
 		file: null,
-		file_bulk: null,
+		file_bulk: [],
 		fileRules: [(v) => !!v || 'File is required'],
 
 		gottenLicenses: [],
@@ -621,7 +622,76 @@ export default Vue.extend({
 				.filter((element) => element.owner)
 				.map((element) => ({ text: element.label, value: element.id }))
 		},
-		async upload() {
+		async uploadBulk() {
+			if (this.$refs.bulkform.validate() !== false) {
+				this.loading = true
+				let versionMajor = 1
+				for (let i = 0; i < this.file_bulk.length; i++) {
+					const data = new FormData()
+
+					data.append('label', this.file_bulk[i].name.slice(0, -4))
+					console.log('LABEL')
+					console.log(this.file_bulk[i].name.slice(0, -4))
+					const event = new Date()
+					const options = {
+						weekday: 'long',
+						year: 'numeric',
+						month: 'long',
+						day: 'numeric',
+						hour: 'numeric',
+						minute: 'numeric',
+					}
+					data.append(
+						'description',
+						`Added in bulk upload on ${event.toLocaleDateString(
+							'en-US',
+							options
+						)}`
+					)
+					console.log('DESCRIPTION')
+					console.log(
+						`Added in bulk upload on ${event.toLocaleDateString(
+							'en-US',
+							options
+						)}`
+					)
+					data.append('local_file', this.file_bulk[i])
+					data.append('license', this.license_bulk)
+					console.log('LICENSE')
+					console.log(this.license_bulk)
+					data.append('version', `${versionMajor}.0.0`)
+					console.log('VERSION')
+					console.log(`${versionMajor}.0.0`)
+					if (i !== 0) {
+						//change back to this.family.value when using v-combobox again
+						data.append('family', this.family_bulk)
+						console.log('FAMILY (not new)')
+						console.log(this.family_bulk)
+					} else {
+						this.uploadStatus = 'Uploading new family...'
+						const uploadedFamily = await this.$store.dispatch(
+							'uploadFamily',
+							{
+								label: this.family_bulk,
+								description: this.newFamilyDescription_bulk,
+							}
+						)
+						data.append('family', uploadedFamily.id)
+						console.log('FAMILY (new) id:')
+						console.log(uploadedFamily.id)
+					}
+					data.append('tags', JSON.stringify(this.tags_bulk))
+					console.log('TAGS')
+					console.log(JSON.stringify(this.tags_bulk))
+					versionMajor++
+					await this.uploadFile(data, i + 1, this.file_bulk.length)
+				}
+				this.uploadStatus = ''
+				this.loading = false
+				this.close()
+			}
+		},
+		async uploadSingle() {
 			if (this.$refs.form.validate() !== false) {
 				this.loading = true
 				const data = new FormData()
@@ -660,13 +730,19 @@ export default Vue.extend({
 				data.append('tags', JSON.stringify(this.tags))
 				console.log('TAGS')
 				console.log(JSON.stringify(this.tags))
-				this.uploadStatus = 'Uploading file...'
-				await this.$store.dispatch('uploadFeatureModel', data)
-				console.log('finished uploading file')
+				await this.uploadFile(data, -1, -1)
 				this.uploadStatus = ''
 				this.loading = false
 				this.close()
 			}
+		},
+		async uploadFile(data, number, max) {
+			this.uploadStatus =
+				number === -1
+					? 'Uploading file...'
+					: `Uploading file ${number}/${max}`
+			await this.$store.dispatch('uploadFeatureModel', data)
+			console.log('finished uploading file')
 		},
 		async uploadTag() {
 			this.loadingAddTag = true
