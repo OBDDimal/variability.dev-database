@@ -350,6 +350,12 @@
                                 label="Semantic editing"
                             ></v-checkbox>
                         </v-list-item>
+                        <v-list-item>
+                            <v-checkbox
+                                v-model="quickEdit"
+                                label="Quick edit"
+                            ></v-checkbox>
+                        </v-list-item>
                     </v-list>
                 </v-menu>
             </v-list>
@@ -384,6 +390,7 @@ export default Vue.extend({
         itemsColoring: ['Count', 'Direct Children', 'Total Children'],
         isShortName: false,
         semanticEditing: false,
+        quickEdit: true,
         drawer: false,
         miniSidebar: true,
         discardChangesConfirmDialog: false,
@@ -412,6 +419,9 @@ export default Vue.extend({
         semanticEditing: function (newValue) {
             this.$emit('semanticEditing', newValue)
         },
+        quickEdit: function (newValue) {
+            this.$emit('quickEdit', newValue)
+        }
     },
 
     computed: {},

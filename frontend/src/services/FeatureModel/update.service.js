@@ -85,7 +85,7 @@ function updateFeatureNodes(d3Data, visibleD3Nodes) {
 }
 
 function updateQuickEditActions(d3Data, featureNodeUpdate) {
-    const quickEditActions = featureNodeUpdate.selectAll('g.quick-edit-actions').data(d => [d], d => d.data.id);
+    const quickEditActions = featureNodeUpdate.selectAll('g.quick-edit-actions').data(d => d3Data.quickEdit ? [d] : [], d => d.data.id);
 
     const quickEditActionsEnter = quickEditActions.enter().append('g').classed('quick-edit-actions', true);
     const quickEditActionsUpdate = quickEditActionsEnter.merge(quickEditActions);
@@ -96,16 +96,10 @@ function updateQuickEditActions(d3Data, featureNodeUpdate) {
         .classed("quick-edit-action-child", true)
         .on('click', (e, d3Node) => {
             e.stopPropagation();
+            d3Data.d3AddNodeIndex = d3Node.data.children.length;
             d3Data.featureModelTree.openAddAsChildDialog(d3Node);
         });
-    bottomEnter
-        .append('circle')
-        .attr("fill", "#4caf50")
-        .attr("r", CONSTANTS.QUICK_EDIT_RADIUS);
-    bottomEnter
-        .append("path")
-        .attr("d", `M -0.5 ${-(2 * CONSTANTS.QUICK_EDIT_RADIUS) / 3} h 1 v ${(4 * CONSTANTS.QUICK_EDIT_RADIUS) / 3} h -1 V ${(4 * CONSTANTS.QUICK_EDIT_RADIUS) / 3} z`)
-        .attr("fill", "white");
+    drawQuickEditGroup(bottomEnter);
     quickEditActionsUpdate
         .select('g.quick-edit-action-child')
         .attr('transform', `translate(0, ${RECT_HEIGHT})`);
@@ -117,16 +111,10 @@ function updateQuickEditActions(d3Data, featureNodeUpdate) {
         .classed('quick-edit-action-left', true)
         .on('click', (e, d3Node) => {
             e.stopPropagation();
+            d3Data.d3AddNodeIndex = d3Node.data.parent.children.indexOf(d3Node.data);
             d3Data.featureModelTree.openAddAsSiblingDialog(d3Node);
         });
-    leftEnter
-        .append('circle')
-        .attr("fill", "#4caf50")
-        .attr("r", CONSTANTS.QUICK_EDIT_RADIUS);
-    leftEnter
-        .append("path")
-        .attr("d", `M -0.5 ${-(2 * CONSTANTS.QUICK_EDIT_RADIUS) / 3} h 1 v ${(4 * CONSTANTS.QUICK_EDIT_RADIUS) / 3} h -1 V ${(4 * CONSTANTS.QUICK_EDIT_RADIUS) / 3} z`)
-        .attr("fill", "white");
+    drawQuickEditGroup(leftEnter);
     quickEditActionsUpdate
         .select('g.quick-edit-action-left')
         .attr('transform', d3Node => `translate(${-d3Node.width / 2}, ${RECT_HEIGHT / 2})`);
@@ -138,21 +126,30 @@ function updateQuickEditActions(d3Data, featureNodeUpdate) {
         .classed('quick-edit-action-right', true)
         .on('click', (e, d3Node) => {
             e.stopPropagation();
+            d3Data.d3AddNodeIndex = d3Node.data.parent.children.indexOf(d3Node.data) + 1;
             d3Data.featureModelTree.openAddAsSiblingDialog(d3Node);
         });
-    rightEnter
-        .append('circle')
-        .attr("fill", "#4caf50")
-        .attr("r", CONSTANTS.QUICK_EDIT_RADIUS);
-    rightEnter
-        .append("path")
-        .attr("d", `M -0.5 ${-(2 * CONSTANTS.QUICK_EDIT_RADIUS) / 3} h 1 v ${(4 * CONSTANTS.QUICK_EDIT_RADIUS) / 3} h -1 V ${(4 * CONSTANTS.QUICK_EDIT_RADIUS) / 3} z`)
-        .attr("fill", "white");
+    drawQuickEditGroup(rightEnter);
     quickEditActionsUpdate
         .select('g.quick-edit-action-right')
         .attr('transform', d3Node => `translate(${d3Node.width / 2}, ${RECT_HEIGHT / 2})`);
 
     quickEditActions.exit().remove();
+}
+
+function drawQuickEditGroup(d3Element) {
+    d3Element
+        .append('circle')
+        .attr("fill", "#4caf50")
+        .attr("r", CONSTANTS.QUICK_EDIT_RADIUS);
+    d3Element
+        .append("path")
+        .attr("d", `M -0.5 ${-(2 * CONSTANTS.QUICK_EDIT_RADIUS) / 3} h 1 v ${(4 * CONSTANTS.QUICK_EDIT_RADIUS) / 3} h -1 z`)
+        .attr("fill", "white");
+    d3Element
+        .append("path")
+        .attr("d", `M ${-(2 * CONSTANTS.QUICK_EDIT_RADIUS) / 3} -0.5 v 1 h ${(4 * CONSTANTS.QUICK_EDIT_RADIUS) / 3} v -1 z`)
+        .attr("fill", "white");
 }
 
 function updateChildrenCount(d3Data, featureNodeUpdate) {

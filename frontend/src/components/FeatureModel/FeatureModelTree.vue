@@ -5,13 +5,13 @@
                 class="rounded-pill"
                 elevation="9"
                 height="auto"
-                width="auto"
                 style="border: 2px solid white"
+                width="auto"
             >
                 <v-btn
                     :disabled="search.foundNodeIndex === 0"
-                    icon
                     :small="$vuetify.breakpoint.smAndDown"
+                    icon
                     @click="onChangeFoundNodeIndex(--search.foundNodeIndex)"
                 >
                     <v-icon>mdi-chevron-left</v-icon>
@@ -22,25 +22,25 @@
 						search.foundNodeDistances.length <=
 						search.foundNodeIndex + 1
 					"
-                    icon
                     :small="$vuetify.breakpoint.smAndDown"
+                    icon
                     @click="onChangeFoundNodeIndex(++search.foundNodeIndex)"
                 >
                     <v-icon>mdi-chevron-right</v-icon>
                 </v-btn>
                 <v-spacer></v-spacer>
                 <v-text-field
-                    :dense="$vuetify.breakpoint.smAndDown"
-                    prepend-inner-icon="mdi-magnify"
-                    @focus="search.showSearch = true"
-                    @blur="search.showSearch = false"
                     v-model="search.searchText"
-                    class="px-4 expanding-search"
                     :class="search.showSearch ? '' : 'closed'"
+                    :dense="$vuetify.breakpoint.smAndDown"
+                    class="px-4 expanding-search"
                     clearable
                     hide-details
                     placeholder="Search"
+                    prepend-inner-icon="mdi-magnify"
                     single-line
+                    @blur="search.showSearch = false"
+                    @focus="search.showSearch = true"
                     @input="onChangeSearchText"
                 ></v-text-field>
 
@@ -62,16 +62,17 @@
         </div>
 
         <feature-model-tree-toolbar
+            :collaborationStatus="collaborationStatus"
             :direction="d3Data.direction"
             :editRights="editRights"
             :is-redo-available="commandManager && commandManager.isRedoAvailable()"
             :is-save-available="(commandManager && commandManager.isUndoAvailable())
                 || (commandManager.collaborationManager.constraintCommandManager.isUndoAvailable())"
             :is-undo-available="commandManager && commandManager.isUndoAvailable()"
-            :collaborationStatus="collaborationStatus"
             @coloring="coloringIndex => coloring(coloringIndex)"
             @export="$emit('exportToXML')"
             @fitToView="fitToView"
+            @quickEdit="value => updateQuickEdit(value)"
             @redo="redo"
             @reset="$emit('reset')"
             @resetView="(levels, maxChildren) => resetView(levels, maxChildren)"
@@ -199,8 +200,10 @@ export default Vue.extend({
             spaceBetweenParentChild: 75,
             spaceBetweenSiblings: 20,
             d3ParentOfAddNode: undefined,
+            d3AddNodeIndex: 0,
             coloringIndex: -1,
             semanticEditing: false,
+            quickEdit: true,
             direction: 'v', // h = horizontally, v = vertically
             maxHorizontallyLevelWidth: [],
             featureModelTree: undefined,
@@ -350,15 +353,14 @@ export default Vue.extend({
             const parent = this.d3Data.d3ParentOfAddNode.data
             const addCommand = new AddCommand(
                 parent,
-                parent.children ? parent.children.length : 0,
+                this.d3Data.d3AddNodeIndex,
                 newNode
-            )
+            );
             this.commandManager.execute(addCommand)
             update.updateSvg(this.d3Data)
         },
 
         openAddAsChildDialog(d3Node) {
-            console.log(d3Node);
             this.d3Data.d3ParentOfAddNode = d3Node
             this.showAddDialog = true
         },
@@ -403,6 +405,11 @@ export default Vue.extend({
         updateConstraints() {
             this.$emit('update-constraints')
         },
+
+        updateQuickEdit(newValue) {
+            this.d3Data.quickEdit = newValue
+            this.updateSvg();
+        }
     },
 
     computed: {
