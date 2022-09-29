@@ -25,7 +25,7 @@ export default new Vuex.Store({
 		featureModels: [],
 		searchedNodes: '',
 		openConstraints: false,
-        isOnline: true,
+		isOnline: true,
 	},
 	actions: {
 		logout({ commit }) {
@@ -134,6 +134,24 @@ export default new Vuex.Store({
 					return error
 				})
 		},
+		async loginWithGithubRedirect({ commit }) {
+			return api
+				.post(`${API_URL}auth/github/redirect/`)
+				.then((response) => {
+					return response.data.url
+				})
+				.catch((error) => {
+					commit('updateSnackbar', {
+						message:
+							'Error while connecting to GitHub: ' +
+							error.message,
+						variant: 'error',
+						timeout: 5000,
+						show: true,
+					})
+					return error
+				})
+		},
 	},
 	mutations: {
 		updateSnackbar(state, payload) {
@@ -175,9 +193,9 @@ export default new Vuex.Store({
 		openConstraints(state, open) {
 			state.openConstraints = open
 		},
-        setOnlineState(state, isOnline) {
-            state.isOnline = isOnline;
-        }
+		setOnlineState(state, isOnline) {
+			state.isOnline = isOnline
+		},
 	},
 	modules: {},
 })
