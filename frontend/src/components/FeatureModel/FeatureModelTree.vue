@@ -358,6 +358,7 @@ export default Vue.extend({
         },
 
         openAddAsChildDialog(d3Node) {
+            console.log(d3Node);
             this.d3Data.d3ParentOfAddNode = d3Node
             this.showAddDialog = true
         },
