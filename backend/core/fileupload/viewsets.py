@@ -101,7 +101,7 @@ class ConfirmFileUploadViewSet(GenericViewSet, CreateModelMixin):
 class FileUploadViewSet(viewsets.ModelViewSet):
     queryset = File.objects.all()
     serializer_class = FilesSerializer
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [AllowAny]
 
     def list(self, request, **kwargs):
         """
