@@ -2,8 +2,8 @@
     <v-data-table
         :headers="headers"
         :items="desserts"
-        class="elevation-1"
         :search="search"
+        class="elevation-1"
     >
         <template v-slot:top>
             <v-toolbar flat>
@@ -13,21 +13,21 @@
                 <v-text-field
                     v-model="search"
                     append-icon="mdi-magnify"
+                    hide-details
                     label="Search"
                     single-line
-                    hide-details
                 ></v-text-field>
                 <v-dialog v-if="add" v-model="dialog" max-width="500px">
                     <template v-slot:activator="{ on, attrs }">
                         <v-btn
+                            class="mb-2 ml-4"
                             color="primary"
                             dark
                             rounded
-                            class="mb-2 ml-4"
                             v-bind="attrs"
                             v-on="on"
                         >
-                            <v-icon left> mdi-plus </v-icon>
+                            <v-icon left> mdi-plus</v-icon>
                             New
                         </v-btn>
                     </template>
@@ -75,8 +75,9 @@
                 <v-dialog v-model="dialogDelete" max-width="500px">
                     <v-card>
                         <v-card-title class="text-h5"
-                            >Are you sure you want to delete this
-                            tag?</v-card-title
+                        >Are you sure you want to delete this
+                            tag?
+                        </v-card-title
                         >
                         <v-card-actions>
                             <v-spacer></v-spacer>
@@ -84,13 +85,15 @@
                                 color="blue darken-1"
                                 text
                                 @click="closeDelete"
-                                >Cancel</v-btn
+                            >Cancel
+                            </v-btn
                             >
                             <v-btn
                                 color="blue darken-1"
                                 text
                                 @click="deleteItemConfirm"
-                                >OK</v-btn
+                            >OK
+                            </v-btn
                             >
                             <v-spacer></v-spacer>
                         </v-card-actions>
@@ -100,22 +103,24 @@
         </template>
         <template v-slot:item.actions="{ item }">
             <v-btn
-                small
-                rounded
-                color="primary"
                 class="mr-2"
+                color="primary"
+                rounded
+                small
                 @click="editItem(item)"
             >
-                <v-icon>mdi-pencil</v-icon></v-btn
+                <v-icon>mdi-pencil</v-icon>
+            </v-btn
             >
             <v-btn
-                small
-                rounded
-                color="error"
                 class="mr-2"
+                color="error"
+                rounded
+                small
                 @click="deleteItem(item)"
             >
-                <v-icon>mdi-delete</v-icon></v-btn
+                <v-icon>mdi-delete</v-icon>
+            </v-btn
             >
             <!-- <v-btn small rounded color="error" class="mr-2"> <v-icon>mdi-delete</v-icon></v-btn> -->
         </template>
@@ -123,8 +128,8 @@
             {{ index + 1 }}
         </template>
         <template v-slot:item.public="{ item }">
-            <v-icon v-if="item.public" color="success"> mdi-check </v-icon>
-            <v-icon v-else color="error"> mdi-cancel </v-icon>
+            <v-icon v-if="item.public" color="success"> mdi-check</v-icon>
+            <v-icon v-else color="error"> mdi-cancel</v-icon>
         </template>
     </v-data-table>
 </template>
@@ -151,6 +156,3 @@ export default Vue.extend({
     methods: {},
 });
 </script>
-
-<style scoped>
-</style>

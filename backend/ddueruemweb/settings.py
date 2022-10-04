@@ -45,10 +45,19 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django_extensions',
-
+    'django_filters',
     'rest_framework',
     'rest_framework_simplejwt',
     'corsheaders',
+    'django_seed',
+
+    'rest_framework.authtoken',
+    'dj_rest_auth',
+    'dj_rest_auth.registration',
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.github',
 ]
 
 MIDDLEWARE = [
@@ -132,12 +141,14 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
         'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.TokenAuthentication',
     ),
     'DEFAULT_RENDERER_CLASSES': (
         'rest_framework.renderers.JSONRenderer',
         # enable django rest framework rendering in browser
         'rest_framework.renderers.BrowsableAPIRenderer',
-    )
+    ),
+    'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend']
 }
 
 # Internationalization
@@ -196,3 +207,39 @@ LOGGING = {
     'version': 1,  # the dictConfig format version
     'disable_existing_loggers': False,  # retain the default loggers
 }
+
+SECURE_SSL_REDIRECT = env("USE_SSL") == True
+SECURE_PROXY_SSL_HEADER = None
+
+if env("USE_SSL"):
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+GITHUB_AUTH = True
+
+ACCOUNT_USER_MODEL_USERNAME_FIELD = None
+ACCOUNT_AUTHENTICATION_METHOD = 'email'
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_UNIQUE_EMAIL = True
+ACCOUNT_USERNAME_REQUIRED = False
+ACCOUNT_EMAIL_VERIFICATION = "none"
+REST_USE_JWT = True
+
+
+if GITHUB_AUTH:
+    AUTHENTICATION_BACKENDS = (
+        'allauth.account.auth_backends.AuthenticationBackend',
+        'django.contrib.auth.backends.ModelBackend',
+    )
+    SOCIALACCOUNT_PROVIDERS = {
+        'github': {
+            'SCOPE': [
+                'user:email',
+            ],
+        }
+    }
+
+    SOCIALACCOUNT_ADAPTER = 'core.adapter.AccountAPIAdapter'
+
+    GITHUB_AUTH_CALLBACK = "http://localhost:8080/github_confirm"
+
+    #GITHUB_AUTH_CALLBACK = "https://google.com"

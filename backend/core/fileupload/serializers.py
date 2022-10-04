@@ -18,7 +18,7 @@ class FamiliesSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Family
-        fields = ['id', 'owner', 'label', 'description', 'date_created']
+        fields = ['id', 'owner', 'label', 'description', 'date_created', 'slug']
 
 
 class LicensesSerializer(serializers.ModelSerializer):
@@ -53,7 +53,7 @@ class FilesSerializer(serializers.ModelSerializer):
     family = FamiliesSerializer()
     license = LicensesSerializer()
     analysis = serializers.SerializerMethodField(method_name='get_analysis_state')
-    new_version_of = 'self'
+    # version = 'self'
 
     def get_analysis_state(self, file):
         """
@@ -81,7 +81,7 @@ class FilesSerializer(serializers.ModelSerializer):
     class Meta:
         model = File
         fields = ['id', 'label', 'description', 'local_file', 'family', 'license', 'tags', 'owner', 'uploaded_at',
-                  'new_version_of', 'transpiled_file', 'analysis']
+                  'version', 'transpiled_file', 'analysis', 'slug']
         read_only_fields = ['mirrored', 'is_confirmed']
 
     def create(self, validated_data):
@@ -104,9 +104,8 @@ class FilesSerializer(serializers.ModelSerializer):
         Updates the label, description, tags and new_version_of an already existing file.
         """
         instance.label = validated_data.get('label', instance.label)
-        instance.description = validated_data.get('label', instance.description)
+        instance.description = validated_data.get('description', instance.description)
         instance.tags = validated_data.get('tags', instance.tags)
-        instance.new_version_of = validated_data.get('tags', instance.new_version_of)
         instance.save()
         return instance
 
@@ -124,12 +123,6 @@ class FilesSerializer(serializers.ModelSerializer):
 
         if 'family' in data:
             family = Family.objects.get(id=data['family'])
-        else:
-            # Hope that new_version_of is set!
-            if 'new_version_of' not in data:
-                raise TypeError('family or new_version_of must be set!')
-            new_version_of = File.objects.get(id=data['new_version_of'])
-            family = new_version_of.family
 
         license = License.objects.get(id=data['license'])
 

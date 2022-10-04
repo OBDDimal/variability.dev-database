@@ -2,12 +2,12 @@ export class PseudoNode {
     constructor(parent, hiddenD3Nodes) {
         this.hiddenD3Nodes = hiddenD3Nodes;
         this.parent = parent;
-        this.d3Node = undefined;
+        this.d3Node = null;
     }
 
     unhideHiddenNodes() {
         // Unhide every node that is in this pseudo-node.
-        this.hiddenD3Nodes.forEach((d3Node) => d3Node.data.isHidden = false);
+        this.hiddenD3Nodes.forEach(d3Node => d3Node.data.isHidden = false);
 
         // Move every node back to children of parent node.
         const parentD3Children = this.parent.d3Node.children;

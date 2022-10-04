@@ -1,6 +1,7 @@
 from django.db import models
 from core.user.models import User
 from django.core.files.base import ContentFile
+from django.template.defaultfilters import slugify  # new
 
 
 # -------------------------------------------------- Family Model --------------------------------------------------
@@ -14,6 +15,7 @@ class Family(models.Model):
     label = models.CharField(blank=False, max_length=255)
     description = models.TextField(blank=True)
     date_created = models.DateTimeField(auto_now_add=True)
+    slug = models.SlugField(null=True)
 
     class Meta:
         verbose_name = 'family'
@@ -22,6 +24,11 @@ class Family(models.Model):
     def __str__(self):
         # do not change that
         return f"{self.id}:{self.label}"
+
+    def save(self, *args, **kwargs):  # new
+        if not self.slug:
+            self.slug = slugify(self.label)
+        return super().save(*args, **kwargs)
 
 
 # -------------------------------------------------- Tag Model --------------------------------------------------
@@ -92,8 +99,8 @@ class FileManager(models.Manager):
             raise TypeError('Tags is not set')
         family = kwargs.get('family', None)
         # get file from id
-        if kwargs.get('new_version_of', None) is not None:
-            kwargs.update({'new_version_of': File.objects.get(id=kwargs['new_version_of'])})
+        if kwargs.get('version', None) is None:
+            raise TypeError('Version is not set')
         # get license from id
         if kwargs.get('license', None) is None:
             raise TypeError('License not set!')
@@ -136,11 +143,17 @@ class File(models.Model):
     uploaded_at = models.DateTimeField(auto_now_add=True)
     license = models.ForeignKey(License, on_delete=models.CASCADE)
     tags = models.ManyToManyField(Tag)
-    new_version_of = models.ForeignKey('self', null=True, blank=True, on_delete=models.RESTRICT)
+    version = models.CharField(blank=False, null=False, max_length=16)
     transpiled_file = models.FileField(null=True, blank=True, upload_to=relative_upload_dir)
     mirrored = models.BooleanField(default=False)  # indicates if the file was already mirrored to GitHub
     is_confirmed = models.BooleanField(default=False)  # indicates if the user confirmed the upload
+    slug = models.SlugField(null=True)
 
     def __str__(self):
         # do not change that
         return f"{self.id}"
+
+    def save(self, *args, **kwargs):  # new
+        if not self.slug:
+            self.slug = slugify(self.label)
+        return super().save(*args, **kwargs)

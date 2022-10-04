@@ -1,14 +1,14 @@
-import {SingleNodeCommand} from "@/classes/Commands/SingleNodeCommand";
+import {FeatureNodeCommand} from "@/classes/Commands/FeatureModel/FeatureNodeCommand";
 
-export class SwapCommand extends SingleNodeCommand {
-    constructor(d3Data, node, dstParent, dstIndex) {
-        super(d3Data, node);
+export class SwapCommand extends FeatureNodeCommand {
+    constructor(node, dstParent, dstIndex) {
+        super(node);
         this.dstParent = dstParent;
         this.dstIndex = dstIndex;
 
         // Properties for undo.
-        this.srcParent = undefined;
-        this.srcIndex = undefined;
+        this.srcParent = null;
+        this.srcIndex = null;
     }
 
     execute() {
@@ -26,8 +26,6 @@ export class SwapCommand extends SingleNodeCommand {
 
         this.srcParent.removeChild(this.node);
         this.dstParent.insertChildAtIndex(this.node, this.dstIndex - tmp);
-
-        this.d3Data.updateTrigger.coloring = true;
     }
 
     undo() {
@@ -36,7 +34,14 @@ export class SwapCommand extends SingleNodeCommand {
 
         this.dstParent.removeChild(this.node);
         this.srcParent.insertChildAtIndex(this.node, this.srcIndex);
+    }
 
-        this.d3Data.updateTrigger.coloring = true;
+    createDTO() {
+        return {
+            commandType: 'swap',
+            nodeName: this.node.name,
+            dstParentName: this.dstParent.name,
+            dstIndex: this.dstIndex,
+        };
     }
 }

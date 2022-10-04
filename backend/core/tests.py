@@ -293,8 +293,7 @@ class FileAdminPanelTests(TestCase):
         self.assertEqual(f.description, expected_description)
         self.assertEqual(f.license.label, self.license_label)
         self.assertEqual(f.family.label, self.family_label)
-        # None because blank=True AND null=True
-        self.assertIsNone(f.new_version_of)
+        self.assertEqual(f.version, '')
         # how many tags are there ?
         self.assertEqual(len(f.tags.all()), 0)
         now = timezone.now()

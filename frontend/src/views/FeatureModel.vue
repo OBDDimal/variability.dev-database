@@ -1,188 +1,295 @@
 <template>
     <div>
-        <feature-model-tree ref="featureModelTree"
-                            :rootNode="rootNode"
-                            @exportToXML="exportToXML"
-                            @update-constraints="updateConstraints">
+        <feature-model-tree
+            v-if="data.rootNode"
+            :key="reloadKey"
+            ref="featureModelTree"
+            :collaborationStatus="collaborationStatus"
+            :command-manager="featureModelCommandManager"
+            :constraints="data.constraints"
+            :editRights="editRights"
+            :rootNode="data.rootNode"
+            @exportToXML="exportToXML"
+            @reset="reset"
+            @save="save"
+            @update-constraints="updateConstraints"
+            @show-collaboration-dialog="showStartCollaborationSessionDialog = true"
+            @show-claim-dialog="showClaimDialog"
+            @new-empty-model="newEmptyModel"
+        >
         </feature-model-tree>
-        <v-btn
-            absolute
-            bottom
-            dark
-            elevation="2"
-            icon
-            right
-            style="background-color: var(--v-primary-base)"
-            x-large
-            @click="$store.commit('openConstraints', true)"
-        >
-            <v-icon>mdi-format-list-checks</v-icon>
-        </v-btn
-        >
-        <constraints ref="constraints" :constraints="constraints" @update-feature-model="updateFeatureModel"></constraints>
-    </div>
+
+		<v-btn
+			absolute
+			bottom
+			dark
+			elevation="2"
+			icon
+			right
+			:x-large="$vuetify.breakpoint.mdAndUp"
+			style="background-color: var(--v-primary-base)"
+			@click="$store.commit('openConstraints', true)"
+		>
+			<v-icon>mdi-format-list-checks</v-icon>
+		</v-btn>
+
+		<constraints
+			v-if="data.constraints"
+			ref="constraints"
+			:command-manager="constraintCommandManager"
+			:constraints="data.constraints"
+			:editRights="editRights"
+			:rootNode="data.rootNode"
+			@update-feature-model="updateFeatureModel"
+		></constraints>
+
+		<collaboration-toolbar
+			v-if="collaborationStatus"
+			:key="collaborationReloadKey"
+			:collaboration-manager="collaborationManager"
+			:show-claim-dialog="showClaimDialog"
+		></collaboration-toolbar>
+
+		<v-dialog
+			v-model="showStartCollaborationSessionDialog"
+			persistent
+			width="auto"
+		>
+			<v-card>
+				<v-card-title
+					>Do you want to start a new collaboration
+					session?</v-card-title
+				>
+				<v-card-actions>
+					<v-btn
+						color="red darken-1"
+						text
+						@click="showStartCollaborationSessionDialog = false"
+					>
+						Cancel
+					</v-btn>
+
+					<v-btn
+						color="primary darken-1"
+						text
+						@click="createCollaboration"
+					>
+						Start
+					</v-btn>
+				</v-card-actions>
+			</v-card>
+		</v-dialog>
+
+		<collaboration-name-dialog
+			v-if="collaborationKey"
+			@change-name="(name) => collaborationManager.sendName(name)"
+		></collaboration-name-dialog>
+
+		<collaboration-continue-editing-dialog
+			:show="showContinueEditingDialog"
+			@close="closeFeatureModel"
+			@continue-editing="continueEditing"
+		>
+		</collaboration-continue-editing-dialog>
+	</div>
 </template>
 
 <script>
 import Vue from 'vue';
 import FeatureModelTree from '../components/FeatureModel/FeatureModelTree.vue';
 import Constraints from '../components/Constraints.vue';
-import { Constraint, VarConstraint } from '@/classes/constraint';
-import { berkeley } from '@/classes/featureModelData';
-import { FeatureNode } from '@/classes/FeatureNode';
 import * as update from "@/services/FeatureModel/update.service";
+import api from "@/services/api.service";
+import beautify from "xml-beautifier";
+import CollaborationManager from "@/classes/CollaborationManager";
+import {CommandManager} from "@/classes/Commands/CommandManager";
+import * as xmlTranspiler from "@/services/xmlTranspiler.service";
+import {jsonToXML} from "@/services/xmlTranspiler.service";
+import CollaborationToolbar from "@/components/CollaborationToolbar";
+import CollaborationNameDialog from "@/components/CollaborationNameDialog";
+import CollaborationContinueEditingDialog from "@/components/CollaborationContinueEditingDialog";
+import {EXAMPLE_FEATURE_MODEL_XML} from "@/classes/constants";
+import {NewEmptyModelCommand} from "@/classes/Commands/FeatureModel/NewEmptyModelCommand";
 
 export default Vue.extend({
-    name: 'FeatureModel',
+	name: 'FeatureModel',
 
-    components: {
-        FeatureModelTree,
-        Constraints,
+	components: {
+		CollaborationContinueEditingDialog,
+		CollaborationToolbar,
+		FeatureModelTree,
+		Constraints,
+		CollaborationNameDialog,
+	},
+
+	props: {
+		id: undefined,
+		collaborationKey: undefined,
+	},
+
+	data: () => ({
+		data: {
+			featureMap: [],
+			constraints: [],
+			properties: [],
+			calculations: undefined,
+			comments: [],
+			featureOrder: undefined,
+			rootNode: undefined,
+		},
+		xml: undefined,
+		reloadKey: 0,
+		collaborationReloadKey: 10000,
+		featureModelCommandManager: new CommandManager(),
+		constraintCommandManager: new CommandManager(),
+		collaborationManager: null,
+		editRights: true,
+		showStartCollaborationSessionDialog: false,
+		showClaimDialog: false,
+		showContinueEditingDialog: false,
+		collaborationStatus: false,
+	}),
+
+	created() {
+		this.collaborationManager = new CollaborationManager(
+			this.featureModelCommandManager,
+			this.constraintCommandManager,
+			this
+		)
+		this.featureModelCommandManager.commandEvent = this.commandEvent
+		this.constraintCommandManager.commandEvent = this.commandEvent
+
+		if (this.id === 'local') {
+			const xml = beautify(localStorage.featureModelData)
+			xmlTranspiler.xmlToJson(xml, this.data)
+			this.xml = xml
+		} else if (this.id === 'new') {
+			const xml = beautify(EXAMPLE_FEATURE_MODEL_XML)
+			xmlTranspiler.xmlToJson(xml, this.data)
+			this.xml = xml
+		} else if (this.id) {
+			this.initData()
+		} else if (this.collaborationKey) {
+			const uuid = this.collaborationKey.substring(
+				0,
+				this.collaborationKey.length - 1
+			)
+			const checksum = this.collaborationKey.slice(-1)
+			const condition =
+				checksum ===
+				(
+					Array.from(uuid).reduce(
+						(last, curr) => parseInt(last, 16) + parseInt(curr, 16)
+					) % 16
+				).toString(16)
+			if (condition) {
+				this.collaborationManager.joinCollaboration(
+					this.collaborationKey
+				)
+			} else {
+				alert('Wrong key!')
+			}
+		}
+	},
+
+	beforeRouteLeave(to, from, next) {
+		// If session gets closed by host, don't ask for confirmation
+		if (this.collaborationManager.noConfirm) {
+			const answer = window.confirm(
+				'Do you really want to leave the page? Collaboration sessions will be closed and data will be lost!'
+			)
+
+            if (answer) {
+                // If user wants to close page
+                this.collaborationManager.closeCollaboration();
+                next()
+            } else {
+                // If user doesn't want to close page
+                next(false)
+            }
+        } else {
+            // Don't prevent default site changes without collaboration
+            next();
+        }
     },
 
-    props: {},
+    methods: {
+        save() {
+            localStorage.featureModelData = jsonToXML(this.data);
+            window.onbeforeunload = null;
 
-    data: () => ({
-        featureMap: [],
-        constraints: [],
-        rootNode: undefined,
-    }),
+            this.$store.commit("updateSnackbar", {
+                message: "Successfully saved in local storage",
+                variant: "success",
+                timeout: 5000,
+                show: true,
+            });
+        },
 
-    created() {
-        // TODO: Axios request for xml
-
-        const [rootNode, constraints] = this.xmlToJson(berkeley);
-        this.rootNode = rootNode;
-        this.constraints = constraints;
-    },
-
-    computed: {},
-
-	methods: {
-		updateFeatureModel() {
-			update.updateSvg(this.$refs.featureModelTree.d3Data);
+		reset() {
+			// TODO: Transpile the xml file new and restart viewer.
+			this.initData()
+			this.reloadKey++
 		},
 
-        updateConstraints() {
-            this.$refs.constraints.update();
+        newEmptyModel() {
+            const command = new NewEmptyModelCommand(this, this.$refs.featureModelTree.d3Data);
+            this.featureModelCommandManager.execute(command);
+            this.updateFeatureModel();
         },
 
-        xmlToJson(currentModel) {
-            const start = performance.now();
 
-            // To remove the <?xml...?> line
-            let m = currentModel.split('\n').splice(1).join('\n');
-
-            const parser = new DOMParser();
-            const xmlDocument = parser.parseFromString(m, 'text/xml');
-
-            const struct = xmlDocument.querySelector('struct');
-            const constraints = xmlDocument.querySelector('constraints');
-
-            const featuresToReturn = this.getChildrenOfFeature(struct, null);
-            const constraintsToReturn = this.getConstraints(constraints);
-            console.log('Parsertime', performance.now() - start);
-            return [featuresToReturn[0], constraintsToReturn];
-        },
-
-        getChildrenOfFeature(struct, parent) {
-            let toReturn = [];
-
-            for (const child of struct.childNodes) {
-                // To remove #text nodes, as they don't have a tagName
-                if (child.tagName) {
-                    let toAppend = new FeatureNode(
-                        parent,
-                        child.getAttribute('name'),
-                        child.tagName,
-                        child.getAttribute('mandatory') === 'true',
-                        child.getAttribute('abstract') === 'true'
-                    );
-                    toAppend.children = this.getChildrenOfFeature(child, toAppend);
-
-                    this.featureMap[toAppend.name] = toAppend;
-                    toReturn.push(toAppend);
-                }
-            }
-
-            return toReturn;
-        },
-
-        getConstraints(constraints) {
-            let toReturn = [];
-
-            for (const rule of constraints.childNodes) {
-                // To remove #text nodes, as they don't have a tagName
-                if (rule.tagName) {
-                    const constraint = new Constraint([...rule.childNodes].filter((e) => e.tagName)[0], this.featureMap);
-                    toReturn.push(constraint);
-                }
-            }
-            return toReturn;
-        },
-
-        exportToXML() {
-            let root = {};
-
-            Object.entries(this.featureMap).forEach(([, node]) => {
-                if (node.isRoot) {
-                    root = node;
-                }
-            });
-
-            let xml = `<?xml version="1.0" encoding="UTF-8" standalone="no"?><featureModel>`;
-            xml += `<struct>${this.nodeToXML(root)}</struct>`;
-            xml += `<constraints>${this.constraints.reduce(
-                (prev, constraint) => prev + '<rule>' + this.constraintToXML(constraint) + '</rule>',
-                ''
-            )}</constraints>`;
-            xml += `</featureModel>`;
-
-            const filename = 'featureModel.xml';
-            const pom = document.createElement('a');
-            const bb = new Blob([xml], {type: 'application/xml'});
-
-            pom.setAttribute('href', window.URL.createObjectURL(bb));
-            pom.setAttribute('download', filename);
-
-            pom.dataset.downloadurl = ['application/xml', pom.download, pom.href].join(':');
-
-            pom.click();
-        },
-
-        nodeToXML(node) {
-            if (node.isLeaf()) {
-                return `<feature ${node.isAbstract ? 'abstract="true" ' : ''}${node.isMandatory ? 'mandatory="true" ' : ''}name="${
-                    node.name
-                }"/>`;
-            } else {
-                let toReturn = `<${node.groupType} ${node.isAbstract ? 'abstract="true" ' : ''}${
-                    node.isMandatory ? 'mandatory="true" ' : ''
-                }name="${node.name}">`;
-
-                node.children.forEach((childNode) => {
-                    toReturn += this.nodeToXML(childNode);
+        initData() {
+            api.get(`${process.env.VUE_APP_DOMAIN}files/${this.id}/`)
+                .then(data => {
+                    api.get(data.data.local_file)
+                        .then(rawData => {
+                            const xml = beautify(rawData.data);
+                            xmlTranspiler.xmlToJson(xml, this.data);
+                            this.xml = xml;
+                        });
                 });
-
-                toReturn += `</${node.groupType}>`;
-                return toReturn;
-            }
         },
 
-        constraintToXML(constraint) {
-            if (constraint instanceof VarConstraint) {
-                return `<var>${constraint.featureNode.name}</var>`;
-            } else if (constraint instanceof Constraint) {
-                let toReturn = `<${constraint.xmlOperator}>`;
-                constraint.children.forEach((childConstraint) => {
-                    toReturn += this.constraintToXML(childConstraint);
-                });
-                toReturn += `</${constraint.xmlOperator}>`;
-                return toReturn;
-            }
-        },
-    },
-});
+		updateFeatureModel() {
+			update.updateSvg(this.$refs.featureModelTree.d3Data)
+		},
+
+		updateConstraints() {
+			this.$refs.constraints.update()
+		},
+
+		exportToXML() {
+			xmlTranspiler.downloadXML(this.data)
+		},
+
+		commandEvent() {
+			// Can't override text for Chrome & Edge
+			window.onbeforeunload = function () {
+				return 'Do you really want to leave the page? Collaboration sessions will be closed and data will be lost!'
+			}
+		},
+
+		createCollaboration() {
+			this.showStartCollaborationSessionDialog = false
+			this.collaborationManager.createCollaboration()
+			navigator.clipboard.writeText(
+				`${process.env.VUE_APP_DOMAIN_FRONTEND}collaboration/${this.collaborationManager.collaborationKey}`
+			)
+		},
+
+		continueEditing() {
+			this.showContinueEditingDialog = false
+			this.collaborationManager.closeCollaboration()
+			this.editRights = true
+		},
+
+		closeFeatureModel() {
+			this.showContinueEditingDialog = false
+			this.collaborationManager.closeCollaboration()
+			this.collaborationManager.noConfirm = false
+			this.$router.push('/')
+		},
+	},
+})
 </script>
-
-<style scoped></style>

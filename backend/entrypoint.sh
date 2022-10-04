@@ -1,7 +1,8 @@
-#!/bin/bash
+#!/bin/sh
 
-while !</dev/tcp/db/5432; do echo "Connecting" && sleep 1; done;
+while ! nc -zv db 5432; do echo "Connecting" && sleep 1; done;
+
 python manage.py makemigrations
 python manage.py migrate --run-syncdb
-uwsgi --module ddueruemweb.wsgi --master --processes 1 --threads 1 --socket /tmp/uwsgi.sock --chmod-socket=666 &
-nginx -g "daemon off;"
+gunicorn --bind ":8000" --workers 3 ddueruemweb.wsgi:application
+

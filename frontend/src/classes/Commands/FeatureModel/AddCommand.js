@@ -1,10 +1,10 @@
-import {SingleNodeCommand} from "@/classes/Commands/SingleNodeCommand";
+import {FeatureNodeCommand} from "@/classes/Commands/FeatureModel/FeatureNodeCommand";
 import {createFeatureNode} from "@/classes/FeatureNode";
 
-export class AddCommand extends SingleNodeCommand {
-    constructor(d3Data, dstParent, dstIndex, data) {
+export class AddCommand extends FeatureNodeCommand {
+    constructor(dstParent, dstIndex, data) {
         const node = createFeatureNode(dstParent, data.name, data.groupType, data.mandatory, data.abstract);
-        super(d3Data, node);
+        super(node);
         this.dstParent = dstParent;
         this.dstIndex = dstIndex;
         this.data = data;
@@ -15,8 +15,6 @@ export class AddCommand extends SingleNodeCommand {
         this.dstParent.unhideChildren();
 
         this.dstParent.insertChildAtIndex(this.node, this.dstIndex);
-
-        this.d3Data.updateTrigger.coloring = true;
     }
 
     undo() {
@@ -24,7 +22,14 @@ export class AddCommand extends SingleNodeCommand {
         this.dstParent.unhideChildren();
 
         this.dstParent.removeChild(this.node);
+    }
 
-        this.d3Data.updateTrigger.coloring = true;
+    createDTO() {
+        return {
+            commandType: 'add',
+            dstParentName: this.dstParent.name,
+            dstIndex: this.dstIndex,
+            data: this.data,
+        };
     }
 }
