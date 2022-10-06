@@ -16,10 +16,12 @@
             @show-collaboration-dialog="showStartCollaborationSessionDialog = true"
             @show-claim-dialog="showClaimDialog"
             @new-empty-model="newEmptyModel"
+            @show-tutorial="showTutorial = true"
         >
         </feature-model-tree>
 
         <v-btn
+            id="feature-model-information"
             absolute
             bottom
             dark
@@ -35,6 +37,7 @@
         </v-btn>
 
 		<v-btn
+            id="feature-model-constraints"
 			absolute
 			bottom
 			dark
@@ -102,15 +105,16 @@
 			@change-name="(name) => collaborationManager.sendName(name)"
 		></collaboration-name-dialog>
 
-		<collaboration-continue-editing-dialog
-			:show="showContinueEditingDialog"
-			@close="closeFeatureModel"
-			@continue-editing="continueEditing"
-		>
-		</collaboration-continue-editing-dialog>
+        <collaboration-continue-editing-dialog
+            :show="showContinueEditingDialog"
+            @close="closeFeatureModel"
+            @continue-editing="continueEditing">
+        </collaboration-continue-editing-dialog>
 
-        <feature-model-information v-if="openInformation"></feature-model-information>
-	</div>
+        <feature-model-information v-if="openInformation" ></feature-model-information>
+
+        <tutorial-mode :show="showTutorial" @close="showTutorial= false"></tutorial-mode>
+    </div>
 </template>
 
 <script>
@@ -128,6 +132,7 @@ import CollaborationToolbar from "@/components/CollaborationToolbar";
 import CollaborationNameDialog from "@/components/CollaborationNameDialog";
 import CollaborationContinueEditingDialog from "@/components/CollaborationContinueEditingDialog";
 import {EXAMPLE_FEATURE_MODEL_XML} from "@/classes/constants";
+import TutorialMode from "@/components/TutorialMode";
 import {NewEmptyModelCommand} from "@/classes/Commands/FeatureModel/NewEmptyModelCommand";
 import FeatureModelInformation from "@/components/FeatureModel/FeatureModelInformation";
 
@@ -135,6 +140,7 @@ export default Vue.extend({
 	name: 'FeatureModel',
 
 	components: {
+        TutorialMode,
         FeatureModelInformation,
 		CollaborationContinueEditingDialog,
 		CollaborationToolbar,
@@ -148,30 +154,31 @@ export default Vue.extend({
 		collaborationKey: undefined,
 	},
 
-	data: () => ({
-		data: {
-			featureMap: [],
-			constraints: [],
-			properties: [],
-			calculations: undefined,
-			comments: [],
-			featureOrder: undefined,
-			rootNode: undefined,
-		},
-		xml: undefined,
-		reloadKey: 0,
-		collaborationReloadKey: 10000,
-		featureModelCommandManager: new CommandManager(),
-		constraintCommandManager: new CommandManager(),
-		collaborationManager: null,
-		editRights: true,
-		showStartCollaborationSessionDialog: false,
-		showClaimDialog: false,
-		showContinueEditingDialog: false,
-		collaborationStatus: false,
+    data: () => ({
+        data: {
+            featureMap: [],
+            constraints: [],
+            properties: [],
+            calculations: undefined,
+            comments: [],
+            featureOrder: undefined,
+            rootNode: undefined,
+        },
+        xml: undefined,
+        reloadKey: 0,
+        collaborationReloadKey: 10000,
+        featureModelCommandManager: new CommandManager(),
+        constraintCommandManager: new CommandManager(),
+        collaborationManager: null,
+        editRights: true,
+        showStartCollaborationSessionDialog: false,
+        showClaimDialog: false,
+        showContinueEditingDialog: false,
+        collaborationStatus: false,
         openConstraints: false,
         openInformation: false,
-	}),
+        showTutorial: false,
+    }),
 
 	created() {
 		this.collaborationManager = new CollaborationManager(
@@ -213,6 +220,9 @@ export default Vue.extend({
 				alert('Wrong key!')
 			}
 		}
+
+        // Start tutorial mode if it has not been completed before
+        this.showTutorial = !localStorage.featureModelTutorialCompleted;
 	},
 
 	beforeRouteLeave(to, from, next) {
