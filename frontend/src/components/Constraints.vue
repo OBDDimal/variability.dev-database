@@ -1,5 +1,5 @@
 <template>
-	<v-bottom-sheet v-model="isOpen" hide-overlay>
+	<v-bottom-sheet v-model="isOpenDialog" hide-overlay>
 		<constraint-add-edit-dialog
 			:all-nodes="rootNode ? rootNode.descendants() : undefined"
 			:constraint="constraintAddEdit"
@@ -62,7 +62,7 @@
 
 					<v-btn
 						icon
-						@click="$store.commit('openConstraints', false)"
+						@click="$emit('close')"
 					>
 						<v-icon>mdi-close</v-icon>
 					</v-btn>
@@ -135,6 +135,12 @@ export default Vue.extend({
 	}),
 
 	computed: {
+        isOpenDialog: {
+            get() {
+                return this.isOpen;
+            },
+            set() {}
+        },
 		tableConstraints() {
 			return this.constraints.map((e) => ({
 				constraint: e,
