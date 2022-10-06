@@ -43,7 +43,7 @@
 						<v-btn color="secondary" text @click="discard">
 							Discard</v-btn
 						>
-						<v-btn color="primary" text type="submit"> Add</v-btn>
+						<v-btn :disabled="!name" color="primary" text type="submit"> Add</v-btn>
 					</v-card-actions>
 				</v-form>
 			</v-card>

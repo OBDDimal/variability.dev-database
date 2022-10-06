@@ -559,6 +559,10 @@ polygon {
     transition: max-width 0.5s;
     float: right;
 
+    .v-icon {
+        cursor: pointer;
+    }
+
     &.closed {
         max-width: 45px;
 
