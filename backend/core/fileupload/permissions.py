@@ -1,3 +1,4 @@
+from core.fileupload.models import File
 from rest_framework import permissions
 
 class IsOwnerOrIsAdminOrReadOnly(permissions.BasePermission):
@@ -19,4 +20,5 @@ class IsAdminToAddPublicTag(permissions.BasePermission):
         if request.method == 'POST' and 'is_public' in request.data and request.data['is_public'] == 'True' and not request.user.is_staff:
             return False
         return True
+
 

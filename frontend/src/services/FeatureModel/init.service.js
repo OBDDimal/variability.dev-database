@@ -15,7 +15,7 @@ export function initialize(d3Data, data) {
         .nodeSize(d3Node => calcNodeSize(d3Data, d3Node))
         .spacing((d3NodeA, d3NodeB) => d3NodeA.path(d3NodeB).length);
 
-    this.initData(d3Data, data);
+    initData(d3Data, data);
 
     d3Data.zoom = d3
         .zoom()
@@ -42,6 +42,7 @@ export function initialize(d3Data, data) {
 
     d3Data.container.dragContainer = svgContent.append('g').classed('drag-container', true);
 
+    d3Data.container.quickEditContainer = svgContent.append('g').classed('quick-edit-container', true);
 
     // Listen to window resize.
     window.onresize = () => windowResize.update(d3Data);

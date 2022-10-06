@@ -10,6 +10,12 @@
 			dark
 			clipped-left
 		>
+			<v-avatar tile class="hidden-xs-only mr-3">
+				<img
+					:src="require('@/assets/ddueruem_logo_thick2.svg')"
+					alt="logo"
+				/>
+			</v-avatar>
 			<h1 class="mr-1">
 				{{ title }}
 			</h1>
@@ -72,7 +78,11 @@
 				<v-btn icon v-fullscreen>
 					<v-icon> mdi-fullscreen</v-icon>
 				</v-btn>
-				<v-btn icon @click.stop="drawer = !drawer">
+				<v-btn
+					class="drawer-button"
+					icon
+					@click.stop="drawer = !drawer"
+				>
 					<v-icon> mdi-menu </v-icon>
 				</v-btn>
 			</div>
@@ -106,7 +116,7 @@
 				</v-btn>
 				<!--				<v-divider class="mx-5" vertical></v-divider>-->
 				<v-btn
-					class="mx-3"
+					class="mx-3 theme-button"
 					icon
 					@click="$vuetify.theme.dark = !$vuetify.theme.dark"
 				>
@@ -124,9 +134,14 @@
 				</v-btn>
 			</div>
 		</v-app-bar>
-		<v-navigation-drawer v-model="drawer" app temporary>
+		<v-navigation-drawer
+			class="mobile-navigation"
+			v-model="drawer"
+			app
+			temporary
+		>
 			<v-list>
-				<v-list-item link to="/" v-if="$store.state.isOnline">
+				<v-list-item link to="/">
 					<v-list-item-icon>
 						<v-icon left> mdi-home</v-icon>
 					</v-list-item-icon>
@@ -206,6 +221,7 @@
 					Logout
 				</v-list-item>
 				<v-list-item
+					class="mobile-theme-button"
 					link
 					@click="$vuetify.theme.dark = !$vuetify.theme.dark"
 				>

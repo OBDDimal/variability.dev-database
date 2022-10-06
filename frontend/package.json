@@ -6,6 +6,7 @@
         "serve": "vue-cli-service serve",
         "build": "vue-cli-service build",
         "lint": "vue-cli-service lint",
+        "cypress:open": "cypress open",
         "prettier": "prettier --write \"{src}/**/*.{js,ts,jsx,tsx,css,scss,json,html,vue}\""
     },
     "dependencies": {
@@ -29,7 +30,7 @@
         "vue-chartjs": "^4.1.1",
         "vue-router": "^3.2.0",
         "vue-scroll-snap": "^0.1.11",
-        "vuetify": "^2.6.0",
+        "vuetify": "^2.6.10",
         "vuex": "^3.4.0",
         "xml-beautifier": "^0.5.0"
     },
@@ -42,7 +43,7 @@
         "@vue/cli-service": "~4.5.12",
         "eslint": "^6.7.2",
         "eslint-plugin-vue": "^6.2.2",
-        "node-sass": "^6.0.0",
+        "node-sass": "^7.0.3",
         "sass": "~1.32.0",
         "sass-loader": "^10.0.0",
         "vue-cli-plugin-vuetify": "~2.5.0",

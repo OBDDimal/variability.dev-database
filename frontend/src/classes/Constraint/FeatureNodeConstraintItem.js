@@ -11,7 +11,12 @@ export class FeatureNodeConstraintItem extends ConstraintItem {
     }
 
     toString() {
-        return this.featureNode.name;
+        const str = this.featureNode.name;
+        if (str.split(" ").length > 1) {
+            return `"${str}"`;
+        } else {
+            return str;
+        }
     }
 
     toStringForEdit() {
