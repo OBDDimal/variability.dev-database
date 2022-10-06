@@ -116,15 +116,18 @@ class FilesSerializer(serializers.ModelSerializer):
         """
         internal_rep = QueryDict('', mutable=True)
         for key in data:
-            if key != 'tags':
+            if key not in ['tags', 'family', 'license']:
                 internal_rep.update({key: data[key]})
 
-        tags_as_string = data['tags'].replace('\'', '"')
-        tags_as_json = json.loads(tags_as_string)
-        tags_from_db = []
-        for tag in tags_as_json:
-            tags_from_db.append(Tag.objects.get(id=tag['id']))
-        internal_rep['tags'] = tags_from_db
-        version = internal_rep.get('version')
+        tags = list(map(lambda tag: Tag.objects.get(id=tag), data.getlist('tags')))
+
+        if 'family' in data:
+            family = Family.objects.get(id=data['family'])
+
+        license = License.objects.get(id=data['license'])
+
+        internal_rep['tags'] = tags
+        internal_rep['family'] = family
+        internal_rep['license'] = license
 
         return internal_rep.dict()
