@@ -1,12 +1,24 @@
 from core.analysis.models import DockerProcess, Analysis
 from core.fileupload.models import Family, Tag, License, File
-from core.fileupload.serializers import FilesSerializer, TagsSerializer, FamiliesSerializer, LicensesSerializer
-from core.fileupload.permissions import IsOwnerOrIsAdminOrReadOnly, IsAdminToAddPublicTag
+from core.fileupload.serializers import (
+    FilesSerializer,
+    TagsSerializer,
+    FamiliesSerializer,
+    LicensesSerializer,
+)
+from core.fileupload.permissions import (
+    IsOwnerOrIsAdminOrReadOnly,
+    IsAdminToAddPublicTag,
+)
 from collections import OrderedDict
 import logging
 from django.utils import timezone, dateparse
 from datetime import timedelta
-from rest_framework.status import HTTP_405_METHOD_NOT_ALLOWED, HTTP_403_FORBIDDEN, HTTP_200_OK
+from rest_framework.status import (
+    HTTP_405_METHOD_NOT_ALLOWED,
+    HTTP_403_FORBIDDEN,
+    HTTP_200_OK,
+)
 from rest_framework import viewsets, permissions, mixins
 from rest_framework import status
 from django.core.exceptions import ObjectDoesNotExist
@@ -20,11 +32,13 @@ from ddueruemweb.settings import PASSWORD_RESET_TIMEOUT_DAYS, DEBUG
 from ..auth.tokens import decode_token_to_user
 import core.fileupload.githubmirror.github_manager as gm
 from multiprocessing import Process
+from rest_framework.views import APIView
+import json
+from django.http.request import QueryDict
 
 logger = logging.getLogger(__name__)
 
 
-    
 def anonymize_file(file, request):
     """
     Replace email address of file owner with True or False,
@@ -34,22 +48,22 @@ def anonymize_file(file, request):
 
     anonymized_file = OrderedDict()
     for (file_key, file_value) in file.items():
-        if file_key == 'owner':
+        if file_key == "owner":
             anonymized_file[file_key] = file_value == user_email
-        elif file_key == 'tags':
+        elif file_key == "tags":
             tags = []
             for tag in list(file_value):
                 new_tag = OrderedDict()
                 for (tag_key, tag_value) in tag.items():
-                    if tag_key == 'owner':
+                    if tag_key == "owner":
                         new_tag[tag_key] = tag_value == user_email
                     else:
                         new_tag[tag_key] = tag_value
                 tags.append(new_tag)
             anonymized_file[file_key] = tags
-        elif file_key == 'family':
+        elif file_key == "family":
             new_family = file_value
-            new_family.update({'owner': new_family['owner'] == user_email})
+            new_family.update({"owner": new_family["owner"] == user_email})
             anonymized_file[file_key] = new_family
         else:
             anonymized_file[file_key] = file_value
@@ -61,41 +75,50 @@ class ConfirmFileUploadViewSet(GenericViewSet, CreateModelMixin):
     This view is called when the user tries to confirm  a file, via a link which contains a token.
     This token will be decoded and the file will be set to confirmed if the token is valid.
     """
+
     permission_classes = [AllowAny]
-    http_method_names = ['get']
+    http_method_names = ["get"]
 
     @staticmethod
     def get(request, token):
         try:
             decoded_token = decode_token_to_user(token)
-            actual_request_timestamp = dateparse.parse_datetime(decoded_token.pop('timestamp'))
-            if decoded_token.pop('purpose') != 'upload_confirm':
-                raise BadSignature('Token purpose does not match!')
-            min_possible_request_timestamp = timezone.now() - timedelta(days=PASSWORD_RESET_TIMEOUT_DAYS)
+            actual_request_timestamp = dateparse.parse_datetime(
+                decoded_token.pop("timestamp")
+            )
+            if decoded_token.pop("purpose") != "upload_confirm":
+                raise BadSignature("Token purpose does not match!")
+            min_possible_request_timestamp = timezone.now() - timedelta(
+                days=PASSWORD_RESET_TIMEOUT_DAYS
+            )
             valid = min_possible_request_timestamp <= actual_request_timestamp
             if not valid:
-                raise BadSignature('Token expired!')
+                raise BadSignature("Token expired!")
             else:
-                file_from_db = File.objects.get(pk=decoded_token.pop('file_id'))
+                file_from_db = File.objects.get(pk=decoded_token.pop("file_id"))
                 if file_from_db.is_confirmed:
-                    raise BadSignature('File upload is already confirmed!')
+                    raise BadSignature("File upload is already confirmed!")
                 file_from_db.is_confirmed = True
                 if not file_from_db.mirrored:
                     if not DEBUG:
                         # async start mirror. Details: https://docs.python.org/3/library/multiprocessing.html
-                        mirror_process = Process(target=gm.mirror_to_github, args=(file_from_db,))
+                        mirror_process = Process(
+                            target=gm.mirror_to_github, args=(file_from_db,)
+                        )
                         mirror_process.start()
                         file_from_db.mirrored = True
                     else:
                         logger.debug(" MODE: File mirror is disabled")
                 file_from_db.save()
-                return Response({'file': FilesSerializer(file_from_db).data}, HTTP_200_OK)
+                return Response(
+                    {"file": FilesSerializer(file_from_db).data}, HTTP_200_OK
+                )
         except ObjectDoesNotExist as error:
-            return Response({'message': str(error)})
+            return Response({"message": str(error)})
         except BadSignature as error:
-            return Response({'message': str(error)})
+            return Response({"message": str(error)})
         except DjangoUnicodeDecodeError as error:
-            return Response({'message': str(error)})
+            return Response({"message": str(error)})
 
 
 class FileUploadViewSet(viewsets.ModelViewSet):
@@ -129,7 +152,40 @@ class FileUploadViewSet(viewsets.ModelViewSet):
         self.request.user.send_link_to_file(serializer.data)
 
 
-class UnconfirmedFileViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin, mixins.DestroyModelMixin, mixins.ListModelMixin):
+class BulkUploadApiView(APIView):
+    def post(self, request, format=None):
+        files = json.loads(request.data["files"])
+        for uploaded_file in files:
+            label = uploaded_file["label"]
+            description = uploaded_file["description"]
+            license = uploaded_file["license"]
+            version = uploaded_file["version"]
+            family = uploaded_file["family"]
+            tags = uploaded_file["tags"]
+            file = request.FILES[uploaded_file["file"]]
+
+            validated_data = QueryDict("", mutable=True)
+            validated_data["label"] = label
+            validated_data["description"] = description
+            validated_data["license"] = license
+            validated_data["version"] = version
+            validated_data["family"] = family
+            validated_data.setlist("tags", tags)
+            validated_data["local_file"] = file
+
+            fs = FilesSerializer(data=validated_data)
+            fs.is_valid()
+            fs.save(owner=request.user)
+
+        return Response()
+
+
+class UnconfirmedFileViewSet(
+    viewsets.GenericViewSet,
+    mixins.RetrieveModelMixin,
+    mixins.DestroyModelMixin,
+    mixins.ListModelMixin,
+):
     queryset = File.objects.filter(is_confirmed=False)
     serializer_class = FilesSerializer
     permission_classes = [permissions.IsAuthenticated, IsOwnerOrIsAdminOrReadOnly]
@@ -153,24 +209,33 @@ class UnconfirmedFileViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin,
 
     def destroy(self, request, *args, **kwargs):
         try:
-            file = File.objects.get(pk=kwargs['pk'])
+            file = File.objects.get(pk=kwargs["pk"])
             if file.is_confirmed:
-                return Response({'message': 'Cannot delete confirmed files.'}, HTTP_403_FORBIDDEN)
+                return Response(
+                    {"message": "Cannot delete confirmed files."}, HTTP_403_FORBIDDEN
+                )
             file.delete()
         except ObjectDoesNotExist as error:
-            return Response({'message': str(error)})
+            return Response({"message": str(error)})
         return Response(status=HTTP_200_OK)
 
 
-class ConfirmedFileViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin, mixins.DestroyModelMixin, mixins.ListModelMixin):
+class ConfirmedFileViewSet(
+    viewsets.GenericViewSet,
+    mixins.RetrieveModelMixin,
+    mixins.DestroyModelMixin,
+    mixins.ListModelMixin,
+):
     queryset = File.objects.filter(is_confirmed=True)
     serializer_class = FilesSerializer
     permission_classes = [permissions.AllowAny]
 
     def _get_analysis_state(self, file):
-        if file['owner']:
-            if DockerProcess.objects.filter(file_to_analyse_id=file['id']).exists():
-                docker_process = DockerProcess.objects.get(file_to_analyse_id=file['id'])
+        if file["owner"]:
+            if DockerProcess.objects.filter(file_to_analyse_id=file["id"]).exists():
+                docker_process = DockerProcess.objects.get(
+                    file_to_analyse_id=file["id"]
+                )
                 if Analysis.objects.filter(process=docker_process):
                     return "Analyzed"
                 elif docker_process.working:
@@ -188,15 +253,15 @@ class ConfirmedFileViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin, m
         indicating if the user which has sent the request is the owner.
         """
         queryset = File.objects.filter(is_confirmed=True)
-        familyId = self.request.query_params.get('family')
+        familyId = self.request.query_params.get("family")
         if familyId is not None:
-            queryset = queryset.filter(family__id=familyId).order_by('version')
+            queryset = queryset.filter(family__id=familyId).order_by("version")
         files = FilesSerializer(queryset, many=True).data
         anonymized_files = []
         for file in files:
             anonymized_file = anonymize_file(file, request)
             analysis_state = self._get_analysis_state(anonymized_file)
-            anonymized_file['analysis'] = analysis_state
+            anonymized_file["analysis"] = analysis_state
             anonymized_files.append(anonymized_file)
         return Response(anonymized_files)
 
@@ -205,11 +270,17 @@ class ConfirmedFileViewSet(viewsets.GenericViewSet, mixins.RetrieveModelMixin, m
         serializer = self.get_serializer(instance)
         anonymized_file = anonymize_file(serializer.data, request)
         analysis_state = self._get_analysis_state(anonymized_file)
-        anonymized_file['analysis'] = analysis_state
+        anonymized_file["analysis"] = analysis_state
         return Response(anonymized_file)
 
 
-class FamiliesViewSet(viewsets.GenericViewSet, mixins.ListModelMixin, mixins.CreateModelMixin, mixins.RetrieveModelMixin, mixins.UpdateModelMixin):
+class FamiliesViewSet(
+    viewsets.GenericViewSet,
+    mixins.ListModelMixin,
+    mixins.CreateModelMixin,
+    mixins.RetrieveModelMixin,
+    mixins.UpdateModelMixin,
+):
     queryset = Family.objects.all()
     serializer_class = FamiliesSerializer
     permission_classes = [IsAuthenticatedOrReadOnly, IsOwnerOrIsAdminOrReadOnly]
@@ -221,7 +292,7 @@ class FamiliesViewSet(viewsets.GenericViewSet, mixins.ListModelMixin, mixins.Cre
         """
         anonymized_family = OrderedDict()
         for (key, value) in family.items():
-            if key == 'owner':
+            if key == "owner":
                 user_email = "" if request.user.is_anonymous else request.user.email
                 anonymized_family[key] = value == user_email
             else:
@@ -246,7 +317,9 @@ class FamiliesViewSet(viewsets.GenericViewSet, mixins.ListModelMixin, mixins.Cre
         serializer.save(owner=self.request.user)
 
 
-class LicensesViewSet(viewsets.GenericViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin):
+class LicensesViewSet(
+    viewsets.GenericViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin
+):
     queryset = License.objects.all()
     serializer_class = LicensesSerializer
     permission_classes = [permissions.AllowAny]
@@ -257,14 +330,24 @@ class LicensesViewSet(viewsets.GenericViewSet, mixins.ListModelMixin, mixins.Ret
         return Response(licenses)
 
 
-class TagsViewSet(viewsets.GenericViewSet, mixins.ListModelMixin, mixins.CreateModelMixin, mixins.RetrieveModelMixin, mixins.DestroyModelMixin):
+class TagsViewSet(
+    viewsets.GenericViewSet,
+    mixins.ListModelMixin,
+    mixins.CreateModelMixin,
+    mixins.RetrieveModelMixin,
+    mixins.DestroyModelMixin,
+):
     queryset = Tag.objects.all()
     serializer_class = TagsSerializer
-    permission_classes = [IsAuthenticatedOrReadOnly, IsOwnerOrIsAdminOrReadOnly, IsAdminToAddPublicTag]
+    permission_classes = [
+        IsAuthenticatedOrReadOnly,
+        IsOwnerOrIsAdminOrReadOnly,
+        IsAdminToAddPublicTag,
+    ]
 
     def public_or_owner_or_admin(self, tag, request):
         user_email = "" if request.user.is_anonymous else request.user.email
-        return tag['is_public'] or tag['owner'] == user_email or request.user.is_staff
+        return tag["is_public"] or tag["owner"] == user_email or request.user.is_staff
 
     def remove_private_tags(self, tags, request):
         public_tags = []
@@ -280,7 +363,7 @@ class TagsViewSet(viewsets.GenericViewSet, mixins.ListModelMixin, mixins.CreateM
         """
         anonymized_tag = OrderedDict()
         for (key, value) in tag.items():
-            if key == 'owner':
+            if key == "owner":
                 user_email = "" if request.user.is_anonymous else request.user.email
                 anonymized_tag[key] = value == user_email
             else:
