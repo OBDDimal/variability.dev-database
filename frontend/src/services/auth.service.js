@@ -1,62 +1,68 @@
-import axios from 'axios';
+import axios from 'axios'
 
-const API_URL = `${process.env.VUE_APP_DOMAIN}auth/`;
+const API_URL = `${process.env.VUE_APP_DOMAIN}auth/`
 
 class AuthService {
-    login(email, password) {
-        return axios
-            .post(`${API_URL}login/`, {
-                email,
-                password,
-            })
-            .then((response) => {
-                if (response.data.access && response.data.refresh) {
-                    localStorage.setItem('access', JSON.stringify(response.data.access));
-                    localStorage.setItem(
-                        'refresh',
-                        JSON.stringify(response.data.refresh),
-                    );
-                    localStorage.setItem('user', JSON.stringify(response.data.user));
-                }
+	login(email, password) {
+		return axios
+			.post(`${API_URL}login/`, {
+				email,
+				password,
+			})
+			.then((response) => {
+				if (response.data.access && response.data.refresh) {
+					localStorage.setItem(
+						'access',
+						JSON.stringify(response.data.access)
+					)
+					localStorage.setItem(
+						'refresh',
+						JSON.stringify(response.data.refresh)
+					)
+					localStorage.setItem(
+						'user',
+						JSON.stringify(response.data.user)
+					)
+				}
 
-                return response.data;
-            });
-    }
+				return response.data
+			})
+	}
 
-    logout() {
-        localStorage.removeItem('access');
-        localStorage.removeItem('refresh');
-        localStorage.removeItem('user');
-    }
+	logout() {
+		localStorage.removeItem('access')
+		localStorage.removeItem('refresh')
+		localStorage.removeItem('user')
+	}
 
-    register(email, password1, password2) {
-        return axios.post(`${API_URL}register/`, {
-            email,
-            password1,
-            password2,
-        });
-    }
+	register(email, password1, password2) {
+		return axios.post(`${API_URL}register/`, {
+			email,
+			password1,
+			password2,
+		})
+	}
 
-    getAccessToken() {
-        const accessToken = localStorage.getItem('access');
-        if (accessToken) return JSON.parse(accessToken);
+	getAccessToken() {
+		const accessToken = localStorage.getItem('access')
+		if (accessToken) return JSON.parse(accessToken)
 
-        return null;
-    }
+		return null
+	}
 
-    getRefreshToken() {
-        const refreshToken = localStorage.getItem('refresh');
-        if (refreshToken) return JSON.parse(refreshToken);
+	getRefreshToken() {
+		const refreshToken = localStorage.getItem('refresh')
+		if (refreshToken) return JSON.parse(refreshToken)
 
-        return null;
-    }
+		return null
+	}
 
-    getCurrentUser() {
-        const userStr = localStorage.getItem('user');
-        if (userStr) return JSON.parse(userStr);
+	getCurrentUser() {
+		const userStr = localStorage.getItem('user')
+		if (userStr) return JSON.parse(userStr)
 
-        return null;
-    }
+		return null
+	}
 }
 
-export default new AuthService();
+export default new AuthService()

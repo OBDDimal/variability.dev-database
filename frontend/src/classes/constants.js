@@ -14,6 +14,8 @@ export const PSEUDO_NODE_SIZE = 20;
 export const GHOST_NODE_RADIUS_MOUSE = 15;
 export const GHOST_NODE_RADIUS_TOUCH = 30;
 
+export const QUICK_EDIT_RADIUS = 5;
+
 export let CONSTRAINT_HIGHLIGHT_COLORS = [
     '#B762D9',
     '#FFB17A',
@@ -61,18 +63,8 @@ export const EXAMPLE_FEATURE_MODEL_XML = `
     <properties/>
         <struct>
             <and name="Root">
-                <or abstract="true" mandatory="true" name="Algorithm">
-                    <feature mandatory="true" name="Shortest"/>
-                    <feature mandatory="true" name="Connected"/>
-                </or>
-                <alt abstract="true" name="Direction">
-                    <feature mandatory="true" name="Directed"/>
-                    <feature mandatory="true" name="Undirected"/>
-                </alt>
-                <alt abstract="true" mandatory="true" name="Weight">
-                    <feature mandatory="true" name="Weighted"/>
-                    <feature mandatory="true" name="Unweighted"/>
-                </alt>
+                <feature mandatory="true" name="Feature A"/>
+                <feature mandatory="false" name="Feature B"/>
             </and>
         </struct>
     <constraints/>

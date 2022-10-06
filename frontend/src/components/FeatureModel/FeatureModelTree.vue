@@ -1,61 +1,78 @@
 <template>
     <div>
-        <div class="float-right mt-2 mr-3" style="position: absolute; right: 0;">
+        <div class="float-right mt-2 mr-3" style="position: absolute; right: 0">
             <v-toolbar
                 class="rounded-pill"
                 elevation="9"
                 height="auto"
                 style="border: 2px solid white"
+                width="auto"
             >
                 <v-btn
                     :disabled="search.foundNodeIndex === 0"
+                    :small="$vuetify.breakpoint.smAndDown"
                     icon
-                    @click="onChangeFoundNodeIndex(--search.foundNodeIndex)">
+                    @click="onChangeFoundNodeIndex(--search.foundNodeIndex)"
+                >
                     <v-icon>mdi-chevron-left</v-icon>
                 </v-btn>
 
                 <v-btn
-                    :disabled="search.foundNodeDistances.length <= search.foundNodeIndex + 1"
+                    :disabled="
+						search.foundNodeDistances.length <=
+						search.foundNodeIndex + 1
+					"
+                    :small="$vuetify.breakpoint.smAndDown"
                     icon
-                    @click="onChangeFoundNodeIndex(++search.foundNodeIndex)">
+                    @click="onChangeFoundNodeIndex(++search.foundNodeIndex)"
+                >
                     <v-icon>mdi-chevron-right</v-icon>
                 </v-btn>
-
+                <v-spacer></v-spacer>
                 <v-text-field
-                    v-if="search.showSearch"
                     v-model="search.searchText"
-                    class="px-4"
+                    :class="search.showSearch ? '' : 'closed'"
+                    :dense="$vuetify.breakpoint.smAndDown"
+                    class="px-4 expanding-search"
                     clearable
                     hide-details
                     placeholder="Search"
+                    prepend-inner-icon="mdi-magnify"
                     single-line
+                    @blur="search.showSearch = false"
+                    @focus="search.showSearch = true"
                     @input="onChangeSearchText"
                 ></v-text-field>
 
                 <v-badge
                     v-if="search.foundNodeDistances.length"
-                    :content="search.foundNodeIndex + 1 + '/' + search.foundNodeDistances.length"
+                    :content="
+						search.foundNodeIndex +
+						1 +
+						'/' +
+						search.foundNodeDistances.length
+					"
                     inline
                 ></v-badge>
 
-                <v-btn icon @click="search.showSearch = !search.showSearch">
-                    <v-icon>mdi-magnify</v-icon>
-                </v-btn>
-
+                <!--				<v-btn icon @click="search.showSearch = !search.showSearch">
+                  <v-icon>mdi-magnify</v-icon>
+                </v-btn>-->
             </v-toolbar>
         </div>
 
         <feature-model-tree-toolbar
+            :collaborationStatus="collaborationStatus"
             :direction="d3Data.direction"
             :editRights="editRights"
             :is-redo-available="commandManager && commandManager.isRedoAvailable()"
             :is-save-available="(commandManager && commandManager.isUndoAvailable())
                 || (commandManager.collaborationManager.constraintCommandManager.isUndoAvailable())"
             :is-undo-available="commandManager && commandManager.isUndoAvailable()"
-            :collaborationStatus="collaborationStatus"
             @coloring="coloringIndex => coloring(coloringIndex)"
             @export="$emit('exportToXML')"
             @fitToView="fitToView"
+            @quickEdit="value => updateQuickEdit(value)"
             @redo="redo"
             @reset="$emit('reset')"
             @resetView="(levels, maxChildren) => resetView(levels, maxChildren)"
@@ -68,6 +85,7 @@
             @undo="undo"
             @show-collaboration-dialog="$emit('show-collaboration-dialog')"
             @show-tutorial="$emit('show-tutorial')"
+            @new-empty-model="$emit('new-empty-model')"
         ></feature-model-tree-toolbar>
 
         <div id="svg-container"></div>
@@ -76,53 +94,62 @@
             :d3Node="d3Data.contextMenu.selectedD3Node"
             :d3NodeEvent="d3Data.contextMenu.event"
             :editRights="editRights"
-            @addAsChild="d3Node => openAddAsChildDialog(d3Node)"
-            @addAsSibling="d3Node => openAddAsSiblingDialog(d3Node)"
+            @addAsChild="(d3Node) => openAddAsChildDialog(d3Node)"
+            @addAsSibling="(d3Node) => openAddAsSiblingDialog(d3Node)"
             @close="d3Data.contextMenu.selectedD3Node = undefined"
             @collapse="collapse"
-            @edit="d3Node => openEditDialog(d3Node)"
-            @hideAllNodesOnThisLevel="d3Node => hideAllNodesOnThisLevel(d3Node)"
-            @hideAllOtherNodes="d3Node => hideAllOtherNodes(d3Node)"
-            @hideCurrentNode="d3Node => hideCurrentNode(d3Node)"
-            @hideLeftSiblings="d3Node => hideLeftSiblings(d3Node)"
-            @hideRightSiblings="d3Node => hideRightSiblings(d3Node)"
-            @highlightConstraints="d3Node => highlightConstraints(d3Node)"
-            @resetHighlightConstraints="d3Node => resetHighlightConstraints(d3Node)"
+            @edit="(d3Node) => openEditDialog(d3Node)"
+            @hideAllNodesOnThisLevel="
+				(d3Node) => hideAllNodesOnThisLevel(d3Node)
+			"
+            @hideAllOtherNodes="(d3Node) => hideAllOtherNodes(d3Node)"
+            @hideCurrentNode="(d3Node) => hideCurrentNode(d3Node)"
+            @hideLeftSiblings="(d3Node) => hideLeftSiblings(d3Node)"
+            @hideRightSiblings="(d3Node) => hideRightSiblings(d3Node)"
+            @highlightConstraints="(d3Node) => highlightConstraints(d3Node)"
+            @resetHighlightConstraints="
+				(d3Node) => resetHighlightConstraints(d3Node)
+			"
         ></feature-model-tree-context-menu>
 
         <feature-model-tree-edit-dialog
             :node="editNode"
             :show="showEditDialog"
             @close="showEditDialog = false"
-            @edit="data => edit(data)">
+            @edit="(data) => edit(data)"
+        >
         </feature-model-tree-edit-dialog>
 
         <feature-model-tree-add-dialog
-            :parent="d3Data.d3ParentOfAddNode ? d3Data.d3ParentOfAddNode.data : undefined"
+            :parent="
+				d3Data.d3ParentOfAddNode
+					? d3Data.d3ParentOfAddNode.data
+					: undefined
+			"
             :show="showAddDialog"
-            @add="data => add(data)"
+            @add="(data) => add(data)"
             @close="showAddDialog = false"
         ></feature-model-tree-add-dialog>
     </div>
 </template>
 
 <script>
-import Vue from 'vue';
-import FeatureModelTreeToolbar from './FeatureModelTreeToolbar.vue';
-import FeatureModelTreeContextMenu from './FeatureModelTreeContextMenu.vue';
-import FeatureModelTreeEditDialog from './FeatureModelTreeEditDialog.vue';
-import FeatureModelTreeAddDialog from '@/components/FeatureModel/FeatureModelTreeAddDialog';
+import Vue from 'vue'
+import FeatureModelTreeToolbar from './FeatureModelTreeToolbar.vue'
+import FeatureModelTreeContextMenu from './FeatureModelTreeContextMenu.vue'
+import FeatureModelTreeEditDialog from './FeatureModelTreeEditDialog.vue'
+import FeatureModelTreeAddDialog from '@/components/FeatureModel/FeatureModelTreeAddDialog'
 
 // Import feature-model-services
-import * as dragAndDrop from "@/services/FeatureModel/dragAndDrop.service.js";
-import * as update from '@/services/FeatureModel/update.service.js';
-import * as init from '@/services/FeatureModel/init.service.js';
-import * as view from "@/services/FeatureModel/view.service.js";
-import * as search from "@/services/FeatureModel/search.service.js";
-import {CommandManager} from "@/classes/Commands/CommandManager";
-import {AddCommand} from "@/classes/Commands/FeatureModel/AddCommand";
-import {EditCommand} from "@/classes/Commands/FeatureModel/EditCommand";
-import * as update_service from "@/services/FeatureModel/update.service";
+import * as dragAndDrop from '@/services/FeatureModel/dragAndDrop.service.js'
+import * as update from '@/services/FeatureModel/update.service.js'
+import * as init from '@/services/FeatureModel/init.service.js'
+import * as view from '@/services/FeatureModel/view.service.js'
+import * as search from '@/services/FeatureModel/search.service.js'
+import {CommandManager} from '@/classes/Commands/CommandManager'
+import {AddCommand} from '@/classes/Commands/FeatureModel/AddCommand'
+import {EditCommand} from '@/classes/Commands/FeatureModel/EditCommand'
+import * as update_service from '@/services/FeatureModel/update.service'
 
 export default Vue.extend({
     name: 'FeatureModelTree',
@@ -169,14 +196,18 @@ export default Vue.extend({
                 segmentsContainer: undefined,
                 featureNodesContainer: undefined,
                 dragContainer: undefined,
+                quickEditContainer: undefined,
             },
             spaceBetweenParentChild: 75,
             spaceBetweenSiblings: 20,
             d3ParentOfAddNode: undefined,
+            d3AddNodeIndex: 0,
             coloringIndex: -1,
             semanticEditing: false,
+            quickEdit: true,
             direction: 'v', // h = horizontally, v = vertically
             maxHorizontallyLevelWidth: [],
+            featureModelTree: undefined,
         },
         showAddDialog: false,
         showEditDialog: false,
@@ -191,191 +222,203 @@ export default Vue.extend({
     }),
 
     mounted() {
-        init.initialize(this.d3Data, this.rootNode);
-        dragAndDrop.init(this.d3Data, this.commandManager);
-        view.reset(this.d3Data);
+        this.d3Data.featureModelTree = this;
 
-        this.commandManager.d3Data = this.d3Data;
-        this.commandManager.executeRemoteCommands(this.rootNode, this.constraints, update, this.d3Data);
-        update.updateSvg(this.d3Data);
+        init.initialize(this.d3Data, this.rootNode)
+        dragAndDrop.init(this.d3Data, this.commandManager)
+        view.reset(this.d3Data)
+
+        this.commandManager.d3Data = this.d3Data
+        this.commandManager.executeRemoteCommands(
+            this.rootNode,
+            this.constraints
+        )
+        update.updateSvg(this.d3Data)
     },
 
     methods: {
         resetView(levels, maxChildren) {
-            view.reset(this.d3Data, levels, maxChildren);
+            view.reset(this.d3Data, levels, maxChildren)
         },
 
         coloring(coloringIndex) {
-            this.d3Data.coloringIndex = coloringIndex;
-            update.updateSvg(this.d3Data);
+            this.d3Data.coloringIndex = coloringIndex
+            update.updateSvg(this.d3Data)
         },
 
         onChangeFoundNodeIndex(index) {
             if (index < this.search.foundNodeDistances.length) {
-                this.search.selectedNode = this.search.foundNodeDistances[index].node;
-                search.markNodeAsSearched(this.d3Data, this.search.selectedNode);
+                this.search.selectedNode =
+                    this.search.foundNodeDistances[index].node
+                search.markNodeAsSearched(this.d3Data, this.search.selectedNode)
             }
         },
 
         onChangeSearchText(searchText) {
-            this.search.foundNodeDistances = search.search(this.d3Data, searchText);
-            search.resetSearch(this.d3Data);
+            this.search.foundNodeDistances = search.search(
+                this.d3Data,
+                searchText
+            )
+            search.resetSearch(this.d3Data)
             if (this.search.foundNodeDistances.length) {
-                this.onChangeFoundNodeIndex(0);
+                this.onChangeFoundNodeIndex(0)
             } else {
-                update.updateSvg(this.d3Data);
+                update.updateSvg(this.d3Data)
             }
         },
 
         updateSvg() {
-            update.updateSvg(this.d3Data);
+            update.updateSvg(this.d3Data)
         },
 
         fitToView() {
-            view.zoomFit(this.d3Data);
+            view.zoomFit(this.d3Data)
         },
 
         toggleDirection() {
-            this.d3Data.direction = this.d3Data.direction === 'v' ? 'h' : 'v';
-            update.updateSvg(this.d3Data);
+            this.d3Data.direction = this.d3Data.direction === 'v' ? 'h' : 'v'
+            update.updateSvg(this.d3Data)
         },
 
         hideCurrentNode(d3Node) {
-            this.closeContextMenu();
-            d3Node.data.hide();
-            update_service.updateSvg(this.d3Data);
-            view.focusNode(this.d3Data, d3Node);
+            this.closeContextMenu()
+            d3Node.data.hide()
+            update_service.updateSvg(this.d3Data)
+            view.focusNode(this.d3Data, d3Node)
         },
 
         hideRightSiblings(d3Node) {
-            this.closeContextMenu();
-            d3Node.data.toggleHideRightSiblings();
-            update_service.updateSvg(this.d3Data);
-            view.focusNode(this.d3Data, d3Node);
+            this.closeContextMenu()
+            d3Node.data.toggleHideRightSiblings()
+            update_service.updateSvg(this.d3Data)
+            view.focusNode(this.d3Data, d3Node)
         },
 
         hideLeftSiblings(d3Node) {
-            this.closeContextMenu();
-            d3Node.data.toggleHideLeftSiblings();
-            update_service.updateSvg(this.d3Data);
-            view.focusNode(this.d3Data, d3Node);
+            this.closeContextMenu()
+            d3Node.data.toggleHideLeftSiblings()
+            update_service.updateSvg(this.d3Data)
+            view.focusNode(this.d3Data, d3Node)
         },
 
         hideAllOtherNodes(d3Node) {
-            this.closeContextMenu();
-            d3Node.data.hideAllOtherNodes();
-            update_service.updateSvg(this.d3Data);
-            view.focusNode(this.d3Data, d3Node);
+            this.closeContextMenu()
+            d3Node.data.hideAllOtherNodes()
+            update_service.updateSvg(this.d3Data)
+            view.focusNode(this.d3Data, d3Node)
         },
 
         hideAllNodesOnThisLevel(d3Node) {
-            this.closeContextMenu();
-            d3Node.data.hideAllNodesOnThisLevel();
-            update_service.updateSvg(this.d3Data);
-            view.focusNode(this.d3Data, d3Node);
+            this.closeContextMenu()
+            d3Node.data.hideAllNodesOnThisLevel()
+            update_service.updateSvg(this.d3Data)
+            view.focusNode(this.d3Data, d3Node)
         },
 
         closeContextMenu() {
-            this.d3Data.contextMenu.selectedD3Node = null;
+            this.d3Data.contextMenu.selectedD3Node = null
         },
 
         collapse(d3Node) {
-            this.closeContextMenu();
-            d3Node.data.toggleCollapse();
-            update.updateSvg(this.d3Data);
+            this.closeContextMenu()
+            d3Node.data.toggleCollapse()
+            update.updateSvg(this.d3Data)
         },
 
-
         edit(newData) {
-            this.showEditDialog = false;
+            this.showEditDialog = false
 
-            const editCommand = new EditCommand(
-                this.editNode,
-                newData,
-            );
-            this.commandManager.execute(editCommand, update, this.d3Data);
-            update.updateSvg(this.d3Data);
+            const editCommand = new EditCommand(this.editNode, newData)
+            this.commandManager.execute(editCommand)
+            update.updateSvg(this.d3Data)
         },
 
         changeShortName(isShortName) {
-            this.d3Data.isShortenedName = isShortName;
-            update.updateSvg(this.d3Data);
+            this.d3Data.isShortenedName = isShortName
+            update.updateSvg(this.d3Data)
         },
 
         changeSpaceBetweenParentChild(spacing) {
-            this.d3Data.spaceBetweenParentChild = spacing;
-            update.updateSvg(this.d3Data);
+            this.d3Data.spaceBetweenParentChild = spacing
+            update.updateSvg(this.d3Data)
         },
 
         changeSpaceBetweenSiblings(spacing) {
-            this.d3Data.spaceBetweenSiblings = spacing;
-            update.updateSvg(this.d3Data);
+            this.d3Data.spaceBetweenSiblings = spacing
+            update.updateSvg(this.d3Data)
         },
 
         add(newNode) {
-            this.showAddDialog = false;
+            this.showAddDialog = false
 
-            this.showAddDialog = false;
-
-            const parent = this.d3Data.d3ParentOfAddNode.data;
+            const parent = this.d3Data.d3ParentOfAddNode.data
             const addCommand = new AddCommand(
                 parent,
-                parent.children ? parent.children.length : 0,
-                newNode,
+                this.d3Data.d3AddNodeIndex,
+                newNode
             );
-            this.commandManager.execute(addCommand, update, this.d3Data);
-            update.updateSvg(this.d3Data);
+            this.commandManager.execute(addCommand)
+            update.updateSvg(this.d3Data)
         },
 
         openAddAsChildDialog(d3Node) {
-            this.d3Data.d3ParentOfAddNode = d3Node;
-            this.showAddDialog = true;
+            this.d3Data.d3ParentOfAddNode = d3Node
+            this.showAddDialog = true
         },
 
         openAddAsSiblingDialog(d3Node) {
-            this.d3Data.d3ParentOfAddNode = d3Node.parent;
-            this.showAddDialog = true;
+            this.d3Data.d3ParentOfAddNode = d3Node.parent
+            this.showAddDialog = true
         },
 
         openEditDialog(d3Node) {
-            this.closeContextMenu();
-            this.editNode = d3Node.data;
-            this.showEditDialog = true;
+            this.closeContextMenu()
+            this.editNode = d3Node.data
+            this.showEditDialog = true
         },
 
         undo() {
-            this.commandManager.undo(update, this.d3Data);
-            update.updateSvg(this.d3Data);
+            this.commandManager.undo()
+            update.updateSvg(this.d3Data)
         },
 
         redo() {
-            this.commandManager.redo(update, this.d3Data);
-            update.updateSvg(this.d3Data);
+            this.commandManager.redo()
+            update.updateSvg(this.d3Data)
         },
 
         highlightConstraints(d3Node) {
-            d3Node.data.constraints.forEach(constraint => constraint.highlight());
-            update.updateSvg(this.d3Data);
-            this.updateConstraints();
+            d3Node.data.constraints.forEach((constraint) =>
+                constraint.highlight()
+            )
+            update.updateSvg(this.d3Data)
+            this.updateConstraints()
         },
 
         resetHighlightConstraints(d3Node) {
-            d3Node.data.constraints.forEach(constraint => constraint.resetHighlight());
-            update.updateSvg(this.d3Data);
-            this.updateConstraints();
+            d3Node.data.constraints.forEach((constraint) =>
+                constraint.resetHighlight()
+            )
+            update.updateSvg(this.d3Data)
+            this.updateConstraints()
         },
 
         updateConstraints() {
-            this.$emit('update-constraints');
+            this.$emit('update-constraints')
         },
+
+        updateQuickEdit(newValue) {
+            this.d3Data.quickEdit = newValue
+            this.updateSvg();
+        }
     },
 
     computed: {
         allNodes() {
             if (this.d3Data.root) {
-                return this.d3Data.root.data.descendants();
+                return this.d3Data.root.data.descendants()
             } else {
-                return [];
+                return []
             }
         },
     },
@@ -383,12 +426,12 @@ export default Vue.extend({
     watch: {
         editRights() {
             if (!this.editRights) {
-                this.showAddDialog = false;
-                this.showEditDialog = false;
+                this.showAddDialog = false
+                this.showEditDialog = false
             }
         },
     },
-});
+})
 </script>
 
 <style lang="scss">
@@ -415,7 +458,7 @@ export default Vue.extend({
     }
 
     rect {
-        transition: all .75s;
+        transition: all 0.75s;
         stroke: #888;
         stroke-width: 1px;
     }
@@ -511,5 +554,24 @@ polygon {
 
 .whiteText {
     fill: white !important;
+}
+
+.v-input.expanding-search {
+    transition: max-width 0.5s;
+    float: right;
+
+    .v-icon {
+        cursor: pointer;
+    }
+
+    &.closed {
+        max-width: 45px;
+
+        & .v-input__slot {
+            &::before {
+                border: 0px;
+            }
+        }
+    }
 }
 </style>

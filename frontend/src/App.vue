@@ -13,11 +13,21 @@
 					v-model="$store.state.snackbar.show"
 					:color="$store.state.snackbar.variant"
 					:multi-line="true"
-					:right="true"
+					:transition="
+						$vuetify.breakpoint.smAndDown
+							? 'slide-y-transition'
+							: 'slide-x-reverse-transition'
+					"
+					:centered="$vuetify.breakpoint.smAndDown"
+					:right="!$vuetify.breakpoint.smAndDown"
 					:timeout="$store.state.snackbar.timeout"
 					:top="true"
 					absolute
+					:min-height="$vuetify.breakpoint.smAndDown ? '0' : ''"
+					:min-width="$vuetify.breakpoint.smAndDown ? '0' : ''"
+					:rounded="$vuetify.breakpoint.smAndDown ? 'pill' : false"
 					elevation="8"
+					style="z-index: 99"
 				>
 					{{ $store.state.snackbar.message }}
 					<template v-slot:action="{ attrs }">
@@ -33,8 +43,30 @@
 						</v-btn>
 					</template>
 				</v-snackbar>
+				<!--				<div
+					v-else
+					style="position: absolute; width: 100%; top: 10px"
+					class="justify-center d-flex"
+				>
+					<v-chip
+						v-if="!$vuetify.breakpoint.mdAndUp"
+						v-model="$store.state.snackbar.show"
+						:color="$store.state.snackbar.variant"
+						:timeout="$store.state.snackbar.timeout"
+						style="width: max-content"
+						elevation="8"
+						close
+						@click:close="
+							$store.commit('updateSnackbar', {
+								show: false,
+							})
+						"
+					>
+						{{ $store.state.snackbar.message }}
+					</v-chip>
+				</div>-->
 			</v-main>
-			<Footer></Footer>
+			<Footer v-if="$route.name !== 'FeatureModel'"></Footer>
 		</v-app>
 	</vue-scroll-snap>
 </template>
@@ -56,16 +88,16 @@ export default Vue.extend({
 
 	data: () => ({}),
 
-    mounted() {
-        window.addEventListener('online', () => this.updateOnlineStatus(true));
-        window.addEventListener('offline', () => this.updateOnlineStatus(false));
-    },
+	mounted() {
+		window.addEventListener('online', () => this.updateOnlineStatus(true))
+		window.addEventListener('offline', () => this.updateOnlineStatus(false))
+	},
 
 	methods: {
-        updateOnlineStatus(isOnline) {
-            this.$store.commit('setOnlineState', isOnline);
-        }
-    },
+		updateOnlineStatus(isOnline) {
+			this.$store.commit('setOnlineState', isOnline)
+		},
+	},
 })
 </script>
 

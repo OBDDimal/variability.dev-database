@@ -14,6 +14,8 @@
             @save="save"
             @update-constraints="updateConstraints"
             @show-collaboration-dialog="showStartCollaborationSessionDialog = true"
+            @show-claim-dialog="showClaimDialog"
+            @new-empty-model="newEmptyModel"
             @show-tutorial="showTutorial = true"
         >
         </feature-model-tree>
@@ -25,52 +27,81 @@
             elevation="2"
             icon
             right
+            :x-large="$vuetify.breakpoint.mdAndUp"
             style="background-color: var(--v-primary-base)"
-            x-large
-            @click="$store.commit('openConstraints', true)"
+            @click="openInformation = !openInformation"
+            class="mr-15"
         >
-            <v-icon>mdi-format-list-checks</v-icon>
+            <v-icon>mdi-information</v-icon>
         </v-btn>
 
-        <constraints
-            v-if="data.constraints"
-            ref="constraints"
-            :command-manager="constraintCommandManager"
-            :constraints="data.constraints"
-            :editRights="editRights"
-            :rootNode="data.rootNode"
-            @update-feature-model="updateFeatureModel"
-        ></constraints>
+		<v-btn
+			absolute
+			bottom
+			dark
+			elevation="2"
+			icon
+			right
+			:x-large="$vuetify.breakpoint.mdAndUp"
+			style="background-color: var(--v-primary-base)"
+			@click="openConstraints = true"
+		>
+			<v-icon>mdi-format-list-checks</v-icon>
+		</v-btn>
 
-        <collaboration-toolbar v-if="collaborationStatus" :key="collaborationReloadKey"
-                               :collaboration-manager="collaborationManager"
-                               :show-claim-dialog="showClaimDialog"></collaboration-toolbar>
+		<constraints
+			v-if="data.constraints"
+			ref="constraints"
+            :is-open="openConstraints"
+            @close="openConstraints = false"
+			:command-manager="constraintCommandManager"
+			:constraints="data.constraints"
+			:editRights="editRights"
+			:rootNode="data.rootNode"
+			@update-feature-model="updateFeatureModel"
+		></constraints>
 
-        <v-dialog v-model="showStartCollaborationSessionDialog" persistent width="auto">
-            <v-card>
-                <v-card-title>Do you want to start a new collaboration session?</v-card-title>
-                <v-card-actions>
-                    <v-btn
-                        color="red darken-1"
-                        text
-                        @click="showStartCollaborationSessionDialog = false"
-                    >
-                        Cancel
-                    </v-btn>
+		<collaboration-toolbar
+			v-if="collaborationStatus"
+			:key="collaborationReloadKey"
+			:collaboration-manager="collaborationManager"
+			:show-claim-dialog="showClaimDialog"
+		></collaboration-toolbar>
 
-                    <v-btn
-                        color="primary darken-1"
-                        text
-                        @click="createCollaboration"
-                    >
-                        Start
-                    </v-btn>
-                </v-card-actions>
-            </v-card>
-        </v-dialog>
+		<v-dialog
+			v-model="showStartCollaborationSessionDialog"
+			persistent
+			width="auto"
+		>
+			<v-card>
+				<v-card-title
+					>Do you want to start a new collaboration
+					session?</v-card-title
+				>
+				<v-card-actions>
+					<v-btn
+						color="red darken-1"
+						text
+						@click="showStartCollaborationSessionDialog = false"
+					>
+						Cancel
+					</v-btn>
 
-        <collaboration-name-dialog v-if="collaborationKey"
-                                   @change-name="name => collaborationManager.sendName(name)"></collaboration-name-dialog>
+					<v-btn
+						color="primary darken-1"
+						text
+						@click="createCollaboration"
+					>
+						Start
+					</v-btn>
+				</v-card-actions>
+			</v-card>
+		</v-dialog>
+
+		<collaboration-name-dialog
+			v-if="collaborationKey"
+			@change-name="(name) => collaborationManager.sendName(name)"
+		></collaboration-name-dialog>
 
         <collaboration-continue-editing-dialog
             :show="showContinueEditingDialog"
@@ -78,9 +109,9 @@
             @continue-editing="continueEditing">
         </collaboration-continue-editing-dialog>
 
-        <tutorial-mode :show="showTutorial" @close="showTutorial= false">
+        <feature-model-information v-if="openInformation"></feature-model-information>
 
-        </tutorial-mode>
+        <tutorial-mode :show="showTutorial" @close="showTutorial= false"></tutorial-mode>
     </div>
 </template>
 
@@ -100,23 +131,26 @@ import CollaborationNameDialog from "@/components/CollaborationNameDialog";
 import CollaborationContinueEditingDialog from "@/components/CollaborationContinueEditingDialog";
 import {EXAMPLE_FEATURE_MODEL_XML} from "@/classes/constants";
 import TutorialMode from "@/components/TutorialMode";
+import {NewEmptyModelCommand} from "@/classes/Commands/FeatureModel/NewEmptyModelCommand";
+import FeatureModelInformation from "@/components/FeatureModel/FeatureModelInformation";
 
 export default Vue.extend({
-    name: 'FeatureModel',
+	name: 'FeatureModel',
 
-    components: {
+	components: {
         TutorialMode,
-        CollaborationContinueEditingDialog,
-        CollaborationToolbar,
-        FeatureModelTree,
-        Constraints,
-        CollaborationNameDialog,
-    },
+        FeatureModelInformation,
+		CollaborationContinueEditingDialog,
+		CollaborationToolbar,
+		FeatureModelTree,
+		Constraints,
+		CollaborationNameDialog,
+	},
 
-    props: {
-        id: undefined,
-        collaborationKey: undefined,
-    },
+	props: {
+		id: undefined,
+		collaborationKey: undefined,
+	},
 
     data: () => ({
         data: {
@@ -139,49 +173,63 @@ export default Vue.extend({
         showClaimDialog: false,
         showContinueEditingDialog: false,
         collaborationStatus: false,
+        openConstraints: false,
+        openInformation: false,
         showTutorial: false,
     }),
 
-    created() {
-        this.collaborationManager = new CollaborationManager(this.featureModelCommandManager, this.constraintCommandManager, this);
-        this.featureModelCommandManager.commandEvent = this.commandEvent;
-        this.constraintCommandManager.commandEvent = this.commandEvent;
+	created() {
+		this.collaborationManager = new CollaborationManager(
+			this.featureModelCommandManager,
+			this.constraintCommandManager,
+			this
+		)
+		this.featureModelCommandManager.commandEvent = this.commandEvent
+		this.constraintCommandManager.commandEvent = this.commandEvent
 
-        if (this.id === 'local') {
-            const xml = beautify(localStorage.featureModelData);
-            xmlTranspiler.xmlToJson(xml, this.data);
-            this.xml = xml;
-        } else if (this.id === 'new') {
-            const xml = beautify(EXAMPLE_FEATURE_MODEL_XML);
-            xmlTranspiler.xmlToJson(xml, this.data);
-            this.xml = xml;
-        } else if (this.id) {
-            this.initData();
-        } else if (this.collaborationKey) {
-            const uuid = this.collaborationKey.substring(0, this.collaborationKey.length - 1);
-            const checksum = this.collaborationKey.slice(-1);
-            const condition = checksum === (Array.from(uuid).reduce((last, curr) => parseInt(last, 16) + parseInt(curr, 16)) % 16).toString(16);
-            if (condition) {
-                this.collaborationManager.joinCollaboration(this.collaborationKey);
-            } else {
-                alert("Wrong key!");
-            }
-        }
-    },
+		if (this.id === 'local') {
+			const xml = beautify(localStorage.featureModelData)
+			xmlTranspiler.xmlToJson(xml, this.data)
+			this.xml = xml
+		} else if (this.id === 'new') {
+			const xml = beautify(EXAMPLE_FEATURE_MODEL_XML)
+			xmlTranspiler.xmlToJson(xml, this.data)
+			this.xml = xml
+		} else if (this.id) {
+			this.initData()
+		} else if (this.collaborationKey) {
+			const uuid = this.collaborationKey.substring(
+				0,
+				this.collaborationKey.length - 1
+			)
+			const checksum = this.collaborationKey.slice(-1)
+			const condition =
+				checksum ===
+				(
+					Array.from(uuid).reduce(
+						(last, curr) => parseInt(last, 16) + parseInt(curr, 16)
+					) % 16
+				).toString(16)
+			if (condition) {
+				this.collaborationManager.joinCollaboration(
+					this.collaborationKey
+				)
+			} else {
+				alert('Wrong key!')
+			}
+		}
+	},
 
-
-    beforeRouteLeave(to, from, next) {
-        // If session gets closed by host, don't ask for confirmation
-        if (this.collaborationManager.noConfirm) {
-            const answer = window.confirm('Do you really want to leave the page? Collaboration sessions will be closed and data will be lost!')
+	beforeRouteLeave(to, from, next) {
+		// If session gets closed by host, don't ask for confirmation
+		if (this.collaborationManager.noConfirm) {
+			const answer = window.confirm(
+				'Do you really want to leave the page? Collaboration sessions will be closed and data will be lost!'
+			)
 
             if (answer) {
                 // If user wants to close page
-                if (this.collaborationManager.isHost) {
-                    this.collaborationManager.closeCollaboration();
-                } else {
-                    this.collaborationManager.leaveCollaboration();
-                }
+                this.collaborationManager.closeCollaboration();
                 next()
             } else {
                 // If user doesn't want to close page
@@ -195,17 +243,29 @@ export default Vue.extend({
 
     methods: {
         save() {
-            // TODO: Axios post request to update the xml file in the backend ???
-            const xml = jsonToXML(this.data);
-            localStorage.featureModelData = xml;
+            localStorage.featureModelData = jsonToXML(this.data);
             window.onbeforeunload = null;
+
+            this.$store.commit("updateSnackbar", {
+                message: "Successfully saved in local storage",
+                variant: "success",
+                timeout: 5000,
+                show: true,
+            });
         },
 
-        reset() {
-            // TODO: Transpile the xml file new and restart viewer.
-            this.initData();
-            this.reloadKey++;
+		reset() {
+			// TODO: Transpile the xml file new and restart viewer.
+			this.initData()
+			this.reloadKey++
+		},
+
+        newEmptyModel() {
+            const command = new NewEmptyModelCommand(this, this.$refs.featureModelTree.d3Data);
+            this.featureModelCommandManager.execute(command);
+            this.updateFeatureModel();
         },
+
 
         initData() {
             api.get(`${process.env.VUE_APP_DOMAIN}files/${this.id}/`)
@@ -219,43 +279,45 @@ export default Vue.extend({
                 });
         },
 
-        updateFeatureModel() {
-            update.updateSvg(this.$refs.featureModelTree.d3Data);
-        },
+		updateFeatureModel() {
+			update.updateSvg(this.$refs.featureModelTree.d3Data)
+		},
 
-        updateConstraints() {
-            this.$refs.constraints.update();
-        },
+		updateConstraints() {
+			this.$refs.constraints.update()
+		},
 
-        exportToXML() {
-            xmlTranspiler.downloadXML(this.data);
-        },
+		exportToXML() {
+			xmlTranspiler.downloadXML(this.data)
+		},
 
-        commandEvent() {
-            // Can't override text for Chrome & Edge
-            window.onbeforeunload = function () {
-                return "Do you really want to leave the page? Collaboration sessions will be closed and data will be lost!";
-            };
-        },
+		commandEvent() {
+			// Can't override text for Chrome & Edge
+			window.onbeforeunload = function () {
+				return 'Do you really want to leave the page? Collaboration sessions will be closed and data will be lost!'
+			}
+		},
 
-        createCollaboration() {
-            this.showStartCollaborationSessionDialog = false;
-            this.collaborationManager.createCollaboration();
-            navigator.clipboard.writeText(`${process.env.VUE_APP_DOMAIN_FRONTEND}collaboration/${this.collaborationManager.collaborationKey}`);
-        },
+		createCollaboration() {
+			this.showStartCollaborationSessionDialog = false
+			this.collaborationManager.createCollaboration()
+			navigator.clipboard.writeText(
+				`${process.env.VUE_APP_DOMAIN_FRONTEND}collaboration/${this.collaborationManager.collaborationKey}`
+			)
+		},
 
-        continueEditing() {
-            this.showContinueEditingDialog = false;
-            this.collaborationManager.closeCollaboration();
-            this.editRights = true;
-        },
+		continueEditing() {
+			this.showContinueEditingDialog = false
+			this.collaborationManager.closeCollaboration()
+			this.editRights = true
+		},
 
-        closeFeatureModel() {
-            this.showContinueEditingDialog = false;
-            this.collaborationManager.closeCollaboration();
-            this.collaborationManager.noConfirm = false;
-            this.$router.push('/');
-        },
-    },
-});
+		closeFeatureModel() {
+			this.showContinueEditingDialog = false
+			this.collaborationManager.closeCollaboration()
+			this.collaborationManager.noConfirm = false
+			this.$router.push('/')
+		},
+	},
+})
 </script>

@@ -4,7 +4,9 @@ cffi==1.15.1
 charset-normalizer==2.1.1
 coverage==6.2
 Deprecated==1.2.13
+dj-rest-auth==2.2.5
 Django==3.2.8
+django-allauth==0.51.0
 django-cors-headers==3.10.0
 django-coverage-plugin==2.0.2
 django-environ==0.8.1
@@ -14,7 +16,7 @@ django-rest-auth==0.9.5
 django-seed==0.3.1
 djangorestframework==3.12.4
 djangorestframework-simplejwt==5.0.0
-docker==5.0.3
+docker==6.0.0
 Faker==14.2.0
 idna==3.3
 psycopg2-binary==2.9.2

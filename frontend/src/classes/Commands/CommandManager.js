@@ -1,17 +1,18 @@
 import * as commandFactory from "@/classes/Commands/CommandFactory";
+import * as update from '@/services/FeatureModel/update.service.js';
 
 export class CommandManager {
     constructor() {
         this.historyCommands = [];
         this.futureCommands = [];
-        this.isDirty = false;
         this.collaborationManager = null;
         this.type = null;
         this.remoteCommands = null;
         this.commandEvent = null;
+        this.d3Data = null;
     }
 
-    execute(command, update, d3Data, initiator = true) {
+    execute(command, initiator = true) {
         if (initiator && this.collaborationManager) {
             this.collaborationManager.send(this.type, 'execute', command.createDTO());
         }
@@ -32,14 +33,10 @@ export class CommandManager {
 
         this.commandEvent();
 
-        // Rerender for edits and fade them out
-        setTimeout(() => {
-            command.unmarkChanges();
-            update.updateSvg(d3Data)
-        }, 5000);
+        this.fadeOut(this.d3Data, command);
     }
 
-    undo(update, d3Data, initiator = true) {
+    undo(initiator = true) {
         if (this.historyCommands.length) {
             if (initiator && this.collaborationManager) {
                 this.collaborationManager.send(this.type, 'undo');
@@ -60,15 +57,11 @@ export class CommandManager {
 
             this.commandEvent();
 
-            // Rerender for edits and fade them out
-            setTimeout(() => {
-                undoCommand.unmarkChanges();
-                update.updateSvg(d3Data)
-            }, 5000);
+            this.fadeOut(this.d3Data, undoCommand);
         }
     }
 
-    redo(update, d3Data, initiator = true) {
+    redo(initiator = true) {
         if (this.futureCommands.length) {
             if (initiator && this.collaborationManager) {
                 this.collaborationManager.send(this.type, 'redo');
@@ -89,11 +82,7 @@ export class CommandManager {
 
             this.commandEvent();
 
-            // Rerender for edits and fade them out
-            setTimeout(() => {
-                redoCommand.unmarkChanges();
-                update.updateSvg(d3Data)
-            }, 5000);
+            this.fadeOut(this.d3Data, redoCommand);
         }
     }
 
@@ -105,19 +94,27 @@ export class CommandManager {
         return this.futureCommands.length >= 1;
     }
 
-    executeRemoteCommands(rootNode, constraints, update, d3Data) {
+    executeRemoteCommands(rootNode, constraints) {
         if (this.remoteCommands) {
             this.remoteCommands.historyCommands.forEach(commandData => {
-                const command = commandFactory.create(rootNode, constraints, commandData.type, commandData.data);
-                this.execute(command, false, update, d3Data);
+                const command = commandFactory.create(rootNode, constraints, commandData.type, commandData.data, this.collaborationManager.featureModel);
+                this.execute(command, false);
             });
 
             this.remoteCommands.futureCommands.forEach(commandData => {
-                const command = commandFactory.create(rootNode, constraints, commandData.type, commandData.data);
-                this.execute(command, false, update, d3Data);
+                const command = commandFactory.create(rootNode, constraints, commandData.type, commandData.data, this.collaborationManager.featureModel);
+                this.execute(command, false);
             });
 
             this.remoteCommands.futureCommands.forEach(() => this.undo(false));
         }
+    }
+
+    fadeOut(d3Data, command) {
+        // Rerender for edits and fade them out
+        setTimeout(() => {
+            command.unmarkChanges();
+            update.updateSvg(d3Data);
+        }, 5000);
     }
 }
