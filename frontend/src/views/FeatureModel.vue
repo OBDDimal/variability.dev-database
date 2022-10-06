@@ -21,6 +21,7 @@
         </feature-model-tree>
 
         <v-btn
+            id="feature-model-information"
             absolute
             bottom
             dark
@@ -36,6 +37,7 @@
         </v-btn>
 
 		<v-btn
+            id="feature-model-constraints"
 			absolute
 			bottom
 			dark
@@ -109,7 +111,7 @@
             @continue-editing="continueEditing">
         </collaboration-continue-editing-dialog>
 
-        <feature-model-information v-if="openInformation"></feature-model-information>
+        <feature-model-information v-if="openInformation" ></feature-model-information>
 
         <tutorial-mode :show="showTutorial" @close="showTutorial= false"></tutorial-mode>
     </div>
@@ -218,6 +220,9 @@ export default Vue.extend({
 				alert('Wrong key!')
 			}
 		}
+
+        // Start tutorial mode if it has not been completed before
+        this.showTutorial = !localStorage.featureModelTutorialCompleted;
 	},
 
 	beforeRouteLeave(to, from, next) {

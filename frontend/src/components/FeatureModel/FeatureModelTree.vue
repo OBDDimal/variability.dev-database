@@ -2,6 +2,7 @@
     <div>
         <div class="float-right mt-2 mr-3" style="position: absolute; right: 0">
             <v-toolbar
+                id="feature-model-search"
                 class="rounded-pill"
                 elevation="9"
                 height="auto"

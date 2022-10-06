@@ -8,7 +8,7 @@
         >
             <v-list dense>
                 <v-list-item @click.stop="miniSidebar = !miniSidebar">
-                    <v-list-item-icon>
+                    <v-list-item-icon id="feature-model-toolbar-extend">
                         <v-icon v-if="miniSidebar">mdi-chevron-right</v-icon>
                         <v-icon v-else>mdi-chevron-left</v-icon>
                     </v-list-item-icon>
@@ -33,7 +33,7 @@
                 >
                     <template v-slot:activator="{ on, attrs }">
                         <v-list-item v-bind="attrs" v-on="on">
-                            <v-list-item-icon>
+                            <v-list-item-icon id="feature-model-toolbar-save">
                                 <v-icon v-if="!isSaveAvailable">mdi-content-save</v-icon>
                                 <v-icon v-else>mdi-content-save-edit</v-icon>
                             </v-list-item-icon>
@@ -117,7 +117,7 @@
                     @click="$emit('undo')"
                 >
                     <v-list-item-icon>
-                        <v-icon :disabled="!isUndoAvailable || !editRights"
+                        <v-icon :disabled="!isUndoAvailable || !editRights" id="feature-model-toolbar-undo"
                         >mdi-undo
                         </v-icon
                         >
@@ -292,7 +292,7 @@
                     :disabled="collaborationStatus"
                     @click="$emit('show-collaboration-dialog')"
                 >
-                    <v-list-item-icon>
+                    <v-list-item-icon id="feature-model-toolbar-collaboration">
                         <v-icon :disabled="collaborationStatus"
                         >mdi-account-multiple
                         </v-icon
@@ -317,7 +317,7 @@
                 <v-menu :close-on-content-click="false" offset-y>
                     <template v-slot:activator="{ on, attrs }">
                         <v-list-item v-bind="attrs" v-on="on">
-                            <v-list-item-icon>
+                            <v-list-item-icon id="feature-model-toolbar-other-settings">
                                 <v-icon>mdi-dots-vertical</v-icon>
                             </v-list-item-icon>
 
