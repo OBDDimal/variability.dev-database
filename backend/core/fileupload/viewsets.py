@@ -72,8 +72,59 @@ def anonymize_file(file, request):
 
 class ConfirmFileUploadViewSet(GenericViewSet, CreateModelMixin):
     """
-    This view is called when the user tries to confirm  a file, via a link which contains a token.
-    This token will be decoded and the file will be set to confirmed if the token is valid.
+    This view is called when the user tries to confirm files, via a link which contains a token.
+    This token will be decoded and the files will be set to confirmed if the token is valid.
+    """
+    permission_classes = [AllowAny]
+    http_method_names = ['get']
+
+    @staticmethod
+    def get(request, token):
+        try:
+            decoded_token = decode_token_to_user(token)
+            actual_request_timestamp = dateparse.parse_datetime(decoded_token.pop('timestamp'))
+            if decoded_token.pop('purpose') != 'upload_confirm':
+                raise BadSignature('Token purpose does not match!')
+            min_possible_request_timestamp = timezone.now() - timedelta(days=PASSWORD_RESET_TIMEOUT_DAYS)
+            valid = min_possible_request_timestamp <= actual_request_timestamp
+            if not valid:
+                raise BadSignature('Token expired!')
+            else:
+                file_ids = decoded_token.pop("file_id")
+                if isinstance(file_ids, int):
+                    file_ids = [file_ids]
+                files = []
+                for file_id in file_ids:
+                    file_from_db = File.objects.get(pk=file_id)
+                    if file_from_db.is_confirmed:
+                        raise BadSignature("File upload is already confirmed!")
+                    file_from_db.is_confirmed = True
+                    if not file_from_db.mirrored:
+                        if not DEBUG:
+                            # async start mirror. Details: https://docs.python.org/3/library/multiprocessing.html
+                            mirror_process = Process(
+                                target=gm.mirror_to_github, args=(file_from_db,)
+                            )
+                            mirror_process.start()
+                            file_from_db.mirrored = True
+                        else:
+                            logger.debug(" MODE: File mirror is disabled")
+                    file_from_db.save()
+                    files.append(FilesSerializer(file_from_db).data)
+                return Response(
+                    {"files": files}, HTTP_200_OK
+                )
+        except ObjectDoesNotExist as error:
+            return Response({'message': str(error)})
+        except BadSignature as error:
+            return Response({'message': str(error)})
+        except DjangoUnicodeDecodeError as error:
+            return Response({'message': str(error)})
+
+class DeleteFileUploadViewSet(GenericViewSet, CreateModelMixin):
+    """
+    This view is called when the user tries to delete files, via a link which contains a token.
+    This token will be decoded and the files will be deleted if the token is valid.
     """
 
     permission_classes = [AllowAny]
@@ -95,23 +146,15 @@ class ConfirmFileUploadViewSet(GenericViewSet, CreateModelMixin):
             if not valid:
                 raise BadSignature("Token expired!")
             else:
-                file_from_db = File.objects.get(pk=decoded_token.pop("file_id"))
-                if file_from_db.is_confirmed:
-                    raise BadSignature("File upload is already confirmed!")
-                file_from_db.is_confirmed = True
-                if not file_from_db.mirrored:
-                    if not DEBUG:
-                        # async start mirror. Details: https://docs.python.org/3/library/multiprocessing.html
-                        mirror_process = Process(
-                            target=gm.mirror_to_github, args=(file_from_db,)
-                        )
-                        mirror_process.start()
-                        file_from_db.mirrored = True
-                    else:
-                        logger.debug(" MODE: File mirror is disabled")
-                file_from_db.save()
+                file_ids = decoded_token.pop("file_id")
+                if isinstance(file_ids, int):
+                    file_ids = [file_ids]
+                files = []
+                for file_id in file_ids:
+                    file_from_db = File.objects.get(pk=file_id)
+                    file_from_db.delete()
                 return Response(
-                    {"file": FilesSerializer(file_from_db).data}, HTTP_200_OK
+                    {"files": []}, HTTP_200_OK
                 )
         except ObjectDoesNotExist as error:
             return Response({"message": str(error)})
@@ -119,6 +162,7 @@ class ConfirmFileUploadViewSet(GenericViewSet, CreateModelMixin):
             return Response({"message": str(error)})
         except DjangoUnicodeDecodeError as error:
             return Response({"message": str(error)})
+
 
 
 class FileUploadViewSet(viewsets.ModelViewSet):
@@ -149,12 +193,15 @@ class FileUploadViewSet(viewsets.ModelViewSet):
         Called within the create method to serializer for creation
         """
         serializer.save(owner=self.request.user)
-        self.request.user.send_link_to_file(serializer.data)
+        self.request.user.send_link_to_files([serializer.data])
 
 
 class BulkUploadApiView(APIView):
     def post(self, request, format=None):
         files = json.loads(request.data["files"])
+
+        uploaded = []
+
         for uploaded_file in files:
             label = uploaded_file["label"]
             description = uploaded_file["description"]
@@ -176,8 +223,11 @@ class BulkUploadApiView(APIView):
             fs = FilesSerializer(data=validated_data)
             fs.is_valid()
             fs.save(owner=request.user)
+            uploaded.append(fs.data)
 
-        return Response()
+        request.user.send_link_to_files(uploaded)
+
+        return Response({"files": uploaded})
 
 
 class UnconfirmedFileViewSet(
