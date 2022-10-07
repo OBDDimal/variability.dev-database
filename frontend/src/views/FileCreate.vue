@@ -13,14 +13,13 @@
 					v-model="tab"
 					background-color="transparent"
 					color="primary"
-					:class="tab === 1 ? 'mb-0' : 'mb-4'"
 					centered
 				>
 					<v-tab> Single Upload </v-tab>
 					<v-tab> Bulk Upload </v-tab>
 				</v-tabs>
 
-				<v-tabs-items v-model="tab">
+				<v-tabs-items v-model="tab" class="pt-4">
 					<v-tab-item>
 						<v-container>
 							<v-form ref="form" v-model="valid" lazy-validation>
@@ -626,10 +625,12 @@ export default Vue.extend({
 			if (this.$refs.bulkform.validate() !== false) {
 				this.loading = true
 				let versionMajor = 1
+				const data = new FormData()
+				let file_data = []
+				let uploaded_family_id = -1
 				for (let i = 0; i < this.file_bulk.length; i++) {
-					const data = new FormData()
-
-					data.append('label', this.file_bulk[i].name.slice(0, -4))
+					let file_object = {}
+					file_object['label'] = this.file_bulk[i].name.slice(0, -4)
 					console.log('LABEL')
 					console.log(this.file_bulk[i].name.slice(0, -4))
 					const event = new Date()
@@ -641,13 +642,12 @@ export default Vue.extend({
 						hour: 'numeric',
 						minute: 'numeric',
 					}
-					data.append(
-						'description',
-						`Added in bulk upload on ${event.toLocaleDateString(
-							'en-US',
-							options
-						)}`
-					)
+					file_object[
+						'description'
+					] = `Added in bulk upload on ${event.toLocaleDateString(
+						'en-US',
+						options
+					)}`
 					console.log('DESCRIPTION')
 					console.log(
 						`Added in bulk upload on ${event.toLocaleDateString(
@@ -655,18 +655,18 @@ export default Vue.extend({
 							options
 						)}`
 					)
-					data.append('local_file', this.file_bulk[i])
-					data.append('license', this.license_bulk)
+					//data.append('local_file', this.file_bulk[i])
+					file_object['license'] = this.license_bulk
 					console.log('LICENSE')
 					console.log(this.license_bulk)
-					data.append('version', `${versionMajor}.0.0`)
+					file_object['version'] = `${versionMajor}.0.0`
 					console.log('VERSION')
 					console.log(`${versionMajor}.0.0`)
 					if (i !== 0) {
 						//change back to this.family.value when using v-combobox again
-						data.append('family', this.family_bulk)
+						file_object['family'] = uploaded_family_id
 						console.log('FAMILY (not new)')
-						console.log(this.family_bulk)
+						console.log(uploaded_family_id)
 					} else {
 						this.uploadStatus = 'Uploading new family...'
 						const uploadedFamily = await this.$store.dispatch(
@@ -676,16 +676,32 @@ export default Vue.extend({
 								description: this.newFamilyDescription_bulk,
 							}
 						)
-						data.append('family', uploadedFamily.id)
+						uploaded_family_id = uploadedFamily.id
+						file_object['family'] = uploaded_family_id
 						console.log('FAMILY (new) id:')
 						console.log(uploadedFamily.id)
 					}
-					data.append('tags', JSON.stringify(this.tags_bulk))
+					file_object['tags'] = this.tags.map((x) => x.id)
 					console.log('TAGS')
-					console.log(JSON.stringify(this.tags_bulk))
+					console.log(JSON.stringify(this.tags.map((x) => x.id)))
+					file_object['file'] = `${i}`
+					console.log('FILE (reference):')
+					console.log(`${i}`)
 					versionMajor++
-					await this.uploadFile(data, i + 1, this.file_bulk.length)
+					file_data.push(file_object)
 				}
+				data.append('files', JSON.stringify(file_data))
+				console.log('FILES (in total finished):')
+				console.log(JSON.stringify(file_data))
+				for (let i = 0; i < this.file_bulk.length; i++) {
+					data.append(`${i}`, this.file_bulk[i])
+				}
+				console.log('DATA (in total finished):')
+				console.log(data)
+				this.uploadStatus =
+					'Uploading bulk files. This may take a while...'
+				await this.$store.dispatch('uploadBulkFeatureModels', data)
+				console.log('finished uploading files')
 				this.uploadStatus = ''
 				this.loading = false
 				this.close()
@@ -727,22 +743,19 @@ export default Vue.extend({
 					console.log('FAMILY (new)')
 					console.log(uploadedFamily.id)
 				}
-				data.append('tags', JSON.stringify(this.tags))
+				data.append(
+					'tags',
+					this.tags.map((x) => x.id)
+				)
 				console.log('TAGS')
-				console.log(JSON.stringify(this.tags))
-				await this.uploadFile(data, -1, -1)
+				console.log(JSON.stringify(this.tags.map((x) => x.id)))
+				this.uploadStatus = 'Uploading file...'
+				await this.$store.dispatch('uploadFeatureModel', data)
+				console.log('finished uploading file')
 				this.uploadStatus = ''
 				this.loading = false
 				this.close()
 			}
-		},
-		async uploadFile(data, number, max) {
-			this.uploadStatus =
-				number === -1
-					? 'Uploading file...'
-					: `Uploading file ${number}/${max}`
-			await this.$store.dispatch('uploadFeatureModel', data)
-			console.log('finished uploading file')
 		},
 		async uploadTag() {
 			this.loadingAddTag = true
