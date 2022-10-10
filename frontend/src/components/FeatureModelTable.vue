@@ -289,6 +289,7 @@ export default Vue.extend({
                 this.editedItem.id
             );
             await this.$store.dispatch('fetchFiles');
+            this.$emit('onDelete');
             this.removeLoading = false;
 
             this.closeDelete();
