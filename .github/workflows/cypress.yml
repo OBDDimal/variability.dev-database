@@ -34,17 +34,16 @@ jobs:
         run: |
           cd ../backend
           python manage.py makemigrations
+          python manage.py migrate
           python manage.py migrate --run-syncdb
+          python manage.py check
           
       - name: Run Server
         run: |
           cd ../backend
+          python manage.py runscript create_test_user
           python manage.py runserver &
           
-      - name: Create Testuser
-        run: |
-          cd ../backend
-          python manage.py runscript create_test_user
     
       - name: Checkout
         uses: actions/checkout@v2
