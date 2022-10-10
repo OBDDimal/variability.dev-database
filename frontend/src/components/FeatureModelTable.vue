@@ -168,13 +168,24 @@
                 </template>
                 <template v-slot:no-data> {{ noDataText }} </template>
                 <template v-slot:item.tags="{ item }">
-                    <v-chip
-                        v-for="(tag, index) in item.tags"
-                        :key="index"
-                        class="ma-1"
-                    >
-                        {{ tag.label }}
-                    </v-chip>
+                    <div v-if="item.tags.length <= 2">
+                        <v-chip
+                            v-for="(tag, index) in item.tags"
+                            :key="index"
+                            class="ma-1"
+                        >
+                            {{ tag.label }}
+                        </v-chip>
+                    </div>
+                    <div v-else>
+                        <v-chip class="ma-1">
+                            {{ item.tags[0].label }}
+                        </v-chip>
+                        <v-chip class="ma-1">
+                            {{ item.tags[1].label }}
+                        </v-chip>
+                        <span class="ma-1">+ {{ item.tags.length - 2 }}</span>
+                    </div>
                 </template>
                 <template v-slot:item.owner="{ item }">
                     <v-icon v-if="item.owner" color="success">
