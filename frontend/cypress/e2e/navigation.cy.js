@@ -35,11 +35,11 @@ describe('Navigation tests', () => {
 
         describe('Logged-in navigations', () => {
             beforeEach(() => {
-                if(Cypress.platform === 'win32'){
-                    cy.exec('venv\\Scripts\\python.exe ../backend/manage.py runscript create_test_user')
-                } else {
-                    cy.exec("./venv/bin/python ../backend/manage.py runscript create_test_user")
-                }
+                // if(Cypress.platform === 'win32'){
+                //     cy.exec('venv\\Scripts\\python.exe ../backend/manage.py runscript create_test_user')
+                // } else {
+                //     cy.exec("./venv/bin/python ../backend/manage.py runscript create_test_user")
+                // }
 
                 const email = 'cypress@uni-ulm.de';
                 const password = 'testingIsFun1';
@@ -62,11 +62,11 @@ describe('Navigation tests', () => {
             })
 
             afterEach(() => {
-                if(Cypress.platform === 'win32'){
-                    cy.exec('venv\\Scripts\\python.exe ../backend/manage.py runscript delete_test_user')
-                } else {
-                    cy.exec("./venv/bin/python ../backend/manage.py runscript delete_test_user")
-                }
+                // if(Cypress.platform === 'win32'){
+                //     cy.exec('venv\\Scripts\\python.exe ../backend/manage.py runscript delete_test_user')
+                // } else {
+                //     cy.exec("./venv/bin/python ../backend/manage.py runscript delete_test_user")
+                // }
                 localStorage.clear();
             })
 
@@ -142,11 +142,11 @@ describe('Navigation tests', () => {
 
         describe('Logged-in navigations', () => {
             beforeEach(() => {
-                if(Cypress.platform === 'win32'){
-                    cy.exec('venv\\Scripts\\python.exe ../backend/manage.py runscript create_test_user')
-                } else {
-                    cy.exec("./venv/bin/python ../backend/manage.py runscript create_test_user")
-                }
+                // if(Cypress.platform === 'win32'){
+                //     cy.exec('venv\\Scripts\\python.exe ../backend/manage.py runscript create_test_user')
+                // } else {
+                //     cy.exec("./venv/bin/python ../backend/manage.py runscript create_test_user")
+                // }
 
                 const email = 'cypress@uni-ulm.de';
                 const password = 'testingIsFun1';
@@ -169,11 +169,11 @@ describe('Navigation tests', () => {
             })
 
             afterEach(() => {
-                if(Cypress.platform === 'win32'){
-                    cy.exec('venv\\Scripts\\python.exe ../backend/manage.py runscript delete_test_user')
-                } else {
-                    cy.exec("./venv/bin/python ../backend/manage.py runscript delete_test_user")
-                }
+                // if(Cypress.platform === 'win32'){
+                //     cy.exec('venv\\Scripts\\python.exe ../backend/manage.py runscript delete_test_user')
+                // } else {
+                //     cy.exec("./venv/bin/python ../backend/manage.py runscript delete_test_user")
+                // }
                 localStorage.clear();
             })
 
