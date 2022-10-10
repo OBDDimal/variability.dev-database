@@ -82,22 +82,22 @@ class User(AbstractBaseUser, PermissionsMixin):
         verbose_name = 'user'
         verbose_name_plural = 'users'
 
-    def send_link_to_file(self, data):
+    def send_link_to_files(self, data):
         """
         Send predefined email with link to File after successful upload.
         """
+        file_ids = list(map(lambda file: file['id'], data))
         token = {
-            'file_id': data.get('id', None),
+            'file_id': file_ids,
             'timestamp': str(timezone.now()),
             'purpose': 'upload_confirm',
         }
+
         user = self
         html_message = render_to_string('email/user_upload_email.html', {
             'user': str(user.email),
-            'file_domain': str(data.get('local_file')),
-            'file_name': str(data.get('local_file')).split('/')[-1],
             'confirm_link': f"{env('FRONTEND_URL')}/files/uploaded/unconfirmed/confirm/{encode_user_to_token(token)}",
-            'delete_link': f"{env('FRONTEND_URL')}/files/uploaded/unconfirmed/{data.get('id')}",
+            'delete_link': f"{env('FRONTEND_URL')}/files/uploaded/unconfirmed/delete/{encode_user_to_token(token)}",
         })
         plain_message = strip_tags(html_message)
 

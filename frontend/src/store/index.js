@@ -98,6 +98,28 @@ export default new Vuex.Store({
 					})
 				})
 		},
+		async uploadBulkFeatureModels({ commit }, data) {
+			await api
+				.post(`${API_URL}bulk-upload/`, data, {
+					headers: { 'Content-Type': 'multipart/form-data' },
+				})
+				.then(() => {
+					commit('updateSnackbar', {
+						message: 'Bulk upload successfully! Check your mails',
+						variant: 'success',
+						timeout: 5000,
+						show: true,
+					})
+				})
+				.catch((error) => {
+					commit('updateSnackbar', {
+						message: 'Error: ' + error.message,
+						variant: 'error',
+						timeout: 5000,
+						show: true,
+					})
+				})
+		},
 		async uploadFamily({ commit }, payload) {
 			// payload = { label: this.family, description: this.newFamilyDescription }
 			return api

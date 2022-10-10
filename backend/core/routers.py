@@ -10,6 +10,7 @@ from core.fileupload.viewsets import (
     ConfirmedFileViewSet,
     UnconfirmedFileViewSet,
     ConfirmFileUploadViewSet,
+    DeleteFileUploadViewSet,
 )
 from core.analysis.viewsets import AnalysesViewSet, DockerProcessesViewSet
 from core.user.viewsets import ActivateUserViewSet
@@ -42,6 +43,11 @@ router.register(
     r"files/uploaded/unconfirmed/confirm/(?P<token>[\w\d]+)",
     ConfirmFileUploadViewSet,
     basename="confirm-upload",
+)
+router.register(
+    r"files/uploaded/unconfirmed/delete/(?P<token>[\w\d]+)",
+    DeleteFileUploadViewSet,
+    basename="delete-upload",
 )
 router.register(r"tags", TagsViewSet, basename="tags")
 router.register(r"licenses", LicensesViewSet, basename="licenses")
