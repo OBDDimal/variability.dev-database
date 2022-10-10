@@ -681,9 +681,11 @@ export default Vue.extend({
                         /*console.log('FAMILY (new) id:')
 						console.log(uploadedFamily.id)*/
                     }
-                    file_object['tags'] = this.tags_bulk.map((x) => x.id);
-                    /*console.log('TAGS')
-					console.log(this.tags_bulk.map((x) => x.id))*/
+                    file_object['tags'] = this.tags_bulk.map((x) =>
+                        parseInt(x.id)
+                    );
+                    console.log('TAGS');
+                    console.log(this.tags_bulk.map((x) => x.id));
                     file_object['file'] = `${i}`;
                     /*console.log('FILE (reference):')
 					console.log(`${i}`)*/
@@ -691,13 +693,13 @@ export default Vue.extend({
                     file_data.push(file_object);
                 }
                 data.append('files', JSON.stringify(file_data));
-                /*console.log('FILES (in total finished):')
-				console.log(JSON.stringify(file_data))*/
+                console.log('FILES (in total finished):');
+                console.log(JSON.stringify(file_data));
                 for (let i = 0; i < this.file_bulk.length; i++) {
                     data.append(`${i}`, this.file_bulk[i]);
                 }
-                /*console.log('DATA (in total finished):')
-				console.log(data)*/
+                console.log('DATA (in total finished):');
+                console.log(data);
                 this.uploadStatus =
                     'Uploading bulk files. This may take a while...';
                 await this.$store.dispatch('uploadBulkFeatureModels', data);
@@ -711,23 +713,24 @@ export default Vue.extend({
             if (this.$refs.form.validate() !== false) {
                 this.loading = true;
                 const data = new FormData();
+                let file_data = [];
+                let file_object = {};
 
-                data.append('label', this.label);
+                file_object['label'] = this.label;
                 /*console.log('LABEL')
 				console.log(this.label)*/
-                data.append('description', this.description);
+                file_object['description'] = this.description;
                 /*console.log('DESCRIPTION')
 				console.log(this.description)*/
-                data.append('local_file', this.file);
-                data.append('license', this.license);
+                file_object['license'] = this.license;
                 /*console.log('LICENSE')
 				console.log(this.license)*/
-                data.append('version', this.version);
+                file_object['version'] = this.version;
                 /*console.log('VERSION')
 				console.log(this.version)*/
                 if (!this.isNewFamily) {
                     //change back to this.family.value when using v-combobox again
-                    data.append('family', this.family.value);
+                    file_object['family'] = this.family.value;
                     /*console.log('FAMILY (not new)')
 					console.log(this.family.value)*/
                 } else {
@@ -739,18 +742,21 @@ export default Vue.extend({
                             description: this.newFamilyDescription,
                         }
                     );
-                    data.append('family', uploadedFamily.id);
+                    file_object['family'] = uploadedFamily.id;
                     /*console.log('FAMILY (new)')
 					console.log(uploadedFamily.id)*/
                 }
-                data.append(
-                    'tags',
-                    this.tags.map((x) => parseInt(x.id))
-                );
+                file_object['tags'] = this.tags.map((x) => parseInt(x.id));
                 console.log('TAGS');
                 console.log(this.tags.map((x) => parseInt(x.id)));
+                file_object['file'] = '0';
+                file_data.push(file_object);
+                console.log('FILES (in total finished):');
+                console.log(JSON.stringify(file_data));
+                data.append('files', JSON.stringify(file_data));
+                data.append('0', this.file);
                 this.uploadStatus = 'Uploading file...';
-                await this.$store.dispatch('uploadFeatureModel', data);
+                await this.$store.dispatch('uploadBulkFeatureModels', data);
                 /*console.log('finished uploading file')*/
                 this.uploadStatus = '';
                 this.loading = false;
