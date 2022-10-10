@@ -43,7 +43,6 @@ jobs:
           cd ../backend
           python manage.py runscript create_test_user
           python manage.py runserver &
-          
     
       - name: Checkout
         uses: actions/checkout@v2
