@@ -39,7 +39,7 @@ jobs:
       - name: Run Server
         run: |
           cd ../backend
-          python manage.py runserver
+          python manage.py runserver &
     
       - name: Checkout
         uses: actions/checkout@v2
