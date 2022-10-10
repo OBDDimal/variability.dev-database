@@ -5,6 +5,7 @@ from pathlib import Path
 from rest_framework import status
 from rest_framework.test import APITestCase
 from django.test.client import MULTIPART_CONTENT, encode_multipart, BOUNDARY
+from django.test import override_settings
 from django.core.files.base import ContentFile
 
 from core.fileupload.models import Family, Tag, License, File
@@ -26,7 +27,9 @@ class AuthenticationTest(APITestCase):
         u.save()
 
     def test_correct_login_admin(self):
-        res = self.client.post("/auth/login/", {'email': 'ad@m.in', 'password': '12345678!'})
+        res = self.client.post(
+            "/auth/login/", {"email": "ad@m.in", "password": "12345678!"}
+        )
         json = res.json()
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertEqual(json["user"]["email"], "ad@m.in")
@@ -35,7 +38,9 @@ class AuthenticationTest(APITestCase):
         self.assertIn("refresh", json)
 
     def test_correct_login_user(self):
-        res = self.client.post("/auth/login/", {"email": "u@s.er", "password": "12345678!"})
+        res = self.client.post(
+            "/auth/login/", {"email": "u@s.er", "password": "12345678!"}
+        )
         json = res.json()
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertEqual(json["user"]["email"], "u@s.er")
@@ -44,25 +49,33 @@ class AuthenticationTest(APITestCase):
         self.assertIn("refresh", json)
 
     def test_wrong_login_admin(self):
-        res = self.client.post("/auth/login/", {"email": "ad@m.in", "password": "123456"})
+        res = self.client.post(
+            "/auth/login/", {"email": "ad@m.in", "password": "123456"}
+        )
         json = res.json()
         self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
         self.assertIn("detail", json)
 
     def test_wrong_login_user(self):
-        res = self.client.post("/auth/login/", {"email": "u@s.er", "password": "123456"})
+        res = self.client.post(
+            "/auth/login/", {"email": "u@s.er", "password": "123456"}
+        )
         json = res.json()
         self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
         self.assertIn("detail", json)
 
     def test_login_inactive(self):
-        res = self.client.post("/auth/login/", {"email": "in@acti.ve", "password": "!87654321"})
+        res = self.client.post(
+            "/auth/login/", {"email": "in@acti.ve", "password": "!87654321"}
+        )
         json = res.json()
         self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
         self.assertIn("detail", json)
 
     def test_refresh_admin(self):
-        res = self.client.post("/auth/login/", {"email": "ad@m.in", "password": "12345678!"})
+        res = self.client.post(
+            "/auth/login/", {"email": "ad@m.in", "password": "12345678!"}
+        )
         json = res.json()
         refresh = json["refresh"]
 
@@ -77,7 +90,9 @@ class AuthenticationTest(APITestCase):
         self.assertIn("detail", json)
 
     def test_refresh_user(self):
-        res = self.client.post("/auth/login/", {"email": "u@s.er", "password": "12345678!"})
+        res = self.client.post(
+            "/auth/login/", {"email": "u@s.er", "password": "12345678!"}
+        )
         json = res.json()
         refresh = json["refresh"]
 
@@ -100,10 +115,22 @@ class TagTest(APITestCase):
 
     def setUp(self):
         self.owner = User.objects.create_superuser(email="ow@n.er", password="asdfghj")
-        self.admin = User.objects.create_superuser(email="ad@m.in", password="12345678!")
+        self.admin = User.objects.create_superuser(
+            email="ad@m.in", password="12345678!"
+        )
         self.user = User.objects.create_user(email="u@s.er", password="!87654321")
-        Tag.objects.create(label=self.tag_label, description=self.tag_description, owner=self.owner, is_public=True)
-        Tag.objects.create(label=self.other_tag_label, description=self.other_tag_description, owner=self.owner, is_public=False)
+        Tag.objects.create(
+            label=self.tag_label,
+            description=self.tag_description,
+            owner=self.owner,
+            is_public=True,
+        )
+        Tag.objects.create(
+            label=self.other_tag_label,
+            description=self.other_tag_description,
+            owner=self.owner,
+            is_public=False,
+        )
 
     def test_tag_list_logged_in_owner(self):
         # Licenses are listable when logged in
@@ -201,7 +228,10 @@ class TagTest(APITestCase):
     def test_tag_create_admin(self):
         self.client.force_authenticate(self.owner)
 
-        res = self.client.post("/tags/", {"label": "testlabel", "description": "testdescription", "is_public": True})
+        res = self.client.post(
+            "/tags/",
+            {"label": "testlabel", "description": "testdescription", "is_public": True},
+        )
         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
         json = res.json()
         first_id = json["id"]
@@ -212,7 +242,14 @@ class TagTest(APITestCase):
         self.assertEqual(json["owner"], True)
         self.assertEqual(json["is_public"], True)
 
-        res = self.client.post("/tags/", {"label": "otherlabel", "description": "otherdescription", "is_public": False})
+        res = self.client.post(
+            "/tags/",
+            {
+                "label": "otherlabel",
+                "description": "otherdescription",
+                "is_public": False,
+            },
+        )
         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
         json = res.json()
         second_id = json["id"]
@@ -237,11 +274,21 @@ class TagTest(APITestCase):
     def test_tag_create_user(self):
         # Tags with is_public=True can not be created by non-admins
         self.client.force_authenticate(self.user)
-        res = self.client.post("/tags/", {"label": "testlabel", "description": "testdescription", "is_public": True})
+        res = self.client.post(
+            "/tags/",
+            {"label": "testlabel", "description": "testdescription", "is_public": True},
+        )
         self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
 
         # Tags with is_public=False can be created by non-admins
-        res = self.client.post("/tags/", {"label": "testlabel", "description": "testdescription", "is_public": False})
+        res = self.client.post(
+            "/tags/",
+            {
+                "label": "testlabel",
+                "description": "testdescription",
+                "is_public": False,
+            },
+        )
         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
         json = res.json()
         first_id = json["id"]
@@ -255,12 +302,22 @@ class TagTest(APITestCase):
     def test_tag_create_logged_out(self):
         # Tags with is_public=True can not be created by an unauthenticated user
         self.client.force_authenticate(None)
-        res = self.client.post("/tags/", {"label": "testlabel", "description": "testdescription", "is_public": True})
+        res = self.client.post(
+            "/tags/",
+            {"label": "testlabel", "description": "testdescription", "is_public": True},
+        )
         self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
 
         # Tags with is_public=False can not be created by an unauthenticated user
         self.client.force_authenticate(None)
-        res = self.client.post("/tags/", {"label": "testlabel", "description": "testdescription", "is_public": False})
+        res = self.client.post(
+            "/tags/",
+            {
+                "label": "testlabel",
+                "description": "testdescription",
+                "is_public": False,
+            },
+        )
         self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_tag_destroy_logged_out(self):
@@ -306,10 +363,20 @@ class FamilyTest(APITestCase):
 
     def setUp(self):
         self.owner = User.objects.create_user(email="ow@n.er", password="asdfghj")
-        self.admin = User.objects.create_superuser(email="ad@m.in", password="12345678!")
+        self.admin = User.objects.create_superuser(
+            email="ad@m.in", password="12345678!"
+        )
         self.user = User.objects.create_user(email="u@s.er", password="!87654321")
-        Family.objects.create(label=self.family_label, description=self.family_description, owner=self.owner)
-        Family.objects.create(label=self.other_family_label, description=self.other_family_description, owner=self.owner)
+        Family.objects.create(
+            label=self.family_label,
+            description=self.family_description,
+            owner=self.owner,
+        )
+        Family.objects.create(
+            label=self.other_family_label,
+            description=self.other_family_description,
+            owner=self.owner,
+        )
 
     def test_family_list_logged_in(self):
         # Families are listable when logged in
@@ -346,7 +413,9 @@ class FamilyTest(APITestCase):
     def test_family_create_logged_in(self):
         self.client.force_authenticate(self.owner)
 
-        res = self.client.post("/families/", {"label": "testfamily", "description": "testdescription"})
+        res = self.client.post(
+            "/families/", {"label": "testfamily", "description": "testdescription"}
+        )
         json = res.json()
         first_id = json["id"]
         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
@@ -356,7 +425,9 @@ class FamilyTest(APITestCase):
         self.assertEqual(json["description"], "testdescription")
         self.assertEqual(json["owner"], True)
 
-        res = self.client.post("/families/", {"label": "otherfamily", "description": "otherdescription"})
+        res = self.client.post(
+            "/families/", {"label": "otherfamily", "description": "otherdescription"}
+        )
         json = res.json()
         second_id = json["id"]
         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
@@ -377,30 +448,56 @@ class FamilyTest(APITestCase):
     def test_family_create_logged_out(self):
         self.client.force_authenticate(None)
 
-        res = self.client.post("/families/", {"label": "testfamily", "description": "testdescription"})
+        res = self.client.post(
+            "/families/", {"label": "testfamily", "description": "testdescription"}
+        )
         self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_family_update_logged_out(self):
         # Families are not updateable by an unauthenticated user
-        res = self.client.put("/families/1/", {"label": self.other_family_label, "description": self.other_family_description})
+        res = self.client.put(
+            "/families/1/",
+            {
+                "label": self.other_family_label,
+                "description": self.other_family_description,
+            },
+        )
         self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_family_update_logged_in_other_user(self):
         # Families are not updateable by another non-admin user
         self.client.force_authenticate(self.user)
-        res = self.client.put("/families/1/", {"label": self.other_family_label, "description": self.other_family_description})
+        res = self.client.put(
+            "/families/1/",
+            {
+                "label": self.other_family_label,
+                "description": self.other_family_description,
+            },
+        )
         self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_family_update_logged_in_owner(self):
         # Families are updatable by owner
         self.client.force_authenticate(self.owner)
-        res = self.client.put("/families/1/", {"label": self.other_family_label, "description": self.other_family_description})
+        res = self.client.put(
+            "/families/1/",
+            {
+                "label": self.other_family_label,
+                "description": self.other_family_description,
+            },
+        )
         self.assertEqual(res.status_code, status.HTTP_200_OK)
 
     def test_family_update_logged_in_admin(self):
         # Families are updatable by an admin
         self.client.force_authenticate(self.admin)
-        res = self.client.put("/families/1/", {"label": self.other_family_label, "description": self.other_family_description})
+        res = self.client.put(
+            "/families/1/",
+            {
+                "label": self.other_family_label,
+                "description": self.other_family_description,
+            },
+        )
         self.assertEqual(res.status_code, status.HTTP_200_OK)
 
 
@@ -409,7 +506,9 @@ class LicenseTest(APITestCase):
     other_license_label = "Test license"
 
     def setUp(self):
-        self.admin = User.objects.create_superuser(email="ad@m.in", password="12345678!")
+        self.admin = User.objects.create_superuser(
+            email="ad@m.in", password="12345678!"
+        )
         self.user = User.objects.create_user(email="u@s.er", password="!87654321")
         License.objects.create(label=self.license_label)
         License.objects.create(label=self.other_license_label)
@@ -455,3 +554,372 @@ class LicenseTest(APITestCase):
         res = self.client.get("/licenses/1/")
         json = res.json()
         self.assertEqual(json["label"], self.license_label)
+
+
+class FileUploadTest(APITestCase):
+    license_label = License._default_license
+    other_license_label = "Test license"
+    family_label = "Family label"
+    family_description = "Family description"
+    other_family_label = "Other family label"
+    other_family_description = "Other family description"
+    tag_label = "Tag label"
+    tag_description = "Tag description"
+    other_tag_label = "Other tag label"
+    other_tag_description = "Other tag description"
+
+    file_label = "File label"
+    file_description = "File description"
+    file_version = "1.0.0"
+    file_content = b"""<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>
+    <featureModel>
+        <properties/>
+        <struct>
+        </struct>
+    </featureModel>"""
+
+    other_file_label = "Other file label"
+    other_file_description = "Other file description"
+    other_file_version = "2.0.0"
+    other_file_content = b"""<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>
+    <featureModel>
+        <properties/>
+        <struct>
+        </struct>
+    </featureModel>"""
+
+    def setUp(self):
+        self.owner = User.objects.create_superuser(email="ow@n.er", password="asdfghj")
+        self.admin = User.objects.create_superuser(
+            email="ad@m.in", password="12345678!"
+        )
+        self.user = User.objects.create_user(email="u@s.er", password="!87654321")
+        self.license = License.objects.create(label=self.license_label)
+        self.other_license = License.objects.create(label=self.other_license_label)
+        self.family = Family.objects.create(
+            label=self.family_label,
+            description=self.family_description,
+            owner=self.owner,
+        )
+        self.other_family = Family.objects.create(
+            label=self.other_family_label,
+            description=self.other_family_description,
+            owner=self.owner,
+        )
+        self.tag = Tag.objects.create(
+            label=self.tag_label,
+            description=self.tag_description,
+            owner=self.owner,
+            is_public=True,
+        )
+        self.other_tag = Tag.objects.create(
+            label=self.other_tag_label,
+            description=self.other_tag_description,
+            owner=self.owner,
+            is_public=False,
+        )
+        self.file = File.objects.create(
+            owner=self.owner,
+            label=self.file_label,
+            description=self.file_description,
+            tags=[self.tag],
+            version=self.file_version,
+            license=self.license,
+            local_file=ContentFile(self.file_content, "file.xml"),
+            family=self.family,
+        )
+        self.other_file = File.objects.create(
+            owner=self.owner,
+            label=self.other_file_label,
+            description=self.other_file_description,
+            tags=[self.tag, self.other_tag],
+            version=self.other_file_version,
+            license=self.other_license,
+            local_file=ContentFile(self.other_file_content, "other_file.xml"),
+            family=self.other_family,
+            is_confirmed=True,
+        )
+
+    def test_file_retrieve_logged_in_owner(self):
+        # Files are retrievable when logged in with owner
+        self.client.force_authenticate(self.owner)
+        res = self.client.get("/files/1/")
+        json = res.json()
+        self.assertEqual(json["label"], self.file_label)
+        self.assertEqual(json["description"], self.file_description)
+        self.assertEqual(len(json["tags"]), 1)
+        self.assertEqual(json["tags"][0]["id"], self.tag.id)
+        self.assertEqual(json["version"], self.file_version)
+        self.assertEqual(json["license"]["id"], self.license.id)
+        self.assertEqual(json["family"]["id"], self.family.id)
+
+        res = self.client.get("/files/2/")
+        json = res.json()
+        self.assertEqual(json["label"], self.other_file_label)
+        self.assertEqual(json["description"], self.other_file_description)
+        self.assertEqual(len(json["tags"]), 2)
+        self.assertEqual(json["tags"][0]["id"], self.tag.id)
+        self.assertEqual(json["tags"][1]["id"], self.other_tag.id)
+        self.assertEqual(json["version"], self.other_file_version)
+        self.assertEqual(json["license"]["id"], self.other_license.id)
+        self.assertEqual(json["family"]["id"], self.other_family.id)
+
+    def test_file_retrieve_logged_in_admin(self):
+        # Files are retrievable when logged in with admin
+        self.client.force_authenticate(self.admin)
+        res = self.client.get("/files/1/")
+        json = res.json()
+        self.assertEqual(json["label"], self.file_label)
+        self.assertEqual(json["description"], self.file_description)
+        self.assertEqual(len(json["tags"]), 1)
+        self.assertEqual(json["tags"][0]["id"], self.tag.id)
+        self.assertEqual(json["version"], self.file_version)
+        self.assertEqual(json["license"]["id"], self.license.id)
+        self.assertEqual(json["family"]["id"], self.family.id)
+
+        res = self.client.get("/files/2/")
+        json = res.json()
+        self.assertEqual(json["label"], self.other_file_label)
+        self.assertEqual(json["description"], self.other_file_description)
+        self.assertEqual(len(json["tags"]), 2)
+        self.assertEqual(json["tags"][0]["id"], self.tag.id)
+        self.assertEqual(json["tags"][1]["id"], self.other_tag.id)
+        self.assertEqual(json["version"], self.other_file_version)
+        self.assertEqual(json["license"]["id"], self.other_license.id)
+        self.assertEqual(json["family"]["id"], self.other_family.id)
+
+    def test_file_retrieve_logged_in_non_owner(self):
+        # Files are retrievable when logged in with non-owner
+        self.client.force_authenticate(self.user)
+        res = self.client.get("/files/1/")
+        json = res.json()
+        self.assertEqual(json["label"], self.file_label)
+        self.assertEqual(json["description"], self.file_description)
+        self.assertEqual(len(json["tags"]), 1)
+        self.assertEqual(json["tags"][0]["id"], self.tag.id)
+        self.assertEqual(json["version"], self.file_version)
+        self.assertEqual(json["license"]["id"], self.license.id)
+        self.assertEqual(json["family"]["id"], self.family.id)
+
+        res = self.client.get("/files/2/")
+        json = res.json()
+        self.assertEqual(json["label"], self.other_file_label)
+        self.assertEqual(json["description"], self.other_file_description)
+        self.assertEqual(len(json["tags"]), 2)
+        self.assertEqual(json["tags"][0]["id"], self.tag.id)
+        self.assertEqual(json["tags"][1]["id"], self.other_tag.id)
+        self.assertEqual(json["version"], self.other_file_version)
+        self.assertEqual(json["license"]["id"], self.other_license.id)
+        self.assertEqual(json["family"]["id"], self.other_family.id)
+
+    def test_file_retrieve_logged_out(self):
+        # Files are retrievable when logged out
+        self.client.force_authenticate(None)
+        res = self.client.get("/files/1/")
+        json = res.json()
+        self.assertEqual(json["label"], self.file_label)
+        self.assertEqual(json["description"], self.file_description)
+        self.assertEqual(len(json["tags"]), 1)
+        self.assertEqual(json["tags"][0]["id"], self.tag.id)
+        self.assertEqual(json["version"], self.file_version)
+        self.assertEqual(json["license"]["id"], self.license.id)
+        self.assertEqual(json["family"]["id"], self.family.id)
+
+        res = self.client.get("/files/2/")
+        json = res.json()
+        self.assertEqual(json["label"], self.other_file_label)
+        self.assertEqual(json["description"], self.other_file_description)
+        self.assertEqual(len(json["tags"]), 2)
+        self.assertEqual(json["tags"][0]["id"], self.tag.id)
+        self.assertEqual(json["tags"][1]["id"], self.other_tag.id)
+        self.assertEqual(json["version"], self.other_file_version)
+        self.assertEqual(json["license"]["id"], self.other_license.id)
+        self.assertEqual(json["family"]["id"], self.other_family.id)
+
+    def test_file_list_logged_in_owner(self):
+        # Files are listable when logged in with owner
+        self.client.force_authenticate(self.owner)
+        res = self.client.get("/files/")
+        json = res.json()
+        self.assertEqual(len(json), 2)
+
+    def test_file_retrieve_logged_in_admin(self):
+        # Files are listable when logged in with admin
+        self.client.force_authenticate(self.admin)
+        res = self.client.get("/files/")
+        json = res.json()
+        self.assertEqual(len(json), 2)
+
+    def test_file_retrieve_logged_in_non_owner(self):
+        # Files are listable when logged in with non-owner
+        self.client.force_authenticate(self.user)
+        res = self.client.get("/files/")
+        json = res.json()
+        self.assertEqual(len(json), 2)
+
+    def test_file_retrieve_logged_out(self):
+        # Files are listable when logged out
+        self.client.force_authenticate(None)
+        res = self.client.get("/files/")
+        json = res.json()
+        self.assertEqual(len(json), 2)
+
+    def test_file_destroy_logged_in_owner(self):
+        # Files are destroyable when logged in with owner
+        self.client.force_authenticate(self.owner)
+        res = self.client.delete("/files/1/")
+        self.assertEqual(res.status_code, status.HTTP_204_NO_CONTENT)
+        res = self.client.get("/files/1/")
+        self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_file_destroy_logged_in_admin(self):
+        # Files are destroyable when logged in with admin
+        self.client.force_authenticate(self.owner)
+        res = self.client.delete("/files/1/")
+        self.assertEqual(res.status_code, status.HTTP_204_NO_CONTENT)
+        res = self.client.get("/files/1/")
+        self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_file_destroy_logged_in_non_owner(self):
+        # Files are not destroyable when logged in with non-owner
+        self.client.force_authenticate(self.user)
+        res = self.client.delete("/files/1/")
+        self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
+        res = self.client.get("/files/1/")
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+
+    def test_file_destroy_logged_out(self):
+        # Files are not destroyable when logged out
+        self.client.force_authenticate(None)
+        res = self.client.delete("/files/1/")
+        self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
+        res = self.client.get("/files/1/")
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+
+
+class BulkUploadTest(APITestCase):
+    license_label = License._default_license
+    other_license_label = "Test license"
+    family_label = "Family label"
+    family_description = "Family description"
+    other_family_label = "Other family label"
+    other_family_description = "Other family description"
+    tag_label = "Tag label"
+    tag_description = "Tag description"
+    other_tag_label = "Other tag label"
+    other_tag_description = "Other tag description"
+
+    file_label = "File label"
+    file_description = "File description"
+    file_version = "1.0.0"
+    file_contents = b"""<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>
+    <featureModel>
+        <properties/>
+        <struct>
+        </struct>
+    </featureModel>"""
+
+    other_file_label = "Other file label"
+    other_file_description = "Other file description"
+    other_file_version = "2.0.0"
+    other_file_contents = b"""<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>
+    <featureModel>
+        <properties/>
+        <struct>
+        </struct>
+    </featureModel>"""
+
+    def setUp(self):
+        self.owner = User.objects.create_superuser(email="ow@n.er", password="asdfghj")
+        self.admin = User.objects.create_superuser(
+            email="ad@m.in", password="12345678!"
+        )
+        self.user = User.objects.create_user(email="u@s.er", password="!87654321")
+        self.license = License.objects.create(label=self.license_label)
+        self.other_license = License.objects.create(label=self.other_license_label)
+        self.family = Family.objects.create(
+            label=self.family_label,
+            description=self.family_description,
+            owner=self.owner,
+        )
+        self.other_family = Family.objects.create(
+            label=self.other_family_label,
+            description=self.other_family_description,
+            owner=self.owner,
+        )
+        self.tag = Tag.objects.create(
+            label=self.tag_label,
+            description=self.tag_description,
+            owner=self.owner,
+            is_public=True,
+        )
+        self.other_tag = Tag.objects.create(
+            label=self.other_tag_label,
+            description=self.other_tag_description,
+            owner=self.owner,
+            is_public=False,
+        )
+
+    @override_settings(EMAIL_BACKEND="django.core.mail.backends.smtp.EmailBackend")
+    def test_upload_logged_in_owner(self):
+        # Files are uploadable when logged in with owner
+        self.client.force_authenticate(self.owner)
+        file = ContentFile(self.file_contents, "file.xml")
+        other_file = ContentFile(self.other_file_contents, "other_file.xml")
+        files = [
+            {
+                "description": self.file_description,
+                "label": self.file_label,
+                "file": "1",
+                "family": self.family.id,
+                "license": self.license.id,
+                "version": self.file_version,
+                "tags": [self.tag.id],
+            },
+            {
+                "description": self.other_file_description,
+                "label": self.other_file_label,
+                "file": "2",
+                "family": self.other_family.id,
+                "license": self.other_license.id,
+                "version": self.other_file_version,
+                "tags": [self.tag.id, self.other_tag.id],
+            },
+        ]
+        raw_data = {"files": json.dumps(files), "1": file, "2": other_file}
+        data = encode_multipart(data=raw_data, boundary=BOUNDARY)
+
+        res = self.client.post("/bulk-upload/", data, content_type=MULTIPART_CONTENT)
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+
+    @override_settings(EMAIL_BACKEND="django.core.mail.backends.smtp.EmailBackend")
+    def test_upload_logged_out(self):
+        # Files are not uploadable when logged out
+        self.client.force_authenticate(None)
+        file = ContentFile(self.file_contents, "file.xml")
+        other_file = ContentFile(self.other_file_contents, "other_file.xml")
+        files = [
+            {
+                "description": self.file_description,
+                "label": self.file_label,
+                "file": "1",
+                "family": self.family.id,
+                "license": self.license.id,
+                "version": self.file_version,
+                "tags": [self.tag.id],
+            },
+            {
+                "description": self.other_file_description,
+                "label": self.other_file_label,
+                "file": "2",
+                "family": self.other_family.id,
+                "license": self.other_license.id,
+                "version": self.other_file_version,
+                "tags": [self.tag.id, self.other_tag.id],
+            },
+        ]
+        raw_data = {"files": json.dumps(files), "1": file, "2": other_file}
+        data = encode_multipart(data=raw_data, boundary=BOUNDARY)
+
+        res = self.client.post("/bulk-upload/", data, content_type=MULTIPART_CONTENT)
+        self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)

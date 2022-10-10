@@ -75,16 +75,21 @@ class ConfirmFileUploadApiView(APIView):
     This view is called when the user tries to confirm files, via a link which contains a token.
     This token will be decoded and the files will be set to confirmed if the token is valid.
     """
+
     def get(self, request, token):
         try:
             decoded_token = decode_token_to_user(token)
-            actual_request_timestamp = dateparse.parse_datetime(decoded_token.pop('timestamp'))
-            if decoded_token.pop('purpose') != 'upload_confirm':
-                raise BadSignature('Token purpose does not match!')
-            min_possible_request_timestamp = timezone.now() - timedelta(days=PASSWORD_RESET_TIMEOUT_DAYS)
+            actual_request_timestamp = dateparse.parse_datetime(
+                decoded_token.pop("timestamp")
+            )
+            if decoded_token.pop("purpose") != "upload_confirm":
+                raise BadSignature("Token purpose does not match!")
+            min_possible_request_timestamp = timezone.now() - timedelta(
+                days=PASSWORD_RESET_TIMEOUT_DAYS
+            )
             valid = min_possible_request_timestamp <= actual_request_timestamp
             if not valid:
-                raise BadSignature('Token expired!')
+                raise BadSignature("Token expired!")
             else:
                 file_ids = decoded_token.pop("file_id")
                 if isinstance(file_ids, int):
@@ -107,21 +112,21 @@ class ConfirmFileUploadApiView(APIView):
                             logger.debug(" MODE: File mirror is disabled")
                     file_from_db.save()
                     files.append(FilesSerializer(file_from_db).data)
-                return Response(
-                    {"files": files}, HTTP_200_OK
-                )
+                return Response({"files": files}, HTTP_200_OK)
         except ObjectDoesNotExist as error:
-            return Response({'message': str(error)})
+            return Response({"message": str(error)})
         except BadSignature as error:
-            return Response({'message': str(error)})
+            return Response({"message": str(error)})
         except DjangoUnicodeDecodeError as error:
-            return Response({'message': str(error)})
+            return Response({"message": str(error)})
+
 
 class DeleteFileUploadApiView(APIView):
     """
     This view is called when the user tries to delete files, via a link which contains a token.
     This token will be decoded and the files will be deleted if the token is valid.
     """
+
     def get(self, request, token):
         try:
             decoded_token = decode_token_to_user(token)
@@ -144,16 +149,13 @@ class DeleteFileUploadApiView(APIView):
                 for file_id in file_ids:
                     file_from_db = File.objects.get(pk=file_id)
                     file_from_db.delete()
-                return Response(
-                    {"files": []}, HTTP_200_OK
-                )
+                return Response({"files": []}, HTTP_200_OK)
         except ObjectDoesNotExist as error:
             return Response({"message": str(error)})
         except BadSignature as error:
             return Response({"message": str(error)})
         except DjangoUnicodeDecodeError as error:
             return Response({"message": str(error)})
-
 
 
 class FileUploadViewSet(
@@ -186,6 +188,8 @@ class FileUploadViewSet(
 
 
 class BulkUploadApiView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
     def post(self, request, format=None):
         files = json.loads(request.data["files"])
 
@@ -216,7 +220,7 @@ class BulkUploadApiView(APIView):
 
         request.user.send_link_to_files(uploaded)
 
-        return Response({"files": uploaded})
+        return Response({"files": uploaded}, status=status.HTTP_201_CREATED)
 
 
 class UnconfirmedFileViewSet(
