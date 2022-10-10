@@ -745,12 +745,10 @@ export default Vue.extend({
                 }
                 data.append(
                     'tags',
-                    JSON.stringify(this.tags.map((x) => parseInt(x.id)))
+                    this.tags.map((x) => parseInt(x.id))
                 );
                 console.log('TAGS');
-                console.log(
-                    JSON.stringify(this.tags.map((x) => parseInt(x.id)))
-                );
+                console.log(this.tags.map((x) => parseInt(x.id)));
                 this.uploadStatus = 'Uploading file...';
                 await this.$store.dispatch('uploadFeatureModel', data);
                 /*console.log('finished uploading file')*/
