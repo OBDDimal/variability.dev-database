@@ -147,7 +147,7 @@
                         <v-icon>mdi-eye</v-icon>
                     </v-btn>
                     <v-btn
-                        :disabled="item.owner === false"
+                        :disabled="/*item.owner === false*/ true"
                         class="mr-2"
                         color="error"
                         rounded
