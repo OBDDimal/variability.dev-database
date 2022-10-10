@@ -1,5 +1,5 @@
 from django.conf.urls.static import static
-from django.urls import path, include
+from django.urls import path, re_path, include
 from rest_framework import routers
 from core.fileupload.viewsets import (
     BulkUploadApiView,
@@ -9,8 +9,8 @@ from core.fileupload.viewsets import (
     LicensesViewSet,
     ConfirmedFileViewSet,
     UnconfirmedFileViewSet,
-    ConfirmFileUploadViewSet,
-    DeleteFileUploadViewSet,
+    ConfirmFileUploadApiView,
+    DeleteFileUploadApiView,
 )
 from core.analysis.viewsets import AnalysesViewSet, DockerProcessesViewSet
 from core.user.viewsets import ActivateUserViewSet
@@ -39,16 +39,6 @@ router.register(
 router.register(
     r"files/uploaded/unconfirmed", UnconfirmedFileViewSet, basename="unconfirmed-files"
 )
-router.register(
-    r"files/uploaded/unconfirmed/confirm/(?P<token>[\w\d]+)",
-    ConfirmFileUploadViewSet,
-    basename="confirm-upload",
-)
-router.register(
-    r"files/uploaded/unconfirmed/delete/(?P<token>[\w\d]+)",
-    DeleteFileUploadViewSet,
-    basename="delete-upload",
-)
 router.register(r"tags", TagsViewSet, basename="tags")
 router.register(r"licenses", LicensesViewSet, basename="licenses")
 router.register(r"families", FamiliesViewSet, basename="families")
@@ -59,6 +49,8 @@ router.register(r"docker", DockerProcessesViewSet, basename="docker")
 urlpatterns = [
     *router.urls,
     path("bulk-upload/", BulkUploadApiView.as_view()),
+    re_path(r"files/uploaded/unconfirmed/confirm/(?P<token>[\w\d]+)", ConfirmFileUploadApiView.as_view()),
+    re_path(r"files/uploaded/unconfirmed/delete/(?P<token>[\w\d]+)", DeleteFileUploadApiView.as_view()),
     path("api-auth/", include("rest_framework.urls")),
 ]
 urlpatterns += static(STATIC_URL, document_root=STATIC_ROOT)

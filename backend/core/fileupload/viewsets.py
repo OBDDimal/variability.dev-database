@@ -70,16 +70,12 @@ def anonymize_file(file, request):
     return anonymized_file
 
 
-class ConfirmFileUploadViewSet(GenericViewSet, CreateModelMixin):
+class ConfirmFileUploadApiView(APIView):
     """
     This view is called when the user tries to confirm files, via a link which contains a token.
     This token will be decoded and the files will be set to confirmed if the token is valid.
     """
-    permission_classes = [AllowAny]
-    http_method_names = ['get']
-
-    @staticmethod
-    def get(request, token):
+    def get(self, request, token):
         try:
             decoded_token = decode_token_to_user(token)
             actual_request_timestamp = dateparse.parse_datetime(decoded_token.pop('timestamp'))
@@ -121,17 +117,12 @@ class ConfirmFileUploadViewSet(GenericViewSet, CreateModelMixin):
         except DjangoUnicodeDecodeError as error:
             return Response({'message': str(error)})
 
-class DeleteFileUploadViewSet(GenericViewSet, CreateModelMixin):
+class DeleteFileUploadApiView(APIView):
     """
     This view is called when the user tries to delete files, via a link which contains a token.
     This token will be decoded and the files will be deleted if the token is valid.
     """
-
-    permission_classes = [AllowAny]
-    http_method_names = ["get"]
-
-    @staticmethod
-    def get(request, token):
+    def get(self, request, token):
         try:
             decoded_token = decode_token_to_user(token)
             actual_request_timestamp = dateparse.parse_datetime(
@@ -165,10 +156,15 @@ class DeleteFileUploadViewSet(GenericViewSet, CreateModelMixin):
 
 
 
-class FileUploadViewSet(viewsets.ModelViewSet):
+class FileUploadViewSet(
+    viewsets.GenericViewSet,
+    mixins.RetrieveModelMixin,
+    mixins.DestroyModelMixin,
+    mixins.ListModelMixin,
+):
     queryset = File.objects.all()
     serializer_class = FilesSerializer
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticatedOrReadOnly, IsOwnerOrIsAdminOrReadOnly]
 
     def list(self, request, **kwargs):
         """
@@ -187,13 +183,6 @@ class FileUploadViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(instance)
         anonymized_file = anonymize_file(serializer.data, request)
         return Response(anonymized_file)
-
-    def perform_create(self, serializer):
-        """
-        Called within the create method to serializer for creation
-        """
-        serializer.save(owner=self.request.user)
-        self.request.user.send_link_to_files([serializer.data])
 
 
 class BulkUploadApiView(APIView):
@@ -238,7 +227,7 @@ class UnconfirmedFileViewSet(
 ):
     queryset = File.objects.filter(is_confirmed=False)
     serializer_class = FilesSerializer
-    permission_classes = [permissions.IsAuthenticated, IsOwnerOrIsAdminOrReadOnly]
+    permission_classes = [IsAuthenticatedOrReadOnly, IsOwnerOrIsAdminOrReadOnly]
 
     def list(self, request, **kwargs):
         """
@@ -278,7 +267,7 @@ class ConfirmedFileViewSet(
 ):
     queryset = File.objects.filter(is_confirmed=True)
     serializer_class = FilesSerializer
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [IsAuthenticatedOrReadOnly, IsOwnerOrIsAdminOrReadOnly]
 
     def _get_analysis_state(self, file):
         if file["owner"]:

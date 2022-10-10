@@ -1,4 +1,5 @@
 from datetime import timedelta
+from time import sleep
 from django.core import mail
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.exceptions import ObjectDoesNotExist
@@ -105,6 +106,7 @@ class UserModelTests(TestCase):
         user = User.objects.create_user(email=expected_receiver_email, password=expected_pw)
         self.assertEqual(user.email, expected_receiver_email)
         user._email_user(subject=expected_subject, message=expected_message, from_email=expected_sender_email)
+        sleep(5)
         self.assertEqual(len(mail.outbox), 1)
         self.assertEqual(mail.outbox[0].from_email, expected_sender_email)
         self.assertEqual(mail.outbox[0].to, [expected_receiver_email])
