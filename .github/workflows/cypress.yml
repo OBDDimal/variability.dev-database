@@ -40,6 +40,11 @@ jobs:
         run: |
           cd ../backend
           python manage.py runserver &
+          
+      - name: Create Testuser
+        run: |
+          cd ../backend
+          python manage.py runscript create_test_user
     
       - name: Checkout
         uses: actions/checkout@v2
