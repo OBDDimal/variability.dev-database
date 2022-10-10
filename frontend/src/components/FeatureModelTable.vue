@@ -207,6 +207,12 @@ export default Vue.extend({
         FileCreate,
     },
 
+    watch: {
+        '$store.state.loggedIn': function () {
+            this.$store.dispatch('fetchFiles');
+        },
+    },
+
     props: {
         headline: {
             type: String,
