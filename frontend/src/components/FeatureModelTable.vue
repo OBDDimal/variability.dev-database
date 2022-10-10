@@ -147,12 +147,12 @@
                         <v-icon>mdi-eye</v-icon>
                     </v-btn>
                     <v-btn
-                        :disabled="/*item.owner === false*/ true"
+                        :disabled="item.owner === false"
                         class="mr-2"
                         color="error"
                         rounded
                         small
-                        @click="deleteItem(item)"
+                        @click.stop="deleteItem(item)"
                     >
                         <v-icon>mdi-delete</v-icon>
                     </v-btn>
@@ -216,12 +216,6 @@ export default Vue.extend({
 
     components: {
         FileCreate,
-    },
-
-    watch: {
-        '$store.state.loggedIn': function () {
-            this.$store.dispatch('fetchFiles');
-        },
     },
 
     props: {
@@ -288,39 +282,13 @@ export default Vue.extend({
     },
 
     methods: {
-        deleteItemConfirm() {
+        async deleteItemConfirm() {
             this.removeLoading = true;
-
-            //TODO: actually delete the feature model
-            // api.delete(`${API_URL}tags/${this.editedID}/`)
-            //     .then(() => {
-            //         this.$store.commit("updateSnackbar", {
-            //             message: "Tag deleted successfully!",
-            //             variant: "success",
-            //             timeout: 5000,
-            //             show: true,
-            //         });
-            //         this.$store.dispatch("fetchTags");
-            //         this.removeLoading = false;
-            //     })
-            //     .catch((error) => {
-            //         this.$store.commit("updateSnackbar", {
-            //             message: "Error: " + error.message,
-            //             variant: "error",
-            //             timeout: 5000,
-            //             show: true,
-            //         });
-            //         this.removeLoading = false;
-            //     });
-
-            this.$store.commit('updateSnackbar', {
-                message:
-                    'Error: ' +
-                    'deletion of feature models is not yet implemented!',
-                variant: 'error',
-                timeout: 5000,
-                show: true,
-            });
+            await this.$store.dispatch(
+                'deleteFeatureModel',
+                this.editedItem.id
+            );
+            await this.$store.dispatch('fetchFiles');
             this.removeLoading = false;
 
             this.closeDelete();

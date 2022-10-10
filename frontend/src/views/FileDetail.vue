@@ -191,7 +191,12 @@
                         </v-btn>
                     </div>
                     <div class="float-right">
-                        <v-btn outlined color="error" disabled>
+                        <v-btn
+                            outlined
+                            color="error"
+                            :disabled="file.owner === false"
+                            @click="deleteItem(item)"
+                        >
                             Delete Model
                         </v-btn>
                     </div>
@@ -206,6 +211,29 @@
                 </div>
             </v-col>
         </v-row>
+        <v-dialog v-model="dialogDelete" max-width="400px">
+            <v-card>
+                <v-card-title class="text-h5" style="word-break: break-word">
+                    Are you sure you want to delete this feature model?
+                </v-card-title>
+                <v-card-actions>
+                    <v-spacer></v-spacer>
+                    <v-btn color="primary" text @click="closeDelete"
+                        >Cancel
+                    </v-btn>
+                    <v-spacer></v-spacer>
+                    <v-btn
+                        :loading="removeLoading"
+                        color="primary"
+                        text
+                        @click="deleteItemConfirm"
+                    >
+                        Delete
+                    </v-btn>
+                    <v-spacer></v-spacer>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
     </div>
 </template>
 
@@ -225,6 +253,8 @@ export default Vue.extend({
     data: () => ({
         file: {},
         loading: true,
+        dialogDelete: false,
+        removeLoading: false,
     }),
 
     async mounted() {
@@ -247,6 +277,19 @@ export default Vue.extend({
                 .catch((error) => {
                     console.log(error);
                 });
+        },
+        deleteItem() {
+            this.dialogDelete = true;
+        },
+        closeDelete() {
+            this.dialogDelete = false;
+        },
+        async deleteItemConfirm() {
+            this.removeLoading = true;
+            await this.$store.dispatch('deleteFeatureModel', this.file.id);
+            await this.$store.dispatch('fetchFiles');
+            this.removeLoading = false;
+            await this.$router.push('/');
         },
         /*async fetchFeatureModelOfFamily(value) {
 			await api

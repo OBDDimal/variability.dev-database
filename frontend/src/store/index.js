@@ -120,6 +120,26 @@ export default new Vuex.Store({
                     });
                 });
         },
+        async deleteFeatureModel({ commit }, id) {
+            await api
+                .delete(`${API_URL}files/${id}/`)
+                .then(() => {
+                    commit('updateSnackbar', {
+                        message: 'File deleted successfully!',
+                        variant: 'success',
+                        timeout: 5000,
+                        show: true,
+                    });
+                })
+                .catch((error) => {
+                    commit('updateSnackbar', {
+                        message: 'Error: ' + error.message,
+                        variant: 'error',
+                        timeout: 5000,
+                        show: true,
+                    });
+                });
+        },
         async uploadFamily({ commit }, payload) {
             // payload = { label: this.family, description: this.newFamilyDescription }
             return api
