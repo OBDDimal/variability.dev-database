@@ -831,6 +831,8 @@ class BulkUploadTest(APITestCase):
         </struct>
     </featureModel>"""
 
+    invalid_file_contents = b"This is not valid xml"
+
     def setUp(self):
         self.owner = User.objects.create_superuser(email="ow@n.er", password="asdfghj")
         self.admin = User.objects.create_superuser(
@@ -867,7 +869,7 @@ class BulkUploadTest(APITestCase):
             is_public=False,
         )
 
-    @override_settings(EMAIL_BACKEND="django.core.mail.backends.smtp.EmailBackend")
+    @override_settings(EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend")
     def test_upload_logged_in_owner(self):
         # Files are uploadable when logged in with owner
         self.client.force_authenticate(self.owner)
@@ -899,7 +901,7 @@ class BulkUploadTest(APITestCase):
         res = self.client.post("/bulk-upload/", data, content_type=MULTIPART_CONTENT)
         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
 
-    @override_settings(EMAIL_BACKEND="django.core.mail.backends.smtp.EmailBackend")
+    @override_settings(EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend")
     def test_upload_logged_in_admin(self):
         # Files are uploadable when logged in with admin
         self.client.force_authenticate(self.admin)
@@ -931,7 +933,7 @@ class BulkUploadTest(APITestCase):
         res = self.client.post("/bulk-upload/", data, content_type=MULTIPART_CONTENT)
         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
 
-    @override_settings(EMAIL_BACKEND="django.core.mail.backends.smtp.EmailBackend")
+    @override_settings(EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend")
     def test_upload_logged_in_non_owner(self):
         # Files are not uploadable when logged in with non-owner
         self.client.force_authenticate(self.user)
@@ -993,7 +995,7 @@ class BulkUploadTest(APITestCase):
         res = self.client.post("/bulk-upload/", data, content_type=MULTIPART_CONTENT)
         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
 
-    @override_settings(EMAIL_BACKEND="django.core.mail.backends.smtp.EmailBackend")
+    @override_settings(EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend")
     def test_upload_logged_out(self):
         # Files are not uploadable when logged out
         self.client.force_authenticate(None)
@@ -1024,3 +1026,33 @@ class BulkUploadTest(APITestCase):
 
         res = self.client.post("/bulk-upload/", data, content_type=MULTIPART_CONTENT)
         self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    @override_settings(EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend")
+    def test_upload_invalid_xml(self):
+        self.client.force_authenticate(self.owner)
+        file = ContentFile(self.invalid_file_contents, "file.xml")
+        files = [
+            {
+                "description": self.file_description,
+                "label": self.file_label,
+                "file": "1",
+                "family": self.family.id,
+                "license": self.license.id,
+                "version": self.file_version,
+                "tags": [self.tag.id],
+            },
+            {
+                "description": self.other_file_description,
+                "label": self.other_file_label,
+                "file": "2",
+                "family": self.other_family.id,
+                "license": self.other_license.id,
+                "version": self.other_file_version,
+                "tags": [self.tag.id, self.other_tag.id],
+            },
+        ]
+        raw_data = {"files": json.dumps(files), "1": file}
+        data = encode_multipart(data=raw_data, boundary=BOUNDARY)
+
+        res = self.client.post("/bulk-upload/", data, content_type=MULTIPART_CONTENT)
+        self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
