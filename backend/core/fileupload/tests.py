@@ -774,7 +774,7 @@ class FileUploadTest(APITestCase):
 
     def test_file_destroy_logged_in_admin(self):
         # Files are destroyable when logged in with admin
-        self.client.force_authenticate(self.owner)
+        self.client.force_authenticate(self.admin)
         res = self.client.delete("/files/1/")
         self.assertEqual(res.status_code, status.HTTP_204_NO_CONTENT)
         res = self.client.get("/files/1/")
@@ -804,6 +804,8 @@ class BulkUploadTest(APITestCase):
     family_description = "Family description"
     other_family_label = "Other family label"
     other_family_description = "Other family description"
+    user_family_label = "User family label"
+    user_family_description = "User family description"
     tag_label = "Tag label"
     tag_description = "Tag description"
     other_tag_label = "Other tag label"
@@ -847,6 +849,11 @@ class BulkUploadTest(APITestCase):
             description=self.other_family_description,
             owner=self.owner,
         )
+        self.user_family = Family.objects.create(
+            label=self.user_family_label,
+            description=self.user_family_description,
+            owner=self.user,
+        )
         self.tag = Tag.objects.create(
             label=self.tag_label,
             description=self.tag_description,
@@ -884,6 +891,100 @@ class BulkUploadTest(APITestCase):
                 "license": self.other_license.id,
                 "version": self.other_file_version,
                 "tags": [self.tag.id, self.other_tag.id],
+            },
+        ]
+        raw_data = {"files": json.dumps(files), "1": file, "2": other_file}
+        data = encode_multipart(data=raw_data, boundary=BOUNDARY)
+
+        res = self.client.post("/bulk-upload/", data, content_type=MULTIPART_CONTENT)
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+
+    @override_settings(EMAIL_BACKEND="django.core.mail.backends.smtp.EmailBackend")
+    def test_upload_logged_in_admin(self):
+        # Files are uploadable when logged in with admin
+        self.client.force_authenticate(self.admin)
+        file = ContentFile(self.file_contents, "file.xml")
+        other_file = ContentFile(self.other_file_contents, "other_file.xml")
+        files = [
+            {
+                "description": self.file_description,
+                "label": self.file_label,
+                "file": "1",
+                "family": self.family.id,
+                "license": self.license.id,
+                "version": self.file_version,
+                "tags": [self.tag.id],
+            },
+            {
+                "description": self.other_file_description,
+                "label": self.other_file_label,
+                "file": "2",
+                "family": self.other_family.id,
+                "license": self.other_license.id,
+                "version": self.other_file_version,
+                "tags": [self.tag.id, self.other_tag.id],
+            },
+        ]
+        raw_data = {"files": json.dumps(files), "1": file, "2": other_file}
+        data = encode_multipart(data=raw_data, boundary=BOUNDARY)
+
+        res = self.client.post("/bulk-upload/", data, content_type=MULTIPART_CONTENT)
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+
+    @override_settings(EMAIL_BACKEND="django.core.mail.backends.smtp.EmailBackend")
+    def test_upload_logged_in_non_owner(self):
+        # Files are not uploadable when logged in with non-owner
+        self.client.force_authenticate(self.user)
+        file = ContentFile(self.file_contents, "file.xml")
+        other_file = ContentFile(self.other_file_contents, "other_file.xml")
+        files = [
+            {
+                "description": self.file_description,
+                "label": self.file_label,
+                "file": "1",
+                "family": self.family.id,
+                "license": self.license.id,
+                "version": self.file_version,
+                "tags": [self.tag.id],
+            },
+            {
+                "description": self.other_file_description,
+                "label": self.other_file_label,
+                "file": "2",
+                "family": self.other_family.id,
+                "license": self.other_license.id,
+                "version": self.other_file_version,
+                "tags": [self.tag.id, self.other_tag.id],
+            },
+        ]
+        raw_data = {"files": json.dumps(files), "1": file, "2": other_file}
+        data = encode_multipart(data=raw_data, boundary=BOUNDARY)
+
+        res = self.client.post("/bulk-upload/", data, content_type=MULTIPART_CONTENT)
+        self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
+
+        # Files are uploadable when logged in with non-owner if tags are public
+        self.client.force_authenticate(self.user)
+        file = ContentFile(self.file_contents, "file.xml")
+        other_file = ContentFile(self.other_file_contents, "other_file.xml")
+        files = [
+            {
+                "description": self.file_description,
+                "label": self.file_label,
+                "file": "1",
+                "family": self.user_family.id,
+                "license": self.license.id,
+                "version": self.file_version,
+                "tags": [self.tag.id],
+            },
+            {
+                "description": self.other_file_description,
+                "label": self.other_file_label,
+                "file": "2",
+                "family": self.user_family.id,
+                "license": self.other_license.id,
+                "version": self.other_file_version,
+                "tags": [self.tag.id],
             },
         ]
         raw_data = {"files": json.dumps(files), "1": file, "2": other_file}

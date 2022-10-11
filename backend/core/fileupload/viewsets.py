@@ -190,10 +190,29 @@ class FileUploadViewSet(
 class BulkUploadApiView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
+    def check_family(self, request, family_id):
+        family = Family.objects.get(pk=family_id)
+        return family and family.owner == request.user
+
+    def check_tags(self, request, tag_ids):
+        for tag_id in tag_ids:
+            tag = Tag.objects.get(pk=tag_id)
+            if not tag:
+                return False
+            if not tag.is_public and tag.owner != request.user:
+                return False
+        return True
+
+    def check_validity(self, request, family_id, tag_ids):
+        if request.user.is_staff:
+            return True
+
+        return self.check_family(request, family_id) and self.check_tags(request, tag_ids)
+
     def post(self, request, format=None):
         files = json.loads(request.data["files"])
 
-        uploaded = []
+        serializers = []
 
         for uploaded_file in files:
             label = uploaded_file["label"]
@@ -214,7 +233,14 @@ class BulkUploadApiView(APIView):
             validated_data["local_file"] = file
 
             fs = FilesSerializer(data=validated_data)
-            fs.is_valid()
+
+            if not self.check_validity(request, family, tags) or not fs.is_valid():
+                return Response({"message": "Upload not valid"}, status=status.HTTP_403_FORBIDDEN)
+
+            serializers.append(fs)
+
+        uploaded = []
+        for fs in serializers:
             fs.save(owner=request.user)
             uploaded.append(fs.data)
 
