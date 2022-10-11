@@ -13,7 +13,7 @@ from core.fileupload.viewsets import (
     DeleteFileUploadApiView,
 )
 from core.analysis.viewsets import AnalysesViewSet, DockerProcessesViewSet
-from core.user.viewsets import ActivateUserViewSet
+from core.user.viewsets import ActivateUserViewSet, UserInfoApiView
 from core.auth.viewsets import LoginViewSet, RegistrationViewSet, RefreshViewSet
 from ddueruemweb.settings import STATIC_ROOT, STATIC_URL, MEDIA_URL, MEDIA_ROOT
 
@@ -52,6 +52,7 @@ urlpatterns = [
     re_path(r"files/uploaded/unconfirmed/confirm/(?P<token>[\w\d]+)", ConfirmFileUploadApiView.as_view()),
     re_path(r"files/uploaded/unconfirmed/delete/(?P<token>[\w\d]+)", DeleteFileUploadApiView.as_view()),
     path("api-auth/", include("rest_framework.urls")),
+    path("user-info/", UserInfoApiView.as_view()),
 ]
 urlpatterns += static(STATIC_URL, document_root=STATIC_ROOT)
 urlpatterns += static(MEDIA_URL, document_root=MEDIA_ROOT)
