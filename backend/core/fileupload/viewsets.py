@@ -112,13 +112,13 @@ class ConfirmFileUploadApiView(APIView):
                             logger.debug(" MODE: File mirror is disabled")
                     file_from_db.save()
                     files.append(FilesSerializer(file_from_db).data)
-                return Response({"files": files}, HTTP_200_OK)
+                return Response({"files": files}, status.HTTP_201_CREATED)
         except ObjectDoesNotExist as error:
-            return Response({"message": str(error)})
-        except BadSignature as error:
-            return Response({"message": str(error)})
+            return Response({"message": str(error)}, status.HTTP_404_NOT_FOUND)
         except DjangoUnicodeDecodeError as error:
-            return Response({"message": str(error)})
+            return Response({"message": str(error)}, status.HTTP_404_NOT_FOUND)
+        except BadSignature as error:
+            return Response({"message": str(error)}, status.HTTP_403_FORBIDDEN)
 
 
 class DeleteFileUploadApiView(APIView):
@@ -149,13 +149,13 @@ class DeleteFileUploadApiView(APIView):
                 for file_id in file_ids:
                     file_from_db = File.objects.get(pk=file_id)
                     file_from_db.delete()
-                return Response({"files": []}, HTTP_200_OK)
+                return Response({"files": []}, status.HTTP_204_NO_CONTENT)
         except ObjectDoesNotExist as error:
-            return Response({"message": str(error)})
-        except BadSignature as error:
-            return Response({"message": str(error)})
+            return Response({"message": str(error)}, status.HTTP_404_NOT_FOUND)
         except DjangoUnicodeDecodeError as error:
-            return Response({"message": str(error)})
+            return Response({"message": str(error)}, status.HTTP_404_NOT_FOUND)
+        except BadSignature as error:
+            return Response({"message": str(error)}, status.HTTP_403_FORBIDDEN)
 
 
 class FileUploadViewSet(

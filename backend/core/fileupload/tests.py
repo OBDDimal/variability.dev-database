@@ -1056,3 +1056,181 @@ class BulkUploadTest(APITestCase):
 
         res = self.client.post("/bulk-upload/", data, content_type=MULTIPART_CONTENT)
         self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
+
+class ConfirmUploadTest(APITestCase):
+    license_label = License._default_license
+    family_label = "Family label"
+    family_description = "Family description"
+    tag_label = "Tag label"
+    tag_description = "Tag description"
+
+    file_label = "File label"
+    file_description = "File description"
+    file_version = "1.0.0"
+    file_content = b"""<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>
+    <featureModel>
+        <properties/>
+        <struct>
+        </struct>
+    </featureModel>"""
+
+
+    def setUp(self):
+        self.owner = User.objects.create_superuser(email="ow@n.er", password="asdfghj")
+        self.user = User.objects.create_user(email="u@s.er", password="!87654321")
+        self.license = License.objects.create(label=self.license_label)
+        self.family = Family.objects.create(
+            label=self.family_label,
+            description=self.family_description,
+            owner=self.owner,
+        )
+        self.tag = Tag.objects.create(
+            label=self.tag_label,
+            description=self.tag_description,
+            owner=self.owner,
+            is_public=True,
+        )
+        self.file = File.objects.create(
+            owner=self.owner,
+            label=self.file_label,
+            description=self.file_description,
+            tags=[self.tag],
+            version=self.file_version,
+            license=self.license,
+            local_file=ContentFile(self.file_content, "file.xml"),
+            family=self.family,
+        )
+
+    def test_confirm_token_logged_in_owner(self):
+        self.client.force_authenticate(self.owner)
+
+        confirmation_token = self.owner.generate_file_confirmation_token([{"id": self.file.id}])
+        res = self.client.get(f"/files/uploaded/unconfirmed/{self.file.id}/")
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+
+        res = self.client.get(f"/files/uploaded/unconfirmed/confirm/{confirmation_token}/")
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+
+        res = self.client.get(f"/files/uploaded/unconfirmed/{self.file.id}/")
+        self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
+        res = self.client.get(f"/files/{self.file.id}/")
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+
+    def test_confirm_token_logged_in_non_owner(self):
+        self.client.force_authenticate(self.user)
+
+        confirmation_token = self.owner.generate_file_confirmation_token([{"id": self.file.id}])
+        res = self.client.get(f"/files/uploaded/unconfirmed/{self.file.id}/")
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+
+        res = self.client.get(f"/files/uploaded/unconfirmed/confirm/{confirmation_token}/")
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+
+        res = self.client.get(f"/files/uploaded/unconfirmed/{self.file.id}/")
+        self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
+        res = self.client.get(f"/files/{self.file.id}/")
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+
+    def test_confirm_token_logged_out(self):
+        self.client.force_authenticate(None)
+
+        confirmation_token = self.owner.generate_file_confirmation_token([{"id": self.file.id}])
+        res = self.client.get(f"/files/uploaded/unconfirmed/{self.file.id}/")
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+
+        res = self.client.get(f"/files/uploaded/unconfirmed/confirm/{confirmation_token}/")
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+
+        res = self.client.get(f"/files/uploaded/unconfirmed/{self.file.id}/")
+        self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
+        res = self.client.get(f"/files/{self.file.id}/")
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+
+class DeleteUploadTest(APITestCase):
+    license_label = License._default_license
+    family_label = "Family label"
+    family_description = "Family description"
+    tag_label = "Tag label"
+    tag_description = "Tag description"
+
+    file_label = "File label"
+    file_description = "File description"
+    file_version = "1.0.0"
+    file_content = b"""<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>
+    <featureModel>
+        <properties/>
+        <struct>
+        </struct>
+    </featureModel>"""
+
+
+    def setUp(self):
+        self.owner = User.objects.create_superuser(email="ow@n.er", password="asdfghj")
+        self.user = User.objects.create_user(email="u@s.er", password="!87654321")
+        self.license = License.objects.create(label=self.license_label)
+        self.family = Family.objects.create(
+            label=self.family_label,
+            description=self.family_description,
+            owner=self.owner,
+        )
+        self.tag = Tag.objects.create(
+            label=self.tag_label,
+            description=self.tag_description,
+            owner=self.owner,
+            is_public=True,
+        )
+        self.file = File.objects.create(
+            owner=self.owner,
+            label=self.file_label,
+            description=self.file_description,
+            tags=[self.tag],
+            version=self.file_version,
+            license=self.license,
+            local_file=ContentFile(self.file_content, "file.xml"),
+            family=self.family,
+        )
+
+    def test_delete_token_logged_in_owner(self):
+        self.client.force_authenticate(self.owner)
+
+        confirmation_token = self.owner.generate_file_confirmation_token([{"id": self.file.id}])
+        res = self.client.get(f"/files/uploaded/unconfirmed/{self.file.id}/")
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+
+        res = self.client.get(f"/files/uploaded/unconfirmed/delete/{confirmation_token}/")
+        self.assertEqual(res.status_code, status.HTTP_204_NO_CONTENT)
+
+        res = self.client.get(f"/files/uploaded/unconfirmed/{self.file.id}/")
+        self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
+        res = self.client.get(f"/files/{self.file.id}/")
+        self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_delete_token_logged_in_non_owner(self):
+        self.client.force_authenticate(self.user)
+
+        confirmation_token = self.owner.generate_file_confirmation_token([{"id": self.file.id}])
+        res = self.client.get(f"/files/uploaded/unconfirmed/{self.file.id}/")
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+
+        res = self.client.get(f"/files/uploaded/unconfirmed/delete/{confirmation_token}/")
+        self.assertEqual(res.status_code, status.HTTP_204_NO_CONTENT)
+
+        res = self.client.get(f"/files/uploaded/unconfirmed/{self.file.id}/")
+        self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
+        res = self.client.get(f"/files/{self.file.id}/")
+        self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_delete_token_logged_out(self):
+        self.client.force_authenticate(None)
+
+        confirmation_token = self.owner.generate_file_confirmation_token([{"id": self.file.id}])
+        res = self.client.get(f"/files/uploaded/unconfirmed/{self.file.id}/")
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+
+        res = self.client.get(f"/files/uploaded/unconfirmed/delete/{confirmation_token}/")
+        self.assertEqual(res.status_code, status.HTTP_204_NO_CONTENT)
+
+        res = self.client.get(f"/files/uploaded/unconfirmed/{self.file.id}/")
+        self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
+        res = self.client.get(f"/files/{self.file.id}/")
+        self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
