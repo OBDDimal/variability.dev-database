@@ -798,6 +798,191 @@ class FileUploadTest(APITestCase):
         self.assertEqual(res.status_code, status.HTTP_200_OK)
 
 
+class UnconfirmedFileUploadTest(APITestCase):
+    license_label = License._default_license
+    other_license_label = "Test license"
+    family_label = "Family label"
+    family_description = "Family description"
+    other_family_label = "Other family label"
+    other_family_description = "Other family description"
+    tag_label = "Tag label"
+    tag_description = "Tag description"
+    other_tag_label = "Other tag label"
+    other_tag_description = "Other tag description"
+
+    file_label = "File label"
+    file_description = "File description"
+    file_version = "1.0.0"
+    file_content = b"""<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>
+    <featureModel>
+        <properties/>
+        <struct>
+        </struct>
+    </featureModel>"""
+
+    other_file_label = "Other file label"
+    other_file_description = "Other file description"
+    other_file_version = "2.0.0"
+    other_file_content = b"""<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>
+    <featureModel>
+        <properties/>
+        <struct>
+        </struct>
+    </featureModel>"""
+
+    def setUp(self):
+        self.owner = User.objects.create_superuser(email="ow@n.er", password="asdfghj")
+        self.admin = User.objects.create_superuser(
+            email="ad@m.in", password="12345678!"
+        )
+        self.user = User.objects.create_user(email="u@s.er", password="!87654321")
+        self.license = License.objects.create(label=self.license_label)
+        self.other_license = License.objects.create(label=self.other_license_label)
+        self.family = Family.objects.create(
+            label=self.family_label,
+            description=self.family_description,
+            owner=self.owner,
+        )
+        self.other_family = Family.objects.create(
+            label=self.other_family_label,
+            description=self.other_family_description,
+            owner=self.owner,
+        )
+        self.tag = Tag.objects.create(
+            label=self.tag_label,
+            description=self.tag_description,
+            owner=self.owner,
+            is_public=True,
+        )
+        self.other_tag = Tag.objects.create(
+            label=self.other_tag_label,
+            description=self.other_tag_description,
+            owner=self.owner,
+            is_public=False,
+        )
+        self.file = File.objects.create(
+            owner=self.owner,
+            label=self.file_label,
+            description=self.file_description,
+            tags=[self.tag],
+            version=self.file_version,
+            license=self.license,
+            local_file=ContentFile(self.file_content, "file.xml"),
+            family=self.family,
+        )
+        self.other_file = File.objects.create(
+            owner=self.owner,
+            label=self.other_file_label,
+            description=self.other_file_description,
+            tags=[self.tag, self.other_tag],
+            version=self.other_file_version,
+            license=self.other_license,
+            local_file=ContentFile(self.other_file_content, "other_file.xml"),
+            family=self.other_family,
+            is_confirmed=True,
+        )
+
+    def test_file_retrieve_logged_in_owner(self):
+        # Unconfirmed files are retrievable when logged in with owner
+        self.client.force_authenticate(self.owner)
+        res = self.client.get("/files/uploaded/unconfirmed/1/")
+        json = res.json()
+        self.assertEqual(json["label"], self.file_label)
+        self.assertEqual(json["description"], self.file_description)
+        self.assertEqual(len(json["tags"]), 1)
+        self.assertEqual(json["tags"][0]["id"], self.tag.id)
+        self.assertEqual(json["version"], self.file_version)
+        self.assertEqual(json["license"]["id"], self.license.id)
+        self.assertEqual(json["family"]["id"], self.family.id)
+
+        # Confirmed files are not retrievable when logged in with owner
+        res = self.client.get("/files/uploaded/unconfirmed/2/")
+        self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_file_retrieve_logged_in_admin(self):
+        # Unconfirmed files are retrievable when logged in with admin
+        self.client.force_authenticate(self.admin)
+        res = self.client.get("/files/uploaded/unconfirmed/1/")
+        json = res.json()
+        self.assertEqual(json["label"], self.file_label)
+        self.assertEqual(json["description"], self.file_description)
+        self.assertEqual(len(json["tags"]), 1)
+        self.assertEqual(json["tags"][0]["id"], self.tag.id)
+        self.assertEqual(json["version"], self.file_version)
+        self.assertEqual(json["license"]["id"], self.license.id)
+        self.assertEqual(json["family"]["id"], self.family.id)
+
+        # Confirmed files are not retrievable when logged in with admin
+        res = self.client.get("/files/uploaded/unconfirmed/2/")
+        self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_file_retrieve_logged_in_non_owner(self):
+        # Unconfirmed files are retrievable when logged in with non-owner
+        self.client.force_authenticate(self.user)
+        res = self.client.get("/files/uploaded/unconfirmed/1/")
+        json = res.json()
+        self.assertEqual(json["label"], self.file_label)
+        self.assertEqual(json["description"], self.file_description)
+        self.assertEqual(len(json["tags"]), 1)
+        self.assertEqual(json["tags"][0]["id"], self.tag.id)
+        self.assertEqual(json["version"], self.file_version)
+        self.assertEqual(json["license"]["id"], self.license.id)
+        self.assertEqual(json["family"]["id"], self.family.id)
+
+        # Confirmed files are not retrievable when logged in with non-owner
+        res = self.client.get("/files/uploaded/unconfirmed/2/")
+        self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_file_retrieve_logged_out(self):
+        # Unconfirmed files are retrievable when logged out
+        self.client.force_authenticate(None)
+        res = self.client.get("/files/uploaded/unconfirmed/1/")
+        json = res.json()
+        self.assertEqual(json["label"], self.file_label)
+        self.assertEqual(json["description"], self.file_description)
+        self.assertEqual(len(json["tags"]), 1)
+        self.assertEqual(json["tags"][0]["id"], self.tag.id)
+        self.assertEqual(json["version"], self.file_version)
+        self.assertEqual(json["license"]["id"], self.license.id)
+        self.assertEqual(json["family"]["id"], self.family.id)
+
+        # Confirmed files are not retrievable when logged out
+        res = self.client.get("/files/uploaded/unconfirmed/2/")
+        self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_file_list_logged_in_owner(self):
+        # Unconfirmed files are listable when logged in with owner
+        self.client.force_authenticate(self.owner)
+        res = self.client.get("/files/uploaded/unconfirmed/")
+        json = res.json()
+        self.assertEqual(len(json), 1)
+        self.assertEqual(json[0]["label"], self.file_label)
+
+    def test_file_list_logged_in_admin(self):
+        # Unconfirmed files are listable when logged in with admin
+        self.client.force_authenticate(self.admin)
+        res = self.client.get("/files/uploaded/unconfirmed/")
+        json = res.json()
+        self.assertEqual(len(json), 1)
+        self.assertEqual(json[0]["label"], self.file_label)
+
+    def test_file_list_logged_in_non_owner(self):
+        # Unconfirmed files are listable when logged in with non-owner
+        self.client.force_authenticate(self.user)
+        res = self.client.get("/files/uploaded/unconfirmed/")
+        json = res.json()
+        self.assertEqual(len(json), 1)
+        self.assertEqual(json[0]["label"], self.file_label)
+
+    def test_file_list_logged_out(self):
+        # Unconfirmed files are listable when logged out
+        self.client.force_authenticate(None)
+        res = self.client.get("/files/uploaded/unconfirmed/")
+        json = res.json()
+        self.assertEqual(len(json), 1)
+        self.assertEqual(json[0]["label"], self.file_label)
+
+
 class BulkUploadTest(APITestCase):
     license_label = License._default_license
     other_license_label = "Test license"
@@ -1252,6 +1437,18 @@ class DeleteUploadTest(APITestCase):
             family=self.family,
             confirmation_token=self.confirmation_token,
         )
+        self.confirmed_file = File.objects.create(
+            owner=self.owner,
+            label=self.other_file_label,
+            description=self.other_file_description,
+            tags=[self.tag],
+            version=self.other_file_version,
+            license=self.license,
+            local_file=ContentFile(self.other_file_content, "other_file.xml"),
+            family=self.family,
+            is_confirmed=True,
+            confirmation_token=BulkUploadApiView.generate_confirmation_token(),
+        )
 
     def test_delete_token_logged_in_owner(self):
         self.client.force_authenticate(self.owner)
@@ -1315,3 +1512,16 @@ class DeleteUploadTest(APITestCase):
         self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
         res = self.client.get(f"/files/{self.other_file.id}/")
         self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_delete_token_cannot_delete_confirmed_file(self):
+        self.client.force_authenticate(None)
+
+        confirmation_token = self.confirmation_token
+        res = self.client.get(f"/files/uploaded/confirmed/{self.confirmed_file.id}/")
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+
+        res = self.client.get(f"/files/uploaded/unconfirmed/delete/{self.confirmed_file.confirmation_token}/")
+        self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
+
+        res = self.client.get(f"/files/uploaded/confirmed/{self.confirmed_file.id}/")
+        self.assertEqual(res.status_code, status.HTTP_200_OK)

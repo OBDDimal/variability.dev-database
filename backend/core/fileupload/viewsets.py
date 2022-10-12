@@ -266,6 +266,8 @@ class UnconfirmedFileViewSet(
         instance = self.get_object()
         serializer = self.get_serializer(instance)
         anonymized_file = anonymize_file(serializer.data, request)
+        if instance.is_confirmed:
+            return Response(status=status.HTTP_404_NOT_FOUND)
         return Response(anonymized_file)
 
     def destroy(self, request, *args, **kwargs):
@@ -332,6 +334,8 @@ class ConfirmedFileViewSet(
         anonymized_file = anonymize_file(serializer.data, request)
         analysis_state = self._get_analysis_state(anonymized_file)
         anonymized_file["analysis"] = analysis_state
+        if not instance.is_confirmed:
+            return Response(status=status.HTTP_404_NOT_FOUND)
         return Response(anonymized_file)
 
 
