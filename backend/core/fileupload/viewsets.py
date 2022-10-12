@@ -33,8 +33,11 @@ from ..auth.tokens import decode_token_to_user
 import core.fileupload.githubmirror.github_manager as gm
 from multiprocessing import Process
 from rest_framework.views import APIView
-import json
 from django.http.request import QueryDict
+
+import json
+import os
+import binascii
 
 logger = logging.getLogger(__name__)
 
@@ -77,48 +80,30 @@ class ConfirmFileUploadApiView(APIView):
     """
 
     def get(self, request, token):
-        try:
-            decoded_token = decode_token_to_user(token)
-            actual_request_timestamp = dateparse.parse_datetime(
-                decoded_token.pop("timestamp")
+        if token == "":
+            return Response(
+                {"message": "Invalid confirmation token"}, status.HTTP_404_NOT_FOUND
             )
-            if decoded_token.pop("purpose") != "upload_confirm":
-                raise BadSignature("Token purpose does not match!")
-            min_possible_request_timestamp = timezone.now() - timedelta(
-                days=PASSWORD_RESET_TIMEOUT_DAYS
+
+        files = File.objects.filter(confirmation_token=token)
+
+        if files.count() == 0:
+            return Response(
+                {"message": "Invalid confirmation token"}, status.HTTP_404_NOT_FOUND
             )
-            valid = min_possible_request_timestamp <= actual_request_timestamp
-            if not valid:
-                raise BadSignature("Token expired!")
-            else:
-                file_ids = decoded_token.pop("file_id")
-                if isinstance(file_ids, int):
-                    file_ids = [file_ids]
-                files = []
-                for file_id in file_ids:
-                    file_from_db = File.objects.get(pk=file_id)
-                    if file_from_db.is_confirmed:
-                        raise BadSignature("File upload is already confirmed!")
-                    file_from_db.is_confirmed = True
-                    if not file_from_db.mirrored:
-                        if not DEBUG:
-                            # async start mirror. Details: https://docs.python.org/3/library/multiprocessing.html
-                            mirror_process = Process(
-                                target=gm.mirror_to_github, args=(file_from_db,)
-                            )
-                            mirror_process.start()
-                            file_from_db.mirrored = True
-                        else:
-                            logger.debug(" MODE: File mirror is disabled")
-                    file_from_db.save()
-                    files.append(FilesSerializer(file_from_db).data)
-                return Response({"files": files}, status.HTTP_201_CREATED)
-        except ObjectDoesNotExist as error:
-            return Response({"message": str(error)}, status.HTTP_404_NOT_FOUND)
-        except DjangoUnicodeDecodeError as error:
-            return Response({"message": str(error)}, status.HTTP_404_NOT_FOUND)
-        except BadSignature as error:
-            return Response({"message": str(error)}, status.HTTP_403_FORBIDDEN)
+
+        file_data = []
+
+        for file in files:
+            if file.is_confirmed:
+                return Response(
+                    {"message": "Files already confirmed"}, HTTP_403_FORBIDDEN
+                )
+            file.is_confirmed = True
+            file.save()
+            file_data.append(FilesSerializer(file).data)
+
+        return Response({"files": file_data}, status.HTTP_201_CREATED)
 
 
 class DeleteFileUploadApiView(APIView):
@@ -128,34 +113,26 @@ class DeleteFileUploadApiView(APIView):
     """
 
     def get(self, request, token):
-        try:
-            decoded_token = decode_token_to_user(token)
-            actual_request_timestamp = dateparse.parse_datetime(
-                decoded_token.pop("timestamp")
+        if token == "":
+            return Response(
+                {"message": "Invalid confirmation token"}, status.HTTP_404_NOT_FOUND
             )
-            if decoded_token.pop("purpose") != "upload_confirm":
-                raise BadSignature("Token purpose does not match!")
-            min_possible_request_timestamp = timezone.now() - timedelta(
-                days=PASSWORD_RESET_TIMEOUT_DAYS
+
+        files = File.objects.filter(confirmation_token=token)
+
+        if files.count() == 0:
+            return Response(
+                {"message": "Invalid confirmation token"}, status.HTTP_404_NOT_FOUND
             )
-            valid = min_possible_request_timestamp <= actual_request_timestamp
-            if not valid:
-                raise BadSignature("Token expired!")
-            else:
-                file_ids = decoded_token.pop("file_id")
-                if isinstance(file_ids, int):
-                    file_ids = [file_ids]
-                files = []
-                for file_id in file_ids:
-                    file_from_db = File.objects.get(pk=file_id)
-                    file_from_db.delete()
-                return Response({"files": []}, status.HTTP_204_NO_CONTENT)
-        except ObjectDoesNotExist as error:
-            return Response({"message": str(error)}, status.HTTP_404_NOT_FOUND)
-        except DjangoUnicodeDecodeError as error:
-            return Response({"message": str(error)}, status.HTTP_404_NOT_FOUND)
-        except BadSignature as error:
-            return Response({"message": str(error)}, status.HTTP_403_FORBIDDEN)
+
+        for file in files:
+            if file.is_confirmed:
+                return Response(
+                    {"message": "Cannot delete confirmed files"}, HTTP_403_FORBIDDEN
+                )
+            file.delete()
+
+        return Response({"files": []}, status.HTTP_204_NO_CONTENT)
 
 
 class FileUploadViewSet(
@@ -190,6 +167,10 @@ class FileUploadViewSet(
 class BulkUploadApiView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
+    @staticmethod
+    def generate_confirmation_token():
+        return binascii.hexlify(os.urandom(30)).decode('ascii')
+
     def check_family(self, request, family_id):
         family = Family.objects.get(pk=family_id)
         return family and family.owner == request.user
@@ -207,12 +188,15 @@ class BulkUploadApiView(APIView):
         if request.user.is_staff:
             return True
 
-        return self.check_family(request, family_id) and self.check_tags(request, tag_ids)
+        return self.check_family(request, family_id) and self.check_tags(
+            request, tag_ids
+        )
 
     def post(self, request, format=None):
         files = json.loads(request.data["files"])
 
         serializers = []
+        confirmation_token = BulkUploadApiView.generate_confirmation_token()
 
         for uploaded_file in files:
             label = uploaded_file["label"]
@@ -231,11 +215,19 @@ class BulkUploadApiView(APIView):
             validated_data["family"] = family
             validated_data.setlist("tags", tags)
             validated_data["local_file"] = file
+            validated_data["confirmation_token"] = confirmation_token
 
             fs = FilesSerializer(data=validated_data)
 
-            if not self.check_validity(request, family, tags) or not fs.is_valid():
-                return Response({"message": "Upload not valid"}, status=status.HTTP_403_FORBIDDEN)
+            if not self.check_validity(request, family, tags):
+                return Response(
+                    {"message": "Upload not valid"}, status=status.HTTP_403_FORBIDDEN
+                )
+            if not fs.is_valid():
+                return Response(
+                    {"message": "File does not contain valid XML"},
+                    status.HTTP_403_FORBIDDEN,
+                )
 
             serializers.append(fs)
 
@@ -244,7 +236,7 @@ class BulkUploadApiView(APIView):
             fs.save(owner=request.user)
             uploaded.append(fs.data)
 
-        request.user.send_link_to_files(uploaded)
+        request.user.send_link_to_files(confirmation_token)
 
         return Response({"files": uploaded}, status=status.HTTP_201_CREATED)
 
@@ -281,7 +273,7 @@ class UnconfirmedFileViewSet(
             file = File.objects.get(pk=kwargs["pk"])
             if file.is_confirmed:
                 return Response(
-                    {"message": "Cannot delete confirmed files."}, HTTP_403_FORBIDDEN
+                    {"message": "Cannot delete confirmed files"}, HTTP_403_FORBIDDEN
                 )
             file.delete()
         except ObjectDoesNotExist as error:

@@ -9,6 +9,7 @@ from django.test import override_settings
 from django.core.files.base import ContentFile
 
 from core.fileupload.models import Family, Tag, License, File
+from core.fileupload.viewsets import BulkUploadApiView
 from core.user.models import User
 
 
@@ -1099,12 +1100,13 @@ class ConfirmUploadTest(APITestCase):
             license=self.license,
             local_file=ContentFile(self.file_content, "file.xml"),
             family=self.family,
+            confirmation_token=BulkUploadApiView.generate_confirmation_token(),
         )
 
     def test_confirm_token_logged_in_owner(self):
         self.client.force_authenticate(self.owner)
 
-        confirmation_token = self.owner.generate_file_confirmation_token([{"id": self.file.id}])
+        confirmation_token = self.file.confirmation_token
         res = self.client.get(f"/files/uploaded/unconfirmed/{self.file.id}/")
         self.assertEqual(res.status_code, status.HTTP_200_OK)
 
@@ -1119,7 +1121,7 @@ class ConfirmUploadTest(APITestCase):
     def test_confirm_token_logged_in_non_owner(self):
         self.client.force_authenticate(self.user)
 
-        confirmation_token = self.owner.generate_file_confirmation_token([{"id": self.file.id}])
+        confirmation_token = self.file.confirmation_token
         res = self.client.get(f"/files/uploaded/unconfirmed/{self.file.id}/")
         self.assertEqual(res.status_code, status.HTTP_200_OK)
 
@@ -1134,7 +1136,7 @@ class ConfirmUploadTest(APITestCase):
     def test_confirm_token_logged_out(self):
         self.client.force_authenticate(None)
 
-        confirmation_token = self.owner.generate_file_confirmation_token([{"id": self.file.id}])
+        confirmation_token = self.file.confirmation_token
         res = self.client.get(f"/files/uploaded/unconfirmed/{self.file.id}/")
         self.assertEqual(res.status_code, status.HTTP_200_OK)
 
@@ -1188,12 +1190,13 @@ class DeleteUploadTest(APITestCase):
             license=self.license,
             local_file=ContentFile(self.file_content, "file.xml"),
             family=self.family,
+            confirmation_token=BulkUploadApiView.generate_confirmation_token(),
         )
 
     def test_delete_token_logged_in_owner(self):
         self.client.force_authenticate(self.owner)
 
-        confirmation_token = self.owner.generate_file_confirmation_token([{"id": self.file.id}])
+        confirmation_token = self.file.confirmation_token
         res = self.client.get(f"/files/uploaded/unconfirmed/{self.file.id}/")
         self.assertEqual(res.status_code, status.HTTP_200_OK)
 
@@ -1208,7 +1211,7 @@ class DeleteUploadTest(APITestCase):
     def test_delete_token_logged_in_non_owner(self):
         self.client.force_authenticate(self.user)
 
-        confirmation_token = self.owner.generate_file_confirmation_token([{"id": self.file.id}])
+        confirmation_token = self.file.confirmation_token
         res = self.client.get(f"/files/uploaded/unconfirmed/{self.file.id}/")
         self.assertEqual(res.status_code, status.HTTP_200_OK)
 
@@ -1223,7 +1226,7 @@ class DeleteUploadTest(APITestCase):
     def test_delete_token_logged_out(self):
         self.client.force_authenticate(None)
 
-        confirmation_token = self.owner.generate_file_confirmation_token([{"id": self.file.id}])
+        confirmation_token = self.file.confirmation_token
         res = self.client.get(f"/files/uploaded/unconfirmed/{self.file.id}/")
         self.assertEqual(res.status_code, status.HTTP_200_OK)
 
