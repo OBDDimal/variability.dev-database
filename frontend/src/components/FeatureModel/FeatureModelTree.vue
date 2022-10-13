@@ -197,7 +197,6 @@ export default Vue.extend({
                 segmentsContainer: undefined,
                 featureNodesContainer: undefined,
                 dragContainer: undefined,
-                quickEditContainer: undefined,
             },
             spaceBetweenParentChild: 75,
             spaceBetweenSiblings: 20,
