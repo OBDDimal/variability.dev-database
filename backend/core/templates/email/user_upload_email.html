@@ -1,15 +1,15 @@
 {% extends "email/email_template.html" %}
 {% block greeting %}Hello {{ user }},{% endblock %}
-{% block upper_text %}We noticed you uploaded {{ file_name }}. You can now choose to add this file permanently (confirm
-    upload) or to delete it now.{% endblock %}
+{% block upper_text %}We noticed you uploaded files. You can now choose to add these files permanently (confirm
+    upload) or to delete them now.{% endblock %}
 {% block call_to_action_link %}{{ confirm_link }}{% endblock %}
 {% block call_to_action_text %}Confirm Upload{% endblock %}
 {% block lower_text %}
-    If you do not confirm your file upload within <strong>48 hours</strong> the file will be deleted automatically.
+    If you do not confirm your file upload within <strong>48 hours</strong> the files will be deleted automatically.
     <br />
-    Once you confirmed the upload, you <strong>can not delete the file anymore</strong>.
+    Once you confirmed the upload, you <strong>can not delete the files anymore</strong>.
     <br />
-    If you want to delete the file and not confirm it <a href="{{ delete_link }}">click here</a>.
+    If you want to delete the files and not confirm them <a href="{{ delete_link }}">click here</a>.
     <br />
     If clicking one of the buttons above doesn't work, you can copy the plain links here:
     <ul>

@@ -8,7 +8,8 @@ from rest_framework.response import Response
 from core.user.serializers import UserSerializer
 from core.user.models import User
 from rest_framework.viewsets import ModelViewSet, GenericViewSet
-from rest_framework.permissions import AllowAny
+from rest_framework.views import APIView
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.mixins import CreateModelMixin
 from ddueruemweb.settings import PASSWORD_RESET_TIMEOUT_DAYS
 from ..auth.tokens import decode_token_to_user
@@ -41,8 +42,15 @@ class ActivateUserViewSet(GenericViewSet, CreateModelMixin):
                 user_from_db.save()
                 return Response({'user': UserSerializer(user_from_db).data})
         except ObjectDoesNotExist as error:
-            return Response({'message': str(error)})
-        except BadSignature as error:
-            return Response({'message': str(error)})
+            return Response({'message': str(error)}, status.HTTP_404_NOT_FOUND)
         except DjangoUnicodeDecodeError as error:
-            return Response({'message': str(error)})
+            return Response({'message': str(error)}, status.HTTP_404_NOT_FOUND)
+        except BadSignature as error:
+            return Response({'message': str(error)}, status.HTTP_403_FORBIDDEN)
+
+class UserInfoApiView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, format=None):
+        us = UserSerializer(request.user)
+        return Response(us.data)
