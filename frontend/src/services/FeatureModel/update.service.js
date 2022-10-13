@@ -115,12 +115,17 @@ function updateFeatureNodes(d3Data, visibleD3Nodes) {
     // Remove old/invisible nodes.
     featureNode.exit().remove();
 
+    featureNodeEnter.append('g').classed('children-count-container', true);
+    featureNodeEnter.append('g').classed('quick-edit-actions-container', true);
+
+
     updateChildrenCount(d3Data, featureNodeUpdate);
     updateQuickEditActions(d3Data, featureNodeUpdate);
 }
 
 function updateQuickEditActions(d3Data, featureNodeUpdate) {
     const quickEditActions = featureNodeUpdate
+        .select('g.quick-edit-actions-container')
         .selectAll('g.quick-edit-actions')
         .data(
             (d) => (d3Data.quickEdit ? [d] : []),
@@ -217,7 +222,10 @@ function drawQuickEditGroup(d3Element) {
 
 function updateChildrenCount(d3Data, featureNodeUpdate) {
     // Enter triangle with number of direct and total children.
-    const childrenCount = featureNodeUpdate.selectAll('g.children-count').data(
+    const childrenCount = featureNodeUpdate
+        .select('g.children-count-container')
+        .selectAll('g.children-count')
+        .data(
         (d) => (d.data.isLeaf() || !d.data.isCollapsed ? [] : [d]),
         (d) => d.id
     );
