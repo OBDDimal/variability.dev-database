@@ -1,11 +1,11 @@
 import * as createPaths from '@/services/FeatureModel/createPaths.service.js';
 import * as CONSTANTS from '@/classes/constants';
 import * as collapse from '@/services/FeatureModel/collapse.service.js';
-import { FeatureNode } from '@/classes/FeatureNode';
-import { PseudoNode } from '@/classes/PseudoNode';
+import {FeatureNode} from '@/classes/FeatureNode';
+import {PseudoNode} from '@/classes/PseudoNode';
 import * as count from '@/services/FeatureModel/count.service';
-import { ghostNodeTouchMove } from '@/services/FeatureModel/dragAndDrop.service';
-import { RECT_HEIGHT } from '@/classes/constants';
+import {ghostNodeTouchMove} from '@/services/FeatureModel/dragAndDrop.service';
+import {RECT_HEIGHT} from '@/classes/constants';
 
 function updateFeatureNodes(d3Data, visibleD3Nodes) {
     const featureNode = d3Data.container.featureNodesContainer
@@ -151,7 +151,7 @@ function updateQuickEditActions(d3Data, featureNodeUpdate) {
     drawQuickEditGroup(bottomEnter);
     quickEditActionsUpdate
         .select('g.quick-edit-action-child')
-        .attr('transform', `translate(0, ${RECT_HEIGHT})`);
+        .attr('transform', (d3Node) => (d3Data.direction === 'v' ? `translate(0, ${RECT_HEIGHT})` : `translate(${d3Node.width}, 0)`));
 
     // Left side circle
     const leftEnter = quickEditActionsEnter
@@ -168,10 +168,7 @@ function updateQuickEditActions(d3Data, featureNodeUpdate) {
     drawQuickEditGroup(leftEnter);
     quickEditActionsUpdate
         .select('g.quick-edit-action-left')
-        .attr(
-            'transform',
-            (d3Node) => `translate(${-d3Node.width / 2}, ${RECT_HEIGHT / 2})`
-        );
+        .attr('transform', (d3Node) => (d3Data.direction === 'v' ? `translate(${-d3Node.width / 2}, ${RECT_HEIGHT / 2})` : `translate(${d3Node.width / 2}, -${RECT_HEIGHT / 2})`));
 
     // Right side circle
     const rightEnter = quickEditActionsEnter
@@ -189,33 +186,32 @@ function updateQuickEditActions(d3Data, featureNodeUpdate) {
         .select('g.quick-edit-action-right')
         .attr(
             'transform',
-            (d3Node) => `translate(${d3Node.width / 2}, ${RECT_HEIGHT / 2})`
+            (d3Node) => `
+    translate(${d3Node.width / 2}, ${RECT_HEIGHT / 2})`
         );
 
     quickEditActions.exit().remove();
 }
 
 function drawQuickEditGroup(d3Element) {
-    d3Element
-        .append('circle')
-        .attr('fill', '#4caf50')
-        .attr('r', CONSTANTS.QUICK_EDIT_RADIUS);
+    // Enlarge on mobile
+    const radius =
+        'ontouchstart' in window
+            ? CONSTANTS.QUICK_EDIT_RADIUS * 1.75
+            : CONSTANTS.QUICK_EDIT_RADIUS;
+    d3Element.append('circle').attr('fill', '#4caf50').attr('r', radius);
     d3Element
         .append('path')
         .attr(
             'd',
-            `M -0.5 ${-(2 * CONSTANTS.QUICK_EDIT_RADIUS) / 3} h 1 v ${
-                (4 * CONSTANTS.QUICK_EDIT_RADIUS) / 3
-            } h -1 z`
+            `M -0.5 ${-(2 * radius) / 3} h 1 v ${(4 * radius) / 3} h -1 z`
         )
         .attr('fill', 'white');
     d3Element
         .append('path')
         .attr(
             'd',
-            `M ${-(2 * CONSTANTS.QUICK_EDIT_RADIUS) / 3} -0.5 v 1 h ${
-                (4 * CONSTANTS.QUICK_EDIT_RADIUS) / 3
-            } v -1 z`
+            `M ${-(2 * radius) / 3} -0.5 v 1 h ${(4 * radius) / 3} v -1 z`
         )
         .attr('fill', 'white');
 }
@@ -226,9 +222,9 @@ function updateChildrenCount(d3Data, featureNodeUpdate) {
         .select('g.children-count-container')
         .selectAll('g.children-count')
         .data(
-        (d) => (d.data.isLeaf() || !d.data.isCollapsed ? [] : [d]),
-        (d) => d.id
-    );
+            (d) => (d.data.isLeaf() || !d.data.isCollapsed ? [] : [d]),
+            (d) => d.id
+        );
 
     const childrenCountEnter = childrenCount
         .enter()
@@ -252,13 +248,14 @@ function updateChildrenCount(d3Data, featureNodeUpdate) {
         .attr('font-size', CONSTANTS.CHILDREN_COUNT_FONT_SIZE);
 
     const childrenCountUpdate = childrenCountEnter.merge(childrenCount);
-    childrenCountUpdate.attr('transform', () => {
-        const x = 0;
+    childrenCountUpdate.attr('transform', (d3Node) => {
+        const x = d3Data.direction === 'v' ? 0 : d3Node.width + 10;
         const y =
             d3Data.direction === 'v'
                 ? CONSTANTS.RECT_HEIGHT + 10
-                : CONSTANTS.RECT_HEIGHT / 2;
-        return `translate(${x}, ${y})`;
+                : -CONSTANTS.RECT_HEIGHT / 8;
+        return `
+    translate(${x}, ${y})`;
     });
     childrenCountUpdate
         .selectAll('text.direct-children')
@@ -304,7 +301,8 @@ function updatePseudoNodes(d3Data, visibleD3Nodes) {
         } else {
             dx += d3Node.width / 2;
         }
-        return `translate(${dx}, ${dy})`;
+        return `
+    translate(${dx}, ${dy})`;
     });
 
     pseudoNode.exit().remove();
@@ -375,16 +373,17 @@ function updateHighlightedConstraints(d3Data, visibleD3Nodes) {
         )
         .attr(
             'transform',
-            (json, i) => `translate(${
+            (json, i) => `
+    translate(${
                 json.d3Node.x -
                 i * CONSTANTS.STROKE_WIDTH_CONSTANT -
                 CONSTANTS.STROKE_WIDTH_CONSTANT / 2
-            }, 
-                ${
-                    json.d3Node.y -
-                    i * CONSTANTS.STROKE_WIDTH_CONSTANT -
-                    CONSTANTS.STROKE_WIDTH_CONSTANT / 2
-                })`
+            },
+        ${
+                json.d3Node.y -
+                i * CONSTANTS.STROKE_WIDTH_CONSTANT -
+                CONSTANTS.STROKE_WIDTH_CONSTANT / 2
+            })`
         );
 
     // Remove constraints highlighted nodes
@@ -467,7 +466,8 @@ function updateSegments(d3Data, visibleD3Nodes) {
             } else {
                 dy += CONSTANTS.RECT_HEIGHT;
             }
-            return `translate(${dx}, ${dy})`;
+            return `
+    translate(${dx}, ${dy})`;
         });
 
     segment.exit().remove();
@@ -521,8 +521,8 @@ export function calcRectWidth(d3Data, d3Node) {
             (d3Data.isShortenedName
                 ? d3Node.data.displayName.length
                 : d3Node.data.name.length) *
-                (CONSTANTS.FEATURE_FONT_SIZE *
-                    CONSTANTS.MONOSPACE_HEIGHT_WIDTH_FACTOR) +
+            (CONSTANTS.FEATURE_FONT_SIZE *
+                CONSTANTS.MONOSPACE_HEIGHT_WIDTH_FACTOR) +
             CONSTANTS.RECT_MARGIN.left +
             CONSTANTS.RECT_MARGIN.right
         );
