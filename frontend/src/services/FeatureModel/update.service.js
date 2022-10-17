@@ -1,11 +1,11 @@
 import * as createPaths from '@/services/FeatureModel/createPaths.service.js';
 import * as CONSTANTS from '@/classes/constants';
 import * as collapse from '@/services/FeatureModel/collapse.service.js';
-import {FeatureNode} from '@/classes/FeatureNode';
-import {PseudoNode} from '@/classes/PseudoNode';
+import { FeatureNode } from '@/classes/FeatureNode';
+import { PseudoNode } from '@/classes/PseudoNode';
 import * as count from '@/services/FeatureModel/count.service';
-import {ghostNodeTouchMove} from '@/services/FeatureModel/dragAndDrop.service';
-import {RECT_HEIGHT} from '@/classes/constants';
+import { ghostNodeTouchMove } from '@/services/FeatureModel/dragAndDrop.service';
+import { RECT_HEIGHT } from '@/classes/constants';
 
 function updateFeatureNodes(d3Data, visibleD3Nodes) {
     const featureNode = d3Data.container.featureNodesContainer
@@ -118,7 +118,6 @@ function updateFeatureNodes(d3Data, visibleD3Nodes) {
     featureNodeEnter.append('g').classed('children-count-container', true);
     featureNodeEnter.append('g').classed('quick-edit-actions-container', true);
 
-
     updateChildrenCount(d3Data, featureNodeUpdate);
     updateQuickEditActions(d3Data, featureNodeUpdate);
 }
@@ -151,7 +150,11 @@ function updateQuickEditActions(d3Data, featureNodeUpdate) {
     drawQuickEditGroup(bottomEnter);
     quickEditActionsUpdate
         .select('g.quick-edit-action-child')
-        .attr('transform', (d3Node) => (d3Data.direction === 'v' ? `translate(0, ${RECT_HEIGHT})` : `translate(${d3Node.width}, 0)`));
+        .attr('transform', (d3Node) =>
+            d3Data.direction === 'v'
+                ? `translate(0, ${RECT_HEIGHT})`
+                : `translate(${d3Node.width}, 0)`
+        );
 
     // Left side circle
     const leftEnter = quickEditActionsEnter
@@ -168,7 +171,11 @@ function updateQuickEditActions(d3Data, featureNodeUpdate) {
     drawQuickEditGroup(leftEnter);
     quickEditActionsUpdate
         .select('g.quick-edit-action-left')
-        .attr('transform', (d3Node) => (d3Data.direction === 'v' ? `translate(${-d3Node.width / 2}, ${RECT_HEIGHT / 2})` : `translate(${d3Node.width / 2}, -${RECT_HEIGHT / 2})`));
+        .attr('transform', (d3Node) =>
+            d3Data.direction === 'v'
+                ? `translate(${-d3Node.width / 2}, ${RECT_HEIGHT / 2})`
+                : `translate(${d3Node.width / 2}, -${RECT_HEIGHT / 2})`
+        );
 
     // Right side circle
     const rightEnter = quickEditActionsEnter
@@ -182,13 +189,11 @@ function updateQuickEditActions(d3Data, featureNodeUpdate) {
             d3Data.featureModelTree.openAddAsSiblingDialog(d3Node);
         });
     drawQuickEditGroup(rightEnter);
-    quickEditActionsUpdate
-        .select('g.quick-edit-action-right')
-        .attr(
-            'transform',
-            (d3Node) => `
+    quickEditActionsUpdate.select('g.quick-edit-action-right').attr(
+        'transform',
+        (d3Node) => `
     translate(${d3Node.width / 2}, ${RECT_HEIGHT / 2})`
-        );
+    );
 
     quickEditActions.exit().remove();
 }
@@ -375,15 +380,15 @@ function updateHighlightedConstraints(d3Data, visibleD3Nodes) {
             'transform',
             (json, i) => `
     translate(${
-                json.d3Node.x -
-                i * CONSTANTS.STROKE_WIDTH_CONSTANT -
-                CONSTANTS.STROKE_WIDTH_CONSTANT / 2
-            },
+        json.d3Node.x -
+        i * CONSTANTS.STROKE_WIDTH_CONSTANT -
+        CONSTANTS.STROKE_WIDTH_CONSTANT / 2
+    },
         ${
-                json.d3Node.y -
-                i * CONSTANTS.STROKE_WIDTH_CONSTANT -
-                CONSTANTS.STROKE_WIDTH_CONSTANT / 2
-            })`
+            json.d3Node.y -
+            i * CONSTANTS.STROKE_WIDTH_CONSTANT -
+            CONSTANTS.STROKE_WIDTH_CONSTANT / 2
+        })`
         );
 
     // Remove constraints highlighted nodes
@@ -474,7 +479,7 @@ function updateSegments(d3Data, visibleD3Nodes) {
 }
 
 export function updateSvg(d3Data) {
-    const start = performance.now();
+    /*const start = performance.now();*/
 
     // Calculate rect widths of all d3Nodes once for better performance instead of repeatedly during update.
     d3Data.root.descendants().forEach((d3Node) => {
@@ -511,7 +516,7 @@ export function updateSvg(d3Data) {
     updatePseudoNodes(d3Data, visibleD3Nodes);
     updateLinks(d3Data, visibleD3Nodes);
 
-    console.log('Rendertime', performance.now() - start);
+    /*console.log('Rendertime', performance.now() - start);*/
 }
 
 // Calculates rect-width dependent on font-size dynamically.
@@ -521,8 +526,8 @@ export function calcRectWidth(d3Data, d3Node) {
             (d3Data.isShortenedName
                 ? d3Node.data.displayName.length
                 : d3Node.data.name.length) *
-            (CONSTANTS.FEATURE_FONT_SIZE *
-                CONSTANTS.MONOSPACE_HEIGHT_WIDTH_FACTOR) +
+                (CONSTANTS.FEATURE_FONT_SIZE *
+                    CONSTANTS.MONOSPACE_HEIGHT_WIDTH_FACTOR) +
             CONSTANTS.RECT_MARGIN.left +
             CONSTANTS.RECT_MARGIN.right
         );

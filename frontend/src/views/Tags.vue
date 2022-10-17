@@ -13,8 +13,14 @@
         >
             <template v-slot:top>
                 <v-toolbar flat>
-                    <v-toolbar-title class="hidden-sm-and-down">Tags</v-toolbar-title>
-                    <v-divider class="mx-4 hidden-sm-and-down" inset vertical></v-divider>
+                    <v-toolbar-title class="hidden-sm-and-down"
+                        >Tags</v-toolbar-title
+                    >
+                    <v-divider
+                        class="mx-4 hidden-sm-and-down"
+                        inset
+                        vertical
+                    ></v-divider>
                     <v-spacer class="hidden-sm-and-down"></v-spacer>
                     <v-text-field
                         v-model="search"
@@ -71,7 +77,11 @@
 
                             <v-card-actions>
                                 <v-spacer></v-spacer>
-                                <v-btn color="blue darken-1" text @click="close">
+                                <v-btn
+                                    color="blue darken-1"
+                                    text
+                                    @click="close"
+                                >
                                     Cancel
                                 </v-btn>
                                 <v-btn
@@ -88,19 +98,20 @@
                     <v-dialog v-model="dialogDelete" max-width="500px">
                         <v-card>
                             <v-card-title class="text-h5"
-                            >Are you sure you want to delete this tag?
-                            </v-card-title
-                            >
+                                >Are you sure you want to delete this tag?
+                            </v-card-title>
                             <v-card-actions>
                                 <v-spacer></v-spacer>
-                                <v-btn color="primary" text @click="closeDelete">Cancel</v-btn>
+                                <v-btn color="primary" text @click="closeDelete"
+                                    >Cancel</v-btn
+                                >
                                 <v-spacer></v-spacer>
                                 <v-btn
                                     :loading="removeLoading"
                                     color="primary"
                                     text
                                     @click="deleteItemConfirm"
-                                >Delete
+                                    >Delete
                                 </v-btn>
                                 <v-spacer></v-spacer>
                             </v-card-actions>
@@ -126,11 +137,13 @@
                 <!-- <v-btn small rounded color="error" class="mr-2"> <v-icon>mdi-delete</v-icon></v-btn> -->
             </template>
             <template v-slot:item.is_public="{ item }">
-                <v-icon v-if="item.is_public" color="success"> mdi-check</v-icon>
+                <v-icon v-if="item.is_public" color="success">
+                    mdi-check</v-icon
+                >
                 <v-icon v-else color="error"> mdi-cancel</v-icon>
             </template>
             <template v-slot:item.date_created="{ item }">
-                {{ new Date(item.date_created).toLocaleString("en-US") }}
+                {{ new Date(item.date_created).toLocaleString('en-US') }}
             </template>
             <template v-slot:item.id="{ index }">
                 {{ index + 1 }}
@@ -144,50 +157,50 @@
 </template>
 
 <script>
-import Vue from "vue";
-import api from "@/services/api.service";
+import Vue from 'vue';
+import api from '@/services/api.service';
 
 const API_URL = process.env.VUE_APP_DOMAIN;
 
 export default Vue.extend({
-    name: "Tags",
+    name: 'Tags',
 
     components: {},
 
     props: {},
 
     data: () => ({
-        search: "",
+        search: '',
         dialog: false,
         dialogDelete: false,
         editedIndex: -1,
         headers: [
             {
-                text: "ID",
-                align: "start",
+                text: 'ID',
+                align: 'start',
                 sortable: false,
-                value: "id",
+                value: 'id',
             },
-            {text: "Label", value: "label"},
-            {text: "Description", value: "description"},
-            {text: "Owner", value: "owner"},
-            {text: "Public", value: "is_public"},
-            {text: "Date Created", value: "date_created"},
+            { text: 'Label', value: 'label' },
+            { text: 'Description', value: 'description' },
+            { text: 'Owner', value: 'owner' },
+            { text: 'Public', value: 'is_public' },
+            { text: 'Date Created', value: 'date_created' },
             {
-                text: "Actions",
-                align: "center",
-                value: "actions",
+                text: 'Actions',
+                align: 'center',
+                value: 'actions',
                 sortable: false,
             },
         ],
         editedItem: {
-            label: "",
-            description: "",
+            label: '',
+            description: '',
             is_public: false,
         },
         defaultItem: {
-            label: "",
-            description: "",
+            label: '',
+            description: '',
             is_public: false,
         },
         editedID: -1,
@@ -199,7 +212,7 @@ export default Vue.extend({
 
     computed: {
         formTitle() {
-            return this.editedIndex === -1 ? "Create New Tag" : "Edit Tag";
+            return this.editedIndex === -1 ? 'Create New Tag' : 'Edit Tag';
         },
     },
 
@@ -229,22 +242,21 @@ export default Vue.extend({
         deleteItemConfirm() {
             this.removeLoading = true;
 
-            api
-                .delete(`${API_URL}tags/${this.editedID}/`)
+            api.delete(`${API_URL}tags/${this.editedID}/`)
                 .then(() => {
-                    this.$store.commit("updateSnackbar", {
-                        message: "Tag deleted successfully!",
-                        variant: "success",
+                    this.$store.commit('updateSnackbar', {
+                        message: 'Tag deleted successfully!',
+                        variant: 'success',
                         timeout: 5000,
                         show: true,
                     });
-                    this.$store.dispatch("fetchTags");
+                    this.$store.dispatch('fetchTags');
                     this.removeLoading = false;
                 })
                 .catch((error) => {
-                    this.$store.commit("updateSnackbar", {
-                        message: "Error: " + error.message,
-                        variant: "error",
+                    this.$store.commit('updateSnackbar', {
+                        message: 'Error: ' + error.message,
+                        variant: 'error',
                         timeout: 5000,
                         show: true,
                     });
@@ -270,23 +282,22 @@ export default Vue.extend({
 
         addTag() {
             this.addLoading = true;
-            console.log(this.editedItem)
-            api
-                .post(`${API_URL}tags/`, this.editedItem)
+            /*console.log(this.editedItem)*/
+            api.post(`${API_URL}tags/`, this.editedItem)
                 .then(() => {
-                    this.$store.commit("updateSnackbar", {
-                        message: "Tag added successfully!",
-                        variant: "success",
+                    this.$store.commit('updateSnackbar', {
+                        message: 'Tag added successfully!',
+                        variant: 'success',
                         timeout: 5000,
                         show: true,
                     });
-                    this.$store.dispatch("fetchTags");
+                    this.$store.dispatch('fetchTags');
                     this.addLoading = false;
                 })
                 .catch((error) => {
-                    this.$store.commit("updateSnackbar", {
-                        message: "Error: " + error.message,
-                        variant: "error",
+                    this.$store.commit('updateSnackbar', {
+                        message: 'Error: ' + error.message,
+                        variant: 'error',
                         timeout: 5000,
                         show: true,
                     });
@@ -309,16 +320,16 @@ export default Vue.extend({
 
     mounted() {
         if (!this.$store.state.loggedIn || !this.$store.state.currentUser) {
-            this.$store.commit("updateSnackbar", {
-                message: "Please log in to view this page",
-                variant: "info",
+            this.$store.commit('updateSnackbar', {
+                message: 'Please log in to view this page',
+                variant: 'info',
                 timeout: 5000,
                 show: true,
             });
-            this.$router.push("/login");
+            this.$router.push('/login');
         } else {
             this.loading = true;
-            this.$store.dispatch("fetchTags");
+            this.$store.dispatch('fetchTags');
             this.tags = this.$store.state.tags;
             this.loading = false;
         }

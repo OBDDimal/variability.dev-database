@@ -108,13 +108,13 @@ export default Vue.extend({
         },
     },
 
-    mounted() {
+    async mounted() {
         this.loading = true;
-        this.$store.dispatch('fetchFamilies');
+        await this.$store.dispatch('fetchFamilies');
         this.families = this.$store.state.families;
-        this.$store.dispatch('fetchTags');
+        await this.$store.dispatch('fetchTags');
         this.tags = this.$store.state.tags;
-        this.$store.dispatch('fetchFiles');
+        await this.$store.dispatch('fetchFiles');
         this.loading = false;
     },
 });
