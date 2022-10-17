@@ -30,9 +30,6 @@
                     <v-icon left> mdi-home</v-icon>
                     Home
                 </v-btn>
-                <span class="ml-6" v-if="!$store.state.loggedIn">
-                    This is a demo only, registering and login are disabled
-                </span>
                 <v-btn
                     v-if="$store.state.loggedIn && $store.state.isOnline"
                     class="mx-1"
@@ -61,7 +58,7 @@
                     Tags
                 </v-btn>
                 <v-btn
-                    v-if="$store.state.loggedIn && $store.state.isOnline"
+                    v-if="$store.state.isOnline"
                     class="mx-1"
                     text
                     to="/families"
@@ -69,6 +66,9 @@
                     <v-icon left> mdi-human-male-female-child</v-icon>
                     Families
                 </v-btn>
+                <span class="ml-6" v-if="!$store.state.loggedIn">
+                    This is a demo only, registering and login are disabled
+                </span>
             </div>
             <v-spacer></v-spacer>
             <div class="hidden-md-and-up">
@@ -181,11 +181,7 @@
                     </v-list-item-icon>
                     Tags
                 </v-list-item>
-                <v-list-item
-                    v-if="$store.state.loggedIn && $store.state.isOnline"
-                    link
-                    to="/families"
-                >
+                <v-list-item v-if="$store.state.isOnline" link to="/families">
                     <v-list-item-icon>
                         <v-icon left> mdi-human-male-female-child</v-icon>
                     </v-list-item-icon>
