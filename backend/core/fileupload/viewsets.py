@@ -1,5 +1,6 @@
 from core.analysis.models import DockerProcess, Analysis
 from core.fileupload.models import Family, Tag, License, File
+from core.fileupload.utils import generate_random_string
 from core.fileupload.serializers import (
     FilesSerializer,
     TagsSerializer,
@@ -167,10 +168,6 @@ class FileUploadViewSet(
 class BulkUploadApiView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
-    @staticmethod
-    def generate_confirmation_token():
-        return binascii.hexlify(os.urandom(30)).decode('ascii')
-
     def check_family(self, request, family_id):
         family = Family.objects.get(pk=family_id)
         return family and family.owner == request.user
@@ -196,7 +193,7 @@ class BulkUploadApiView(APIView):
         files = json.loads(request.data["files"])
 
         serializers = []
-        confirmation_token = BulkUploadApiView.generate_confirmation_token()
+        confirmation_token = generate_random_string(30)
 
         for uploaded_file in files:
             label = uploaded_file["label"]
