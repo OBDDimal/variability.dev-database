@@ -91,6 +91,7 @@
                     v-if="!$store.state.loggedIn && $store.state.isOnline"
                     text
                     to="/register"
+                    disabled
                 >
                     <v-icon left> mdi-account-plus</v-icon>
                     Register
