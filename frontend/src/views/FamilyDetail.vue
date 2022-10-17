@@ -147,6 +147,7 @@
                         </v-expansion-panel-header>
                         <v-expansion-panel-content>
                             <v-sheet
+                                v-if="loadingTable"
                                 :color="`grey ${
                                     $vuetify.theme.dark
                                         ? 'darken-2'
@@ -160,6 +161,12 @@
                                     type="card"
                                 ></v-skeleton-loader>
                             </v-sheet>
+                            <line-chart
+                                v-else
+                                chartId="configurationsChart"
+                                :chart-data="numberOfConfigurationsData"
+                                @hovered-element="onElementHover"
+                            ></line-chart>
                         </v-expansion-panel-content>
                     </v-expansion-panel>
                 </v-expansion-panels>
@@ -220,6 +227,7 @@ import Vue from 'vue';
 import api from '@/services/api.service';
 import FeatureModelTable from '@/components/FeatureModelTable';
 import LineChart from '@/components/Charts/LineChart';
+import { busyBoxConfigs } from '@/assets/busyBoxAnalyzeExample';
 
 const API_URL = process.env.VUE_APP_DOMAIN;
 
@@ -297,7 +305,8 @@ export default Vue.extend({
                     for (let i = 0; i < sorted.length; i++) {
                         const elem = sorted[i];
                         const res = await this.getNumbersFromFile(
-                            elem.local_file
+                            elem.local_file,
+                            sorted[i].label
                         );
                         data.push(res.amountFeatures);
                         dataConstraints.push(res.amountConstraints);
@@ -323,18 +332,16 @@ export default Vue.extend({
 
                     this.numberOfConfigurationsData.datasets = [
                         {
-                            label: 'Number of Configurations',
+                            label: 'Number of Configurations (log 10)',
                             borderColor: 'red',
                             fill: false,
                             data: dataConfigurations,
                         },
                     ];
-                    console.log('conf');
-                    console.log(this.numberOfConfigurationsData);
                     this.loadingTable = false;
                 });
         },
-        async getNumbersFromFile(path) {
+        async getNumbersFromFile(path, label) {
             return await api
                 .get(`${API_URL.slice(0, -1)}${path}`)
                 .then((response) => {
@@ -348,7 +355,9 @@ export default Vue.extend({
                             xmlDocument.getElementsByTagName('feature').length,
                         amountConstraints:
                             xmlDocument.getElementsByTagName('rule').length,
-                        amountConfigurations: Math.random(),
+                        amountConfigurations: Math.log10(
+                            busyBoxConfigs.find(({ name }) => name === label).mc
+                        ),
                     };
                     return result;
                 });
