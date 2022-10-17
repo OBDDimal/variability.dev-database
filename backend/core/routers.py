@@ -3,6 +3,7 @@ from django.urls import path, re_path, include
 from rest_framework import routers
 from core.fileupload.viewsets import (
     BulkUploadApiView,
+    ZipUploadApiView,
     FamiliesViewSet,
     FileUploadViewSet,
     TagsViewSet,
@@ -49,6 +50,7 @@ router.register(r"docker", DockerProcessesViewSet, basename="docker")
 urlpatterns = [
     *router.urls,
     path("bulk-upload/", BulkUploadApiView.as_view()),
+    path("zip-upload/", ZipUploadApiView.as_view()),
     re_path(r"files/uploaded/unconfirmed/confirm/(?P<token>[\w\d]+)", ConfirmFileUploadApiView.as_view()),
     re_path(r"files/uploaded/unconfirmed/delete/(?P<token>[\w\d]+)", DeleteFileUploadApiView.as_view()),
     path("api-auth/", include("rest_framework.urls")),
