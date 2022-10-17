@@ -17,3 +17,19 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include(routers)),
 ]
+
+if settings.GITHUB_AUTH:
+    github_auth = [
+        path('redirect/',
+            GithubRedirect.as_view(),
+            name='github_redirect'),
+        path('login/',
+            GithubLogin.as_view(),
+            name='github_login',
+        ),
+        path('callback/',
+            RedirectView.as_view(url=settings.GITHUB_AUTH_CALLBACK, query_string=True),
+            name='github_callback'),
+    ]
+
+    urlpatterns.append(path('auth/github/', include(github_auth)))

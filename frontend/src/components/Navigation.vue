@@ -90,7 +90,6 @@
                 <v-btn
                     v-if="!$store.state.loggedIn && $store.state.isOnline"
                     text
-                    disabled
                     to="/register"
                 >
                     <v-icon left> mdi-account-plus</v-icon>
@@ -99,7 +98,6 @@
                 <v-btn
                     v-if="!$store.state.loggedIn && $store.state.isOnline"
                     text
-                    disabled
                     to="/login"
                 >
                     <v-icon left> mdi-login-variant</v-icon>
@@ -109,7 +107,6 @@
                     v-if="$store.state.loggedIn && $store.state.isOnline"
                     :text="!$vuetify.breakpoint.mdAndDown"
                     :icon="$vuetify.breakpoint.mdAndDown"
-                    disabled
                     @click="logoutAndRedirect()"
                 >
                     <v-icon :left="!$vuetify.breakpoint.mdAndDown">
@@ -194,10 +191,10 @@
             <v-divider></v-divider>
             <v-list>
                 <v-list-item
-                    disabled
                     v-if="!$store.state.loggedIn && $store.state.isOnline"
                     link
                     to="/register"
+                    disabled
                 >
                     <v-list-item-icon>
                         <v-icon left> mdi-account-plus</v-icon>
@@ -205,7 +202,6 @@
                     Register
                 </v-list-item>
                 <v-list-item
-                    disabled
                     v-if="!$store.state.loggedIn && $store.state.isOnline"
                     link
                     to="/login"
