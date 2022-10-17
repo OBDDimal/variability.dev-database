@@ -43,7 +43,7 @@ services:
     restart: unless-stopped
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.peerjs.rule=Host(`boerek.variability.dev`)"
+      - "traefik.http.routers.peerjs.rule=Host(`peerjs.variability.dev`)"
       - "traefik.http.routers.peerjs.entrypoints=websecure"
       - "traefik.http.routers.peerjs.tls.certresolver=myresolver"
       - "traefik.http.middlewares.redirector.redirectscheme.scheme=https"
@@ -61,7 +61,7 @@ services:
       - db
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.backend.rule=Host(`doener.variability.dev`)"
+      - "traefik.http.routers.backend.rule=Host(`backend.variability.dev`)"
       - "traefik.http.routers.backend.entrypoints=websecure"
       - "traefik.http.routers.backend.tls.certresolver=myresolver"
       - "traefik.http.middlewares.redirector.redirectscheme.scheme=https"
