@@ -659,7 +659,7 @@ export default Vue.extend({
                     file_object['license'] = this.license_bulk;
                     /*console.log('LICENSE')
 					console.log(this.license_bulk)*/
-                    file_object['version'] = `${versionMajor}.0.0`;
+                    file_object['version'] = `${versionMajor}`;
                     /*console.log('VERSION')
 					console.log(`${versionMajor}.0.0`)*/
                     if (i !== 0) {

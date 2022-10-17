@@ -8,7 +8,7 @@ from core.analysis.serializers import AnalysesSerializer
 from rest_framework import serializers
 from django.http import QueryDict
 from transpiler.g6_transpiler import xml_to_g6
-
+from core.fileupload.utils import generate_random_string
 
 class FamiliesSerializer(serializers.ModelSerializer):
     """
@@ -107,7 +107,8 @@ class FilesSerializer(serializers.ModelSerializer):
         for line in validated_data['local_file']:
             contents = contents + line.decode()
         transpiled = json.dumps(xml_to_g6(contents, is_file_path=False), indent=2)
-        file.transpiled_file = ContentFile(bytes(transpiled, encoding='utf8'), f"{file.label}_as_g6.json")
+        file.transpiled_file = ContentFile(bytes(transpiled, encoding='utf8'), f"{generate_random_string(20)}.json")
+        file.local_file = ContentFile(bytes(contents, encoding='utf8'), f"{generate_random_string(20)}.xml")
         file.save()
         return file
 

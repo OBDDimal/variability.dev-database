@@ -9,6 +9,7 @@ from django.test import override_settings
 from django.core.files.base import ContentFile
 
 from core.fileupload.models import Family, Tag, License, File
+from core.fileupload.utils import generate_random_string
 from core.fileupload.viewsets import BulkUploadApiView
 from core.user.models import User
 
@@ -1286,7 +1287,7 @@ class ConfirmUploadTest(APITestCase):
             owner=self.owner,
             is_public=True,
         )
-        self.confirmation_token = BulkUploadApiView.generate_confirmation_token()
+        self.confirmation_token = generate_random_string(30)
         self.file = File.objects.create(
             owner=self.owner,
             label=self.file_label,
@@ -1414,7 +1415,7 @@ class DeleteUploadTest(APITestCase):
             owner=self.owner,
             is_public=True,
         )
-        self.confirmation_token = BulkUploadApiView.generate_confirmation_token()
+        self.confirmation_token = generate_random_string(30)
         self.file = File.objects.create(
             owner=self.owner,
             label=self.file_label,
@@ -1447,7 +1448,7 @@ class DeleteUploadTest(APITestCase):
             local_file=ContentFile(self.other_file_content, "other_file.xml"),
             family=self.family,
             is_confirmed=True,
-            confirmation_token=BulkUploadApiView.generate_confirmation_token(),
+            confirmation_token=generate_random_string(30),
         )
 
     def test_delete_token_logged_in_owner(self):
