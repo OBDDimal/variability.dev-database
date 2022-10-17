@@ -20,15 +20,6 @@ from ddueruemweb.settings import STATIC_ROOT, STATIC_URL, MEDIA_URL, MEDIA_ROOT
 # Register new routes for backend here
 router = routers.DefaultRouter()
 
-# AUTHENTICATION
-router.register(r"auth/login", LoginViewSet, basename="auth-login")
-router.register(r"auth/register", RegistrationViewSet, basename="auth-register")
-router.register(
-    r"auth/register/confirm/(?P<token>[\w\d]+)",
-    ActivateUserViewSet,
-    basename="auth-register-confirm",
-)
-router.register(r"auth/refresh", RefreshViewSet, basename="auth-refresh")
 
 # FEATURE MODEL RELATED
 # details file upload https://djangotricks.blogspot.com/2020/03/how-to-upload-a-file-using-django-rest-framework.html
@@ -48,9 +39,6 @@ router.register(r"docker", DockerProcessesViewSet, basename="docker")
 
 urlpatterns = [
     *router.urls,
-    path("bulk-upload/", BulkUploadApiView.as_view()),
-    re_path(r"files/uploaded/unconfirmed/confirm/(?P<token>[\w\d]+)", ConfirmFileUploadApiView.as_view()),
-    re_path(r"files/uploaded/unconfirmed/delete/(?P<token>[\w\d]+)", DeleteFileUploadApiView.as_view()),
     path("api-auth/", include("rest_framework.urls")),
     path("user-info/", UserInfoApiView.as_view()),
 ]
