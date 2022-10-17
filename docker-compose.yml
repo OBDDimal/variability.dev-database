@@ -22,7 +22,7 @@ services:
     ports:
       - "443:443"
       # The Web UI (enabled by --api.insecure=true)
-      - "8080:8080"
+      #- "8080:8080"
     volumes:
       # So that Traefik can listen to the Docker events
       - "./letsencrypt:/letsencrypt"
