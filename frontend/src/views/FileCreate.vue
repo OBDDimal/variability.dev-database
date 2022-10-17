@@ -545,7 +545,6 @@ export default Vue.extend({
             this.gottenFiles = this.$store.state.files;
         },
         family: function (newValue) {
-            console.log(newValue);
             this.newFamilyIsObject = false;
             if (typeof newValue == 'string') {
                 this.isNewFamily = !this.gottenFamilies
@@ -576,9 +575,9 @@ export default Vue.extend({
                 }
             }
         },
-        tags: function (newValue) {
-            console.log(newValue);
-        },
+        /*tags: function (newValue) {
+            /!*console.log(newValue);*!/
+        },*/
         allVersions: function (newValue) {
             this.versionRules = [
                 (v) => !!v || 'Version is required',
@@ -684,8 +683,8 @@ export default Vue.extend({
                     file_object['tags'] = this.tags_bulk.map((x) =>
                         parseInt(x.id)
                     );
-                    console.log('TAGS');
-                    console.log(this.tags_bulk.map((x) => x.id));
+                    /*console.log('TAGS');
+                    console.log(this.tags_bulk.map((x) => x.id));*/
                     file_object['file'] = `${i}`;
                     /*console.log('FILE (reference):')
 					console.log(`${i}`)*/
@@ -693,13 +692,13 @@ export default Vue.extend({
                     file_data.push(file_object);
                 }
                 data.append('files', JSON.stringify(file_data));
-                console.log('FILES (in total finished):');
-                console.log(JSON.stringify(file_data));
+                /*console.log('FILES (in total finished):');
+                console.log(JSON.stringify(file_data));*/
                 for (let i = 0; i < this.file_bulk.length; i++) {
                     data.append(`${i}`, this.file_bulk[i]);
                 }
-                console.log('DATA (in total finished):');
-                console.log(data);
+                /*console.log('DATA (in total finished):');
+                console.log(data);*/
                 this.uploadStatus =
                     'Uploading bulk files. This may take a while...';
                 await this.$store.dispatch('uploadBulkFeatureModels', data);
@@ -747,12 +746,12 @@ export default Vue.extend({
 					console.log(uploadedFamily.id)*/
                 }
                 file_object['tags'] = this.tags.map((x) => parseInt(x.id));
-                console.log('TAGS');
-                console.log(this.tags.map((x) => parseInt(x.id)));
+                /*console.log('TAGS');
+                console.log(this.tags.map((x) => parseInt(x.id)));*/
                 file_object['file'] = '0';
                 file_data.push(file_object);
-                console.log('FILES (in total finished):');
-                console.log(JSON.stringify(file_data));
+                /*console.log('FILES (in total finished):');
+                console.log(JSON.stringify(file_data));*/
                 data.append('files', JSON.stringify(file_data));
                 data.append('0', this.file);
                 this.uploadStatus = 'Uploading file...';
