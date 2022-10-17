@@ -8,16 +8,6 @@
         </div>
         <div class="d-flex justify-center align-center">
             <div style="width: 100%; max-width: 350px">
-                <github-button></github-button>
-                <!--				<v-btn color="#1da1f2" block class="mt-2" dark>
-					<v-icon left>mdi-twitter</v-icon>
-					Sign in with Twitter
-				</v-btn>-->
-                <div class="mt-4 d-flex justify-center align-center">
-                    <v-divider></v-divider>
-                    <span class="mx-2">OR</span>
-                    <v-divider></v-divider>
-                </div>
                 <v-form
                     ref="form"
                     v-model="valid"
@@ -62,14 +52,11 @@
 <script>
 import Vue from 'vue';
 import AuthService from '@/services/auth.service';
-import GithubButton from '@/components/SocialButtons/GithubButton';
 
 export default Vue.extend({
     name: 'Login',
 
-    components: {
-        GithubButton,
-    },
+    components: {},
 
     props: {},
 

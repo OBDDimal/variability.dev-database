@@ -30,6 +30,9 @@
                     <v-icon left> mdi-home</v-icon>
                     Home
                 </v-btn>
+                <span class="ml-6" v-if="!$store.state.loggedIn">
+                    This is a demo only, registering and login are disabled
+                </span>
                 <v-btn
                     v-if="$store.state.loggedIn && $store.state.isOnline"
                     class="mx-1"

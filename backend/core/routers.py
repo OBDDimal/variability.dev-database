@@ -22,11 +22,6 @@ router = routers.DefaultRouter()
 
 # AUTHENTICATION
 router.register(r"auth/login", LoginViewSet, basename="auth-login")
-router.register(
-    r"auth/register/confirm/(?P<token>[\w\d]+)",
-    ActivateUserViewSet,
-    basename="auth-register-confirm",
-)
 router.register(r"auth/refresh", RefreshViewSet, basename="auth-refresh")
 
 # FEATURE MODEL RELATED
@@ -41,8 +36,6 @@ router.register(
 router.register(r"tags", TagsViewSet, basename="tags")
 router.register(r"licenses", LicensesViewSet, basename="licenses")
 router.register(r"families", FamiliesViewSet, basename="families")
-router.register(r"analysis", AnalysesViewSet, basename="analysis")
-router.register(r"docker", DockerProcessesViewSet, basename="docker")
 
 
 urlpatterns = [
