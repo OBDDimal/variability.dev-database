@@ -1,4 +1,4 @@
-import json
+from json import dumps
 import os
 import io
 import zipfile
@@ -1084,11 +1084,20 @@ class BulkUploadTest(APITestCase):
                 "tags": [self.tag.id, self.other_tag.id],
             },
         ]
-        raw_data = {"files": json.dumps(files), "1": file, "2": other_file}
+        raw_data = {"files": dumps(files), "1": file, "2": other_file}
         data = encode_multipart(data=raw_data, boundary=BOUNDARY)
 
         res = self.client.post("/bulk-upload/", data, content_type=MULTIPART_CONTENT)
+        json = res.json()
         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+
+        uploaded_file_contents = open(f".{json['files'][0]['local_file']}", "rb").read()
+        self.assertEqual(uploaded_file_contents, self.file_contents)
+
+        other_uploaded_file_contents = open(
+            f".{json['files'][1]['local_file']}", "rb"
+        ).read()
+        self.assertEqual(other_uploaded_file_contents, self.other_file_contents)
 
     @override_settings(EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend")
     def test_upload_logged_in_admin(self):
@@ -1116,11 +1125,20 @@ class BulkUploadTest(APITestCase):
                 "tags": [self.tag.id, self.other_tag.id],
             },
         ]
-        raw_data = {"files": json.dumps(files), "1": file, "2": other_file}
+        raw_data = {"files": dumps(files), "1": file, "2": other_file}
         data = encode_multipart(data=raw_data, boundary=BOUNDARY)
 
         res = self.client.post("/bulk-upload/", data, content_type=MULTIPART_CONTENT)
+        json = res.json()
         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+
+        uploaded_file_contents = open(f".{json['files'][0]['local_file']}", "rb").read()
+        self.assertEqual(uploaded_file_contents, self.file_contents)
+
+        other_uploaded_file_contents = open(
+            f".{json['files'][1]['local_file']}", "rb"
+        ).read()
+        self.assertEqual(other_uploaded_file_contents, self.other_file_contents)
 
     @override_settings(EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend")
     def test_upload_logged_in_non_owner(self):
@@ -1148,10 +1166,11 @@ class BulkUploadTest(APITestCase):
                 "tags": [self.tag.id, self.other_tag.id],
             },
         ]
-        raw_data = {"files": json.dumps(files), "1": file, "2": other_file}
+        raw_data = {"files": dumps(files), "1": file, "2": other_file}
         data = encode_multipart(data=raw_data, boundary=BOUNDARY)
 
         res = self.client.post("/bulk-upload/", data, content_type=MULTIPART_CONTENT)
+        json = res.json()
         self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
 
         # Files are uploadable when logged in with non-owner if tags are public
@@ -1178,11 +1197,20 @@ class BulkUploadTest(APITestCase):
                 "tags": [self.tag.id],
             },
         ]
-        raw_data = {"files": json.dumps(files), "1": file, "2": other_file}
+        raw_data = {"files": dumps(files), "1": file, "2": other_file}
         data = encode_multipart(data=raw_data, boundary=BOUNDARY)
 
         res = self.client.post("/bulk-upload/", data, content_type=MULTIPART_CONTENT)
+        json = res.json()
         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+
+        uploaded_file_contents = open(f".{json['files'][0]['local_file']}", "rb").read()
+        self.assertEqual(uploaded_file_contents, self.file_contents)
+
+        other_uploaded_file_contents = open(
+            f".{json['files'][1]['local_file']}", "rb"
+        ).read()
+        self.assertEqual(other_uploaded_file_contents, self.other_file_contents)
 
     @override_settings(EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend")
     def test_upload_logged_out(self):
@@ -1210,10 +1238,11 @@ class BulkUploadTest(APITestCase):
                 "tags": [self.tag.id, self.other_tag.id],
             },
         ]
-        raw_data = {"files": json.dumps(files), "1": file, "2": other_file}
+        raw_data = {"files": dumps(files), "1": file, "2": other_file}
         data = encode_multipart(data=raw_data, boundary=BOUNDARY)
 
         res = self.client.post("/bulk-upload/", data, content_type=MULTIPART_CONTENT)
+        json = res.json()
         self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
 
     @override_settings(EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend")
@@ -1231,10 +1260,11 @@ class BulkUploadTest(APITestCase):
                 "tags": [self.tag.id],
             },
         ]
-        raw_data = {"files": json.dumps(files), "1": file}
+        raw_data = {"files": dumps(files), "1": file}
         data = encode_multipart(data=raw_data, boundary=BOUNDARY)
 
         res = self.client.post("/bulk-upload/", data, content_type=MULTIPART_CONTENT)
+        json = res.json()
         self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
 
 
@@ -1318,13 +1348,22 @@ class ZipUploadTest(APITestCase):
         }
 
         raw_data = {
-            "files": json.dumps(files),
+            "files": dumps(files),
             "file": ContentFile(buffer.getvalue(), "file.zip"),
         }
         data = encode_multipart(data=raw_data, boundary=BOUNDARY)
 
         res = self.client.post("/zip-upload/", data, content_type=MULTIPART_CONTENT)
+        json = res.json()
         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+
+        uploaded_file_contents = open(f".{json['files'][0]['local_file']}", "rb").read()
+        self.assertEqual(uploaded_file_contents, self.file_contents)
+
+        other_uploaded_file_contents = open(
+            f".{json['files'][1]['local_file']}", "rb"
+        ).read()
+        self.assertEqual(other_uploaded_file_contents, self.other_file_contents)
 
     @override_settings(EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend")
     def test_upload_logged_in_admin(self):
@@ -1347,13 +1386,22 @@ class ZipUploadTest(APITestCase):
         }
 
         raw_data = {
-            "files": json.dumps(files),
+            "files": dumps(files),
             "file": ContentFile(buffer.getvalue(), "file.zip"),
         }
         data = encode_multipart(data=raw_data, boundary=BOUNDARY)
 
         res = self.client.post("/zip-upload/", data, content_type=MULTIPART_CONTENT)
+        json = res.json()
         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+
+        uploaded_file_contents = open(f".{json['files'][0]['local_file']}", "rb").read()
+        self.assertEqual(uploaded_file_contents, self.file_contents)
+
+        other_uploaded_file_contents = open(
+            f".{json['files'][1]['local_file']}", "rb"
+        ).read()
+        self.assertEqual(other_uploaded_file_contents, self.other_file_contents)
 
     @override_settings(EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend")
     def test_upload_logged_in_non_owner(self):
@@ -1376,7 +1424,7 @@ class ZipUploadTest(APITestCase):
         }
 
         raw_data = {
-            "files": json.dumps(files),
+            "files": dumps(files),
             "file": ContentFile(buffer.getvalue(), "file.zip"),
         }
         data = encode_multipart(data=raw_data, boundary=BOUNDARY)
@@ -1394,13 +1442,22 @@ class ZipUploadTest(APITestCase):
         }
 
         raw_data = {
-            "files": json.dumps(files),
+            "files": dumps(files),
             "file": ContentFile(buffer.getvalue(), "file.zip"),
         }
         data = encode_multipart(data=raw_data, boundary=BOUNDARY)
 
         res = self.client.post("/zip-upload/", data, content_type=MULTIPART_CONTENT)
+        json = res.json()
         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+
+        uploaded_file_contents = open(f".{json['files'][0]['local_file']}", "rb").read()
+        self.assertEqual(uploaded_file_contents, self.file_contents)
+
+        other_uploaded_file_contents = open(
+            f".{json['files'][1]['local_file']}", "rb"
+        ).read()
+        self.assertEqual(other_uploaded_file_contents, self.other_file_contents)
 
     @override_settings(EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend")
     def test_upload_logged_out(self):
@@ -1423,7 +1480,7 @@ class ZipUploadTest(APITestCase):
         }
 
         raw_data = {
-            "files": json.dumps(files),
+            "files": dumps(files),
             "file": ContentFile(buffer.getvalue(), "file.zip"),
         }
         data = encode_multipart(data=raw_data, boundary=BOUNDARY)
@@ -1451,7 +1508,7 @@ class ZipUploadTest(APITestCase):
         }
 
         raw_data = {
-            "files": json.dumps(files),
+            "files": dumps(files),
             "file": ContentFile(buffer.getvalue(), "file.zip"),
         }
         data = encode_multipart(data=raw_data, boundary=BOUNDARY)
