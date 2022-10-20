@@ -1,10 +1,10 @@
 <template>
-    <v-dialog v-model="showDialog" persistent>
+    <v-dialog v-model="showDialog" persistent width="400">
         <div id="tutorial-dialog">
-            <svg v-if="isTop && isLeft" height="50px" width="400px">
+            <svg v-if="!isMobile && isTop && isLeft" height="50px" width="400px">
                 <polygon points="0,0 120,50 220,50" style="fill: white"/>
             </svg>
-            <svg v-if="isTop && !isLeft" height="50px" width="400px">
+            <svg v-if="!isMobile && isTop && !isLeft" height="50px" width="400px">
                 <polygon points="400,0 280,50 180,50" style="fill: white"/>
             </svg>
             <v-card v-if="step">
@@ -31,10 +31,10 @@
                     <v-btn color="primary" text @click="startTutorial">Start Tutorial</v-btn>
                 </v-card-actions>
             </v-card>
-            <svg v-if="!isTop && isLeft" height="50px" width="400px">
+            <svg v-if="!isMobile && !isTop && isLeft" height="50px" width="400px">
                 <polygon points="120,0 220,0 0,50" style="fill: white"/>
             </svg>
-            <svg v-if="!isTop && !isLeft" height="50px" width="400px">
+            <svg v-if="!isMobile && !isTop && !isLeft" height="50px" width="400px">
                 <polygon points="180,0 280,0 400,50" style="fill: white"/>
             </svg>
         </div>
@@ -114,6 +114,7 @@ export default Vue.extend({
         beforeSteps: [],
         isTop: Boolean,
         isLeft: Boolean,
+        isMobile: Boolean,
     }),
 
     props: {
@@ -133,18 +134,27 @@ export default Vue.extend({
     components: {},
 
     mounted() {
+        this.reset();
     },
 
     methods: {
         startTutorial() {
+            this.isMobile = 'ontouchstart' in window;
             this.step = this.nextSteps.shift();
-            this.setBubblePosition();
+            if (!this.isMobile) {
+                this.setBubblePosition();
+            }
         },
 
         setBubblePosition() {
+            const tutorialDialog = document.querySelector("#tutorial-dialog");
+            if (this.isMobile) {
+                tutorialDialog.style.position = "block";
+            } else {
+                tutorialDialog.style.position = "absolute";
+            }
             if (this.step.elementCssSelector) {
                 const rect = document.querySelector(this.step.elementCssSelector).getBoundingClientRect();
-                const tutorialDialog = document.querySelector("#tutorial-dialog");
                 const middleX = ((rect.left - rect.right) / 2) + rect.right;
                 const middleY = ((rect.bottom - rect.top) / 2) + rect.top;
 
@@ -174,7 +184,9 @@ export default Vue.extend({
             if (this.nextSteps.length) {
                 this.beforeSteps.unshift(this.step);
                 this.step = this.nextSteps.shift();
-                this.setBubblePosition();
+                if (!this.isMobile) {
+                    this.setBubblePosition();
+                }
             } else {
                 this.$emit('close');
                 localStorage.featureModelTutorialCompleted = true;
@@ -184,7 +196,18 @@ export default Vue.extend({
         beforeStep() {
             this.nextSteps.unshift(this.step);
             this.step = this.beforeSteps.shift();
-            this.setBubblePosition();
+            if (!this.isMobile) {
+                this.setBubblePosition();
+            }
+        },
+
+        reset() {
+            if (!this.isMobile) {
+                const tutorialDialog = document.querySelector("#tutorial-dialog");
+                tutorialDialog.style.left = 0;
+                tutorialDialog.style.top = 0;
+                tutorialDialog.style.position = "absolute"
+            }
         }
     },
 
@@ -195,10 +218,8 @@ export default Vue.extend({
                 this.beforeSteps = [];
                 this.step = undefined;
 
-                // Reset position to 0 0
-                const tutorialDialog = document.querySelector("#tutorial-dialog");
-                tutorialDialog.style.left = 0;
-                tutorialDialog.style.top = 0;
+                // Reset position to 0 0 when restarting the tutorial again
+                this.reset();
             }
         },
     },
@@ -207,7 +228,6 @@ export default Vue.extend({
 
 <style lang="scss">
 #tutorial-dialog {
-    position: absolute;
     max-width: 400px;
     transition: all .75s;
 
