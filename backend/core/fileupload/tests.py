@@ -1,5 +1,7 @@
-import json
+from json import dumps
 import os
+import io
+import zipfile
 
 from pathlib import Path
 from rest_framework import status
@@ -1082,11 +1084,20 @@ class BulkUploadTest(APITestCase):
                 "tags": [self.tag.id, self.other_tag.id],
             },
         ]
-        raw_data = {"files": json.dumps(files), "1": file, "2": other_file}
+        raw_data = {"files": dumps(files), "1": file, "2": other_file}
         data = encode_multipart(data=raw_data, boundary=BOUNDARY)
 
         res = self.client.post("/bulk-upload/", data, content_type=MULTIPART_CONTENT)
+        json = res.json()
         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+
+        uploaded_file_contents = open(f".{json['files'][0]['local_file']}", "rb").read()
+        self.assertEqual(uploaded_file_contents, self.file_contents)
+
+        other_uploaded_file_contents = open(
+            f".{json['files'][1]['local_file']}", "rb"
+        ).read()
+        self.assertEqual(other_uploaded_file_contents, self.other_file_contents)
 
     @override_settings(EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend")
     def test_upload_logged_in_admin(self):
@@ -1114,11 +1125,20 @@ class BulkUploadTest(APITestCase):
                 "tags": [self.tag.id, self.other_tag.id],
             },
         ]
-        raw_data = {"files": json.dumps(files), "1": file, "2": other_file}
+        raw_data = {"files": dumps(files), "1": file, "2": other_file}
         data = encode_multipart(data=raw_data, boundary=BOUNDARY)
 
         res = self.client.post("/bulk-upload/", data, content_type=MULTIPART_CONTENT)
+        json = res.json()
         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+
+        uploaded_file_contents = open(f".{json['files'][0]['local_file']}", "rb").read()
+        self.assertEqual(uploaded_file_contents, self.file_contents)
+
+        other_uploaded_file_contents = open(
+            f".{json['files'][1]['local_file']}", "rb"
+        ).read()
+        self.assertEqual(other_uploaded_file_contents, self.other_file_contents)
 
     @override_settings(EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend")
     def test_upload_logged_in_non_owner(self):
@@ -1146,10 +1166,11 @@ class BulkUploadTest(APITestCase):
                 "tags": [self.tag.id, self.other_tag.id],
             },
         ]
-        raw_data = {"files": json.dumps(files), "1": file, "2": other_file}
+        raw_data = {"files": dumps(files), "1": file, "2": other_file}
         data = encode_multipart(data=raw_data, boundary=BOUNDARY)
 
         res = self.client.post("/bulk-upload/", data, content_type=MULTIPART_CONTENT)
+        json = res.json()
         self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
 
         # Files are uploadable when logged in with non-owner if tags are public
@@ -1176,11 +1197,20 @@ class BulkUploadTest(APITestCase):
                 "tags": [self.tag.id],
             },
         ]
-        raw_data = {"files": json.dumps(files), "1": file, "2": other_file}
+        raw_data = {"files": dumps(files), "1": file, "2": other_file}
         data = encode_multipart(data=raw_data, boundary=BOUNDARY)
 
         res = self.client.post("/bulk-upload/", data, content_type=MULTIPART_CONTENT)
+        json = res.json()
         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+
+        uploaded_file_contents = open(f".{json['files'][0]['local_file']}", "rb").read()
+        self.assertEqual(uploaded_file_contents, self.file_contents)
+
+        other_uploaded_file_contents = open(
+            f".{json['files'][1]['local_file']}", "rb"
+        ).read()
+        self.assertEqual(other_uploaded_file_contents, self.other_file_contents)
 
     @override_settings(EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend")
     def test_upload_logged_out(self):
@@ -1208,10 +1238,11 @@ class BulkUploadTest(APITestCase):
                 "tags": [self.tag.id, self.other_tag.id],
             },
         ]
-        raw_data = {"files": json.dumps(files), "1": file, "2": other_file}
+        raw_data = {"files": dumps(files), "1": file, "2": other_file}
         data = encode_multipart(data=raw_data, boundary=BOUNDARY)
 
         res = self.client.post("/bulk-upload/", data, content_type=MULTIPART_CONTENT)
+        json = res.json()
         self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
 
     @override_settings(EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend")
@@ -1228,21 +1259,263 @@ class BulkUploadTest(APITestCase):
                 "version": self.file_version,
                 "tags": [self.tag.id],
             },
-            {
-                "description": self.other_file_description,
-                "label": self.other_file_label,
-                "file": "2",
-                "family": self.other_family.id,
-                "license": self.other_license.id,
-                "version": self.other_file_version,
-                "tags": [self.tag.id, self.other_tag.id],
-            },
         ]
-        raw_data = {"files": json.dumps(files), "1": file}
+        raw_data = {"files": dumps(files), "1": file}
         data = encode_multipart(data=raw_data, boundary=BOUNDARY)
 
         res = self.client.post("/bulk-upload/", data, content_type=MULTIPART_CONTENT)
+        json = res.json()
         self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
+
+
+class ZipUploadTest(APITestCase):
+    license_label = License._default_license
+    family_label = "Family label"
+    family_description = "Family description"
+    user_family_label = "User family label"
+    user_family_description = "User family description"
+    tag_label = "Tag label"
+    tag_description = "Tag description"
+    other_tag_label = "Other tag label"
+    other_tag_description = "Other tag description"
+
+    file_label = "File label"
+    file_description = "File description"
+    file_contents = b"""<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>
+    <featureModel>
+        <properties/>
+        <struct>
+        </struct>
+    </featureModel>"""
+
+    other_file_contents = b"""<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>
+    <featureModel>
+        <properties/>
+        <struct>
+        </struct>
+    </featureModel>"""
+
+    invalid_file_contents = b"This is not valid xml"
+
+    def setUp(self):
+        self.owner = User.objects.create_superuser(email="ow@n.er", password="asdfghj")
+        self.admin = User.objects.create_superuser(
+            email="ad@m.in", password="12345678!"
+        )
+        self.user = User.objects.create_user(email="u@s.er", password="!87654321")
+        self.license = License.objects.create(label=self.license_label)
+        self.family = Family.objects.create(
+            label=self.family_label,
+            description=self.family_description,
+            owner=self.owner,
+        )
+        self.user_family = Family.objects.create(
+            label=self.user_family_label,
+            description=self.user_family_description,
+            owner=self.user,
+        )
+        self.tag = Tag.objects.create(
+            label=self.tag_label,
+            description=self.tag_description,
+            owner=self.owner,
+            is_public=True,
+        )
+        self.other_tag = Tag.objects.create(
+            label=self.other_tag_label,
+            description=self.other_tag_description,
+            owner=self.owner,
+            is_public=False,
+        )
+
+    @override_settings(EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend")
+    def test_upload_logged_in_owner(self):
+        # Files are uploadable when logged in with owner
+        self.client.force_authenticate(self.owner)
+
+        buffer = io.BytesIO()
+
+        zip_file = zipfile.ZipFile(buffer, "a", zipfile.ZIP_DEFLATED, False)
+        zip_file.writestr("file.xml", self.file_contents)
+        zip_file.writestr("other_file.xml", self.other_file_contents)
+        zip_file.close()
+
+        files = {
+            "description": self.file_description,
+            "label": self.file_label,
+            "family": self.family.id,
+            "license": self.license.id,
+            "tags": [self.tag.id, self.other_tag.id],
+        }
+
+        raw_data = {
+            "files": dumps(files),
+            "file": ContentFile(buffer.getvalue(), "file.zip"),
+        }
+        data = encode_multipart(data=raw_data, boundary=BOUNDARY)
+
+        res = self.client.post("/zip-upload/", data, content_type=MULTIPART_CONTENT)
+        json = res.json()
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+
+        uploaded_file_contents = open(f".{json['files'][0]['local_file']}", "rb").read()
+        self.assertEqual(uploaded_file_contents, self.file_contents)
+
+        other_uploaded_file_contents = open(
+            f".{json['files'][1]['local_file']}", "rb"
+        ).read()
+        self.assertEqual(other_uploaded_file_contents, self.other_file_contents)
+
+    @override_settings(EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend")
+    def test_upload_logged_in_admin(self):
+        # Files are uploadable when logged in with admin
+        self.client.force_authenticate(self.admin)
+
+        buffer = io.BytesIO()
+
+        zip_file = zipfile.ZipFile(buffer, "a", zipfile.ZIP_DEFLATED, False)
+        zip_file.writestr("file.xml", self.file_contents)
+        zip_file.writestr("other_file.xml", self.other_file_contents)
+        zip_file.close()
+
+        files = {
+            "description": self.file_description,
+            "label": self.file_label,
+            "family": self.family.id,
+            "license": self.license.id,
+            "tags": [self.tag.id, self.other_tag.id],
+        }
+
+        raw_data = {
+            "files": dumps(files),
+            "file": ContentFile(buffer.getvalue(), "file.zip"),
+        }
+        data = encode_multipart(data=raw_data, boundary=BOUNDARY)
+
+        res = self.client.post("/zip-upload/", data, content_type=MULTIPART_CONTENT)
+        json = res.json()
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+
+        uploaded_file_contents = open(f".{json['files'][0]['local_file']}", "rb").read()
+        self.assertEqual(uploaded_file_contents, self.file_contents)
+
+        other_uploaded_file_contents = open(
+            f".{json['files'][1]['local_file']}", "rb"
+        ).read()
+        self.assertEqual(other_uploaded_file_contents, self.other_file_contents)
+
+    @override_settings(EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend")
+    def test_upload_logged_in_non_owner(self):
+        # Files are not uploadable when logged in with non-owner
+        self.client.force_authenticate(self.user)
+
+        buffer = io.BytesIO()
+
+        zip_file = zipfile.ZipFile(buffer, "a", zipfile.ZIP_DEFLATED, False)
+        zip_file.writestr("file.xml", self.file_contents)
+        zip_file.writestr("other_file.xml", self.other_file_contents)
+        zip_file.close()
+
+        files = {
+            "description": self.file_description,
+            "label": self.file_label,
+            "family": self.family.id,
+            "license": self.license.id,
+            "tags": [self.tag.id, self.other_tag.id],
+        }
+
+        raw_data = {
+            "files": dumps(files),
+            "file": ContentFile(buffer.getvalue(), "file.zip"),
+        }
+        data = encode_multipart(data=raw_data, boundary=BOUNDARY)
+
+        res = self.client.post("/zip-upload/", data, content_type=MULTIPART_CONTENT)
+        self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
+
+        # Files are uploadable when logged in with non-owner if tags are public
+        files = {
+            "description": self.file_description,
+            "label": self.file_label,
+            "family": self.user_family.id,
+            "license": self.license.id,
+            "tags": [self.tag.id],
+        }
+
+        raw_data = {
+            "files": dumps(files),
+            "file": ContentFile(buffer.getvalue(), "file.zip"),
+        }
+        data = encode_multipart(data=raw_data, boundary=BOUNDARY)
+
+        res = self.client.post("/zip-upload/", data, content_type=MULTIPART_CONTENT)
+        json = res.json()
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+
+        uploaded_file_contents = open(f".{json['files'][0]['local_file']}", "rb").read()
+        self.assertEqual(uploaded_file_contents, self.file_contents)
+
+        other_uploaded_file_contents = open(
+            f".{json['files'][1]['local_file']}", "rb"
+        ).read()
+        self.assertEqual(other_uploaded_file_contents, self.other_file_contents)
+
+    @override_settings(EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend")
+    def test_upload_logged_out(self):
+        # Files are not uploadable when logged out
+        self.client.force_authenticate(None)
+
+        buffer = io.BytesIO()
+
+        zip_file = zipfile.ZipFile(buffer, "a", zipfile.ZIP_DEFLATED, False)
+        zip_file.writestr("file.xml", self.file_contents)
+        zip_file.writestr("other_file.xml", self.other_file_contents)
+        zip_file.close()
+
+        files = {
+            "description": self.file_description,
+            "label": self.file_label,
+            "family": self.family.id,
+            "license": self.license.id,
+            "tags": [self.tag.id, self.other_tag.id],
+        }
+
+        raw_data = {
+            "files": dumps(files),
+            "file": ContentFile(buffer.getvalue(), "file.zip"),
+        }
+        data = encode_multipart(data=raw_data, boundary=BOUNDARY)
+
+        res = self.client.post("/zip-upload/", data, content_type=MULTIPART_CONTENT)
+        self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    @override_settings(EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend")
+    def test_upload_invalid_xml(self):
+        self.client.force_authenticate(self.owner)
+
+        buffer = io.BytesIO()
+
+        zip_file = zipfile.ZipFile(buffer, "a", zipfile.ZIP_DEFLATED, False)
+        zip_file.writestr("file.xml", self.invalid_file_contents)
+        zip_file.writestr("other_file.xml", self.other_file_contents)
+        zip_file.close()
+
+        files = {
+            "description": self.file_description,
+            "label": self.file_label,
+            "family": self.family.id,
+            "license": self.license.id,
+            "tags": [self.tag.id, self.other_tag.id],
+        }
+
+        raw_data = {
+            "files": dumps(files),
+            "file": ContentFile(buffer.getvalue(), "file.zip"),
+        }
+        data = encode_multipart(data=raw_data, boundary=BOUNDARY)
+
+        res = self.client.post("/zip-upload/", data, content_type=MULTIPART_CONTENT)
+        self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
+
 
 class ConfirmUploadTest(APITestCase):
     license_label = License._default_license
@@ -1270,7 +1543,6 @@ class ConfirmUploadTest(APITestCase):
         <struct>
         </struct>
     </featureModel>"""
-
 
     def setUp(self):
         self.owner = User.objects.create_superuser(email="ow@n.er", password="asdfghj")
@@ -1320,7 +1592,9 @@ class ConfirmUploadTest(APITestCase):
         res = self.client.get(f"/files/uploaded/unconfirmed/{self.other_file.id}/")
         self.assertEqual(res.status_code, status.HTTP_200_OK)
 
-        res = self.client.get(f"/files/uploaded/unconfirmed/confirm/{confirmation_token}/")
+        res = self.client.get(
+            f"/files/uploaded/unconfirmed/confirm/{confirmation_token}/"
+        )
         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
 
         res = self.client.get(f"/files/uploaded/unconfirmed/{self.file.id}/")
@@ -1341,7 +1615,9 @@ class ConfirmUploadTest(APITestCase):
         res = self.client.get(f"/files/uploaded/unconfirmed/{self.other_file.id}/")
         self.assertEqual(res.status_code, status.HTTP_200_OK)
 
-        res = self.client.get(f"/files/uploaded/unconfirmed/confirm/{confirmation_token}/")
+        res = self.client.get(
+            f"/files/uploaded/unconfirmed/confirm/{confirmation_token}/"
+        )
         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
 
         res = self.client.get(f"/files/uploaded/unconfirmed/{self.file.id}/")
@@ -1361,7 +1637,9 @@ class ConfirmUploadTest(APITestCase):
         res = self.client.get(f"/files/uploaded/unconfirmed/{self.other_file.id}/")
         self.assertEqual(res.status_code, status.HTTP_200_OK)
 
-        res = self.client.get(f"/files/uploaded/unconfirmed/confirm/{confirmation_token}/")
+        res = self.client.get(
+            f"/files/uploaded/unconfirmed/confirm/{confirmation_token}/"
+        )
         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
 
         res = self.client.get(f"/files/uploaded/unconfirmed/{self.file.id}/")
@@ -1371,6 +1649,7 @@ class ConfirmUploadTest(APITestCase):
         res = self.client.get(f"/files/{self.file.id}/")
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         res = self.client.get(f"/files/{self.other_file.id}/")
+
 
 class DeleteUploadTest(APITestCase):
     license_label = License._default_license
@@ -1398,7 +1677,6 @@ class DeleteUploadTest(APITestCase):
         <struct>
         </struct>
     </featureModel>"""
-
 
     def setUp(self):
         self.owner = User.objects.create_superuser(email="ow@n.er", password="asdfghj")
@@ -1460,7 +1738,9 @@ class DeleteUploadTest(APITestCase):
         res = self.client.get(f"/files/uploaded/unconfirmed/{self.other_file.id}/")
         self.assertEqual(res.status_code, status.HTTP_200_OK)
 
-        res = self.client.get(f"/files/uploaded/unconfirmed/delete/{confirmation_token}/")
+        res = self.client.get(
+            f"/files/uploaded/unconfirmed/delete/{confirmation_token}/"
+        )
         self.assertEqual(res.status_code, status.HTTP_204_NO_CONTENT)
 
         res = self.client.get(f"/files/uploaded/unconfirmed/{self.file.id}/")
@@ -1481,7 +1761,9 @@ class DeleteUploadTest(APITestCase):
         res = self.client.get(f"/files/uploaded/unconfirmed/{self.other_file.id}/")
         self.assertEqual(res.status_code, status.HTTP_200_OK)
 
-        res = self.client.get(f"/files/uploaded/unconfirmed/delete/{confirmation_token}/")
+        res = self.client.get(
+            f"/files/uploaded/unconfirmed/delete/{confirmation_token}/"
+        )
         self.assertEqual(res.status_code, status.HTTP_204_NO_CONTENT)
 
         res = self.client.get(f"/files/uploaded/unconfirmed/{self.file.id}/")
@@ -1502,7 +1784,9 @@ class DeleteUploadTest(APITestCase):
         res = self.client.get(f"/files/uploaded/unconfirmed/{self.other_file.id}/")
         self.assertEqual(res.status_code, status.HTTP_200_OK)
 
-        res = self.client.get(f"/files/uploaded/unconfirmed/delete/{confirmation_token}/")
+        res = self.client.get(
+            f"/files/uploaded/unconfirmed/delete/{confirmation_token}/"
+        )
         self.assertEqual(res.status_code, status.HTTP_204_NO_CONTENT)
 
         res = self.client.get(f"/files/uploaded/unconfirmed/{self.file.id}/")
@@ -1521,7 +1805,9 @@ class DeleteUploadTest(APITestCase):
         res = self.client.get(f"/files/uploaded/confirmed/{self.confirmed_file.id}/")
         self.assertEqual(res.status_code, status.HTTP_200_OK)
 
-        res = self.client.get(f"/files/uploaded/unconfirmed/delete/{self.confirmed_file.confirmation_token}/")
+        res = self.client.get(
+            f"/files/uploaded/unconfirmed/delete/{self.confirmed_file.confirmation_token}/"
+        )
         self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
 
         res = self.client.get(f"/files/uploaded/confirmed/{self.confirmed_file.id}/")
