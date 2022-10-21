@@ -429,6 +429,8 @@ export default Vue.extend({
                 this.showAddDialog = false
                 this.showEditDialog = false
             }
+
+            this.updateSvg();
         },
     },
 })
