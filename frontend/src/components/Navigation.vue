@@ -6,7 +6,13 @@
                 ($route.name === 'FeatureModel' && !isMobileLandscape)
             "
             app
-            :color="$store.state.isOnline ? 'primary' : 'error'"
+            :color="
+                !$store.state.isOnline
+                    ? 'error'
+                    : !$vuetify.theme.dark
+                    ? 'primary'
+                    : ''
+            "
             dark
             clipped-left
         >
