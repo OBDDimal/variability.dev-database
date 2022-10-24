@@ -26,15 +26,13 @@
                     </v-list-item-content>
                 </v-list-item>
 
-                <v-dialog
-                    v-model="saveDialog"
-                    persistent
-                    width="400"
-                >
+                <v-dialog v-model="saveDialog" persistent width="400">
                     <template v-slot:activator="{ on, attrs }">
                         <v-list-item v-bind="attrs" v-on="on">
                             <v-list-item-icon id="feature-model-toolbar-save">
-                                <v-icon v-if="!isSaveAvailable">mdi-content-save</v-icon>
+                                <v-icon v-if="!isSaveAvailable"
+                                    >mdi-content-save</v-icon
+                                >
                                 <v-icon v-else>mdi-content-save-edit</v-icon>
                             </v-list-item-icon>
 
@@ -47,14 +45,28 @@
                     <v-card>
                         <v-card-title>Save?</v-card-title>
                         <v-card-text>
-                            Do you really want to overwrite the feature-model currently saved in local storage?
+                            Do you really want to overwrite the feature-model
+                            currently saved in local storage?
                         </v-card-text>
                         <v-card-actions>
                             <v-spacer></v-spacer>
-                            <v-btn text @click="saveDialog = false">
+                            <v-btn
+                                text
+                                color="error"
+                                @click="saveDialog = false"
+                            >
                                 Cancel
                             </v-btn>
-                            <v-btn color="primary" text @click="() => { $emit('save'); this.saveDialog = false; }">
+                            <v-btn
+                                color="primary"
+                                text
+                                @click="
+                                    () => {
+                                        $emit('save');
+                                        this.saveDialog = false;
+                                    }
+                                "
+                            >
                                 Save
                             </v-btn>
                         </v-card-actions>
@@ -75,16 +87,14 @@
                             <v-list-item-icon>
                                 <v-icon
                                     :disabled="!isUndoAvailable || !editRights"
-                                >mdi-backup-restore
-                                </v-icon
-                                >
+                                    >mdi-backup-restore
+                                </v-icon>
                             </v-list-item-icon>
 
                             <v-list-item-content>
                                 <v-list-item-title
-                                >Discard changes
-                                </v-list-item-title
-                                >
+                                    >Discard changes
+                                </v-list-item-title>
                             </v-list-item-content>
                         </v-list-item>
                     </template>
@@ -92,7 +102,7 @@
                     <v-card>
                         <v-card-title>Discard changes?</v-card-title>
                         <v-card-text
-                        >Do you really want to discard all changes? This
+                            >Do you really want to discard all changes? This
                             action can't be undone!
                         </v-card-text>
                         <v-card-actions>
@@ -101,13 +111,11 @@
                                 color="primary"
                                 text
                                 @click="discardChangesConfirmDialog = false"
-                            >Cancel
-                            </v-btn
-                            >
+                                >Cancel
+                            </v-btn>
                             <v-btn color="primary" text @click="$emit('reset')"
-                            >Discard
-                            </v-btn
-                            >
+                                >Discard
+                            </v-btn>
                         </v-card-actions>
                     </v-card>
                 </v-dialog>
@@ -117,10 +125,11 @@
                     @click="$emit('undo')"
                 >
                     <v-list-item-icon>
-                        <v-icon :disabled="!isUndoAvailable || !editRights" id="feature-model-toolbar-undo"
-                        >mdi-undo
-                        </v-icon
-                        >
+                        <v-icon
+                            :disabled="!isUndoAvailable || !editRights"
+                            id="feature-model-toolbar-undo"
+                            >mdi-undo
+                        </v-icon>
                     </v-list-item-icon>
 
                     <v-list-item-content>
@@ -134,9 +143,8 @@
                 >
                     <v-list-item-icon>
                         <v-icon :disabled="!isRedoAvailable || !editRights"
-                        >mdi-redo
-                        </v-icon
-                        >
+                            >mdi-redo
+                        </v-icon>
                     </v-list-item-icon>
 
                     <v-list-item-content>
@@ -196,9 +204,8 @@
                         >
                             <v-list-item-content>
                                 <v-list-item-title
-                                >Fit to view
-                                </v-list-item-title
-                                >
+                                    >Fit to view
+                                </v-list-item-title>
                             </v-list-item-content>
                         </v-list-item>
                         <v-list-item
@@ -221,9 +228,8 @@
                         >
                             <v-list-item-content>
                                 <v-list-item-title
-                                >Reset view
-                                </v-list-item-title
-                                >
+                                    >Reset view
+                                </v-list-item-title>
                             </v-list-item-content>
                         </v-list-item>
                         <v-list-item
@@ -232,9 +238,8 @@
                         >
                             <v-list-item-content>
                                 <v-list-item-title
-                                >Show Constraints
-                                </v-list-item-title
-                                >
+                                    >Show Constraints
+                                </v-list-item-title>
                             </v-list-item-content>
                         </v-list-item>
                         <v-list-item>
@@ -249,9 +254,8 @@
 
                                 <v-list-item-content>
                                     <v-list-item-title
-                                    >Short Name
-                                    </v-list-item-title
-                                    >
+                                        >Short Name
+                                    </v-list-item-title>
                                 </v-list-item-content>
                             </template>
                         </v-list-item>
@@ -294,9 +298,8 @@
                 >
                     <v-list-item-icon id="feature-model-toolbar-collaboration">
                         <v-icon :disabled="collaborationStatus"
-                        >mdi-account-multiple
-                        </v-icon
-                        >
+                            >mdi-account-multiple
+                        </v-icon>
                     </v-list-item-icon>
 
                     <v-list-item-content>
@@ -317,7 +320,9 @@
                 <v-menu :close-on-content-click="false" offset-y>
                     <template v-slot:activator="{ on, attrs }">
                         <v-list-item v-bind="attrs" v-on="on">
-                            <v-list-item-icon id="feature-model-toolbar-other-settings">
+                            <v-list-item-icon
+                                id="feature-model-toolbar-other-settings"
+                            >
                                 <v-icon>mdi-dots-vertical</v-icon>
                             </v-list-item-icon>
 
@@ -336,8 +341,8 @@
                                 min="0"
                                 type="number"
                                 @change="
-									$emit('resetView', levels, maxChildren)
-								"
+                                    $emit('resetView', levels, maxChildren)
+                                "
                             ></v-text-field>
                         </v-list-item>
                         <v-subheader>Adjust Max Children</v-subheader>
@@ -349,8 +354,8 @@
                                 min="0"
                                 type="number"
                                 @change="
-									$emit('resetView', levels, maxChildren)
-								"
+                                    $emit('resetView', levels, maxChildren)
+                                "
                             ></v-text-field>
                         </v-list-item>
 
@@ -374,7 +379,7 @@
 </template>
 
 <script>
-import Vue from 'vue'
+import Vue from 'vue';
 
 export default Vue.extend({
     name: 'FeatureModelTreeToolbar',
@@ -409,35 +414,35 @@ export default Vue.extend({
 
     watch: {
         selectedColoring: function (newValue) {
-            this.$emit('coloring', newValue)
+            this.$emit('coloring', newValue);
         },
         isShortName: function (newValue) {
-            this.$emit('shortName', newValue)
+            this.$emit('shortName', newValue);
         },
         spaceBetweenParentChild: function (newValue) {
-            this.$emit('spaceBetweenParentChild', newValue)
+            this.$emit('spaceBetweenParentChild', newValue);
         },
         spaceBetweenSiblings: function (newValue) {
-            this.$emit('spaceBetweenSiblings', newValue)
+            this.$emit('spaceBetweenSiblings', newValue);
         },
         levels: function (newValue) {
-            this.$emit('levels', newValue)
+            this.$emit('levels', newValue);
         },
         maxChilds: function (newValue) {
-            this.$emit('maxChilds', newValue)
+            this.$emit('maxChilds', newValue);
         },
         semanticEditing: function (newValue) {
-            this.$emit('semanticEditing', newValue)
+            this.$emit('semanticEditing', newValue);
         },
         quickEdit: function (newValue) {
-            this.$emit('quickEdit', newValue)
-        }
+            this.$emit('quickEdit', newValue);
+        },
     },
 
     computed: {},
 
     methods: {},
-})
+});
 </script>
 
 <style scoped>
