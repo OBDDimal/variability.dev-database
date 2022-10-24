@@ -197,7 +197,6 @@ export default Vue.extend({
                 segmentsContainer: undefined,
                 featureNodesContainer: undefined,
                 dragContainer: undefined,
-                quickEditContainer: undefined,
             },
             spaceBetweenParentChild: 75,
             spaceBetweenSiblings: 20,
@@ -205,7 +204,7 @@ export default Vue.extend({
             d3AddNodeIndex: 0,
             coloringIndex: -1,
             semanticEditing: false,
-            quickEdit: true,
+            quickEdit: false,
             direction: 'v', // h = horizontally, v = vertically
             maxHorizontallyLevelWidth: [],
             featureModelTree: undefined,
@@ -430,6 +429,8 @@ export default Vue.extend({
                 this.showAddDialog = false
                 this.showEditDialog = false
             }
+
+            this.updateSvg();
         },
     },
 })

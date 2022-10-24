@@ -120,6 +120,28 @@ export default new Vuex.Store({
                     });
                 });
         },
+        async uploadZipFeatureModel({ commit }, data) {
+            await api
+                .post(`${API_URL}zip-upload/`, data, {
+                    headers: { 'Content-Type': 'multipart/form-data' },
+                })
+                .then(() => {
+                    commit('updateSnackbar', {
+                        message: 'Upload successfully! Check your mails',
+                        variant: 'success',
+                        timeout: 5000,
+                        show: true,
+                    });
+                })
+                .catch((error) => {
+                    commit('updateSnackbar', {
+                        message: 'Error: ' + error.message,
+                        variant: 'error',
+                        timeout: 5000,
+                        show: true,
+                    });
+                });
+        },
         async deleteFeatureModel({ commit }, id) {
             await api
                 .delete(`${API_URL}files/${id}/`)

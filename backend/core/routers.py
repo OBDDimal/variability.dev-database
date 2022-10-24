@@ -1,19 +1,20 @@
 from django.conf.urls.static import static
-from django.urls import path, include
+from django.urls import path, re_path, include
 from rest_framework import routers
 from core.fileupload.viewsets import (
     BulkUploadApiView,
+    ZipUploadApiView,
     FamiliesViewSet,
     FileUploadViewSet,
     TagsViewSet,
     LicensesViewSet,
     ConfirmedFileViewSet,
     UnconfirmedFileViewSet,
-    ConfirmFileUploadViewSet,
-    DeleteFileUploadViewSet,
+    ConfirmFileUploadApiView,
+    DeleteFileUploadApiView,
 )
 from core.analysis.viewsets import AnalysesViewSet, DockerProcessesViewSet
-from core.user.viewsets import ActivateUserViewSet
+from core.user.viewsets import ActivateUserViewSet, UserInfoApiView
 from core.auth.viewsets import LoginViewSet, RegistrationViewSet, RefreshViewSet
 from ddueruemweb.settings import STATIC_ROOT, STATIC_URL, MEDIA_URL, MEDIA_ROOT
 
@@ -39,16 +40,6 @@ router.register(
 router.register(
     r"files/uploaded/unconfirmed", UnconfirmedFileViewSet, basename="unconfirmed-files"
 )
-router.register(
-    r"files/uploaded/unconfirmed/confirm/(?P<token>[\w\d]+)",
-    ConfirmFileUploadViewSet,
-    basename="confirm-upload",
-)
-router.register(
-    r"files/uploaded/unconfirmed/delete/(?P<token>[\w\d]+)",
-    DeleteFileUploadViewSet,
-    basename="delete-upload",
-)
 router.register(r"tags", TagsViewSet, basename="tags")
 router.register(r"licenses", LicensesViewSet, basename="licenses")
 router.register(r"families", FamiliesViewSet, basename="families")
@@ -59,7 +50,11 @@ router.register(r"docker", DockerProcessesViewSet, basename="docker")
 urlpatterns = [
     *router.urls,
     path("bulk-upload/", BulkUploadApiView.as_view()),
+    path("zip-upload/", ZipUploadApiView.as_view()),
+    re_path(r"files/uploaded/unconfirmed/confirm/(?P<token>[\w\d]+)", ConfirmFileUploadApiView.as_view()),
+    re_path(r"files/uploaded/unconfirmed/delete/(?P<token>[\w\d]+)", DeleteFileUploadApiView.as_view()),
     path("api-auth/", include("rest_framework.urls")),
+    path("user-info/", UserInfoApiView.as_view()),
 ]
 urlpatterns += static(STATIC_URL, document_root=STATIC_ROOT)
 urlpatterns += static(MEDIA_URL, document_root=MEDIA_ROOT)

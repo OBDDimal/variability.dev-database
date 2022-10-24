@@ -2,8 +2,8 @@ from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, Permis
 from django.core.mail import send_mail
 from django.db import models
 from django.template.loader import render_to_string
-from django.utils import timezone
 from django.utils.html import strip_tags
+from django.utils.timezone import now
 
 from core.auth.tokens import encode_user_to_token
 from ddueruemweb.settings import env
@@ -82,22 +82,15 @@ class User(AbstractBaseUser, PermissionsMixin):
         verbose_name = 'user'
         verbose_name_plural = 'users'
 
-    def send_link_to_files(self, data):
+    def send_link_to_files(self, confirmation_token):
         """
         Send predefined email with link to File after successful upload.
         """
-        file_ids = list(map(lambda file: file['id'], data))
-        token = {
-            'file_id': file_ids,
-            'timestamp': str(timezone.now()),
-            'purpose': 'upload_confirm',
-        }
-
         user = self
         html_message = render_to_string('email/user_upload_email.html', {
             'user': str(user.email),
-            'confirm_link': f"{env('FRONTEND_URL')}/files/uploaded/unconfirmed/confirm/{encode_user_to_token(token)}",
-            'delete_link': f"{env('FRONTEND_URL')}/files/uploaded/unconfirmed/delete/{encode_user_to_token(token)}",
+            'confirm_link': f"{env('FRONTEND_URL')}/files/uploaded/unconfirmed/confirm/{confirmation_token}",
+            'delete_link': f"{env('FRONTEND_URL')}/files/uploaded/unconfirmed/delete/{confirmation_token}",
         })
         plain_message = strip_tags(html_message)
 
@@ -112,7 +105,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         extended_user = {
             'id': str(user.id),
             'email': str(user.email),
-            'timestamp': str(timezone.now()),
+            'timestamp': str(now()),
             'purpose': 'user_activation'
         }
         link = f"{env('FRONTEND_URL')}/register/{encode_user_to_token(extended_user)}"

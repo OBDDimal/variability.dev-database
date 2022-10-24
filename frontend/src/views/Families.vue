@@ -12,8 +12,14 @@
         >
             <template v-slot:top>
                 <v-toolbar flat>
-                    <v-toolbar-title class="hidden-sm-and-down">Families</v-toolbar-title>
-                    <v-divider class="mx-4 hidden-sm-and-down" inset vertical></v-divider>
+                    <v-toolbar-title class="hidden-sm-and-down"
+                        >Families</v-toolbar-title
+                    >
+                    <v-divider
+                        class="mx-4 hidden-sm-and-down"
+                        inset
+                        vertical
+                    ></v-divider>
                     <v-spacer class="hidden-sm-and-down"></v-spacer>
                     <v-text-field
                         v-model="search"
@@ -62,7 +68,11 @@
 
                             <v-card-actions>
                                 <v-spacer></v-spacer>
-                                <v-btn color="blue darken-1" text @click="close">
+                                <v-btn
+                                    color="blue darken-1"
+                                    text
+                                    @click="close"
+                                >
                                     Cancel
                                 </v-btn>
                                 <v-btn
@@ -103,47 +113,47 @@
 </template>
 
 <script>
-import Vue from "vue";
-import api from "@/services/api.service";
+import Vue from 'vue';
+import api from '@/services/api.service';
 
 const API_URL = process.env.VUE_APP_DOMAIN;
 
 export default Vue.extend({
-    name: "Families",
+    name: 'Families',
 
     components: {},
 
     props: {},
 
     data: () => ({
-        search: "",
+        search: '',
         dialog: false,
         editedIndex: -1,
         headers: [
             {
-                text: "ID",
-                align: "start",
+                text: 'ID',
+                align: 'start',
                 sortable: false,
-                value: "id",
+                value: 'id',
             },
-            {text: "Label", value: "label"},
-            {text: "Description", value: "description"},
-            {text: "Owner", value: "owner"},
+            { text: 'Label', value: 'label' },
+            { text: 'Description', value: 'description' },
+            { text: 'Owner', value: 'owner' },
             {
-                text: "Actions",
-                align: "center",
-                value: "actions",
+                text: 'Actions',
+                align: 'center',
+                value: 'actions',
                 sortable: false,
             },
         ],
         editedItem: {
-            label: "",
-            description: "",
+            label: '',
+            description: '',
             owner: false,
         },
         defaultItem: {
-            label: "",
-            description: "",
+            label: '',
+            description: '',
             owner: false,
         },
         families: [],
@@ -153,7 +163,9 @@ export default Vue.extend({
 
     computed: {
         formTitle() {
-            return this.editedIndex === -1 ? "Create New Family" : "Edit Family";
+            return this.editedIndex === -1
+                ? 'Create New Family'
+                : 'Edit Family';
         },
     },
 
@@ -178,22 +190,21 @@ export default Vue.extend({
 
         addFamily() {
             this.addLoading = true;
-            api
-                .post(`${API_URL}families/`, this.editedItem)
+            api.post(`${API_URL}families/`, this.editedItem)
                 .then(() => {
-                    this.$store.commit("updateSnackbar", {
-                        message: "Family added successfully!",
-                        variant: "success",
+                    this.$store.commit('updateSnackbar', {
+                        message: 'Family added successfully!',
+                        variant: 'success',
                         timeout: 5000,
                         show: true,
                     });
-                    this.$store.dispatch("fetchFamilies");
+                    this.$store.dispatch('fetchFamilies');
                     this.addLoading = false;
                 })
                 .catch((error) => {
-                    this.$store.commit("updateSnackbar", {
-                        message: "Error: " + error.message,
-                        variant: "error",
+                    this.$store.commit('updateSnackbar', {
+                        message: 'Error: ' + error.message,
+                        variant: 'error',
                         timeout: 5000,
                         show: true,
                     });
@@ -203,22 +214,21 @@ export default Vue.extend({
 
         updateFamily() {
             this.addLoading = true;
-            api
-                .put(`${API_URL}families/${this.editedIndex}/`, this.editedItem)
+            api.put(`${API_URL}families/${this.editedIndex}/`, this.editedItem)
                 .then(() => {
-                    this.$store.commit("updateSnackbar", {
-                        message: "Family updated successfully!",
-                        variant: "success",
+                    this.$store.commit('updateSnackbar', {
+                        message: 'Family updated successfully!',
+                        variant: 'success',
                         timeout: 5000,
                         show: true,
                     });
-                    this.$store.dispatch("fetchFamilies");
+                    this.$store.dispatch('fetchFamilies');
                     this.addLoading = false;
                 })
                 .catch((error) => {
-                    this.$store.commit("updateSnackbar", {
-                        message: "Error: " + error.message,
-                        variant: "error",
+                    this.$store.commit('updateSnackbar', {
+                        message: 'Error: ' + error.message,
+                        variant: 'error',
                         timeout: 5000,
                         show: true,
                     });
@@ -235,12 +245,15 @@ export default Vue.extend({
             this.close();
         },
         handleClick(value) {
-          this.$router.push({ name: 'FamilyDetail', params: { id: value.id, slug: value.slug } })
-        }
+            this.$router.push({
+                name: 'FamilyDetail',
+                params: { id: value.id, slug: value.slug },
+            });
+        },
     },
 
     mounted() {
-        if (!this.$store.state.loggedIn || !this.$store.state.currentUser) {
+        /*if (!this.$store.state.loggedIn || !this.$store.state.currentUser) {
             this.$store.commit("updateSnackbar", {
                 message: "Please log in to view this page",
                 variant: "info",
@@ -248,12 +261,12 @@ export default Vue.extend({
                 show: true,
             });
             this.$router.push("/login");
-        } else {
-            this.loading = true;
-            this.$store.dispatch("fetchFamilies");
-            this.families = this.$store.state.families;
-            this.loading = false;
-        }
+        } else {*/
+        this.loading = true;
+        this.$store.dispatch('fetchFamilies');
+        this.families = this.$store.state.families;
+        this.loading = false;
+        /*}*/
     },
 });
 </script>

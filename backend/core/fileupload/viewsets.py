@@ -1,5 +1,6 @@
 from core.analysis.models import DockerProcess, Analysis
 from core.fileupload.models import Family, Tag, License, File
+from core.fileupload.utils import generate_random_string
 from core.fileupload.serializers import (
     FilesSerializer,
     TagsSerializer,
@@ -22,6 +23,7 @@ from rest_framework.status import (
 from rest_framework import viewsets, permissions, mixins
 from rest_framework import status
 from django.core.exceptions import ObjectDoesNotExist
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.signing import BadSignature
 from django.utils.encoding import DjangoUnicodeDecodeError
 from rest_framework.response import Response
@@ -33,8 +35,12 @@ from ..auth.tokens import decode_token_to_user
 import core.fileupload.githubmirror.github_manager as gm
 from multiprocessing import Process
 from rest_framework.views import APIView
-import json
 from django.http.request import QueryDict
+
+import json
+import os
+import binascii
+import zipfile
 
 logger = logging.getLogger(__name__)
 
@@ -70,105 +76,77 @@ def anonymize_file(file, request):
     return anonymized_file
 
 
-class ConfirmFileUploadViewSet(GenericViewSet, CreateModelMixin):
+class ConfirmFileUploadApiView(APIView):
     """
     This view is called when the user tries to confirm files, via a link which contains a token.
     This token will be decoded and the files will be set to confirmed if the token is valid.
     """
-    permission_classes = [AllowAny]
-    http_method_names = ['get']
 
-    @staticmethod
-    def get(request, token):
-        try:
-            decoded_token = decode_token_to_user(token)
-            actual_request_timestamp = dateparse.parse_datetime(decoded_token.pop('timestamp'))
-            if decoded_token.pop('purpose') != 'upload_confirm':
-                raise BadSignature('Token purpose does not match!')
-            min_possible_request_timestamp = timezone.now() - timedelta(days=PASSWORD_RESET_TIMEOUT_DAYS)
-            valid = min_possible_request_timestamp <= actual_request_timestamp
-            if not valid:
-                raise BadSignature('Token expired!')
-            else:
-                file_ids = decoded_token.pop("file_id")
-                if isinstance(file_ids, int):
-                    file_ids = [file_ids]
-                files = []
-                for file_id in file_ids:
-                    file_from_db = File.objects.get(pk=file_id)
-                    if file_from_db.is_confirmed:
-                        raise BadSignature("File upload is already confirmed!")
-                    file_from_db.is_confirmed = True
-                    if not file_from_db.mirrored:
-                        if not DEBUG:
-                            # async start mirror. Details: https://docs.python.org/3/library/multiprocessing.html
-                            mirror_process = Process(
-                                target=gm.mirror_to_github, args=(file_from_db,)
-                            )
-                            mirror_process.start()
-                            file_from_db.mirrored = True
-                        else:
-                            logger.debug(" MODE: File mirror is disabled")
-                    file_from_db.save()
-                    files.append(FilesSerializer(file_from_db).data)
+    def get(self, request, token):
+        if token == "":
+            return Response(
+                {"message": "Invalid confirmation token"}, status.HTTP_404_NOT_FOUND
+            )
+
+        files = File.objects.filter(confirmation_token=token)
+
+        if files.count() == 0:
+            return Response(
+                {"message": "Invalid confirmation token"}, status.HTTP_404_NOT_FOUND
+            )
+
+        file_data = []
+
+        for file in files:
+            if file.is_confirmed:
                 return Response(
-                    {"files": files}, HTTP_200_OK
+                    {"message": "Files already confirmed"}, HTTP_403_FORBIDDEN
                 )
-        except ObjectDoesNotExist as error:
-            return Response({'message': str(error)})
-        except BadSignature as error:
-            return Response({'message': str(error)})
-        except DjangoUnicodeDecodeError as error:
-            return Response({'message': str(error)})
+            file.is_confirmed = True
+            file.save()
+            file_data.append(FilesSerializer(file).data)
 
-class DeleteFileUploadViewSet(GenericViewSet, CreateModelMixin):
+        return Response({"files": file_data}, status.HTTP_201_CREATED)
+
+
+class DeleteFileUploadApiView(APIView):
     """
     This view is called when the user tries to delete files, via a link which contains a token.
     This token will be decoded and the files will be deleted if the token is valid.
     """
 
-    permission_classes = [AllowAny]
-    http_method_names = ["get"]
+    def get(self, request, token):
+        if token == "":
+            return Response(
+                {"message": "Invalid confirmation token"}, status.HTTP_404_NOT_FOUND
+            )
 
-    @staticmethod
-    def get(request, token):
-        try:
-            decoded_token = decode_token_to_user(token)
-            actual_request_timestamp = dateparse.parse_datetime(
-                decoded_token.pop("timestamp")
+        files = File.objects.filter(confirmation_token=token)
+
+        if files.count() == 0:
+            return Response(
+                {"message": "Invalid confirmation token"}, status.HTTP_404_NOT_FOUND
             )
-            if decoded_token.pop("purpose") != "upload_confirm":
-                raise BadSignature("Token purpose does not match!")
-            min_possible_request_timestamp = timezone.now() - timedelta(
-                days=PASSWORD_RESET_TIMEOUT_DAYS
-            )
-            valid = min_possible_request_timestamp <= actual_request_timestamp
-            if not valid:
-                raise BadSignature("Token expired!")
-            else:
-                file_ids = decoded_token.pop("file_id")
-                if isinstance(file_ids, int):
-                    file_ids = [file_ids]
-                files = []
-                for file_id in file_ids:
-                    file_from_db = File.objects.get(pk=file_id)
-                    file_from_db.delete()
+
+        for file in files:
+            if file.is_confirmed:
                 return Response(
-                    {"files": []}, HTTP_200_OK
+                    {"message": "Cannot delete confirmed files"}, HTTP_403_FORBIDDEN
                 )
-        except ObjectDoesNotExist as error:
-            return Response({"message": str(error)})
-        except BadSignature as error:
-            return Response({"message": str(error)})
-        except DjangoUnicodeDecodeError as error:
-            return Response({"message": str(error)})
+            file.delete()
+
+        return Response({"files": []}, status.HTTP_204_NO_CONTENT)
 
 
-
-class FileUploadViewSet(viewsets.ModelViewSet):
+class FileUploadViewSet(
+    viewsets.GenericViewSet,
+    mixins.RetrieveModelMixin,
+    mixins.DestroyModelMixin,
+    mixins.ListModelMixin,
+):
     queryset = File.objects.all()
     serializer_class = FilesSerializer
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticatedOrReadOnly, IsOwnerOrIsAdminOrReadOnly]
 
     def list(self, request, **kwargs):
         """
@@ -188,19 +166,38 @@ class FileUploadViewSet(viewsets.ModelViewSet):
         anonymized_file = anonymize_file(serializer.data, request)
         return Response(anonymized_file)
 
-    def perform_create(self, serializer):
-        """
-        Called within the create method to serializer for creation
-        """
-        serializer.save(owner=self.request.user)
-        self.request.user.send_link_to_files([serializer.data])
+
+class UploadApiView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def check_family(self, request, family_id):
+        family = Family.objects.get(pk=family_id)
+        return family and family.owner == request.user
+
+    def check_tags(self, request, tag_ids):
+        for tag_id in tag_ids:
+            tag = Tag.objects.get(pk=tag_id)
+            if not tag:
+                return False
+            if not tag.is_public and tag.owner != request.user:
+                return False
+        return True
+
+    def check_validity(self, request, family_id, tag_ids):
+        if request.user.is_staff:
+            return True
+
+        return self.check_family(request, family_id) and self.check_tags(
+            request, tag_ids
+        )
 
 
-class BulkUploadApiView(APIView):
+class BulkUploadApiView(UploadApiView):
     def post(self, request, format=None):
         files = json.loads(request.data["files"])
 
-        uploaded = []
+        serializers = []
+        confirmation_token = generate_random_string(30)
 
         for uploaded_file in files:
             label = uploaded_file["label"]
@@ -219,15 +216,83 @@ class BulkUploadApiView(APIView):
             validated_data["family"] = family
             validated_data.setlist("tags", tags)
             validated_data["local_file"] = file
+            validated_data["confirmation_token"] = confirmation_token
 
             fs = FilesSerializer(data=validated_data)
-            fs.is_valid()
+
+            if not self.check_validity(request, family, tags):
+                return Response(
+                    {"message": "Upload not valid"}, status=status.HTTP_403_FORBIDDEN
+                )
+            if not fs.is_valid():
+                return Response(
+                    {"message": "File does not contain valid XML"},
+                    status.HTTP_403_FORBIDDEN,
+                )
+
+            serializers.append(fs)
+
+        uploaded = []
+        for fs in serializers:
             fs.save(owner=request.user)
             uploaded.append(fs.data)
 
-        request.user.send_link_to_files(uploaded)
+        request.user.send_link_to_files(confirmation_token)
 
-        return Response({"files": uploaded})
+        return Response({"files": uploaded}, status=status.HTTP_201_CREATED)
+
+
+class ZipUploadApiView(UploadApiView):
+    def post(self, request, format=None):
+        file_data = json.loads(request.data["files"])
+        label = file_data["label"]
+        description = file_data["description"]
+        license = file_data["license"]
+        family = file_data["family"]
+        tags = file_data["tags"]
+
+        if not self.check_validity(request, family, tags):
+            return Response(
+                {"message": "Upload not valid"}, status=status.HTTP_403_FORBIDDEN
+            )
+        files = zipfile.ZipFile(request.FILES["file"])
+
+        serializers = []
+        confirmation_token = generate_random_string(30)
+
+        for (i, uploaded_file) in enumerate(files.infolist()):
+            local_file = SimpleUploadedFile(
+                f"{generate_random_string(20)}.xml", files.read(uploaded_file)
+            )
+
+            validated_data = QueryDict("", mutable=True)
+            validated_data["label"] = label
+            validated_data["description"] = description
+            validated_data["license"] = license
+            validated_data["version"] = f"{i+1}.0.0"
+            validated_data["family"] = family
+            validated_data.setlist("tags", tags)
+            validated_data["local_file"] = local_file
+            validated_data["confirmation_token"] = confirmation_token
+
+            fs = FilesSerializer(data=validated_data)
+
+            if not fs.is_valid():
+                return Response(
+                    {"message": "File does not contain valid XML"},
+                    status.HTTP_403_FORBIDDEN,
+                )
+
+            serializers.append(fs)
+
+        uploaded = []
+        for fs in serializers:
+            fs.save(owner=request.user)
+            uploaded.append(fs.data)
+
+        request.user.send_link_to_files(confirmation_token)
+
+        return Response({"files": uploaded}, status=status.HTTP_201_CREATED)
 
 
 class UnconfirmedFileViewSet(
@@ -238,7 +303,7 @@ class UnconfirmedFileViewSet(
 ):
     queryset = File.objects.filter(is_confirmed=False)
     serializer_class = FilesSerializer
-    permission_classes = [permissions.IsAuthenticated, IsOwnerOrIsAdminOrReadOnly]
+    permission_classes = [IsAuthenticatedOrReadOnly, IsOwnerOrIsAdminOrReadOnly]
 
     def list(self, request, **kwargs):
         """
@@ -255,6 +320,8 @@ class UnconfirmedFileViewSet(
         instance = self.get_object()
         serializer = self.get_serializer(instance)
         anonymized_file = anonymize_file(serializer.data, request)
+        if instance.is_confirmed:
+            return Response(status=status.HTTP_404_NOT_FOUND)
         return Response(anonymized_file)
 
     def destroy(self, request, *args, **kwargs):
@@ -262,7 +329,7 @@ class UnconfirmedFileViewSet(
             file = File.objects.get(pk=kwargs["pk"])
             if file.is_confirmed:
                 return Response(
-                    {"message": "Cannot delete confirmed files."}, HTTP_403_FORBIDDEN
+                    {"message": "Cannot delete confirmed files"}, HTTP_403_FORBIDDEN
                 )
             file.delete()
         except ObjectDoesNotExist as error:
@@ -278,7 +345,7 @@ class ConfirmedFileViewSet(
 ):
     queryset = File.objects.filter(is_confirmed=True)
     serializer_class = FilesSerializer
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [IsAuthenticatedOrReadOnly, IsOwnerOrIsAdminOrReadOnly]
 
     def _get_analysis_state(self, file):
         if file["owner"]:
@@ -321,6 +388,8 @@ class ConfirmedFileViewSet(
         anonymized_file = anonymize_file(serializer.data, request)
         analysis_state = self._get_analysis_state(anonymized_file)
         anonymized_file["analysis"] = analysis_state
+        if not instance.is_confirmed:
+            return Response(status=status.HTTP_404_NOT_FOUND)
         return Response(anonymized_file)
 
 

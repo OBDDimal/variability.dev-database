@@ -18,8 +18,8 @@ class Family(models.Model):
     slug = models.SlugField(null=True)
 
     class Meta:
-        verbose_name = 'family'
-        verbose_name_plural = 'families'
+        verbose_name = "family"
+        verbose_name_plural = "families"
 
     def __str__(self):
         # do not change that
@@ -38,7 +38,9 @@ class Tag(models.Model):
     A file can be related to many tags and a single tag can be related to many files.
     """
 
-    owner = models.ForeignKey(User, on_delete=models.RESTRICT)  # TODO: Remove on_delete=CASCADE
+    owner = models.ForeignKey(
+        User, on_delete=models.RESTRICT
+    )  # TODO: Remove on_delete=CASCADE
     label = models.CharField(max_length=30, unique=False, blank=False)
     description = models.TextField(blank=True)
     is_public = models.BooleanField(default=False)
@@ -59,8 +61,8 @@ class LicenseManager(models.Manager):
         Since checking staff_required here is difficult, the serializer
         checks the permissions.
         """
-        if kwargs.get('label', None) is None:
-            raise TypeError('License label is not set')
+        if kwargs.get("label", None) is None:
+            raise TypeError("License label is not set")
         lic = self.model(**kwargs)
         lic.save()
         return lic
@@ -70,8 +72,9 @@ class License(models.Model):
     """
     Data Model for a license in the backend
     """
+
     objects = LicenseManager()
-    _default_license = 'CC BY - Mention'
+    _default_license = "CC BY - Mention"
 
     label = models.TextField(blank=False, default=_default_license)
 
@@ -88,22 +91,22 @@ class FileManager(models.Manager):
         """
         Saves a file with the given attributes to the database
         """
-        if kwargs.get('owner', None) is None:
-            raise TypeError('File owner is not set')
-        if kwargs.get('label', None) is None:
-            raise TypeError('File name is not set')
+        if kwargs.get("owner", None) is None:
+            raise TypeError("File owner is not set")
+        if kwargs.get("label", None) is None:
+            raise TypeError("File name is not set")
         if local_file is None:
-            raise TypeError('File path is not set')
-        tags = kwargs.pop('tags')
+            raise TypeError("File path is not set")
+        tags = kwargs.pop("tags")
         if tags is None:
-            raise TypeError('Tags is not set')
-        family = kwargs.get('family', None)
+            raise TypeError("Tags is not set")
+        family = kwargs.get("family", None)
         # get file from id
-        if kwargs.get('version', None) is None:
-            raise TypeError('Version is not set')
+        if kwargs.get("version", None) is None:
+            raise TypeError("Version is not set")
         # get license from id
-        if kwargs.get('license', None) is None:
-            raise TypeError('License not set!')
+        if kwargs.get("license", None) is None:
+            raise TypeError("License not set!")
         file = self.model(**kwargs)
         file.save()
         file.tags.set(tags)
@@ -124,16 +127,17 @@ class FileManager(models.Manager):
         """
         Creates a file
         """
-        return self.save_file(kwargs.pop('local_file'), **kwargs)
+        return self.save_file(kwargs.pop("local_file"), **kwargs)
 
 
 class File(models.Model):
     """
     Data Model for a file in the backend
     """
+
     objects = FileManager()
 
-    relative_upload_dir = 'files/'
+    relative_upload_dir = "files/"
 
     owner = models.ForeignKey(User, on_delete=models.RESTRICT)
     family = models.ForeignKey(Family, on_delete=models.CASCADE)
@@ -144,10 +148,17 @@ class File(models.Model):
     license = models.ForeignKey(License, on_delete=models.CASCADE)
     tags = models.ManyToManyField(Tag)
     version = models.CharField(blank=False, null=False, max_length=16)
-    transpiled_file = models.FileField(null=True, blank=True, upload_to=relative_upload_dir)
-    mirrored = models.BooleanField(default=False)  # indicates if the file was already mirrored to GitHub
-    is_confirmed = models.BooleanField(default=False)  # indicates if the user confirmed the upload
+    transpiled_file = models.FileField(
+        null=True, blank=True, upload_to=relative_upload_dir
+    )
+    mirrored = models.BooleanField(
+        default=False
+    )  # indicates if the file was already mirrored to GitHub
+    is_confirmed = models.BooleanField(
+        default=False
+    )  # indicates if the user confirmed the upload
     slug = models.SlugField(null=True)
+    confirmation_token = models.CharField(default="", max_length=255)
 
     def __str__(self):
         # do not change that

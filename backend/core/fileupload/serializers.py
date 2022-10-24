@@ -8,7 +8,7 @@ from core.analysis.serializers import AnalysesSerializer
 from rest_framework import serializers
 from django.http import QueryDict
 from transpiler.g6_transpiler import xml_to_g6
-
+from core.fileupload.utils import generate_random_string
 
 class FamiliesSerializer(serializers.ModelSerializer):
     """
@@ -84,18 +84,31 @@ class FilesSerializer(serializers.ModelSerializer):
                   'version', 'transpiled_file', 'analysis', 'slug']
         read_only_fields = ['mirrored', 'is_confirmed']
 
+    def validate(self, data):
+        """
+        Check that the uploaded file contains valid xml
+        """
+        try:
+            contents = ""
+            for line in data['local_file']:
+                contents = contents + line.decode()
+            xml_to_g6(contents, is_file_path=False)
+        except:
+            raise serializers.ValidationError("File contains invalid xml")
+        return data
+
     def create(self, validated_data):
         """
         Actually tries to create and save the internal representation into the database.
         """
-        file = File.objects.create(**validated_data)
-        data = validated_data['local_file']
-        file_content = ''
-        for line in data:
-            file_content = file_content + line.decode()
 
-        transpiled = json.dumps(xml_to_g6(file_content, is_file_path=False), indent=2)
-        file.transpiled_file = ContentFile(bytes(transpiled, encoding='utf8'), f"{file.label}_as_g6.json")
+        file = File.objects.create(**validated_data)
+        contents = ""
+        for line in validated_data['local_file']:
+            contents = contents + line.decode()
+        transpiled = json.dumps(xml_to_g6(contents, is_file_path=False), indent=2)
+        file.transpiled_file = ContentFile(bytes(transpiled, encoding='utf8'), f"{generate_random_string(20)}.json")
+        file.local_file = ContentFile(bytes(contents, encoding='utf8'), f"{generate_random_string(20)}.xml")
         file.save()
         return file
 

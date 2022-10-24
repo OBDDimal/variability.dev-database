@@ -3,28 +3,27 @@
 </template>
 
 <script>
-import Vue from "vue";
-import api from "../services/api.service";
+import Vue from 'vue';
+import api from '../services/api.service';
 
 const API_URL = process.env.VUE_APP_DOMAIN;
 
 export default Vue.extend({
-    name: "RegisterConfirmation",
+    name: 'RegisterConfirmation',
 
     components: {},
 
     props: {},
 
     data: () => ({
-        code: "",
+        code: '',
     }),
 
     computed: {},
 
     methods: {
         confirm() {
-            api
-                .get(`${API_URL}auth/register/confirm/${this.code}/`)
+            api.get(`${API_URL}auth/register/confirm/${this.code}/`)
                 .then((response) => {
                     if (response.data.user) {
                         /* Modal.fire({
@@ -34,15 +33,16 @@ export default Vue.extend({
                                     }).then(() => {
                                         window.location.replace('/login');
                                     }); */
-                        console.log("Success");
-                        this.$store.commit("updateSnackbar", {
-                            message: "Register successful!",
-                            variant: "success",
+                        this.$store.commit('updateSnackbar', {
+                            message: 'Register successful!',
+                            variant: 'success',
                             timeout: 5000,
                             show: true,
                         });
-                        this.$router.push("/");
-                    } else if (response.data.message === "User is already activated!") {
+                        this.$router.push('/');
+                    } else if (
+                        response.data.message === 'User is already activated!'
+                    ) {
                         /* Modal.fire({
                                         icon: 'warning',
                                         title: 'Warning!!',
@@ -50,14 +50,13 @@ export default Vue.extend({
                                     }).then(() => {
                                         window.location.replace('/login');
                                     }); */
-                        console.log("Unsuccess");
-                        this.$store.commit("updateSnackbar", {
-                            message: "Your code was already used!",
-                            variant: "warning",
+                        this.$store.commit('updateSnackbar', {
+                            message: 'Your code was already used!',
+                            variant: 'warning',
                             timeout: 5000,
                             show: true,
                         });
-                        this.$router.push("/");
+                        this.$router.push('/');
                     } else {
                         /* Modal.fire({
                                         icon: 'error',
@@ -66,14 +65,13 @@ export default Vue.extend({
                                     }).then(() => {
                                         window.location.replace('/login');
                                     }); */
-                        console.log("Unsuccess2");
-                        this.$store.commit("updateSnackbar", {
-                            message: "Your code is not valid",
-                            variant: "error",
+                        this.$store.commit('updateSnackbar', {
+                            message: 'Your code is not valid',
+                            variant: 'error',
                             timeout: 5000,
                             show: true,
                         });
-                        this.$router.push("/");
+                        this.$router.push('/');
                     }
                 })
                 .catch(() => {
@@ -84,14 +82,13 @@ export default Vue.extend({
                               }).then(() => {
                                   window.location.replace('/login');
                               }); */
-                    console.log("Unsuccess3");
-                    this.$store.commit("updateSnackbar", {
-                        message: "Your code is not valid",
-                        variant: "error",
+                    this.$store.commit('updateSnackbar', {
+                        message: 'Your code is not valid',
+                        variant: 'error',
                         timeout: 5000,
                         show: true,
                     });
-                    window.location.replace("/");
+                    window.location.replace('/');
                 });
         },
     },

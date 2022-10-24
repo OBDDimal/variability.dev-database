@@ -400,7 +400,7 @@ export default Vue.extend({
         itemsColoring: ['Count', 'Direct Children', 'Total Children'],
         isShortName: false,
         semanticEditing: false,
-        quickEdit: true,
+        quickEdit: false,
         drawer: false,
         miniSidebar: true,
         discardChangesConfirmDialog: false,

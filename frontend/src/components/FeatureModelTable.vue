@@ -319,9 +319,7 @@ export default Vue.extend({
                 params: { id: value.id, slug: value.slug },
             });
         },
-        setHovered() {
-            console.log('hi');
-        },
+        setHovered() {},
         /*showAnalysis(item) {
       this.editedIndex = this.featureModels.indexOf(item);
       this.editedItem = Object.assign({}, item);
