@@ -194,7 +194,18 @@ class UploadApiView(APIView):
 
 class BulkUploadApiView(UploadApiView):
     def post(self, request, format=None):
-        files = json.loads(request.data["files"])
+        if not request.data["files"]:
+            return Response(
+                    {"files": "This field may not be blank."},
+                    status.HTTP_400_BAD_REQUEST,
+                )
+        try:
+            files = json.loads(request.data["files"])
+        except:
+            return Response(
+                    {"files": "This field must contain JSON."},
+                    status.HTTP_400_BAD_REQUEST,
+                )
 
         serializers = []
         confirmation_token = generate_random_string(30)
@@ -244,7 +255,19 @@ class BulkUploadApiView(UploadApiView):
 
 class ZipUploadApiView(UploadApiView):
     def post(self, request, format=None):
-        file_data = json.loads(request.data["files"])
+        if not request.data["files"]:
+            return Response(
+                    {"files": "This field may not be blank."},
+                    status.HTTP_400_BAD_REQUEST,
+                )
+        try:
+            file_data = json.loads(request.data["files"])
+        except:
+            return Response(
+                    {"files": "This field must contain JSON."},
+                    status.HTTP_400_BAD_REQUEST,
+                )
+
         label = file_data["label"]
         description = file_data["description"]
         license = file_data["license"]
