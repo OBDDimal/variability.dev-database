@@ -6,11 +6,8 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.test import TestCase, Client
 from django.utils import timezone
 
-from core.fileupload.models import Tag
-from core.fileupload.models import Family
-from core.fileupload.models import File
-from core.fileupload.models import License
-from core.user.models import User
+from core.fileupload.models import Tag, Family, File, License
+from core.user.models import User, EmailSendTask, run_tasks
 from ddueruemweb.settings import PASSWORD_RESET_TIMEOUT_DAYS
 from core.jobs.hourly.check_user_activation_period_expired import Job as InactiveUserJob
 
@@ -106,8 +103,11 @@ class UserModelTests(TestCase):
         user = User.objects.create_user(email=expected_receiver_email, password=expected_pw)
         self.assertEqual(user.email, expected_receiver_email)
         user._email_user(subject=expected_subject, message=expected_message, from_email=expected_sender_email)
-        sleep(5)
+        # run_tasks is usually executed regularly by a background process, but we have to run it manually during tests
+        run_tasks()
         self.assertEqual(len(mail.outbox), 1)
+        self.assertEqual(len(EmailSendTask.objects.all()), 0)
+
         self.assertEqual(mail.outbox[0].from_email, expected_sender_email)
         self.assertEqual(mail.outbox[0].to, [expected_receiver_email])
         self.assertEqual(mail.outbox[0].subject, expected_subject)
