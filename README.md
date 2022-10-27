@@ -34,6 +34,12 @@ python manage.py runjobs hourly
 ```
 Details, see: [django-extensions docu for job scheduling](https://django-extensions.readthedocs.io/en/latest/jobs_scheduling.html#create-a-job)
 
+Note that emails (both for the confirmation of new user accounts as well as the confirmation of file uploads) are sent using runjobs. You should thus add
+```
+python manage.py runjobs minutely
+```
+as a cron job.
+
 #### Start the backend
 ```
 python manage.py runserver
