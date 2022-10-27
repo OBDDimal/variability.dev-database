@@ -70,7 +70,7 @@ export default Vue.extend({
         check1: false,
         check2: false,
         check3: false,
-        loading: false,
+        loading: true,
         info: '',
     }),
 
@@ -86,6 +86,12 @@ export default Vue.extend({
     watch: {
         dialog(val) {
             val || this.close();
+        },
+
+        '$store.state.files': function (newVal) {
+            if (newVal !== []) {
+                this.loading = false;
+            }
         },
     },
 
@@ -108,14 +114,13 @@ export default Vue.extend({
         },
     },
 
-    mounted() {
+    async mounted() {
         this.loading = true;
-        this.$store.dispatch('fetchFamilies');
+        await this.$store.dispatch('fetchFamilies');
         this.families = this.$store.state.families;
-        this.$store.dispatch('fetchTags');
+        await this.$store.dispatch('fetchTags');
         this.tags = this.$store.state.tags;
-        this.$store.dispatch('fetchFiles');
-        this.loading = false;
+        await this.$store.dispatch('fetchFiles');
     },
 });
 </script>

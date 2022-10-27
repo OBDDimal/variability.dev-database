@@ -11,7 +11,7 @@
             <span v-else>{{ family.label }}</span>
         </h3>
         <h5 class="text-h5 mb-4">Details and more information</h5>
-        <v-row justify="space-between" ref="barview">
+        <v-row justify="center" ref="barview">
             <v-col cols="12" sm="6" md="3">
                 <div v-if="$vuetify.breakpoint.mdAndUp">
                     <v-sheet
@@ -27,12 +27,12 @@
                             type="card"
                         ></v-skeleton-loader>
                     </v-sheet>
-                    <bar-chart
+                    <line-chart
                         v-else
                         chartId="featureChart"
-                        :data="numberOfFeaturesData"
+                        :chart-data="numberOfFeaturesData"
                         @hovered-element="onElementHover"
-                    ></bar-chart>
+                    ></line-chart>
                 </div>
                 <v-expansion-panels v-else>
                     <v-expansion-panel>
@@ -55,12 +55,12 @@
                                     type="card"
                                 ></v-skeleton-loader>
                             </v-sheet>
-                            <bar-chart
+                            <line-chart
                                 v-else
                                 chartId="featureChart"
-                                :data="numberOfFeaturesData"
+                                :chart-data="numberOfFeaturesData"
                                 @hovered-element="onElementHover"
-                            ></bar-chart>
+                            ></line-chart>
                         </v-expansion-panel-content>
                     </v-expansion-panel>
                 </v-expansion-panels>
@@ -80,12 +80,12 @@
                             type="card"
                         ></v-skeleton-loader>
                     </v-sheet>
-                    <bar-chart
+                    <line-chart
                         v-else
                         chartId="constraintChart"
-                        :data="numberOfConstraintsData"
+                        :chart-data="numberOfConstraintsData"
                         @hovered-element="onElementHover"
-                    ></bar-chart>
+                    ></line-chart>
                 </div>
                 <v-expansion-panels v-else>
                     <v-expansion-panel>
@@ -108,12 +108,12 @@
                                     type="card"
                                 ></v-skeleton-loader>
                             </v-sheet>
-                            <bar-chart
+                            <line-chart
                                 v-else
                                 chartId="featureChart"
-                                :data="numberOfConstraintsData"
+                                :chart-data="numberOfConstraintsData"
                                 @hovered-element="onElementHover"
-                            ></bar-chart>
+                            ></line-chart>
                         </v-expansion-panel-content>
                     </v-expansion-panel>
                 </v-expansion-panels>
@@ -121,6 +121,7 @@
             <v-col cols="12" sm="6" md="3">
                 <div v-if="$vuetify.breakpoint.mdAndUp">
                     <v-sheet
+                        v-if="loadingTable"
                         :color="`grey ${
                             $vuetify.theme.dark ? 'darken-2' : 'lighten-4'
                         }`"
@@ -132,12 +133,21 @@
                             type="card"
                         ></v-skeleton-loader>
                     </v-sheet>
+                    <line-chart
+                        v-else
+                        chartId="configurationsChart"
+                        :chart-data="numberOfConfigurationsData"
+                        @hovered-element="onElementHover"
+                    ></line-chart>
                 </div>
                 <v-expansion-panels v-else>
                     <v-expansion-panel>
-                        <v-expansion-panel-header>tba</v-expansion-panel-header>
+                        <v-expansion-panel-header>
+                            Number of Configurations
+                        </v-expansion-panel-header>
                         <v-expansion-panel-content>
                             <v-sheet
+                                v-if="loadingTable"
                                 :color="`grey ${
                                     $vuetify.theme.dark
                                         ? 'darken-2'
@@ -151,47 +161,53 @@
                                     type="card"
                                 ></v-skeleton-loader>
                             </v-sheet>
+                            <line-chart
+                                v-else
+                                chartId="configurationsChart"
+                                :chart-data="numberOfConfigurationsData"
+                                @hovered-element="onElementHover"
+                            ></line-chart>
                         </v-expansion-panel-content>
                     </v-expansion-panel>
                 </v-expansion-panels>
             </v-col>
-            <v-col cols="12" sm="6" md="3">
-                <div v-if="$vuetify.breakpoint.mdAndUp">
-                    <v-sheet
-                        :color="`grey ${
-                            $vuetify.theme.dark ? 'darken-2' : 'lighten-4'
-                        }`"
-                        class="pa-3"
-                    >
-                        <v-skeleton-loader
-                            class="mx-auto"
-                            max-width="300"
-                            type="card"
-                        ></v-skeleton-loader>
-                    </v-sheet>
-                </div>
-                <v-expansion-panels v-else>
-                    <v-expansion-panel>
-                        <v-expansion-panel-header>tba</v-expansion-panel-header>
-                        <v-expansion-panel-content>
-                            <v-sheet
-                                :color="`grey ${
-                                    $vuetify.theme.dark
-                                        ? 'darken-2'
-                                        : 'lighten-4'
-                                }`"
-                                class="pa-3"
-                            >
-                                <v-skeleton-loader
-                                    class="mx-auto"
-                                    max-width="300"
-                                    type="card"
-                                ></v-skeleton-loader>
-                            </v-sheet>
-                        </v-expansion-panel-content>
-                    </v-expansion-panel>
-                </v-expansion-panels>
-            </v-col>
+            <!--            <v-col cols="12" sm="6" md="3">
+							<div v-if="$vuetify.breakpoint.mdAndUp">
+								<v-sheet
+									:color="`grey ${
+										$vuetify.theme.dark ? 'darken-2' : 'lighten-4'
+									}`"
+									class="pa-3"
+								>
+									<v-skeleton-loader
+										class="mx-auto"
+										max-width="300"
+										type="card"
+									></v-skeleton-loader>
+								</v-sheet>
+							</div>
+							<v-expansion-panels v-else>
+								<v-expansion-panel>
+									<v-expansion-panel-header>tba</v-expansion-panel-header>
+									<v-expansion-panel-content>
+										<v-sheet
+											:color="`grey ${
+												$vuetify.theme.dark
+													? 'darken-2'
+													: 'lighten-4'
+											}`"
+											class="pa-3"
+										>
+											<v-skeleton-loader
+												class="mx-auto"
+												max-width="300"
+												type="card"
+											></v-skeleton-loader>
+										</v-sheet>
+									</v-expansion-panel-content>
+								</v-expansion-panel>
+							</v-expansion-panels>
+						</v-col>-->
         </v-row>
         <div class="mt-5">
             <feature-model-table
@@ -210,7 +226,8 @@
 import Vue from 'vue';
 import api from '@/services/api.service';
 import FeatureModelTable from '@/components/FeatureModelTable';
-import BarChart from '@/components/Charts/BarChart';
+import LineChart from '@/components/Charts/LineChart';
+import { busyBoxConfigs } from '@/assets/busyBoxAnalyzeExample';
 
 const API_URL = process.env.VUE_APP_DOMAIN;
 
@@ -219,7 +236,7 @@ export default Vue.extend({
 
     components: {
         FeatureModelTable,
-        BarChart,
+        LineChart,
     },
 
     props: {},
@@ -236,12 +253,14 @@ export default Vue.extend({
             labels: [],
             datasets: [],
         },
+        numberOfConfigurationsData: {
+            labels: [],
+            datasets: [],
+        },
     }),
 
     async mounted() {
-        console.log(this.family);
         await this.getFamily();
-        console.log(this.family);
         await this.fetchFeatureModelOfFamily();
     },
 
@@ -260,33 +279,44 @@ export default Vue.extend({
                 });
         },
         async fetchFeatureModelOfFamily() {
-            console.log('hitted');
             await api
                 .get(
                     `${API_URL}files/uploaded/confirmed/?family=${this.family.id}`
                 )
                 .then(async (response) => {
-                    this.files = response.data.map((elem) => ({
+                    const sorted = response.data.sort((a, b) =>
+                        parseInt(a.version, 10) > parseInt(b.version, 10)
+                            ? 1
+                            : parseInt(b.version, 10) > parseInt(a.version, 10)
+                            ? -1
+                            : 0
+                    );
+                    this.files = sorted.map((elem) => ({
                         ...elem,
                         active: false,
                     }));
-                    const labels = response.data.map((elem) => elem.version);
+                    const labels = sorted.map((elem) => elem.version);
                     this.numberOfFeaturesData.labels = labels;
                     this.numberOfConstraintsData.labels = labels;
+                    this.numberOfConfigurationsData.labels = labels;
                     let data = [];
                     let dataConstraints = [];
-                    for (let i = 0; i < response.data.length; i++) {
-                        const elem = response.data[i];
+                    let dataConfigurations = [];
+                    for (let i = 0; i < sorted.length; i++) {
+                        const elem = sorted[i];
                         const res = await this.getNumbersFromFile(
-                            elem.local_file
+                            elem.local_file,
+                            sorted[i].label
                         );
                         data.push(res.amountFeatures);
                         dataConstraints.push(res.amountConstraints);
+                        dataConfigurations.push(res.amountConfigurations);
                     }
                     this.numberOfFeaturesData.datasets = [
                         {
                             label: 'Number of Features',
-                            backgroundColor: 'green',
+                            borderColor: 'green',
+                            fill: false,
                             data,
                         },
                     ];
@@ -294,18 +324,24 @@ export default Vue.extend({
                     this.numberOfConstraintsData.datasets = [
                         {
                             label: 'Number of Constraints',
-                            backgroundColor: 'blue',
+                            borderColor: 'blue',
+                            fill: false,
                             data: dataConstraints,
                         },
                     ];
-                    console.log('feat');
-                    console.log(this.numberOfFeaturesData);
-                    console.log('constr');
-                    console.log(this.numberOfConstraintsData);
+
+                    this.numberOfConfigurationsData.datasets = [
+                        {
+                            label: 'Number of Configurations (log 10)',
+                            borderColor: 'red',
+                            fill: false,
+                            data: dataConfigurations,
+                        },
+                    ];
                     this.loadingTable = false;
                 });
         },
-        async getNumbersFromFile(path) {
+        async getNumbersFromFile(path, label) {
             return await api
                 .get(`${API_URL.slice(0, -1)}${path}`)
                 .then((response) => {
@@ -319,6 +355,9 @@ export default Vue.extend({
                             xmlDocument.getElementsByTagName('feature').length,
                         amountConstraints:
                             xmlDocument.getElementsByTagName('rule').length,
+                        amountConfigurations: Math.log10(
+                            busyBoxConfigs.find(({ name }) => name === label).mc
+                        ),
                     };
                     return result;
                 });

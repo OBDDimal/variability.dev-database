@@ -1,13 +1,13 @@
-import {FeatureNode} from "@/classes/FeatureNode";
-import {Constraint} from "@/classes/Constraint";
-import {FeatureNodeConstraintItem} from "@/classes/Constraint/FeatureNodeConstraintItem";
-import {Disjunction} from "@/classes/Constraint/Disjunction";
-import {Conjunction} from "@/classes/Constraint/Conjunction";
-import {Implication} from "@/classes/Constraint/Implication";
-import {Negation} from "@/classes/Constraint/Negation";
+import { FeatureNode } from '@/classes/FeatureNode';
+import { Constraint } from '@/classes/Constraint';
+import { FeatureNodeConstraintItem } from '@/classes/Constraint/FeatureNodeConstraintItem';
+import { Disjunction } from '@/classes/Constraint/Disjunction';
+import { Conjunction } from '@/classes/Constraint/Conjunction';
+import { Implication } from '@/classes/Constraint/Implication';
+import { Negation } from '@/classes/Constraint/Negation';
 
 export function xmlToJson(currentModel, data) {
-    const start = performance.now();
+    /*const start = performance.now();*/
 
     // To remove the <?xml...?> line
     let m = currentModel.split('\n').splice(1).join('\n');
@@ -25,12 +25,15 @@ export function xmlToJson(currentModel, data) {
     data.calculations = getCalculations(calculationsSection);
 
     data.rootNode = getChildrenOfFeature(struct, null, data)[0];
-    data.constraints = readConstraints([...constraintsContainer.childNodes], data);
+    data.constraints = readConstraints(
+        [...constraintsContainer.childNodes],
+        data
+    );
     data.properties = getProperties(propertiesSection);
     data.comments = getComments(commentsSection);
     data.featureOrder = getFeatureOrder(featureOrderSection);
 
-    console.log('Parsertime', performance.now() - start);
+    /*console.log('Parsertime', performance.now() - start);*/
 }
 
 function getChildrenOfFeature(struct, parent, data) {
@@ -44,7 +47,7 @@ function getChildrenOfFeature(struct, parent, data) {
                 child.getAttribute('name'),
                 child.tagName,
                 child.getAttribute('mandatory') === 'true',
-                child.getAttribute('abstract') === 'true',
+                child.getAttribute('abstract') === 'true'
             );
             toAppend.children = getChildrenOfFeature(child, toAppend, data);
 
@@ -62,13 +65,17 @@ function readConstraints(constraints, data) {
         .map((rule) => {
             return [...rule.childNodes]
                 .filter((item) => item.tagName)
-                .map((item) => new Constraint(readConstraintItem(item, data)))[0];
+                .map(
+                    (item) => new Constraint(readConstraintItem(item, data))
+                )[0];
         });
 }
 
 function readConstraintItem(item, data) {
     if (item.tagName === 'var') {
-        return new FeatureNodeConstraintItem(data.featureMap[item.innerHTML.trim()]);
+        return new FeatureNodeConstraintItem(
+            data.featureMap[item.innerHTML.trim()]
+        );
     } else {
         const childItems = [...item.childNodes]
             .filter((childItem) => childItem.tagName)
@@ -131,7 +138,8 @@ export function jsonToXML(data) {
     let xml = `<?xml version="1.0" encoding="UTF-8" standalone="no"?><featureModel>`;
 
     xml += `<properties>${data.properties.reduce(
-        (prev, prop) => prev + `<${prop.tag} key="${prop.key}" value="${prop.value}"/>`,
+        (prev, prop) =>
+            prev + `<${prop.tag} key="${prop.key}" value="${prop.value}"/>`,
         ''
     )}</properties>`;
 
@@ -139,7 +147,7 @@ export function jsonToXML(data) {
 
     xml += `<constraints>${data.constraints.reduce(
         (prev, constraint) => `${prev}<rule>${constraint.toStringXML()}</rule>`,
-        '',
+        ''
     )}</constraints>`;
 
     if (data.calculations) {
@@ -152,7 +160,9 @@ export function jsonToXML(data) {
                     />`;
     }
 
-    xml += `<comments>${data.comments.map((comment) => "<c>" + comment + "</c>").join(' ')}</comments>`;
+    xml += `<comments>${data.comments
+        .map((comment) => '<c>' + comment + '</c>')
+        .join(' ')}</comments>`;
 
     if (data.featureOrder) {
         xml += `<featureOrder
@@ -170,27 +180,29 @@ export function downloadXML(data) {
 
     const filename = 'featureModel.xml';
     const pom = document.createElement('a');
-    const bb = new Blob([xml], {type: 'application/xml'});
+    const bb = new Blob([xml], { type: 'application/xml' });
 
     pom.setAttribute('href', window.URL.createObjectURL(bb));
     pom.setAttribute('download', filename);
 
-    pom.dataset.downloadurl = ['application/xml', pom.download, pom.href].join(':');
+    pom.dataset.downloadurl = ['application/xml', pom.download, pom.href].join(
+        ':'
+    );
 
     pom.click();
 }
 
 function nodeToXML(node) {
     if (node.isLeaf()) {
-        return `<feature ${node.isAbstract ? 'abstract="true" ' : ''}${node.isMandatory ? 'mandatory="true" ' : ''}name="${
-            node.name
-        }"/>`;
-    } else {
-        let toReturn = `<${node.groupType} ${node.isAbstract ? 'abstract="true" ' : ''}${
+        return `<feature ${node.isAbstract ? 'abstract="true" ' : ''}${
             node.isMandatory ? 'mandatory="true" ' : ''
-        }name="${node.name}">`;
+        }name="${node.name}"/>`;
+    } else {
+        let toReturn = `<${node.groupType} ${
+            node.isAbstract ? 'abstract="true" ' : ''
+        }${node.isMandatory ? 'mandatory="true" ' : ''}name="${node.name}">`;
 
-        node.children.forEach(childNode => {
+        node.children.forEach((childNode) => {
             toReturn += nodeToXML(childNode);
         });
 

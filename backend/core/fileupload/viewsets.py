@@ -23,6 +23,7 @@ from rest_framework.status import (
 from rest_framework import viewsets, permissions, mixins
 from rest_framework import status
 from django.core.exceptions import ObjectDoesNotExist
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.signing import BadSignature
 from django.utils.encoding import DjangoUnicodeDecodeError
 from rest_framework.response import Response
@@ -39,6 +40,7 @@ from django.http.request import QueryDict
 import json
 import os
 import binascii
+import zipfile
 
 logger = logging.getLogger(__name__)
 
@@ -165,7 +167,7 @@ class FileUploadViewSet(
         return Response(anonymized_file)
 
 
-class BulkUploadApiView(APIView):
+class UploadApiView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def check_family(self, request, family_id):
@@ -189,6 +191,8 @@ class BulkUploadApiView(APIView):
             request, tag_ids
         )
 
+
+class BulkUploadApiView(UploadApiView):
     def post(self, request, format=None):
         files = json.loads(request.data["files"])
 
@@ -220,6 +224,59 @@ class BulkUploadApiView(APIView):
                 return Response(
                     {"message": "Upload not valid"}, status=status.HTTP_403_FORBIDDEN
                 )
+            if not fs.is_valid():
+                return Response(
+                    {"message": "File does not contain valid XML"},
+                    status.HTTP_403_FORBIDDEN,
+                )
+
+            serializers.append(fs)
+
+        uploaded = []
+        for fs in serializers:
+            fs.save(owner=request.user)
+            uploaded.append(fs.data)
+
+        request.user.send_link_to_files(confirmation_token)
+
+        return Response({"files": uploaded}, status=status.HTTP_201_CREATED)
+
+
+class ZipUploadApiView(UploadApiView):
+    def post(self, request, format=None):
+        file_data = json.loads(request.data["files"])
+        label = file_data["label"]
+        description = file_data["description"]
+        license = file_data["license"]
+        family = file_data["family"]
+        tags = file_data["tags"]
+
+        if not self.check_validity(request, family, tags):
+            return Response(
+                {"message": "Upload not valid"}, status=status.HTTP_403_FORBIDDEN
+            )
+        files = zipfile.ZipFile(request.FILES["file"])
+
+        serializers = []
+        confirmation_token = generate_random_string(30)
+
+        for (i, uploaded_file) in enumerate(files.infolist()):
+            local_file = SimpleUploadedFile(
+                f"{generate_random_string(20)}.xml", files.read(uploaded_file)
+            )
+
+            validated_data = QueryDict("", mutable=True)
+            validated_data["label"] = label
+            validated_data["description"] = description
+            validated_data["license"] = license
+            validated_data["version"] = f"{i+1}.0.0"
+            validated_data["family"] = family
+            validated_data.setlist("tags", tags)
+            validated_data["local_file"] = local_file
+            validated_data["confirmation_token"] = confirmation_token
+
+            fs = FilesSerializer(data=validated_data)
+
             if not fs.is_valid():
                 return Response(
                     {"message": "File does not contain valid XML"},
