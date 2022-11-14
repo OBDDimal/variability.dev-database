@@ -15,6 +15,7 @@ import GithubConfirm from '../views/GithubConfirm.vue'
 import RegisterConfirmation from '../views/RegisterConfirmation.vue'
 import FileCreateConfirmation from '@/views/FileCreateConfirmation'
 import FeatureModel from '../views/FeatureModel.vue'
+import FeatureModelConfiguration from "@/views/FeatureModelConfiguration";
 
 Vue.use(VueRouter)
 
@@ -155,6 +156,15 @@ const routes = [
 		component: FileDetail,
 		meta: {
 			title: 'File Detail',
+		},
+	},
+	{
+		path: '/configurations/:id',
+		name: 'Configuration',
+		props: true,
+		component: FeatureModelConfiguration,
+		meta: {
+			title: 'Feature Model Configuration',
 		},
 	},
 ]
