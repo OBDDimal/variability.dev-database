@@ -168,3 +168,10 @@ class File(models.Model):
         if not self.slug:
             self.slug = slugify(self.label)
         return super().save(*args, **kwargs)
+
+class Analysis(models.Model):
+    admin_only = models.BooleanField(default=False)
+    disabled = models.BooleanField(default=False)
+    query = models.TextField()
+    
+    depends_on = models.ManyToManyField("self", symmetrical=False)
