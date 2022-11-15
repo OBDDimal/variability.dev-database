@@ -175,3 +175,11 @@ class Analysis(models.Model):
     query = models.TextField()
     
     depends_on = models.ManyToManyField("self", symmetrical=False)
+
+class AnalysisResult(models.Model):
+    triggered = models.BooleanField(default=False)
+    error = models.BooleanField(default=False)
+    result = models.JSONField(null=True)
+    
+    analysis = models.ForeignKey(Analysis, on_delete=models.CASCADE)
+    file = models.ForeignKey(File, on_delete=models.CASCADE)
