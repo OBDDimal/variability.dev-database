@@ -6,7 +6,9 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.test import TestCase, Client
 from django.utils import timezone
 
-from core.fileupload.models import Tag, Family, File, License
+from core.fileupload.models import Tag, Family, File, License, Analysis, AnalysisResult
+from django.core.files.base import ContentFile
+from core.fileupload.utils import get_triggerable_analyses
 from core.user.models import User, EmailSendTask, run_tasks
 from ddueruemweb.settings import PASSWORD_RESET_TIMEOUT_DAYS
 from core.jobs.hourly.check_user_activation_period_expired import Job as InactiveUserJob
@@ -14,7 +16,7 @@ from core.jobs.hourly.check_user_activation_period_expired import Job as Inactiv
 
 # ####################### MODEL TESTS #######################
 # details, see https://docs.djangoproject.com/en/3.2/topics/testing/overview/
-# When tests interactive with db use  import django.test.TestCase rather than unittest.TestCase
+# When tests interact with the database use `import django.test.TestCase` rather than `unittest.TestCase`
 class UserModelTests(TestCase):
     """
     Tests for User and UserManager methods
@@ -193,6 +195,86 @@ class UserModelTests(TestCase):
         user.date_joined = date_joined
         user.save()
         pass
+
+
+class AnalysisTests(TestCase):
+    license_label = License._default_license
+    family_label = "Family label"
+    family_description = "Family description"
+    tag_label = "Tag label"
+    tag_description = "Tag description"
+    other_tag_label = "Other tag label"
+
+    file_label = "File label"
+    file_description = "File description"
+    file_version = "1.0.0"
+    file_content = b"""<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>
+    <featureModel>
+        <properties/>
+        <struct>
+        </struct>
+    </featureModel>"""
+
+    def setUp(self):
+        self.owner = User.objects.create_superuser(email="ow@n.er", password="asdfghj")
+        self.license = License.objects.create(label=self.license_label)
+        self.family = Family.objects.create(
+            label=self.family_label,
+            description=self.family_description,
+            owner=self.owner,
+        )
+        self.tag = Tag.objects.create(
+            label=self.tag_label,
+            description=self.tag_description,
+            owner=self.owner,
+            is_public=True,
+        )
+        self.file = File.objects.create(
+            owner=self.owner,
+            label=self.file_label,
+            description=self.file_description,
+            tags=[self.tag],
+            version=self.file_version,
+            license=self.license,
+            local_file=ContentFile(self.file_content, "file.xml"),
+            family=self.family,
+        )
+
+
+    def test_get_triggerable_analyses(self):
+        first_analysis = Analysis()
+        first_analysis.save()
+        first_analysis_result = AnalysisResult(file_id=self.file.id, analysis_id=first_analysis.id, result="\{\}")
+        first_analysis_result.save()
+
+        second_analysis = Analysis()
+        second_analysis.save()
+        second_analysis_result = AnalysisResult(file_id=self.file.id, analysis_id=second_analysis.id,  result="\{\}")
+        second_analysis_result.save()
+
+        third_analysis = Analysis()
+        third_analysis.save()
+        third_analysis.depends_on.add(first_analysis)
+        third_analysis.depends_on.add(second_analysis)
+        third_analysis_result = AnalysisResult(file_id=self.file.id, analysis_id=third_analysis.id)
+        third_analysis_result.save()
+
+        fourth_analysis = Analysis()
+        fourth_analysis.save()
+        fourth_analysis.depends_on.add(third_analysis)
+        fourth_analysis_result = AnalysisResult(file_id=self.file.id, analysis_id=fourth_analysis.id)
+        fourth_analysis_result.save()
+
+        fifth_analysis = Analysis()
+        fifth_analysis.save()
+        fifth_analysis.depends_on.add(first_analysis)
+        fifth_analysis.depends_on.add(second_analysis)
+        fifth_analysis.depends_on.add(third_analysis)
+        fifth_analysis_result = AnalysisResult(file_id=self.file.id, analysis_id=fifth_analysis.id)
+        fifth_analysis_result.save()
+
+        for analysis_results in get_triggerable_analyses():
+            self.assertIn(analysis_results.id, [first_analysis_result.id, second_analysis_result.id, third_analysis.id])
 
 
 # ####################### SINGLE ADMIN PANEL TESTS #######################

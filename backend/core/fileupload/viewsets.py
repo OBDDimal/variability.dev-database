@@ -1,5 +1,5 @@
-from core.analysis.models import DockerProcess, Analysis
-from core.fileupload.models import Family, Tag, License, File
+# from core.analysis.models import DockerProcess, Analysis
+from core.fileupload.models import Family, Tag, License, File, Analysis, AnalysisResult
 from core.fileupload.utils import generate_random_string
 from core.fileupload.serializers import (
     FilesSerializer,
@@ -191,6 +191,11 @@ class UploadApiView(APIView):
             request, tag_ids
         )
 
+    def schedule_analysis(self, fs):
+        for analysis in Analysis.objects.filter(disabled=False, admin_only=False):
+            analysis_result = AnalysisResult(analysis_id=analysis.id, file_id=fs.id)
+            analysis_result.save()
+
 
 class BulkUploadApiView(UploadApiView):
     def post(self, request, format=None):
@@ -246,6 +251,7 @@ class BulkUploadApiView(UploadApiView):
         uploaded = []
         for fs in serializers:
             fs.save(owner=request.user)
+            self.schedule_analysis(fs)
             uploaded.append(fs.data)
 
         request.user.send_link_to_files(confirmation_token)
@@ -400,8 +406,8 @@ class ConfirmedFileViewSet(
         anonymized_files = []
         for file in files:
             anonymized_file = anonymize_file(file, request)
-            analysis_state = self._get_analysis_state(anonymized_file)
-            anonymized_file["analysis"] = analysis_state
+            # analysis_state = self._get_analysis_state(anonymized_file)
+            # anonymized_file["analysis"] = analysis_state
             anonymized_files.append(anonymized_file)
         return Response(anonymized_files)
 
@@ -409,8 +415,8 @@ class ConfirmedFileViewSet(
         instance = self.get_object()
         serializer = self.get_serializer(instance)
         anonymized_file = anonymize_file(serializer.data, request)
-        analysis_state = self._get_analysis_state(anonymized_file)
-        anonymized_file["analysis"] = analysis_state
+        # analysis_state = self._get_analysis_state(anonymized_file)
+        # anonymized_file["analysis"] = analysis_state
         if not instance.is_confirmed:
             return Response(status=status.HTTP_404_NOT_FOUND)
         return Response(anonymized_file)
