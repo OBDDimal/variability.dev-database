@@ -22,7 +22,7 @@
         "peerjs": "^1.4.7",
         "qrcode.vue": "^1.7.0",
         "register-service-worker": "^1.7.2",
-        "serve": "^14.0.1",
+        "serve": "^14.1.1",
         "unique-names-generator": "^4.7.1",
         "prettier": "^2.7.1",
         "vue": "^2.6.11",
