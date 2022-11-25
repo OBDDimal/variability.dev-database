@@ -127,7 +127,7 @@ function updateQuickEditActions(d3Data, featureNodeUpdate) {
         .select('g.quick-edit-actions-container')
         .selectAll('g.quick-edit-actions')
         .data(
-            (d) => (d3Data.quickEdit ? [d] : []),
+            (d) => (d3Data.quickEdit && d3Data.featureModelTree.editRights ? [d] : []),
             (d) => d.data.id
         );
 
