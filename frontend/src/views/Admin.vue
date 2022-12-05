@@ -4,102 +4,171 @@
         <h5 class="text-h5 mb-4">
             Here you can add new analyses for your Feature Models
         </h5>
-        <v-dialog v-model="dialog" max-width="500px">
-            <template v-slot:activator="{ on, attrs }">
+
+        <v-data-table
+            :headers="headers"
+            :items="$store.state.analysis"
+            :loading="loading"
+            :search="search"
+            class="elevation-1"
+        >
+            <template v-slot:top>
+                <v-toolbar flat>
+                    <v-toolbar-title class="hidden-sm-and-down"
+                        >Analysis</v-toolbar-title
+                    >
+                    <v-divider
+                        class="mx-4 hidden-sm-and-down"
+                        inset
+                        vertical
+                    ></v-divider>
+                    <v-spacer class="hidden-sm-and-down"></v-spacer>
+                    <v-text-field
+                        v-model="search"
+                        append-icon="mdi-magnify"
+                        hide-details
+                        label="Search"
+                        single-line
+                    >
+                    </v-text-field>
+                    <v-dialog v-model="dialog" max-width="500px">
+                        <template v-slot:activator="{ on, attrs }">
+                            <v-btn
+                                class="mb-2 ml-4"
+                                color="primary"
+                                dark
+                                rounded
+                                v-bind="attrs"
+                                v-on="on"
+                            >
+                                <v-icon left> mdi-plus</v-icon>
+                                New Analysis
+                            </v-btn>
+                        </template>
+                        <v-card>
+                            <v-card-title>
+                                <span class="text-h5">Create New Analysis</span>
+                            </v-card-title>
+
+                            <v-card-text>
+                                <v-container>
+                                    <v-row>
+                                        <v-col cols="12">
+                                            <v-text-field
+                                                v-model="editedItem.name"
+                                                label="Name"
+                                            ></v-text-field>
+                                        </v-col>
+                                        <v-col cols="12">
+                                            <v-text-field
+                                                v-model="editedItem.query"
+                                                label="Query"
+                                            >
+                                            </v-text-field>
+                                        </v-col>
+                                        <v-col cols="12">
+                                            <v-checkbox
+                                                v-model="editedItem.admin_only"
+                                                label="Admin Only"
+                                            ></v-checkbox>
+                                        </v-col>
+                                        <v-col cols="12">
+                                            <v-checkbox
+                                                v-model="editedItem.disabled"
+                                                label="Disabled"
+                                            ></v-checkbox>
+                                        </v-col>
+                                    </v-row>
+                                </v-container>
+                            </v-card-text>
+
+                            <v-card-actions>
+                                <v-spacer></v-spacer>
+                                <v-btn
+                                    color="blue darken-1"
+                                    text
+                                    @click="close"
+                                >
+                                    Cancel
+                                </v-btn>
+                                <v-btn
+                                    :loading="addLoading"
+                                    color="blue darken-1"
+                                    text
+                                    @click="save"
+                                >
+                                    Save
+                                </v-btn>
+                            </v-card-actions>
+                        </v-card>
+                    </v-dialog>
+                    <v-dialog v-model="dialogDelete" max-width="500px">
+                        <v-card>
+                            <v-card-title class="text-h5"
+                                >Are you sure you want to delete this analysis?
+                            </v-card-title>
+                            <v-card-actions>
+                                <v-spacer></v-spacer>
+                                <v-btn color="primary" text @click="closeDelete"
+                                    >Cancel</v-btn
+                                >
+                                <v-spacer></v-spacer>
+                                <v-btn
+                                    :loading="removeLoading"
+                                    color="primary"
+                                    text
+                                    @click="deleteItemConfirm"
+                                    >Delete
+                                </v-btn>
+                                <v-spacer></v-spacer>
+                            </v-card-actions>
+                        </v-card>
+                    </v-dialog>
+                </v-toolbar>
+            </template>
+            <template v-slot:item.actions="{ item }">
                 <v-btn
-                    class="mb-2 ml-4"
-                    color="primary"
-                    dark
+                    class="mr-2"
+                    color="error"
                     rounded
-                    v-bind="attrs"
-                    v-on="on"
+                    small
+                    @click="deleteItem(item)"
                 >
-                    <v-icon left> mdi-plus</v-icon>
-                    New Analysis
+                    <v-icon>mdi-delete</v-icon>
                 </v-btn>
             </template>
-            <v-card>
-                <v-card-title>
-                    <span class="text-h5">Create New Analysis</span>
-                </v-card-title>
-
-                <v-card-text>
-                    <v-container>
-                        <v-row>
-                            <v-col cols="12">
-                                <v-text-field
-                                    v-model="editedItem.name"
-                                    label="Name"
-                                ></v-text-field>
-                            </v-col>
-                            <v-col cols="12">
-                                <v-text-field
-                                    v-model="editedItem.query"
-                                    label="Query"
-                                >
-                                </v-text-field>
-                            </v-col>
-                            <v-col cols="12">
-                                <v-checkbox
-                                    v-model="editedItem.admin_only"
-                                    label="Admin Only"
-                                ></v-checkbox>
-                            </v-col>
-                            <v-col cols="12">
-                                <v-checkbox
-                                    v-model="editedItem.disabled"
-                                    label="Disabled"
-                                ></v-checkbox>
-                            </v-col>
-                        </v-row>
-                    </v-container>
-                </v-card-text>
-
-                <v-card-actions>
-                    <v-spacer></v-spacer>
-                    <v-btn
-                        color="blue darken-1"
-                        text
-                        @click="close"
-                    >
-                        Cancel
-                    </v-btn>
-                    <v-btn
-                        :loading="addLoading"
-                        color="blue darken-1"
-                        text
-                        @click="save"
-                    >
-                        Save
-                    </v-btn>
-                </v-card-actions>
-            </v-card>
-        </v-dialog>
-        <v-list>
-                <v-list-item>
-                    <Analysis />
-                </v-list-item>
-                <v-list-item>
-                    <Analysis />
-                </v-list-item>
-                <v-list-item>
-                    <Analysis />
-                </v-list-item>
-            </v-list>
+            <template v-slot:item.admin_only="{ item }">
+                <v-icon v-if="item.admin_only" color="success">
+                    mdi-check</v-icon
+                >
+                <v-icon v-else color="error"> mdi-cancel</v-icon>
+            </template>
+            <template v-slot:item.disabled="{ item }">
+                <v-icon v-if="item.disabled" color="success">
+                    mdi-check</v-icon
+                >
+                <v-icon v-else color="error"> mdi-cancel</v-icon>
+            </template>
+            <template v-slot:item.date_created="{ item }">
+                {{ new Date(item.date_created).toLocaleString('en-US') }}
+            </template>
+            <template v-slot:item.id="{ index }">
+                {{ index + 1 }}
+            </template>
+        </v-data-table>
     </div>
 </template>
 
 <script>
 import Vue from 'vue';
 import api from '@/services/api.service';
-import Analysis from '@/components/Analysis.vue'
 
 const API_URL = process.env.VUE_APP_DOMAIN;
 
 export default Vue.extend({
     name: 'Admin',
 
-    components: {Analysis},
+    components: {},
 
     props: {},
 
@@ -115,10 +184,10 @@ export default Vue.extend({
                 sortable: false,
                 value: 'id',
             },
-            { text: 'Label', value: 'label' },
-            { text: 'Description', value: 'description' },
-            { text: 'Owner', value: 'owner' },
-            { text: 'Public', value: 'is_public' },
+            { text: 'Name', value: 'name' },
+            { text: 'Query', value: 'query' },
+            { text: 'Admin Only', value: 'admin_only' },
+            { text: 'Disabled', value: 'disabled' },
             { text: 'Date Created', value: 'date_created' },
             {
                 text: 'Actions',
@@ -140,7 +209,7 @@ export default Vue.extend({
             disabled: false,
         },
         editedID: -1,
-        tags: [],
+        analysis: [],
         loading: false,
         addLoading: false,
         removeLoading: false,
@@ -159,6 +228,39 @@ export default Vue.extend({
     },
 
     methods: {
+        deleteItem(item) {
+            this.editedIndex = this.analysis.indexOf(item);
+            this.editedItem = Object.assign({}, item);
+            this.editedID = item.id;
+            this.dialogDelete = true;
+        },
+
+        deleteItemConfirm() {
+            this.removeLoading = true;
+
+            api.delete(`${API_URL}analysis/${this.editedID}/`)
+                .then(() => {
+                    this.$store.commit('updateSnackbar', {
+                        message: 'Analysis deleted successfully!',
+                        variant: 'success',
+                        timeout: 5000,
+                        show: true,
+                    });
+                    this.$store.dispatch('fetchAnalysis');
+                    this.removeLoading = false;
+                })
+                .catch((error) => {
+                    this.$store.commit('updateSnackbar', {
+                        message: 'Error: ' + error.message,
+                        variant: 'error',
+                        timeout: 5000,
+                        show: true,
+                    });
+                    this.removeLoading = false;
+                });
+            this.closeDelete();
+        },
+
         close() {
             this.dialog = false;
             this.$nextTick(() => {
@@ -166,18 +268,26 @@ export default Vue.extend({
                 this.editedIndex = -1;
             });
         },
+        closeDelete() {
+            this.dialogDelete = false;
+            this.$nextTick(() => {
+                this.editedItem = Object.assign({}, this.defaultItem);
+                this.editedIndex = -1;
+                this.editedID = -1;
+            });
+        },
 
-        addTag() {
+        addAnalysis() {
             this.addLoading = true;
-            api.post(`${API_URL}tags/`, this.editedItem)
+            api.post(`${API_URL}analysis/`, this.editedItem)
                 .then(() => {
                     this.$store.commit('updateSnackbar', {
-                        message: 'Tag added successfully!',
+                        message: 'Analysis added successfully!',
                         variant: 'success',
                         timeout: 5000,
                         show: true,
                     });
-                    this.$store.dispatch('fetchTags');
+                    this.$store.dispatch('fetchAnalysis');
                     this.addLoading = false;
                 })
                 .catch((error) => {
@@ -197,7 +307,7 @@ export default Vue.extend({
                 //this.addTag();
                 //UPDATE call to service
             } else {
-                this.addTag();
+                this.addAnalysis();
             }
             // TODO: call a service to push new tag / edited tag to the server
             this.close();
@@ -215,8 +325,8 @@ export default Vue.extend({
             this.$router.push('/login');
         } else {
             this.loading = true;
-            this.$store.dispatch('fetchTags');
-            this.tags = this.$store.state.tags;
+            this.$store.dispatch('fetchAnalysis');
+            this.analysis = this.$store.state.analysis;
             this.loading = false;
         }
     },
