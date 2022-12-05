@@ -72,6 +72,16 @@
                     <v-icon left> mdi-human-male-female-child</v-icon>
                     Families
                 </v-btn>
+                <!-- TODO: add isAdmin check --> 
+                <v-btn
+                    v-if="$store.state.loggedIn && $store.state.isOnline"
+                    class="mx-1"
+                    text
+                    to="/admin"
+                >
+                    <v-icon left> mdi-chart-histogram</v-icon>
+                    Admin
+                </v-btn>
             </div>
             <v-spacer></v-spacer>
             <div class="hidden-md-and-up">
@@ -222,6 +232,17 @@
                         <v-icon left> mdi-human-male-female-child</v-icon>
                     </v-list-item-icon>
                     Families
+                </v-list-item>
+                <!-- TODO: add isAdmin check --> 
+                <v-list-item
+                    v-if="$store.state.loggedIn && $store.state.isOnline"   
+                    link
+                    to="/admin"
+                >
+                    <v-list-item-icon>
+                        <v-icon left> mdi-chart-histogram</v-icon>
+                    </v-list-item-icon>
+                    Admin
                 </v-list-item>
             </v-list>
             <v-divider></v-divider>
