@@ -210,35 +210,71 @@
                         class="d-flex justify-center flex-column align-center my-3"
                     >
                         <span>Analyses Progress:</span>
-                        <v-row class="pa-0" no-gutters style="width: 100%">
-                            <v-col
-                                :style="`width: ${percentageOne}%!important`"
+                        <div class="pa-0" style="width: 100%">
+                            <div
+                                :style="`width: ${getStati.success.percentage}%!important`"
+                                class="d-inline-block"
                             >
-                                <v-progress-linear
-                                    height="15"
-                                    value="100"
-                                    color="green"
-                                />
-                            </v-col>
-                            <v-col
-                                :style="`width: ${percentageTwo}%!important`"
+                                <v-tooltip bottom>
+                                    <template v-slot:activator="{ on, attrs }">
+                                        <v-progress-linear
+                                            height="15"
+                                            value="100"
+                                            color="green"
+                                            v-bind="attrs"
+                                            v-on="on"
+                                        />
+                                    </template>
+                                    <span>
+                                        Success:
+                                        {{ getStati.success.absolute }} /
+                                        {{ getStati.amount }}
+                                    </span>
+                                </v-tooltip>
+                            </div>
+                            <div
+                                :style="`width: ${getStati.error.percentage}%!important`"
+                                class="d-inline-block"
                             >
-                                <v-progress-linear
-                                    height="15"
-                                    value="100"
-                                    color="blue"
-                                />
-                            </v-col>
-                            <v-col
-                                :style="`width: ${percentageTwo}%!important`"
+                                <v-tooltip bottom>
+                                    <template v-slot:activator="{ on, attrs }">
+                                        <v-progress-linear
+                                            height="15"
+                                            value="100"
+                                            color="error"
+                                            v-bind="attrs"
+                                            v-on="on"
+                                        />
+                                    </template>
+                                    <span>
+                                        Error:
+                                        {{ getStati.error.absolute }} /
+                                        {{ getStati.amount }}
+                                    </span>
+                                </v-tooltip>
+                            </div>
+                            <div
+                                :style="`width: ${getStati.progress.percentage}%!important`"
+                                class="d-inline-block"
                             >
-                                <v-progress-linear
-                                    height="15"
-                                    value="100"
-                                    color="error"
-                                />
-                            </v-col>
-                        </v-row>
+                                <v-tooltip bottom>
+                                    <template v-slot:activator="{ on, attrs }">
+                                        <v-progress-linear
+                                            height="15"
+                                            value="100"
+                                            color="primary"
+                                            v-bind="attrs"
+                                            v-on="on"
+                                        />
+                                    </template>
+                                    <span>
+                                        In progress:
+                                        {{ getStati.progress.absolute }} /
+                                        {{ getStati.amount }}
+                                    </span>
+                                </v-tooltip>
+                            </div>
+                        </div>
                     </div>
                     <v-data-table
                         :headers="headersAnalysis"
@@ -352,13 +388,13 @@ export default Vue.extend({
                 id: 1,
                 name: 'first analysis',
                 query: 'count nodes',
-                status: 1,
+                status: 0,
             },
             {
                 id: 2,
                 name: 'complex analysis',
                 query: 'calculate purpose of life --force',
-                status: 0,
+                status: 1,
             },
             {
                 id: 42,
@@ -376,7 +412,51 @@ export default Vue.extend({
         //await this.fetchFeatureModelOfFamily(this.family.id)
     },
 
-    computed: {},
+    computed: {
+        getStati() {
+            /*function compute(amount) {
+                return (
+                    (this.itemsAnalysis.filter((obj) => obj.status === amount)
+                        .length /
+                        this.itemsAnalysis.length) *
+                    100
+                );
+            }*/
+            return {
+                success: {
+                    percentage:
+                        (this.itemsAnalysis.filter((obj) => obj.status === 1)
+                            .length /
+                            this.itemsAnalysis.length) *
+                        100,
+                    absolute: this.itemsAnalysis.filter(
+                        (obj) => obj.status === 1
+                    ).length,
+                },
+                error: {
+                    percentage:
+                        (this.itemsAnalysis.filter((obj) => obj.status === -1)
+                            .length /
+                            this.itemsAnalysis.length) *
+                        100,
+                    absolute: this.itemsAnalysis.filter(
+                        (obj) => obj.status === -1
+                    ).length,
+                },
+                progress: {
+                    percentage:
+                        (this.itemsAnalysis.filter((obj) => obj.status === 0)
+                            .length /
+                            this.itemsAnalysis.length) *
+                        100,
+                    absolute: this.itemsAnalysis.filter(
+                        (obj) => obj.status === 0
+                    ).length,
+                },
+                amount: this.itemsAnalysis.length,
+            };
+        },
+    },
 
     methods: {
         async getFile() {
