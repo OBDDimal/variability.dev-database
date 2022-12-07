@@ -51,49 +51,47 @@
                             </v-card-title>
 
                             <v-card-text>
-                                <v-container>
-                                    <v-row>
-                                        <v-col cols="12">
-                                            <v-text-field
-                                                v-model="editedItem.name"
-                                                label="Name"
-                                            ></v-text-field>
-                                        </v-col>
-                                        <v-col cols="12">
-                                            <v-text-field
-                                                v-model="editedItem.query"
-                                                label="Query"
-                                            >
-                                            </v-text-field>
-                                        </v-col>
-                                        <v-col cols="12">
-                                            <v-checkbox
-                                                v-model="editedItem.admin_only"
-                                                label="Admin Only"
-                                            ></v-checkbox>
-                                        </v-col>
-                                        <v-col cols="12">
-                                            <v-checkbox
-                                                v-model="editedItem.disabled"
-                                                label="Disabled"
-                                            ></v-checkbox>
-                                        </v-col>
-                                    </v-row>
-                                </v-container>
+                                <v-row>
+                                    <v-col cols="12">
+                                        <v-text-field
+                                            v-model="editedItem.name"
+                                            label="Name"
+                                            hide-details
+                                        ></v-text-field>
+                                    </v-col>
+                                    <v-col cols="12">
+                                        <v-text-field
+                                            v-model="editedItem.query"
+                                            label="Query"
+                                            hide-details
+                                        >
+                                        </v-text-field>
+                                    </v-col>
+                                    <v-col cols="12">
+                                        <v-checkbox
+                                            v-model="editedItem.admin_only"
+                                            label="Admin Only"
+                                            hide-details
+                                        ></v-checkbox>
+                                    </v-col>
+                                    <v-col cols="12">
+                                        <v-checkbox
+                                            v-model="editedItem.disabled"
+                                            label="Disabled"
+                                            hide-details
+                                        ></v-checkbox>
+                                    </v-col>
+                                </v-row>
                             </v-card-text>
 
                             <v-card-actions>
                                 <v-spacer></v-spacer>
-                                <v-btn
-                                    color="blue darken-1"
-                                    text
-                                    @click="close"
-                                >
+                                <v-btn color="error" text @click="close">
                                     Cancel
                                 </v-btn>
                                 <v-btn
                                     :loading="addLoading"
-                                    color="blue darken-1"
+                                    color="primary"
                                     text
                                     @click="save"
                                 >
@@ -144,9 +142,7 @@
                 <v-icon v-else color="error"> mdi-cancel</v-icon>
             </template>
             <template v-slot:item.disabled="{ item }">
-                <v-icon v-if="item.disabled" color="success">
-                    mdi-check</v-icon
-                >
+                <v-icon v-if="item.disabled" color="success"> mdi-check</v-icon>
                 <v-icon v-else color="error"> mdi-cancel</v-icon>
             </template>
             <template v-slot:item.date_created="{ item }">
@@ -215,8 +211,7 @@ export default Vue.extend({
         removeLoading: false,
     }),
 
-    computed: {
-    },
+    computed: {},
 
     watch: {
         dialog(val) {
