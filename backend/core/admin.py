@@ -1,5 +1,4 @@
 from core.fileupload.models import Family, License, Tag, File
-from core.analysis.models import Analysis, DockerProcess
 from core.user.forms import AdminUserChangeForm, AdminUserCreationForm
 from core.user.models import User
 from django.contrib import admin
@@ -154,39 +153,9 @@ class FileAdmin(ModelAdmin):
         return _boolean_icon(True) if file.is_confirmed else f"{delta.days}d{hour}h{minute:02}m{second:02}s"
 
 
-class AnalysisAdmin(ModelAdmin):
-    """
-    Class for defining the backend Analysis admin panel.
-    """
-    model = Analysis
-    list_display = ('id', 'order', 'process')
-    fieldsets = [
-        (None, {'fields': ['process', 'order', 'report']}),
-    ]
-    search_fields = ('id', 'process')
-    ordering = ('id',)
-    filter_horizontal = ()
-
-
-class DockerProcessAdmin(ModelAdmin):
-    """
-    Class for defining the backend DockerProcess admin panel.
-    """
-    model = DockerProcess
-    list_display = ('id', 'working', 'owner', 'library')
-    fieldsets = [
-        (None, {'fields': ['owner', 'working', 'file_to_analyse', 'resources', 'library']}),
-    ]
-    search_fields = ('id', 'owner', 'library')
-    ordering = ('id',)
-    filter_horizontal = ()
-
-
 # Register your models here.
 admin.site.register(License, LicenseAdmin)
 admin.site.register(User, UserAdmin)
 admin.site.register(Family, FamilyAdmin)
 admin.site.register(Tag, TagAdmin)
 admin.site.register(File, FileAdmin)
-admin.site.register(Analysis, AnalysisAdmin)
-admin.site.register(DockerProcess, DockerProcessAdmin)

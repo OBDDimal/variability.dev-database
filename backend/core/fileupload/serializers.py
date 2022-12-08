@@ -3,8 +3,6 @@ import json
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.files.base import ContentFile
 from core.fileupload.models import Family, Tag, License, File
-from core.analysis.models import DockerProcess, Analysis
-from core.analysis.serializers import AnalysesSerializer
 from rest_framework import serializers
 from django.http import QueryDict
 from transpiler.g6_transpiler import xml_to_g6
@@ -52,36 +50,12 @@ class FilesSerializer(serializers.ModelSerializer):
     tags = TagsSerializer(many=True)
     family = FamiliesSerializer()
     license = LicensesSerializer()
-    analysis = serializers.SerializerMethodField(method_name='get_analysis_state')
     # version = 'self'
-
-    def get_analysis_state(self, file):
-        """
-        Return Analysis belonging to this file or None
-        """
-        if not file:
-            return None
-        if not file.is_confirmed:
-            return None
-        dp = None
-        try:
-            dp = DockerProcess.objects.filter(file_to_analyse=file).get()
-        except ObjectDoesNotExist:
-            return None
-        analysis = None
-        try:
-            analysis = Analysis.objects.filter(process=dp).get()
-        except ObjectDoesNotExist:
-            return None
-        if dp is None or analysis is None:
-            return None
-        else:
-            return AnalysesSerializer(analysis).data
 
     class Meta:
         model = File
         fields = ['id', 'label', 'description', 'local_file', 'family', 'license', 'tags', 'owner', 'uploaded_at',
-                  'version', 'transpiled_file', 'analysis', 'slug']
+                  'version', 'transpiled_file', 'slug']
         read_only_fields = ['mirrored', 'is_confirmed']
 
     def validate(self, data):

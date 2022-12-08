@@ -1,4 +1,3 @@
-# from core.analysis.models import DockerProcess, Analysis
 from core.fileupload.models import Family, Tag, License, File, Analysis, AnalysisResult
 from core.fileupload.utils import generate_random_string
 from core.fileupload.serializers import (
@@ -376,23 +375,6 @@ class ConfirmedFileViewSet(
     serializer_class = FilesSerializer
     permission_classes = [IsAuthenticatedOrReadOnly, IsOwnerOrIsAdminOrReadOnly]
 
-    def _get_analysis_state(self, file):
-        if file["owner"]:
-            if DockerProcess.objects.filter(file_to_analyse_id=file["id"]).exists():
-                docker_process = DockerProcess.objects.get(
-                    file_to_analyse_id=file["id"]
-                )
-                if Analysis.objects.filter(process=docker_process):
-                    return "Analyzed"
-                elif docker_process.working:
-                    return "Working"
-                else:
-                    return "Queued"
-            else:
-                return "Not started"
-
-        return "Permission denied"
-
     def list(self, request, **kwargs):
         """
         Replace email address of file owner with True or False,
@@ -406,8 +388,6 @@ class ConfirmedFileViewSet(
         anonymized_files = []
         for file in files:
             anonymized_file = anonymize_file(file, request)
-            # analysis_state = self._get_analysis_state(anonymized_file)
-            # anonymized_file["analysis"] = analysis_state
             anonymized_files.append(anonymized_file)
         return Response(anonymized_files)
 
@@ -415,8 +395,6 @@ class ConfirmedFileViewSet(
         instance = self.get_object()
         serializer = self.get_serializer(instance)
         anonymized_file = anonymize_file(serializer.data, request)
-        # analysis_state = self._get_analysis_state(anonymized_file)
-        # anonymized_file["analysis"] = analysis_state
         if not instance.is_confirmed:
             return Response(status=status.HTTP_404_NOT_FOUND)
         return Response(anonymized_file)

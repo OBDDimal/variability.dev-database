@@ -13,7 +13,6 @@ from core.fileupload.viewsets import (
     ConfirmFileUploadApiView,
     DeleteFileUploadApiView,
 )
-from core.analysis.viewsets import AnalysesViewSet, DockerProcessesViewSet
 from core.user.viewsets import ActivateUserViewSet, UserInfoApiView
 from core.auth.viewsets import LoginViewSet, RegistrationViewSet, RefreshViewSet
 from ddueruemweb.settings import STATIC_ROOT, STATIC_URL, MEDIA_URL, MEDIA_ROOT
@@ -43,8 +42,6 @@ router.register(
 router.register(r"tags", TagsViewSet, basename="tags")
 router.register(r"licenses", LicensesViewSet, basename="licenses")
 router.register(r"families", FamiliesViewSet, basename="families")
-router.register(r"analysis", AnalysesViewSet, basename="analysis")
-router.register(r"docker", DockerProcessesViewSet, basename="docker")
 
 
 urlpatterns = [
