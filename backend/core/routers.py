@@ -5,6 +5,8 @@ from core.fileupload.viewsets import (
     BulkUploadApiView,
     ZipUploadApiView,
     FamiliesViewSet,
+    AnalysesViewSet,
+    AnalysisResultsViewSet,
     FileUploadViewSet,
     TagsViewSet,
     LicensesViewSet,
@@ -42,6 +44,8 @@ router.register(
 router.register(r"tags", TagsViewSet, basename="tags")
 router.register(r"licenses", LicensesViewSet, basename="licenses")
 router.register(r"families", FamiliesViewSet, basename="families")
+router.register(r"analyses", AnalysesViewSet, basename="analyses")
+router.register(r"analysisresults", AnalysisResultsViewSet, basename="analysisresults")
 
 
 urlpatterns = [

@@ -5,6 +5,8 @@ from core.fileupload.serializers import (
     TagsSerializer,
     FamiliesSerializer,
     LicensesSerializer,
+    AnalysesSerializer,
+    AnalysisResultsSerializer,
 )
 from core.fileupload.permissions import (
     IsOwnerOrIsAdminOrReadOnly,
@@ -515,3 +517,36 @@ class TagsViewSet(
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
+
+class AnalysesViewSet(
+    viewsets.GenericViewSet,
+    mixins.CreateModelMixin,
+    mixins.RetrieveModelMixin,
+    mixins.DestroyModelMixin,
+    mixins.ListModelMixin,
+):
+
+    queryset = Analysis.objects.all()
+    serializer_class = AnalysesSerializer
+    permission_classes = [
+        IsAuthenticatedOrReadOnly,
+    ]
+
+    def list(self, request, **kwargs):
+        queryset = Analysis.objects.all()
+        analyses = AnalysesSerializer(queryset, many=True).data
+        return Response(analyses)
+
+class AnalysisResultsViewSet(
+    viewsets.GenericViewSet,
+    mixins.RetrieveModelMixin,
+    mixins.ListModelMixin,
+):
+
+    queryset = AnalysisResult.objects.all()
+    serializer_class = AnalysisResultsSerializer
+
+    def list(self, request, **kwargs):
+        queryset = AnalysisResult.objects.all()
+        analysisresults = AnalysisResultsSerializer(queryset, many=True).data
+        return Response(analysisresults)

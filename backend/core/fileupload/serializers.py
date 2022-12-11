@@ -2,7 +2,7 @@ import json
 
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.files.base import ContentFile
-from core.fileupload.models import Family, Tag, License, File
+from core.fileupload.models import Family, Tag, License, File, Analysis, AnalysisResult
 from rest_framework import serializers
 from django.http import QueryDict
 from transpiler.g6_transpiler import xml_to_g6
@@ -118,3 +118,23 @@ class FilesSerializer(serializers.ModelSerializer):
         internal_rep['license'] = license
 
         return internal_rep.dict()
+
+class AnalysesSerializer(serializers.ModelSerializer):
+    """
+    A serializer for defining which Analysis attributes should be converted to JSON
+    """
+
+    class Meta:
+        model = Analysis
+        fields = ['id', 'query', 'admin_only', 'disabled']
+
+class AnalysisResultsSerializer(serializers.ModelSerializer):
+    """
+    A serializer for defining which AnalysisResult attributes should be converted to JSON
+    """
+    analysis = AnalysesSerializer()
+    file = FilesSerializer()
+
+    class Meta:
+        model = AnalysisResult
+        fields = ['triggered', 'error', 'result', 'analysis', 'file']
