@@ -15,25 +15,6 @@
         <v-row justify="space-between">
             <v-col cols="12" md="6">
                 <h5 class="text-h5 mb-4">Details and more information</h5>
-                <div class="d-flex justify-center my-3">
-                    <v-btn
-                        color="primary"
-                        :x-large="$vuetify.breakpoint.mdAndUp"
-                        class="mr-5"
-                        :to="'/feature-model/' + file.id"
-                    >
-                        <v-icon dark left>mdi-eye</v-icon>
-                        View Model
-                    </v-btn>
-                    <v-btn
-                        color="success"
-                        :x-large="$vuetify.breakpoint.mdAndUp"
-                        disabled
-                    >
-                        <v-icon dark left>mdi-play</v-icon>
-                        Analyze Model
-                    </v-btn>
-                </div>
 
                 <v-list two-line>
                     <v-list-item>
@@ -172,25 +153,40 @@
 						</v-list-item-action>-->
                     </v-list-item>
                 </v-list>
-                <div class="mt-3">
-                    <div class="float-left">
-                        <v-btn
-                            outlined
-                            color="primary"
-                            @click="
-                                $router.push({
-                                    name: 'FamilyDetail',
-                                    params: {
-                                        id: file.family.id,
-                                        slug: file.family.slug,
-                                    },
-                                })
-                            "
-                        >
-                            See Family
-                        </v-btn>
+                <div class="mt-3 d-flex justify-space-between align-center">
+                    <div>
+                        <div class="d-inline-block mr-2">
+                            <v-btn
+                                color="primary"
+                                outlined
+                                :to="'/feature-model/' + file.id"
+                            >
+                                <v-icon dark left>mdi-eye</v-icon>
+                                View Model
+                            </v-btn>
+                        </div>
+                        <div class="d-inline-block">
+                            <v-btn
+                                outlined
+                                color="primary"
+                                @click="
+                                    $router.push({
+                                        name: 'FamilyDetail',
+                                        params: {
+                                            id: file.family.id,
+                                            slug: file.family.slug,
+                                        },
+                                    })
+                                "
+                            >
+                                <v-icon dark left>
+                                    mdi-human-male-female-child
+                                </v-icon>
+                                See Family
+                            </v-btn>
+                        </div>
                     </div>
-                    <div class="float-right">
+                    <div class="d-inline-block">
                         <v-btn
                             outlined
                             color="error"
@@ -208,6 +204,126 @@
                     <v-skeleton-loader
                         type="list-item-avatar-two-line@5"
                     ></v-skeleton-loader>
+                </div>
+                <div class="my-3">
+                    <div
+                        class="d-flex justify-center flex-column align-center my-3"
+                    >
+                        <span>Analyses Progress:</span>
+                        <div class="pa-0" style="width: 100%">
+                            <div
+                                :style="`width: ${getStati.success.percentage}%!important`"
+                                class="d-inline-block"
+                            >
+                                <v-tooltip bottom>
+                                    <template v-slot:activator="{ on, attrs }">
+                                        <v-progress-linear
+                                            height="15"
+                                            value="100"
+                                            color="green"
+                                            v-bind="attrs"
+                                            v-on="on"
+                                        />
+                                    </template>
+                                    <span>
+                                        Success:
+                                        {{ getStati.success.absolute }} /
+                                        {{ getStati.amount }}
+                                    </span>
+                                </v-tooltip>
+                            </div>
+                            <div
+                                :style="`width: ${getStati.error.percentage}%!important`"
+                                class="d-inline-block"
+                            >
+                                <v-tooltip bottom>
+                                    <template v-slot:activator="{ on, attrs }">
+                                        <v-progress-linear
+                                            height="15"
+                                            value="100"
+                                            color="error"
+                                            v-bind="attrs"
+                                            v-on="on"
+                                        />
+                                    </template>
+                                    <span>
+                                        Error:
+                                        {{ getStati.error.absolute }} /
+                                        {{ getStati.amount }}
+                                    </span>
+                                </v-tooltip>
+                            </div>
+                            <div
+                                :style="`width: ${getStati.progress.percentage}%!important`"
+                                class="d-inline-block"
+                            >
+                                <v-tooltip bottom>
+                                    <template v-slot:activator="{ on, attrs }">
+                                        <v-progress-linear
+                                            height="15"
+                                            value="100"
+                                            color="primary"
+                                            v-bind="attrs"
+                                            v-on="on"
+                                        />
+                                    </template>
+                                    <span>
+                                        In progress:
+                                        {{ getStati.progress.absolute }} /
+                                        {{ getStati.amount }}
+                                    </span>
+                                </v-tooltip>
+                            </div>
+                        </div>
+                    </div>
+                    <v-data-table
+                        :headers="headersAnalysis"
+                        :items="itemsAnalysis"
+                        :loading="loading"
+                        :search="searchAnalysis"
+                        class="elevation-1"
+                    >
+                        <template v-slot:top>
+                            <v-toolbar flat>
+                                <v-toolbar-title class="hidden-sm-and-down"
+                                    >Analyses</v-toolbar-title
+                                >
+                                <v-divider
+                                    class="mx-4 hidden-sm-and-down"
+                                    inset
+                                    vertical
+                                ></v-divider>
+                                <v-spacer class="hidden-sm-and-down"></v-spacer>
+                                <v-text-field
+                                    v-model="searchAnalysis"
+                                    append-icon="mdi-magnify"
+                                    hide-details
+                                    label="Search"
+                                    single-line
+                                >
+                                </v-text-field>
+                            </v-toolbar>
+                        </template>
+                        <template v-slot:item.status="{ item }">
+                            <v-progress-circular
+                                v-if="item.status === 0"
+                                size="24"
+                                width="3"
+                                indeterminate
+                                color="primary"
+                            ></v-progress-circular>
+                            <v-icon
+                                v-else-if="item.status === 1"
+                                color="success"
+                            >
+                                mdi-check
+                            </v-icon>
+                            <v-icon v-else color="error"> mdi-cancel</v-icon>
+                        </template>
+                        <template v-slot:item.id="{ index }">
+                            {{ index + 1 }}
+                        </template>
+                    </v-data-table>
                 </div>
             </v-col>
         </v-row>
@@ -255,6 +371,38 @@ export default Vue.extend({
         loading: true,
         dialogDelete: false,
         removeLoading: false,
+        searchAnalysis: '',
+        headersAnalysis: [
+            {
+                text: 'ID',
+                align: 'start',
+                sortable: false,
+                value: 'id',
+            },
+            { text: 'Name', value: 'name' },
+            { text: 'Query', value: 'query' },
+            { text: 'Status', value: 'status' },
+        ],
+        itemsAnalysis: [
+            {
+                id: 1,
+                name: 'first analysis',
+                query: 'count nodes',
+                status: 0,
+            },
+            {
+                id: 2,
+                name: 'complex analysis',
+                query: 'calculate purpose of life --force',
+                status: 1,
+            },
+            {
+                id: 42,
+                name: 'another analysis',
+                query: 'foo bar',
+                status: 0,
+            },
+        ],
     }),
 
     async mounted() {
@@ -264,7 +412,51 @@ export default Vue.extend({
         //await this.fetchFeatureModelOfFamily(this.family.id)
     },
 
-    computed: {},
+    computed: {
+        getStati() {
+            /*function compute(amount) {
+                return (
+                    (this.itemsAnalysis.filter((obj) => obj.status === amount)
+                        .length /
+                        this.itemsAnalysis.length) *
+                    100
+                );
+            }*/
+            return {
+                success: {
+                    percentage:
+                        (this.itemsAnalysis.filter((obj) => obj.status === 1)
+                            .length /
+                            this.itemsAnalysis.length) *
+                        100,
+                    absolute: this.itemsAnalysis.filter(
+                        (obj) => obj.status === 1
+                    ).length,
+                },
+                error: {
+                    percentage:
+                        (this.itemsAnalysis.filter((obj) => obj.status === -1)
+                            .length /
+                            this.itemsAnalysis.length) *
+                        100,
+                    absolute: this.itemsAnalysis.filter(
+                        (obj) => obj.status === -1
+                    ).length,
+                },
+                progress: {
+                    percentage:
+                        (this.itemsAnalysis.filter((obj) => obj.status === 0)
+                            .length /
+                            this.itemsAnalysis.length) *
+                        100,
+                    absolute: this.itemsAnalysis.filter(
+                        (obj) => obj.status === 0
+                    ).length,
+                },
+                amount: this.itemsAnalysis.length,
+            };
+        },
+    },
 
     methods: {
         async getFile() {
