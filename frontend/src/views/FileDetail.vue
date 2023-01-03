@@ -205,9 +205,33 @@
                 <div id="feature-model-artifacts">
                     <h5 class="text-h5 mb-4">Artifacts (tbd)</h5>
                     <div class="my-3">
-                        <v-skeleton-loader
-                            type="list-item-avatar-two-line@5"
-                        ></v-skeleton-loader>
+                        <v-list rounded>
+                            <v-subheader>REPORTS</v-subheader>
+                            <v-list-item
+                                v-for="(item, i) in artifacts"
+                                :key="i"
+                            >
+                                <v-list-item-avatar>
+                                    <v-icon> mdi-file-document-outline </v-icon>
+                                </v-list-item-avatar>
+                                <v-list-item-content>
+                                    <v-list-item-title>
+                                        {{ item.title }}
+                                    </v-list-item-title>
+                                    <v-list-item-subtitle>
+                                        {{ item.subtitle }}
+                                    </v-list-item-subtitle>
+                                </v-list-item-content>
+                                <v-list-item-action>
+                                    <v-btn
+                                        icon
+                                        @click.stop="showArtifactDialog(item)"
+                                    >
+                                        <v-icon> mdi-eye </v-icon>
+                                    </v-btn>
+                                </v-list-item-action>
+                            </v-list-item>
+                        </v-list>
                     </div>
                 </div>
                 <div class="my-3" id="feature-model-analysis-progress">
@@ -355,6 +379,120 @@
                 </v-card-actions>
             </v-card>
         </v-dialog>
+        <v-dialog v-model="dialogArtifact" max-width="1200px" width="90vw">
+            <v-card>
+                <v-card-title class="text-h5">
+                    Analysis: {{ selectedArtifact.title }}
+                    <v-spacer></v-spacer>
+                    <v-btn icon @click="dialogArtifact = false">
+                        <v-icon> mdi-close </v-icon>
+                    </v-btn>
+                </v-card-title>
+
+                <v-card-text>
+                    <v-row class="ma-1">
+                        <v-col
+                            cols="12"
+                            :md="isRightFmSelected ? 6 : 8"
+                            :lg="isRightFmSelected ? 6 : 9"
+                            class="pa-2"
+                        >
+                            <h6 class="text-h6">{{ file.label }}</h6>
+                            <v-skeleton-loader type="card"> </v-skeleton-loader>
+                        </v-col>
+                        <v-col
+                            v-if="!isRightFmSelected"
+                            cols="12"
+                            md="4"
+                            lg="3"
+                            class="pa-2"
+                            style="border: 2px dashed grey"
+                        >
+                            <v-sheet
+                                v-if="!shouldCompare"
+                                height="300px"
+                                min-height="190px"
+                                width="100%"
+                                class="d-flex justify-center align-center pointer-on-hover"
+                                @click="compare"
+                            >
+                                <div class="text-h6 text-info text-center">
+                                    Click to compare with another feature model
+                                </div>
+                            </v-sheet>
+                            <div v-else>
+                                <v-btn
+                                    icon
+                                    @click="shouldCompare = false"
+                                    class="mr-2"
+                                >
+                                    <v-icon>mdi-arrow-left</v-icon>
+                                </v-btn>
+                                <span class="text-subtitle-1"
+                                    >My Feature Models</span
+                                >
+                                <v-progress-circular
+                                    style="display: block"
+                                    indeterminate
+                                    color="primary"
+                                    v-if="loadingComparableFM"
+                                ></v-progress-circular>
+                                <v-list
+                                    rounded
+                                    v-else
+                                    height="300px"
+                                    style="overflow-y: auto"
+                                >
+                                    <v-list-item-group
+                                        v-model="selectedRightFM"
+                                        color="primary"
+                                    >
+                                        <v-list-item
+                                            v-for="(item, i) in getMyFM"
+                                            :key="i"
+                                        >
+                                            <v-list-item-avatar>
+                                                <v-icon>
+                                                    mdi-family-tree
+                                                </v-icon>
+                                            </v-list-item-avatar>
+                                            <v-list-item-content>
+                                                <v-list-item-title>
+                                                    {{ item.label }}
+                                                </v-list-item-title>
+                                                <v-list-item-subtitle>
+                                                    {{
+                                                        new Date(
+                                                            item.uploaded_at
+                                                        ).toLocaleString(
+                                                            'en-US'
+                                                        )
+                                                    }}
+                                                </v-list-item-subtitle>
+                                            </v-list-item-content>
+                                        </v-list-item>
+                                    </v-list-item-group>
+                                </v-list>
+                            </div>
+                        </v-col>
+                        <v-col v-else cols="12" md="6" lg="6" class="pa-2">
+                            <h6 class="text-h6">
+                                <v-btn
+                                    color="inherit"
+                                    icon
+                                    @click="selectedRightFM = -1"
+                                    class="mr-2"
+                                >
+                                    <v-icon>mdi-arrow-left</v-icon>
+                                </v-btn>
+                                {{ getMyFM[selectedRightFM].label }}
+                            </h6>
+                            <v-skeleton-loader type="card"> </v-skeleton-loader>
+                        </v-col>
+                    </v-row>
+                </v-card-text>
+            </v-card>
+        </v-dialog>
         <tutorial-mode
             :show="showTutorial"
             @close="showTutorial = false"
@@ -395,6 +533,12 @@ export default Vue.extend({
         file: {},
         loading: true,
         dialogDelete: false,
+        dialogArtifact: false,
+        shouldCompare: false,
+        loadingComparableFM: false,
+        selectedRightFM: -1,
+        selectedArtifact: {},
+        rightFmIsSelected: false,
         removeLoading: false,
         searchAnalysis: '',
         headersAnalysis: [
@@ -461,6 +605,24 @@ export default Vue.extend({
                 elementCssSelector: '#feature-model-artifacts',
             },
         ],
+        artifacts: [
+            {
+                title: 'Binary',
+                subtitle: 'Displaying binaries of feature model',
+            },
+            {
+                title: 'Purpose of life',
+                subtitle: 'What is it even?',
+            },
+            {
+                title: 'Complex Document',
+                subtitle: 'Generated from analysis: complex analysis',
+            },
+            {
+                title: 'Final.docx',
+                subtitle: 'Test file',
+            },
+        ],
     }),
 
     async mounted() {
@@ -470,11 +632,23 @@ export default Vue.extend({
         //await this.fetchFeatureModelOfFamily(this.family.id)
     },
 
+    watch: {
+        selectedRightFM: function (newValue) {
+            console.log(newValue);
+        },
+    },
+
     created() {
         this.showTutorial = !localStorage.fileDetailTutorialCompleted;
     },
 
     computed: {
+        isRightFmSelected() {
+            return this.selectedRightFM !== -1;
+        },
+        getMyFM() {
+            return this.$store.state.featureModels.filter((item) => item.owner);
+        },
         getStati() {
             /*function compute(amount) {
                 return (
@@ -545,6 +719,16 @@ export default Vue.extend({
             this.removeLoading = false;
             await this.$router.push('/');
         },
+        showArtifactDialog(item) {
+            this.selectedArtifact = item;
+            this.dialogArtifact = true;
+        },
+        async compare() {
+            this.shouldCompare = true;
+            this.loadingComparableFM = true;
+            await this.$store.dispatch('fetchFeatureModels');
+            this.loadingComparableFM = false;
+        },
         /*async fetchFeatureModelOfFamily(value) {
 			await api
 				.get(`${API_URL}files/uploaded/confirmed/?family=${value}`)
@@ -556,3 +740,9 @@ export default Vue.extend({
     },
 });
 </script>
+
+<style>
+.pointer-on-hover:hover {
+    cursor: pointer;
+}
+</style>
