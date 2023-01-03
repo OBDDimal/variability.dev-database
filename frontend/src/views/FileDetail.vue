@@ -13,7 +13,7 @@
             </span>
         </h3>
         <v-row justify="space-between">
-            <v-col cols="12" md="6">
+            <v-col cols="12" md="6" id="feature-model-details">
                 <h5 class="text-h5 mb-4">Details and more information</h5>
 
                 <v-list two-line>
@@ -153,7 +153,10 @@
 						</v-list-item-action>-->
                     </v-list-item>
                 </v-list>
-                <div class="mt-3 d-flex justify-space-between align-center">
+                <div
+                    class="mt-3 d-flex justify-space-between align-center"
+                    id="feature-model-actions"
+                >
                     <div>
                         <div class="d-inline-block mr-2">
                             <v-btn
@@ -199,13 +202,15 @@
                 </div>
             </v-col>
             <v-col cols="12" md="6">
-                <h5 class="text-h5 mb-4">Artifacts (tbd)</h5>
-                <div class="my-3">
-                    <v-skeleton-loader
-                        type="list-item-avatar-two-line@5"
-                    ></v-skeleton-loader>
+                <div id="feature-model-artifacts">
+                    <h5 class="text-h5 mb-4">Artifacts (tbd)</h5>
+                    <div class="my-3">
+                        <v-skeleton-loader
+                            type="list-item-avatar-two-line@5"
+                        ></v-skeleton-loader>
+                    </div>
                 </div>
-                <div class="my-3">
+                <div class="my-3" id="feature-model-analysis-progress">
                     <div
                         class="d-flex justify-center flex-column align-center my-3"
                     >
@@ -350,19 +355,39 @@
                 </v-card-actions>
             </v-card>
         </v-dialog>
+        <tutorial-mode
+            :show="showTutorial"
+            @close="showTutorial = false"
+            :next-steps="tutorialSteps"
+            local-storage-identifier="fileDetailTutorialCompleted"
+        ></tutorial-mode>
+        <v-btn
+            id="tutorial-mode"
+            fab
+            fixed
+            right
+            bottom
+            color="primary"
+            @click="showTutorial = true"
+        >
+            <v-icon> mdi-school </v-icon>
+        </v-btn>
     </div>
 </template>
 
 <script>
 import Vue from 'vue';
 import api from '@/services/api.service';
+import TutorialMode from '@/components/TutorialMode';
 
 const API_URL = process.env.VUE_APP_DOMAIN;
 
 export default Vue.extend({
     name: 'FileDetail',
 
-    components: {},
+    components: {
+        TutorialMode,
+    },
 
     props: {},
 
@@ -403,6 +428,39 @@ export default Vue.extend({
                 status: 0,
             },
         ],
+        showTutorial: false,
+        tutorialSteps: [
+            {
+                title: 'Welcome to the tutorial!',
+                description:
+                    'You can restart the tutorial anytime by clicking on this button.',
+                elementCssSelector: '#tutorial-mode',
+            },
+            {
+                title: 'Feature model details',
+                description:
+                    'Here you can see details and more information about the feature model. You can also view the model and the family. If you are the owner of the model, you can also edit aspects like name or description.',
+                elementCssSelector: '#feature-model-details',
+            },
+            {
+                title: 'Feature model actions',
+                description:
+                    'With those action buttons, you are able to view the model or the family, or - if you are the owner of the model - delete it.',
+                elementCssSelector: '#feature-model-actions',
+            },
+            {
+                title: 'The Analyses and progress',
+                description:
+                    "After uploading a feature model, some predefined analyses will run on them automatically. In this table you'll see those analyses as well as the progress (done, in progress, failed).",
+                elementCssSelector: '#feature-model-analysis-progress',
+            },
+            {
+                title: 'Feature model artifacts',
+                description:
+                    "In this section you'll find artifacts of the feature model. Those artifacts - which are basically files - are automatically generated after the analyses are done. You can view them here.",
+                elementCssSelector: '#feature-model-artifacts',
+            },
+        ],
     }),
 
     async mounted() {
@@ -410,6 +468,10 @@ export default Vue.extend({
         await this.getFile();
         this.loading = false;
         //await this.fetchFeatureModelOfFamily(this.family.id)
+    },
+
+    created() {
+        this.showTutorial = !localStorage.fileDetailTutorialCompleted;
     },
 
     computed: {

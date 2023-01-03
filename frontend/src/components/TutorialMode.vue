@@ -119,88 +119,98 @@ export default Vue.extend({
 
     data: () => ({
         step: undefined,
-        nextSteps: [
-            {
-                title: 'Welcome to the tutorial!',
-                description:
-                    'You can restart the tutorial anytime by clicking on this icon on the left.',
-                elementCssSelector: '#tutorial-mode',
-            },
-            {
-                title: 'The menu',
-                description:
-                    "For a more precise description of the menu's icons click on this icon on the left.",
-                elementCssSelector: '#feature-model-toolbar-extend',
-            },
-            {
-                title: 'Your feature model',
-                description:
-                    'This is your main workspace. The feature model tree. You can move around and zoom in and out with your mouse or your fingers, depending on your platform.',
-                elementCssSelector: '#svg-container',
-            },
-            {
-                title: 'Your feature model',
-                description:
-                    'Feature model nodes are collapsed and uncollapsed when double-clicking. You can edit individual nodes with a right click and also use the corresponding context menu for other means of interacting with the feature model.',
-                elementCssSelector: '#svg-container',
-            },
-            {
-                title: 'Search',
-                description:
-                    'Feature models can get rather complex. To search for a node an navigate there automatically just click the magnifying glass above and enter your search query. In case there are multiple results you can navigate them with the arrows above.',
-                elementCssSelector: '#feature-model-search',
-            },
-            {
-                title: 'Your feature model',
-                description:
-                    "You may move around individual feature model nodes with 'drang and drop™'️. This does not allow semantic changes by default.",
-                elementCssSelector: '#svg-container',
-            },
-            {
-                title: 'Undo and redo',
-                description:
-                    'When making changes to a feature model it is important to have the possibility to revert changes. On the left you can find the undo and redo button.',
-                elementCssSelector: '#feature-model-toolbar-undo',
-            },
-            {
-                title: 'Save your changes',
-                description:
-                    'All of your modifications can be saved via the button on the left, even when you are offline!',
-                elementCssSelector: '#feature-model-toolbar-save',
-            },
-            {
-                title: 'Collaboration',
-                description:
-                    'You want to show others your feature model, or even edit it together with them? Just click the collaboration button on the left and share your thoughts!',
-                elementCssSelector: '#feature-model-toolbar-collaboration',
-            },
-            {
-                title: 'Constraints',
-                description:
-                    'To edit and view all of your cross-tree-constraints just click the button below. You may click individual constraints to highlight the corresponding feature model nodes in the tree above.',
-                elementCssSelector: '#feature-model-constraints',
-            },
-            {
-                title: 'Information',
-                description:
-                    'You may see individual statistics about your model by clicking the button below.',
-                elementCssSelector: '#feature-model-information',
-            },
-            {
-                title: 'Other settings',
-                description:
-                    'To change defaults and other settings just click on this icon on the left. You may also experiment around with all the other options. Remember the undo option.',
-                elementCssSelector: '#feature-model-toolbar-other-settings',
-            },
-        ],
         beforeSteps: [],
         isTop: Boolean,
         isLeft: Boolean,
         isMobile: Boolean,
+        counter: 0,
     }),
 
     props: {
         show: Boolean,
+        nextSteps: {
+            type: Array,
+            required: false,
+            default: () => [
+                {
+                    title: 'Welcome to the tutorial!',
+                    description:
+                        'You can restart the tutorial anytime by clicking on this icon on the left.',
+                    elementCssSelector: '#tutorial-mode',
+                },
+                {
+                    title: 'The menu',
+                    description:
+                        "For a more precise description of the menu's icons click on this icon on the left.",
+                    elementCssSelector: '#feature-model-toolbar-extend',
+                },
+                {
+                    title: 'Your feature model',
+                    description:
+                        'This is your main workspace. The feature model tree. You can move around and zoom in and out with your mouse or your fingers, depending on your platform.',
+                    elementCssSelector: '#svg-container',
+                },
+                {
+                    title: 'Your feature model',
+                    description:
+                        'Feature model nodes are collapsed and uncollapsed when double-clicking. You can edit individual nodes with a right click and also use the corresponding context menu for other means of interacting with the feature model.',
+                    elementCssSelector: '#svg-container',
+                },
+                {
+                    title: 'Search',
+                    description:
+                        'Feature models can get rather complex. To search for a node an navigate there automatically just click the magnifying glass above and enter your search query. In case there are multiple results you can navigate them with the arrows above.',
+                    elementCssSelector: '#feature-model-search',
+                },
+                {
+                    title: 'Your feature model',
+                    description:
+                        "You may move around individual feature model nodes with 'drang and drop™'️. This does not allow semantic changes by default.",
+                    elementCssSelector: '#svg-container',
+                },
+                {
+                    title: 'Undo and redo',
+                    description:
+                        'When making changes to a feature model it is important to have the possibility to revert changes. On the left you can find the undo and redo button.',
+                    elementCssSelector: '#feature-model-toolbar-undo',
+                },
+                {
+                    title: 'Save your changes',
+                    description:
+                        'All of your modifications can be saved via the button on the left, even when you are offline!',
+                    elementCssSelector: '#feature-model-toolbar-save',
+                },
+                {
+                    title: 'Collaboration',
+                    description:
+                        'You want to show others your feature model, or even edit it together with them? Just click the collaboration button on the left and share your thoughts!',
+                    elementCssSelector: '#feature-model-toolbar-collaboration',
+                },
+                {
+                    title: 'Constraints',
+                    description:
+                        'To edit and view all of your cross-tree-constraints just click the button below. You may click individual constraints to highlight the corresponding feature model nodes in the tree above.',
+                    elementCssSelector: '#feature-model-constraints',
+                },
+                {
+                    title: 'Information',
+                    description:
+                        'You may see individual statistics about your model by clicking the button below.',
+                    elementCssSelector: '#feature-model-information',
+                },
+                {
+                    title: 'Other settings',
+                    description:
+                        'To change defaults and other settings just click on this icon on the left. You may also experiment around with all the other options. Remember the undo option.',
+                    elementCssSelector: '#feature-model-toolbar-other-settings',
+                },
+            ],
+        },
+        localStorageIdentifier: {
+            type: String,
+            required: false,
+            default: 'featureModelTutorialCompleted',
+        },
     },
 
     computed: {
@@ -221,7 +231,8 @@ export default Vue.extend({
     methods: {
         startTutorial() {
             this.isMobile = 'ontouchstart' in window;
-            this.step = this.nextSteps.shift();
+            this.step = this.nextSteps[this.counter];
+            this.counter++;
             if (!this.isMobile) {
                 this.setBubblePosition();
             }
@@ -273,9 +284,10 @@ export default Vue.extend({
         },
 
         nextStep() {
-            if (this.nextSteps.length) {
+            if (this.nextSteps.length > this.counter) {
                 this.beforeSteps.unshift(this.step);
-                this.step = this.nextSteps.shift();
+                this.step = this.nextSteps[this.counter];
+                this.counter++;
                 if (!this.isMobile) {
                     this.setBubblePosition();
                 }
@@ -285,13 +297,29 @@ export default Vue.extend({
         },
 
         exit() {
-            this.$emit('close');
+            console.log('start');
+            if (!this.isMobile) {
+                const tutorialDialog =
+                    document.querySelector('#tutorial-dialog');
+                tutorialDialog.style.left = '';
+                tutorialDialog.style.top = '';
+                tutorialDialog.style.position = '';
+            }
             this.step = undefined;
-            localStorage.featureModelTutorialCompleted = true;
+            this.beforeSteps = [];
+            this.isTop = Boolean;
+            this.isLeft = Boolean;
+            this.isMobile = Boolean;
+            this.counter = 0;
+            localStorage[this.localStorageIdentifier] = true;
+            console.log('midd');
+            this.$emit('close');
+            console.log('end');
         },
 
         beforeStep() {
-            this.nextSteps.unshift(this.step);
+            this.counter = this.counter - 1;
+            //this.nextSteps.unshift(this.step);
             this.step = this.beforeSteps.shift();
             if (!this.isMobile) {
                 this.setBubblePosition();
@@ -312,13 +340,17 @@ export default Vue.extend({
     watch: {
         show(newValue, oldValue) {
             if (oldValue) {
-                this.nextSteps = [
+                /*this.nextSteps = [
                     ...this.beforeSteps.reverse(),
                     this.step,
                     ...this.nextSteps,
-                ];
-                this.beforeSteps = [];
+                ];*/
                 this.step = undefined;
+                this.beforeSteps = [];
+                this.isTop = Boolean;
+                this.isLeft = Boolean;
+                this.isMobile = Boolean;
+                this.counter = 0;
 
                 // Reset position to 0 0 when restarting the tutorial again
                 this.reset();

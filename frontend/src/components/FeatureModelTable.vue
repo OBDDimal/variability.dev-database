@@ -21,6 +21,7 @@
                         ></v-divider>
                         <v-spacer class="hidden-sm-and-down"></v-spacer>
                         <v-text-field
+                            id="feature-model-search"
                             v-model="search"
                             append-icon="mdi-magnify"
                             hide-details
@@ -31,6 +32,7 @@
                         <v-tooltip top>
                             <template v-slot:activator="{ on, attrs }">
                                 <v-btn
+                                    id="feature-model-upload"
                                     v-if="addable"
                                     class="mb-2 ml-4"
                                     color="primary"
@@ -49,6 +51,7 @@
                         <v-tooltip top>
                             <template v-slot:activator="{ on, attrs }">
                                 <v-btn
+                                    id="feature-model-create"
                                     v-if="addable"
                                     class="mb-2 ml-4"
                                     color="success"
@@ -67,6 +70,7 @@
                         <v-tooltip top>
                             <template v-slot:activator="{ on, attrs }">
                                 <v-btn
+                                    id="feature-model-ls"
                                     v-if="addable"
                                     :disabled="!checkLocalStorage"
                                     class="mb-2 ml-4"
