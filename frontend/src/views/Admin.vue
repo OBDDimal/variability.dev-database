@@ -102,23 +102,24 @@
                     </v-dialog>
                     <v-dialog v-model="dialogDelete" max-width="500px">
                         <v-card>
-                            <v-card-title class="text-h5"
-                                >Are you sure you want to delete this analysis?
+                            <v-card-title
+                                class="text-h5"
+                                style="word-break: break-word"
+                            >
+                                Are you sure you want to delete this analysis?
                             </v-card-title>
                             <v-card-actions>
                                 <v-spacer></v-spacer>
                                 <v-btn color="primary" text @click="closeDelete"
                                     >Cancel</v-btn
                                 >
-                                <v-spacer></v-spacer>
                                 <v-btn
                                     :loading="removeLoading"
-                                    color="primary"
+                                    color="error"
                                     text
                                     @click="deleteItemConfirm"
                                     >Delete
                                 </v-btn>
-                                <v-spacer></v-spacer>
                             </v-card-actions>
                         </v-card>
                     </v-dialog>

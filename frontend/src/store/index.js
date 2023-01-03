@@ -67,26 +67,33 @@ export default new Vuex.Store({
             // api.get(`${API_URL}analysis/`).then((response) => {
             //     commit('setAnalysis', { analysis: response.data });
             // });
-            commit('setAnalysis', { analysis: [
-                {
-                    id: 1,
-                    name: 'first analysis',
-                    query: 'count nodes',
-                    admin_only: false,
-                    disabled: false,
-                },{
-                    id: 2,
-                    name: 'complex analysis',
-                    query: 'calculate purpose of life --force',
-                    admin_only: false,
-                    disabled: true,
-                },{
-                    id: 42,
-                    name: 'another analysis',
-                    query: 'foo bar',
-                    admin_only: true,
-                    disabled: true,
-                }]
+            commit('setAnalysis', {
+                analysis: [
+                    {
+                        id: 1,
+                        name: 'first analysis',
+                        query: 'count nodes',
+                        admin_only: false,
+                        disabled: false,
+                        date_created: '2022-08-15T08:48:20.853576Z',
+                    },
+                    {
+                        id: 2,
+                        name: 'complex analysis',
+                        query: 'calculate purpose of life --force',
+                        admin_only: false,
+                        disabled: true,
+                        date_created: '2022-08-15T08:48:20.853576Z',
+                    },
+                    {
+                        id: 42,
+                        name: 'another analysis',
+                        query: 'foo bar',
+                        admin_only: true,
+                        disabled: true,
+                        date_created: '2022-08-15T08:48:20.853576Z',
+                    },
+                ],
             });
         },
         fetchLicenses({ commit }) {
@@ -237,7 +244,8 @@ export default new Vuex.Store({
                 .catch((error) => {
                     commit('updateSnackbar', {
                         message:
-                            'Error while uploading new analysis: ' + error.message,
+                            'Error while uploading new analysis: ' +
+                            error.message,
                         variant: 'error',
                         timeout: 5000,
                         show: true,

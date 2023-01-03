@@ -400,7 +400,7 @@ export default Vue.extend({
                 id: 42,
                 name: 'another analysis',
                 query: 'foo bar',
-                status: -1,
+                status: 0,
             },
         ],
     }),
