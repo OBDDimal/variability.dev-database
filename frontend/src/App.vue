@@ -1,5 +1,5 @@
 <template>
-    <vue-scroll-snap>
+    <vue-scroll-snap style="overflow-y: auto">
         <fullscreen></fullscreen>
 
         <v-app>

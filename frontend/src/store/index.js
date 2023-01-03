@@ -20,6 +20,7 @@ export default new Vuex.Store({
         accessToken: authService.getAccessToken(),
         tags: [],
         families: [],
+        analysis: [],
         licenses: [],
         files: [],
         featureModels: [],
@@ -59,6 +60,40 @@ export default new Vuex.Store({
         fetchFamilies({ commit }) {
             api.get(`${API_URL}families/`).then((response) => {
                 commit('setFamilies', { families: response.data });
+            });
+        },
+        fetchAnalysis({ commit }) {
+            // TODO: add proper endpoint in backend
+            // api.get(`${API_URL}analysis/`).then((response) => {
+            //     commit('setAnalysis', { analysis: response.data });
+            // });
+            commit('setAnalysis', {
+                analysis: [
+                    {
+                        id: 1,
+                        name: 'first analysis',
+                        query: 'count nodes',
+                        admin_only: false,
+                        disabled: false,
+                        date_created: '2022-08-15T08:48:20.853576Z',
+                    },
+                    {
+                        id: 2,
+                        name: 'complex analysis',
+                        query: 'calculate purpose of life --force',
+                        admin_only: false,
+                        disabled: true,
+                        date_created: '2022-08-15T08:48:20.853576Z',
+                    },
+                    {
+                        id: 42,
+                        name: 'another analysis',
+                        query: 'foo bar',
+                        admin_only: true,
+                        disabled: true,
+                        date_created: '2022-08-15T08:48:20.853576Z',
+                    },
+                ],
             });
         },
         fetchLicenses({ commit }) {
@@ -198,6 +233,26 @@ export default new Vuex.Store({
                     return error;
                 });
         },
+        async uploadAnalysis({ commit }, payload) {
+            // payload = { name: "", query: "", admin_only: false, disabled: false }
+            // TODO: add analysis upload enpoint in backend
+            return api
+                .post(`${API_URL}analysis/`, payload)
+                .then((response) => {
+                    return response.data;
+                })
+                .catch((error) => {
+                    commit('updateSnackbar', {
+                        message:
+                            'Error while uploading new analysis: ' +
+                            error.message,
+                        variant: 'error',
+                        timeout: 5000,
+                        show: true,
+                    });
+                    return error;
+                });
+        },
         async loginWithGithubRedirect({ commit }) {
             return api
                 .post(`${API_URL}auth/github/redirect/`)
@@ -241,6 +296,10 @@ export default new Vuex.Store({
         setFamilies(state, payload) {
             const { families } = payload;
             state.families = families;
+        },
+        setAnalysis(state, payload) {
+            const { analysis } = payload;
+            state.analysis = analysis;
         },
         setLicenses(state, payload) {
             const { licenses } = payload;
