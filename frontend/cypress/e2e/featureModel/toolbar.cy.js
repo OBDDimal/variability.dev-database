@@ -69,6 +69,8 @@ describe('Toolbar tests', () => {
             cy.get('.edit-feature-name').get('input').type('hello');
             cy.contains('Edit', { matchCase: true }).click();
             cy.get('#feature-model-toolbar-undo').should('not.be.disabled');
+            cy.get('#feature-model-toolbar-undo').click();
+            expect(cy.get('.feature-node-container').contains('Root', { matchCase: true })).to.be.true;
         })
     })
 })
