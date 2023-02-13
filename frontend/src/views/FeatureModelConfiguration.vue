@@ -4,13 +4,16 @@
     <h5 class="text-h5 mb-4">Here you can edit or add new feature model configurations</h5>
 
     <v-treeview
-        v-model="selectedFeatureNodes"
+        v-model="selected"
         :items="[data.rootNode]"
-        item-disabled="locked"
+        item-disabled="disabled"
         item-key="name"
         return-object
         selectable
+        open-on-click
         selection-type="independent"
+        :open="opened"
+        @update:open="onOpen"
         @input="update">
       <!--<template v-slot:prepend="{ item }">
           <v-icon
@@ -50,12 +53,18 @@ export default Vue.extend({
       featureOrder: undefined,
       rootNode: undefined,
     },
-    selectedFeatureNodes: [],
-    oldSelectedFeatureNodes: [],
+    selected: [],
+    oldSelected: [],
+    opened: [],
   }),
 
   created() {
     this.initData();
+  },
+
+  watch: {
+    selected() {
+    },
   },
 
   methods: {
@@ -75,25 +84,24 @@ export default Vue.extend({
             }
         );
       }
-      console.log(this.data);
     },
 
-    update() {
-      const newSelectedFeatureNodes = this.selectedFeatureNodes.filter(node => !this.oldSelectedFeatureNodes.includes(node));
-      const deselectedFeatureNodes = this.oldSelectedFeatureNodes.filter(node => !this.selectedFeatureNodes.includes(node));
-      console.log(newSelectedFeatureNodes, deselectedFeatureNodes);
+    update(selected) {
+      const newSelected = selected.find(node => !this.oldSelected.includes(node));
+      const newDeselected = this.oldSelected.find(node => !this.selected.includes(node));
+      if (newSelected && newDeselected) return;
+      console.log(newSelected?.name, newDeselected?.name);
 
-      if (newSelectedFeatureNodes.length) {
-        newSelectedFeatureNodes[0].selected = true;
+      // Focused View (Children of current selected feature will be uncollpased)
+      if (newSelected && !newSelected.isLeaf()) {
+        this.opened.push(newSelected);
       }
 
-      if (deselectedFeatureNodes.length) {
-        deselectedFeatureNodes[0].selected = false;
-      }
+      this.oldSelected = selected;
+    },
 
-      // Display all selected feature nodes.
-      this.selectedFeatureNodes = this.data.rootNode.descendants().filter(node => node.selected);
-      this.oldSelectedFeatureNodes = this.selectedFeatureNodes;
+    onOpen(opened) {
+      console.log(opened.map(n => n.name));
     }
   },
 
