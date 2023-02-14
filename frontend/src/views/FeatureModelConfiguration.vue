@@ -4,23 +4,16 @@
     <h5 class="text-h5 mb-4">Here you can edit or add new feature model configurations</h5>
 
     <v-treeview
-        v-model="selected"
         :items="[data.rootNode]"
-        item-disabled="disabled"
-        item-key="name"
-        return-object
-        selectable
-        open-on-click
-        selection-type="independent"
-        :open="opened"
-        @update:open="onOpen"
-        @input="update">
-      <!--<template v-slot:prepend="{ item }">
+        selection-type="independent">
+      <template v-slot:prepend="{ item }">
+          <v-checkbox v-model="item.isSelected" :disabled="item.isImplicit" @change="update(item)"></v-checkbox>
           <v-icon
               v-if="item.locked"
               v-text="`mdi-close`"
           ></v-icon>
-      </template>-->
+      </template>
+
       <template v-slot:label="{item}">
         <span class="v-treeview-node__label">{{ item.name }}</span>
         <span class="v-treeview-node__label">{{ item.isAnd() ? " (AND)" : item.isOr() ? " (OR)" : item.isAlt() ? " (ALT)" : ""}}</span>
@@ -53,9 +46,6 @@ export default Vue.extend({
       featureOrder: undefined,
       rootNode: undefined,
     },
-    selected: [],
-    oldSelected: [],
-    opened: [],
   }),
 
   created() {
@@ -87,17 +77,8 @@ export default Vue.extend({
     },
 
     update(selected) {
-      const newSelected = selected.find(node => !this.oldSelected.includes(node));
-      const newDeselected = this.oldSelected.find(node => !this.selected.includes(node));
-      if (newSelected && newDeselected) return;
-      console.log(newSelected?.name, newDeselected?.name);
-
-      // Focused View (Children of current selected feature will be uncollpased)
-      if (newSelected && !newSelected.isLeaf()) {
-        this.opened.push(newSelected);
-      }
-
-      this.oldSelected = selected;
+      selected.isExplicit = selected.isSelected;
+      this.data.rootNode.decisionPropagation();
     },
 
     onOpen(opened) {
