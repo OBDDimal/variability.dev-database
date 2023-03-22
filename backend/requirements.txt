@@ -19,7 +19,6 @@ djangorestframework-simplejwt==5.0.0
 docker==6.0.0
 Faker==14.2.0
 idna==3.3
-psycopg2-binary==2.9.2
 pycparser==2.21
 PyGithub==1.55
 PyJWT==2.3.0

@@ -386,6 +386,9 @@ class ConfirmedFileViewSet(
         familyId = self.request.query_params.get("family")
         if familyId is not None:
             queryset = queryset.filter(family__id=familyId).order_by("version")
+        owner = self.request.query_params.get("owner")
+        if owner is not None:
+            queryset = queryset.filter(owner=owner)
         files = FilesSerializer(queryset, many=True).data
         anonymized_files = []
         for file in files:
