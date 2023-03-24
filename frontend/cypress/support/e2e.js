@@ -15,23 +15,33 @@
 
 // Import commands.js using ES2015 syntax:
 import './commands'
+//import { existsSync } from 'node:fs';
 
 // Alternatively you can use CommonJS syntax:
 // require('./commands')
 
-before(() => {
-    cy.exec('python -m venv venv')
-    if(Cypress.platform === 'win32'){
-        cy.exec('venv\\Scripts\\pip.exe install -r ../backend/requirements.txt', {timeout: 240000})
-    } else {
-        cy.exec("./venv/bin/pip install -r ../backend/requirements.txt", {timeout: 240000})
-    }
-})
+//------------------------------------------------------------------------------------------------------
+// !!! uncomment this if you want to re-enable venv + requirements installation for each cypress run !!!
+//------------------------------------------------------------------------------------------------------
 
-after(() => {
-    if(Cypress.platform === 'win32'){
-        cy.exec('rmdir /s /q venv')
-    } else {
-        cy.exec('rm -r venv')
-    }
-})
+// before(() => {
+//     const path = '/venv';
+
+//     if(!existsSync(path)){
+//         cy.exec('python -m venv venv')
+//         if(Cypress.platform === 'win32'){
+//             cy.exec('venv\\Scripts\\pip.exe install -r ../backend/requirements.txt', {timeout: 240000})
+//         } else {
+//             cy.exec("./venv/bin/pip install -r ../backend/requirements.txt", {timeout: 240000})
+//         }
+//     }
+// })
+
+// after(() => {
+//     // uncomment this if the venv installation is somehow messed up
+//     // if(Cypress.platform === 'win32'){
+//     //     cy.exec('rmdir /s /q venv')
+//     // } else {
+//     //     cy.exec('rm -r venv')
+//     // }
+// })

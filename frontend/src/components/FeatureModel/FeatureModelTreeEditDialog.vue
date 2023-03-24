@@ -58,7 +58,7 @@
 						<v-btn color="secondary" text @click="discard">
 							Discard
 						</v-btn>
-						<v-btn :disabled="!name" color="primary" text type="submit"> Edit</v-btn>
+						<v-btn :disabled="!name" color="primary" text type="submit" data-cy="tree-edit-dialog-edit-btn"> Edit</v-btn>
 					</v-card-actions>
 				</v-form>
 			</v-card>
