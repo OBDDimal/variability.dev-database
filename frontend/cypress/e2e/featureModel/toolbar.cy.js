@@ -270,8 +270,85 @@ describe('Toolbar tests', () => {
             // TODO: this button does not do anything, fix!
         })
 
-        it(`Short Name`, () => {
-            
+        it(`Short Name for names < 9`, () => {
+            cy.get('[class*="feature-node-container"]').children().contains('Root').should('exist');
+
+            cy.get('[data-cy="feature-model-toolbar-view"]').click();
+            cy.get('[data-cy="short-name-checkbox"]').click({force: true});
+
+            cy.get('[class*="feature-node-container"]').children().contains('Root...').should('exist');
+        })
+
+        it(`Short Name for names >= 9`, () => {
+            cy.get('[class*="feature-node-container"]').children().contains('Root').rightclick();
+            cy.contains('Edit', { matchCase: true }).click();
+            cy.get('[data-cy="edit-feature-name"]').get('input').eq(1).type('123456');
+            cy.get('[data-cy="tree-edit-dialog-edit-btn"]').click();
+
+            cy.get('[data-cy="feature-model-toolbar-view"]').click();
+            cy.get('[data-cy="short-name-checkbox"]').click({force: true});
+
+            //cy.get('[class*="feature-node-container"]').children().contains('Root1234...').should('exist');
+            // TODO: this looks like a real bug, the value for the displayName in the FeatureNode.js seems to be not updated when the node name is edited
+        })
+
+        it(`Space parent -> child horizontal scaling`, () => {
+            cy.get('[class*="feature-node-container"]').children().contains('Feature A').parent().parent().then(($featureATransform) => {
+                const transf = $featureATransform.attr('transform');
+                
+                const startIndex = transf.indexOf(" ");
+
+                const numberWithClosingBracket = transf.substring(startIndex);
+                const yAxisNumberString = numberWithClosingBracket.replace(")", "");
+                const yAxisNumber = parseFloat(yAxisNumberString);
+
+                cy.get('[data-cy="feature-model-toolbar-view"]').click();
+                cy.get('[data-cy="parent-child-space-slider"]').parent().clickVSlider(0.50);
+
+
+                cy.get('[class*="feature-node-container"]').children().contains('Feature A').parent().parent().then(($featureATransformChanged) => {
+                    const transf2 = $featureATransformChanged.attr('transform');
+                
+                    const startIndex2 = transf2.indexOf(" ");
+
+                    const numberWithClosingBracket2 = transf2.substring(startIndex2);
+                    const yAxisNumberString2 = numberWithClosingBracket2.replace(")", "");
+                    const yAxisNumber2 = parseFloat(yAxisNumberString2);
+
+                    cy.wrap(yAxisNumber2).should('be.gt', yAxisNumber);
+                })
+            })
+        })
+
+        it(`Space parent -> child vertical scaling`, () => {
+            cy.get('[data-cy="feature-model-toolbar-view"]').click();
+            cy.contains('Change direction to horizontally', { matchCase: true }).click();
+
+            cy.get('[class*="feature-node-container"]').children().contains('Feature A').parent().parent().then(($featureATransform) => {
+                const transf = $featureATransform.attr('transform');
+                
+                const cutStart = transf.replace("translate(", "");
+                const endIndex = cutStart.indexOf(")");
+
+                const xAxisNumberString = cutStart.substring(0, endIndex);
+                const xAxisNumber = parseFloat(xAxisNumberString);
+
+                cy.get('[data-cy="feature-model-toolbar-view"]').click();
+                cy.get('[data-cy="parent-child-space-slider"]').parent().clickVSlider(0.50);
+
+
+                cy.get('[class*="feature-node-container"]').children().contains('Feature A').parent().parent().then(($featureATransformChanged) => {
+                    const transf2 = $featureATransformChanged.attr('transform');
+                
+                    const cutStart2 = transf2.replace("translate(", "");
+                    const endIndex2 = cutStart2.indexOf(")");
+
+                    const xAxisNumberString2 = cutStart2.substring(0, endIndex2);
+                    const xAxisNumber2 = parseFloat(xAxisNumberString2);
+
+                    cy.wrap(xAxisNumber2).should('be.gt', xAxisNumber);
+                })
+            })
         })
     })
 })

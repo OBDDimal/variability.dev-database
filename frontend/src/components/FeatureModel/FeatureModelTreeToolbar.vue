@@ -247,6 +247,7 @@
                             <template v-slot:default="{ active }">
                                 <v-list-item-action>
                                     <v-checkbox
+                                        data-cy="short-name-checkbox"
                                         v-model="isShortName"
                                         :input-value="active"
                                         color="primary"
@@ -263,6 +264,7 @@
                         <v-subheader>Space parent -> child</v-subheader>
                         <v-list-item>
                             <v-slider
+                                data-cy="parent-child-space-slider"
                                 v-model="spaceBetweenParentChild"
                                 hide-details
                                 max="300"
@@ -273,6 +275,7 @@
                         <v-subheader>Space between siblings</v-subheader>
                         <v-list-item>
                             <v-slider
+                            data-cy="sibling-space-slider"
                                 v-model="spaceBetweenSiblings"
                                 hide-details
                                 max="300"

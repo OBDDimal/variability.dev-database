@@ -43,3 +43,11 @@ Cypress.Commands.add('isInViewport', { prevSubject: true },(subject) => {
 
     return subject;
 });
+
+Cypress.Commands.add('clickVSlider', {prevSubject: true}, (subject, percentFromLeft) => {
+  const sliderWidth = subject.width()
+  const sliderHeight = subject.height()
+  const pixelsFromLeft = percentFromLeft * sliderWidth
+  const pixelsFromTop = 0.5 * sliderHeight
+  cy.wrap(subject).click(pixelsFromLeft, pixelsFromTop)
+})
