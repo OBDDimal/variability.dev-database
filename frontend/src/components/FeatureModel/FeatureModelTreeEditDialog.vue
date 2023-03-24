@@ -10,7 +10,7 @@
 					<v-card-text>
 						<div>
 							<v-text-field
-								class="edit-feature-name"
+								data-cy="edit-feature-name"
 								v-model="name"
 								:rules="[(value) => !!value || 'Required.']"
 								label="Name"
