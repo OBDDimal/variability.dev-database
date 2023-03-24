@@ -204,5 +204,74 @@ describe('Toolbar tests', () => {
             cy.get('[class*="feature-node-container"]').children().contains('Feature B1').siblings().first().should('have.attr', 'fill', 'rgb(30, 64, 157)');
             cy.get('[class*="feature-node-container"]').children().contains('Feature B2').siblings().first().should('have.attr', 'fill', 'rgb(30, 64, 157)');
         })
+
+        it(`Fit to view`, () => {
+            // add some children
+            cy.get('[class*="feature-node-container"]').children().contains('Feature A').rightclick();
+            cy.contains('Add', { matchCase: true }).click();
+            cy.contains('Add as child', { matchCase: true }).click();
+            cy.get('[data-cy="add-feature-name"]').get('input').eq(1).type('Feature A1');
+            cy.get('[data-cy="tree-add-dialog-add-btn"]').click();
+
+            cy.get('[class*="feature-node-container"]').children().contains('Feature A1').isNotInViewport();
+
+            // fit to view
+            cy.get('[data-cy="feature-model-toolbar-view"]').click();
+            cy.contains('Fit to view', { matchCase: true }).click();
+
+            cy.get('[class*="feature-node-container"]').children().contains('Feature A1').isInViewport();
+        })
+
+        it(`Change direction to horizontally and back to vertically`, () => {
+            cy.get('[class*="feature-node-container"]').children().contains('Feature A').parent().parent().should('have.attr', 'transform', 'translate(-62.69999999999999, 110)');
+            
+            cy.get('[data-cy="feature-model-toolbar-view"]').click();
+            cy.contains('Change direction to horizontally', { matchCase: true }).click();
+
+            cy.get('[class*="feature-node-container"]').children().contains('Feature A').parent().parent().should('have.attr', 'transform', 'translate(129.4, -29)');
+        
+            cy.get('[data-cy="feature-model-toolbar-view"]').click();
+            cy.contains('Change direction to vertically', { matchCase: true }).click();
+
+            cy.get('[class*="feature-node-container"]').children().contains('Feature A').parent().parent().should('have.attr', 'transform', 'translate(-62.69999999999999, 110)');
+        })
+
+        it(`Reset view`, () => {
+            cy.get('[class*="feature-node-container"]').parent().then(($nodeview) => {
+                const transf = $nodeview.attr('transform');
+                
+                const cutStart = transf.replace("translate(", "");
+                const endIndex = cutStart.indexOf(")");
+
+                const translateNumberString = cutStart.substring(0, endIndex);
+                const translateNumber = parseFloat(translateNumberString);
+
+                cy.get('[data-cy="feature-model-toolbar-view"]').click();
+                cy.contains('Change direction to horizontally', { matchCase: true }).click();
+
+                cy.get('[data-cy="feature-model-toolbar-view"]').click();
+                cy.contains('Reset view', { matchCase: true }).click();
+
+                cy.get('[class*="feature-node-container"]').parent().then(($nodeviewChanged) => {
+                    const transf2 = $nodeviewChanged.attr('transform');
+                
+                    const cutStart2 = transf2.replace("translate(", "");
+                    const endIndex2 = cutStart2.indexOf(")");
+
+                    const translateNumberString2 = cutStart2.substring(0, endIndex2);
+                    const translateNumber2 = parseFloat(translateNumberString2);
+
+                    cy.wrap(translateNumber2).should('be.lt', translateNumber);
+                })
+            })
+        })
+
+        it(`Show constraints`, () => {
+            // TODO: this button does not do anything, fix!
+        })
+
+        it(`Short Name`, () => {
+            
+        })
     })
 })
