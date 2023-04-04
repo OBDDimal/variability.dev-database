@@ -1,13 +1,12 @@
 import * as createPaths from '@/services/FeatureModel/createPaths.service.js';
 import * as CONSTANTS from '@/classes/constants';
 import * as collapse from '@/services/FeatureModel/collapse.service.js';
-import { FeatureNode } from '@/classes/FeatureNode';
-import { PseudoNode } from '@/classes/PseudoNode';
+import {FeatureNode} from '@/classes/Configurator/FeatureNode';
+import {PseudoNode} from '@/classes/PseudoNode';
 import * as count from '@/services/FeatureModel/count.service';
-import { ghostNodeTouchMove } from '@/services/FeatureModel/dragAndDrop.service';
-import { RECT_HEIGHT } from '@/classes/constants';
 
 function updateFeatureNodes(d3Data, visibleD3Nodes) {
+    console.log(visibleD3Nodes)
     const featureNode = d3Data.container.featureNodesContainer
         .selectAll('g.node')
         .data(
@@ -17,37 +16,24 @@ function updateFeatureNodes(d3Data, visibleD3Nodes) {
             (d3Node) => d3Node.id || (d3Node.id = ++d3Data.nodeIdCounter)
         );
 
-    console.log("test1")
     // Enter new nodes
     const featureNodeEnter = featureNode
         .enter()
         .append('g')
         .classed('node', true)
-        .call(d3Data.drag.listener)
-        // Highlight and reset highlighting of ghost-nodes during drag and drop of feature-nodes.
-        .on('touchmove', (event) => ghostNodeTouchMove(event, d3Data), true)
         // Open contextmenu with right-click on d3Node.
         .on('contextmenu', (event, d3Node) => {
-            // only use contextmenu on non-mobile devices
-            if (!('ontouchstart' in window)) {
-                event.preventDefault();
-                d3Data.contextMenu.selectedD3Node = d3Node;
-                d3Data.contextMenu.event = event;
-            } else {
-                event.preventDefault();
-            }
+            event.preventDefault();
+            d3Data.contextMenu.selectedD3Node = d3Node;
+            d3Data.contextMenu.event = event;
         })
         // Toggle collapsing on double-clock on feature-node.
         .on('click', (event, d3Node) => {
-            // Use click for contextmenu on mobile
-            if ('ontouchstart' in window) {
-                d3Data.contextMenu.selectedD3Node = d3Node;
-                d3Data.contextMenu.event = event;
-            }
+            d3Data.contextMenu.selectedD3Node = d3Node;
+            d3Data.contextMenu.event = event;
             dblClickEvent(event, d3Data, d3Node);
             collapse.collapseShortcut(d3Data, event, d3Node); // Collapse d3Node with Ctrl + left-click on d3Node.
         });
-    console.log("test2")
 
     const rectAndTextEnter = featureNodeEnter
         .append('g')
@@ -111,7 +97,7 @@ function updateFeatureNodes(d3Data, visibleD3Nodes) {
             return rgb[0] * 0.299 + rgb[1] * 0.587 + rgb[2] * 0.114 <= 186;
         })
         .text((d3Node) =>
-            d3Data.isShortenedName ? d3Node.data.displayName : d3Node.data.name
+            d3Data.isShortenedName ? d3Node.data.displayName : d3Node.data.feature.name
         );
 
     // Remove old/invisible nodes.
@@ -121,106 +107,6 @@ function updateFeatureNodes(d3Data, visibleD3Nodes) {
     featureNodeEnter.append('g').classed('quick-edit-actions-container', true);
 
     updateChildrenCount(d3Data, featureNodeUpdate);
-    updateQuickEditActions(d3Data, featureNodeUpdate);
-}
-
-function updateQuickEditActions(d3Data, featureNodeUpdate) {
-    const quickEditActions = featureNodeUpdate
-        .select('g.quick-edit-actions-container')
-        .selectAll('g.quick-edit-actions')
-        .data(
-            (d) => (d3Data.quickEdit && d3Data.featureModelTree.editRights ? [d] : []),
-            (d) => d.data.id
-        );
-
-    const quickEditActionsEnter = quickEditActions
-        .enter()
-        .append('g')
-        .classed('quick-edit-actions', true);
-    const quickEditActionsUpdate =
-        quickEditActionsEnter.merge(quickEditActions);
-
-    // Bottom circle
-    const bottomEnter = quickEditActionsEnter
-        .append('g')
-        .classed('quick-edit-action-child', true)
-        .on('click', (e, d3Node) => {
-            e.stopPropagation();
-            d3Data.d3AddNodeIndex = d3Node.data.children.length;
-            d3Data.featureModelTree.openAddAsChildDialog(d3Node);
-        });
-    drawQuickEditGroup(bottomEnter);
-    quickEditActionsUpdate
-        .select('g.quick-edit-action-child')
-        .attr('transform', (d3Node) =>
-            d3Data.direction === 'v'
-                ? `translate(0, ${RECT_HEIGHT})`
-                : `translate(${d3Node.width}, 0)`
-        );
-
-    // Left side circle
-    const leftEnter = quickEditActionsEnter
-        .filter((d3Node) => !d3Node.data.isRoot)
-        .append('g')
-        .classed('quick-edit-action-left', true)
-        .on('click', (e, d3Node) => {
-            e.stopPropagation();
-            d3Data.d3AddNodeIndex = d3Node.data.parent.children.indexOf(
-                d3Node.data
-            );
-            d3Data.featureModelTree.openAddAsSiblingDialog(d3Node);
-        });
-    drawQuickEditGroup(leftEnter);
-    quickEditActionsUpdate
-        .select('g.quick-edit-action-left')
-        .attr('transform', (d3Node) =>
-            d3Data.direction === 'v'
-                ? `translate(${-d3Node.width / 2}, ${RECT_HEIGHT / 2})`
-                : `translate(${d3Node.width / 2}, -${RECT_HEIGHT / 2})`
-        );
-
-    // Right side circle
-    const rightEnter = quickEditActionsEnter
-        .filter((d3Node) => !d3Node.data.isRoot)
-        .append('g')
-        .classed('quick-edit-action-right', true)
-        .on('click', (e, d3Node) => {
-            e.stopPropagation();
-            d3Data.d3AddNodeIndex =
-                d3Node.data.parent.children.indexOf(d3Node.data) + 1;
-            d3Data.featureModelTree.openAddAsSiblingDialog(d3Node);
-        });
-    drawQuickEditGroup(rightEnter);
-    quickEditActionsUpdate.select('g.quick-edit-action-right').attr(
-        'transform',
-        (d3Node) => `
-    translate(${d3Node.width / 2}, ${RECT_HEIGHT / 2})`
-    );
-
-    quickEditActions.exit().remove();
-}
-
-function drawQuickEditGroup(d3Element) {
-    // Enlarge on mobile
-    const radius =
-        'ontouchstart' in window
-            ? CONSTANTS.QUICK_EDIT_RADIUS * 1.75
-            : CONSTANTS.QUICK_EDIT_RADIUS;
-    d3Element.append('circle').attr('fill', '#4caf50').attr('r', radius);
-    d3Element
-        .append('path')
-        .attr(
-            'd',
-            `M -0.5 ${-(2 * radius) / 3} h 1 v ${(4 * radius) / 3} h -1 z`
-        )
-        .attr('fill', 'white');
-    d3Element
-        .append('path')
-        .attr(
-            'd',
-            `M ${-(2 * radius) / 3} -0.5 v 1 h ${(4 * radius) / 3} v -1 z`
-        )
-        .attr('fill', 'white');
 }
 
 function updateChildrenCount(d3Data, featureNodeUpdate) {
@@ -382,15 +268,15 @@ function updateHighlightedConstraints(d3Data, visibleD3Nodes) {
             'transform',
             (json, i) => `
     translate(${
-        json.d3Node.x -
-        i * CONSTANTS.STROKE_WIDTH_CONSTANT -
-        CONSTANTS.STROKE_WIDTH_CONSTANT / 2
-    },
+                json.d3Node.x -
+                i * CONSTANTS.STROKE_WIDTH_CONSTANT -
+                CONSTANTS.STROKE_WIDTH_CONSTANT / 2
+            },
         ${
-            json.d3Node.y -
-            i * CONSTANTS.STROKE_WIDTH_CONSTANT -
-            CONSTANTS.STROKE_WIDTH_CONSTANT / 2
-        })`
+                json.d3Node.y -
+                i * CONSTANTS.STROKE_WIDTH_CONSTANT -
+                CONSTANTS.STROKE_WIDTH_CONSTANT / 2
+            })`
         );
 
     // Remove constraints highlighted nodes
@@ -527,9 +413,9 @@ export function calcRectWidth(d3Data, d3Node) {
         return (
             (d3Data.isShortenedName
                 ? d3Node.data.displayName.length
-                : d3Node.data.name.length) *
-                (CONSTANTS.FEATURE_FONT_SIZE *
-                    CONSTANTS.MONOSPACE_HEIGHT_WIDTH_FACTOR) +
+                : d3Node.data.feature.name.length) *
+            (CONSTANTS.FEATURE_FONT_SIZE *
+                CONSTANTS.MONOSPACE_HEIGHT_WIDTH_FACTOR) +
             CONSTANTS.RECT_MARGIN.left +
             CONSTANTS.RECT_MARGIN.right
         );

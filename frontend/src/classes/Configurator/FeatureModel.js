@@ -1,8 +1,8 @@
-import {SelectionState} from "@/classes/Configuration/SelectionState";
+import {SelectionState} from "@/classes/Configurator/SelectionState";
 import beautify from "xml-beautifier";
-import {FeatureNode} from "@/classes/Configuration/FeatureNode";
-import {Version} from "@/classes/Configuration/Version";
-import {Feature} from "@/classes/Configuration/Feature";
+import {FeatureNode} from "@/classes/Configurator/FeatureNode";
+import {Version} from "@/classes/Configurator/Version";
+import {Feature} from "@/classes/Configurator/Feature";
 
 export class FeatureModel {
     constructor(name, versions, features) {

@@ -164,7 +164,7 @@ const routes = [
 		props: true,
 		component: FeatureModelConfiguration,
 		meta: {
-			title: 'Feature Model Configuration',
+			title: 'Feature Model Configurator',
 		},
 	},
 ]

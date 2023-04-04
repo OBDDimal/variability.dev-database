@@ -119,20 +119,23 @@
 
     <!-- feature model viewer -->
     <v-row>
-
+      <feature-model-viewer :version="selectedVersion">
+      </feature-model-viewer>
     </v-row>
   </div>
 </template>
 
 <script>
 import Vue from 'vue';
-import {FeatureModel} from "@/classes/Configuration/FeatureModel";
-import {xmlVersions} from "@/classes/Configuration/example";
-import {SelectionState} from "@/classes/Configuration/SelectionState";
-import {Version} from "@/classes/Configuration/Version";
+import {FeatureModel} from "@/classes/Configurator/FeatureModel";
+import {xmlVersions} from "@/classes/Configurator/example";
+import {SelectionState} from "@/classes/Configurator/SelectionState";
+import {Version} from "@/classes/Configurator/Version";
+import FeatureModelViewer from "@/components/Configurator/FeatureModelViewer.vue";
 
 export default Vue.extend({
   name: 'FeatureModelConfiguration',
+  components: {FeatureModelViewer},
   computed: {
     SelectionState() {
       return SelectionState
