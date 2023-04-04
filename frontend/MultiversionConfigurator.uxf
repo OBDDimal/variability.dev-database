@@ -4,8 +4,8 @@
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>710</x>
-      <y>260</y>
+      <x>690</x>
+      <y>330</y>
       <w>230</w>
       <h>190</h>
     </coordinates>
@@ -21,8 +21,8 @@ crossTreeConstraints : List&lt;CTC&gt;
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>1070</x>
-      <y>260</y>
+      <x>1050</x>
+      <y>330</y>
       <w>210</w>
       <h>190</h>
     </coordinates>
@@ -39,8 +39,8 @@ crossTreeConstraints : List&lt;CTC&gt;
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>930</x>
-      <y>330</y>
+      <x>910</x>
+      <y>400</y>
       <w>160</w>
       <h>40</h>
     </coordinates>
@@ -51,8 +51,8 @@ root</panel_attributes>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>1430</x>
-      <y>100</y>
+      <x>1410</x>
+      <y>170</y>
       <w>150</w>
       <h>130</h>
     </coordinates>
@@ -70,8 +70,8 @@ ExplicitlyDeselected</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>1260</x>
-      <y>220</y>
+      <x>1240</x>
+      <y>290</y>
       <w>360</w>
       <h>460</h>
     </coordinates>
@@ -82,8 +82,8 @@ SelectionState</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>810</x>
-      <y>140</y>
+      <x>790</x>
+      <y>210</y>
       <w>640</w>
       <h>140</h>
     </coordinates>
@@ -94,8 +94,8 @@ SelectionState</panel_attributes>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>1070</x>
-      <y>560</y>
+      <x>1050</x>
+      <y>630</y>
       <w>200</w>
       <h>190</h>
     </coordinates>
@@ -109,8 +109,8 @@ name : String
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>1160</x>
-      <y>440</y>
+      <x>1140</x>
+      <y>510</y>
       <w>50</w>
       <h>140</h>
     </coordinates>
@@ -121,8 +121,8 @@ m1=0..n</panel_attributes>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>130</x>
-      <y>220</y>
+      <x>110</x>
+      <y>290</y>
       <w>450</w>
       <h>250</h>
     </coordinates>
@@ -147,8 +147,8 @@ _+ create(versionsXML : List&lt;XML&gt;) : FeatureModel_
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>570</x>
-      <y>340</y>
+      <x>550</x>
+      <y>410</y>
       <w>160</w>
       <h>40</h>
     </coordinates>
@@ -159,8 +159,8 @@ m2=1..n</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>340</x>
-      <y>460</y>
+      <x>320</x>
+      <y>530</y>
       <w>750</w>
       <h>230</h>
     </coordinates>
@@ -171,8 +171,8 @@ m2=0..n</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>1270</x>
-      <y>330</y>
+      <x>1250</x>
+      <y>400</y>
       <w>160</w>
       <h>60</h>
     </coordinates>

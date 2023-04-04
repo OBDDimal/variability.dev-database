@@ -1,5 +1,5 @@
 export const SelectionState = {
-    Unselected: "Unselected",
+    Unselected: 'Unselected',
     ImplicitlySelected: 'ImplicitlySelected',
     ImplicitlyDeselected: 'ImplicitlyDeselected',
     ExplicitlySelected: 'ExplicitlySelected',

@@ -1,4 +1,4 @@
-import SelectionState from './SelectionState';
+import {SelectionState} from "@/classes/Configuration/SelectionState";
 
 export class Feature {
     constructor(name) {

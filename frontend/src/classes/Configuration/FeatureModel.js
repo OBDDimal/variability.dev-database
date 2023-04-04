@@ -1,13 +1,64 @@
 import {SelectionState} from "@/classes/Configuration/SelectionState";
+import beautify from "xml-beautifier";
+import {FeatureNode} from "@/classes/Configuration/FeatureNode";
+import {Version} from "@/classes/Configuration/Version";
+import {Feature} from "@/classes/Configuration/Feature";
 
 export class FeatureModel {
-    constructor(name, versions) {
+    constructor(name, versions, features) {
         this.name = name;
         this.versions = versions;
+        this.features = features;
     }
 
-    static create(versionsXML) {
-        return [versionsXML];
+    static create(xmlVersions) {
+        let versionIndex = 0;
+        const features = [];
+        const versions = xmlVersions.map(v => {
+            const xml = beautify(v);
+
+            // To remove the <?xml...?> line
+            let m = xml.split('\n').splice(1).join('\n');
+
+            const parser = new DOMParser();
+            const xmlDocument = parser.parseFromString(m, 'text/xml');
+
+            const struct = xmlDocument.querySelector('struct');
+            const root = this.parseChildren(struct, null, features)[0];
+
+            return new Version(versionIndex++, root);
+        });
+
+        return new FeatureModel("FM", versions, features);
+    }
+
+    static parseChildren(struct, parent, features) {
+        let toReturn = [];
+
+        for (const child of struct.childNodes) {
+            // To remove #text nodes, as they don't have a tagName
+            if (child.tagName) {
+                const featureName = child.getAttribute('name');
+                let feature = features.find(f => f.name === featureName);
+                if (!feature) {
+                    feature = new Feature(featureName);
+                    features.push(feature);
+                }
+
+                let toAppend = new FeatureNode(
+                    feature,
+                    parent,
+                    featureName,
+                    child.tagName,
+                    child.getAttribute('mandatory') === 'true',
+                    child.getAttribute('abstract') === 'true'
+                );
+                toAppend.children = this.parseChildren(child, toAppend, features);
+                toReturn.push(toAppend);
+            }
+        }
+
+        return toReturn;
     }
 
     getAllFeatures(versions) {

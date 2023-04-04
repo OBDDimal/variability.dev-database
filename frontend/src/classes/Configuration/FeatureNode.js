@@ -1,10 +1,11 @@
-import * as CONSTANTS from './constants';
+import * as CONSTANTS from '../constants';
 import * as d3 from "d3";
 import {PseudoNode} from "@/classes/PseudoNode";
 
 export class FeatureNode {
     constructor(feature, parent, name, groupType, mandatory, abstract) {
         this.feature = feature;
+        this.feature.featureNodes.push(this);
         this.parent = parent;
         this.children = [];
 

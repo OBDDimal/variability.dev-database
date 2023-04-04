@@ -1,10 +1,10 @@
-import SelectionState from './SelectionState';
+import {SelectionState} from "@/classes/Configuration/SelectionState";
 
 export class Version {
     constructor(version, root) {
         this.version = version;
         this.root = root;
-        this.selectionState = SelectionState.undefined;
+        this.selectionState = SelectionState.Unselected;
     }
 
     getFeatures() {
