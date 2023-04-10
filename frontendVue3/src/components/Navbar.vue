@@ -5,8 +5,8 @@
                 <v-img
                     :src="
                         theme.global.current.value.dark
-                            ? 'ddueruem_logo_dark.svg'
-                            : 'ddueruem_logo.svg'
+                            ? '/ddueruem_logo_dark.svg'
+                            : '/ddueruem_logo.svg'
                     "
                     alt="logo"
                 />

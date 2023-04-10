@@ -38,6 +38,15 @@ const routes = [
         component: () =>
             import(/* webpackChunkName: "home" */ '@/views/DSGVO.vue'),
     },
+    {
+        path: '/files/:id/:slug',
+        name: 'FileDetail',
+        component: () =>
+            import(/* webpackChunkName: "home" */ '@/views/FileDetail.vue'),
+        meta: {
+            title: 'File Detail',
+        },
+    },
 ];
 
 const router = createRouter({

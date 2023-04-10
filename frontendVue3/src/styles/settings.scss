@@ -8,3 +8,7 @@
 // @use 'vuetify' with (
 //   $color-pack: false
 // );
+
+.v-btn {
+  text-transform: none;
+}

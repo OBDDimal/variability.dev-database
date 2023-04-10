@@ -39,6 +39,27 @@ export const useFileStore = defineStore('file', {
                 }
             );
         },
+        async deleteFeatureModel(id) {
+            const appStore = useAppStore();
+            await api
+                .delete(`${API_URL}files/${id}/`)
+                .then(() => {
+                    appStore.updateSnackbar(
+                        'File deleted successfully!',
+                        'success',
+                        5000,
+                        true
+                    );
+                })
+                .catch((error) => {
+                    appStore.updateSnackbar(
+                        'Error: ' + error.message,
+                        'error',
+                        5000,
+                        true
+                    );
+                });
+        },
         async fetchFeatureModelOfFamily(value) {
             await api
                 .get(`${API_URL}files/uploaded/confirmed/?family=${value}`)

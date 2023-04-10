@@ -7,7 +7,6 @@
                 :items="items"
                 items-per-page="5"
                 :search="props.search"
-                @click:row="handleClick"
             >
                 <template v-slot:top>
                     <v-toolbar flat style="background-color: transparent">
@@ -139,6 +138,17 @@
                   </v-dialog>-->
                     </v-toolbar>
                 </template>
+                <template v-slot:item.label="{ item }">
+                    <v-btn
+                        variant="text"
+                        color="primary"
+                        append-icon="mdi-arrow-top-right-thin"
+                        @click="handleClick(item.raw)"
+                    >
+                        {{ item.raw.label }}
+                    </v-btn>
+                    <!-- <v-btn small rounded color="error" class="mr-2"> <v-icon>mdi-delete</v-icon></v-btn> -->
+                </template>
                 <template v-slot:item.actions="{ item }">
                     <v-btn
                         class="mr-2"
@@ -172,7 +182,6 @@
                 <template v-slot:item.id="{ item }">
                     {{ item.value }}
                 </template>
-                <template v-slot:no-data> {{ noDataText }} </template>
                 <template v-slot:item.tags="{ item }">
                     <div v-if="item.columns.tags.length <= 2">
                         <v-chip
@@ -208,6 +217,7 @@
                 <template v-slot:item.uploaded="{ item }">
                     {{ new Date(item.raw.uploaded_at).toLocaleString('en-US') }}
                 </template>
+                <template v-slot:no-data> {{ noDataText }} </template>
             </v-data-table>
         </v-card>
         <v-dialog v-model="createDialog" width="auto">
@@ -220,7 +230,9 @@
 import FileCreate from '@/components/upload_cards/FileCreate.vue';
 import { useAuthStore } from '@/store/auth';
 import { computed, ref } from 'vue';
+import { useRouter } from 'vue-router';
 
+const router = useRouter();
 const authStore = useAuthStore();
 
 const props = defineProps({
@@ -314,10 +326,11 @@ function deleteItem(item) {
     this.dialogDelete = true;
 }
 function handleClick(value) {
-    /*this.$router.push({
-    name: 'FileDetail',
-    params: { id: value.id, slug: value.slug },
-  });*/
+    console.log(value);
+    router.push({
+        name: 'FileDetail',
+        params: { id: value.id, slug: value.slug },
+    });
 }
 function setHovered() {}
 </script>
