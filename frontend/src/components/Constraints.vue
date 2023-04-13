@@ -25,6 +25,7 @@
             <template v-slot:top>
                 <div class="d-flex justify-center align-center">
                     <v-text-field
+                        data-cy="constraint-search"
                         v-model="search"
                         class="mx-4"
                         label="Search"
@@ -32,6 +33,7 @@
                     ></v-text-field>
 
                     <v-btn
+                        data-cy="add-constraint-button"
                         icon
                         outlined
                         :disabled="!editRights"
@@ -42,6 +44,7 @@
                     </v-btn>
 
                     <v-btn
+                        data-cy="undo-constraint-operation-button"
                         :disabled="
                             !commandManager.isUndoAvailable() || !editRights
                         "
@@ -54,6 +57,7 @@
                     </v-btn>
 
                     <v-btn
+                        data-cy="redo-constraint-operation-button"
                         :disabled="
                             !commandManager.isRedoAvailable() || !editRights
                         "
@@ -64,7 +68,10 @@
                         <v-icon>mdi-redo</v-icon>
                     </v-btn>
 
-                    <v-btn icon @click="$emit('close')">
+                    <v-btn
+                        data-cy="close-constraint-window-button"
+                        icon
+                        @click="$emit('close')">
                         <v-icon>mdi-close</v-icon>
                     </v-btn>
                 </div>
@@ -72,6 +79,7 @@
 
             <template v-slot:item.formula="{ item }">
                 <v-chip
+                    data-cy="constraint-chip"
                     v-model="item.checked"
                     :color="item.constraint.color"
                     :style="`color: ${computeColor(item.constraint.color)}`"
@@ -83,6 +91,7 @@
 
             <template v-slot:item.actions="{ item }">
                 <v-icon
+                    data-cy="constraint-edit"
                     class="mr-6"
                     @click="openAddEditDialog('Edit', item.constraint)"
                     :disabled="!editRights"
@@ -90,6 +99,7 @@
                     mdi-pencil
                 </v-icon>
                 <v-icon
+                    data-cy="constraint-delete"
                     @click="deleteConstraint(item.constraint)"
                     :disabled="!editRights"
                 >
