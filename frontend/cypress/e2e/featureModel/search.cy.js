@@ -83,7 +83,7 @@ describe('Search tests', () => {
             cy.get('[data-cy="feature-model-search-right-button"]').should('be.disabled');
         })
 
-        it.only(`Pressing X button in the search should clear colors and searchtext`, () => {
+        it(`Pressing X button in the search should clear colors and searchtext`, () => {
             cy.get('[data-cy="feature-model-search"]').parent().parent().parent().parent().click();
             cy.get('[data-cy="feature-model-search"]').type(' A');
             cy.get('[class*="feature-node-container"]').children().contains('Root').siblings().first().should('have.class', 'is-searched-feature');
