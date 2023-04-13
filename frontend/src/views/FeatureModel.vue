@@ -92,7 +92,7 @@
                         Cancel
                     </v-btn>
 
-                    <v-btn color="primary" text @click="createCollaboration">
+                    <v-btn data-cy="feature-model-start-collaboration-button" color="primary" text @click="createCollaboration">
                         Start
                     </v-btn>
                 </v-card-actions>

@@ -350,5 +350,183 @@ describe('Toolbar tests', () => {
                 })
             })
         })
+
+        it(`Space siblings horizontal scaling`, () => {
+            cy.get('[class*="feature-node-container"]').children().contains('Feature A').parent().parent().then(($featureATransform) => {
+                const transf = $featureATransform.attr('transform');
+                
+                const cutStart = transf.replace("translate(", "");
+                const endIndex = cutStart.indexOf(")");
+
+                const xAxisNumberString = cutStart.substring(0, endIndex);
+                const xAxisNumber = parseFloat(xAxisNumberString);
+
+                cy.get('[class*="feature-node-container"]').children().contains('Feature B').parent().parent().then(($featureBTransform) => {
+                    const transfB = $featureBTransform.attr('transform');
+                    
+                    const cutStartB = transfB.replace("translate(", "");
+                    const endIndexB = cutStartB.indexOf(")");
+
+                    const xAxisNumberStringB = cutStartB.substring(0, endIndexB);
+                    const xAxisNumberB = parseFloat(xAxisNumberStringB);
+
+                    cy.get('[data-cy="feature-model-toolbar-view"]').click();
+                    cy.get('[data-cy="sibling-space-slider"]').parent().clickVSlider(0.50);
+
+                    cy.get('[class*="feature-node-container"]').children().contains('Feature A').parent().parent().then(($featureATransformChanged) => {
+                        const transf2 = $featureATransformChanged.attr('transform');
+                    
+                        const cutStart2 = transf2.replace("translate(", "");
+                        const endIndex2 = cutStart2.indexOf(")");
+
+                        const xAxisNumberString2 = cutStart2.substring(0, endIndex2);
+                        const xAxisNumber2 = parseFloat(xAxisNumberString2);
+
+                        cy.get('[class*="feature-node-container"]').children().contains('Feature B').parent().parent().then(($featureBTransformChanged) => {
+                            const transfB2 = $featureBTransformChanged.attr('transform');
+                    
+                            const cutStartB2 = transfB2.replace("translate(", "");
+                            const endIndexB2 = cutStartB2.indexOf(")");
+
+                            const xAxisNumberStringB2 = cutStartB2.substring(0, endIndexB2);
+                            const xAxisNumberB2 = parseFloat(xAxisNumberStringB2);
+                            
+                            cy.wrap(xAxisNumber2).should('be.lt', xAxisNumber);
+                            cy.wrap(xAxisNumberB2).should('be.gt', xAxisNumberB);
+                        })
+                    })
+                })
+            })
+        })
+
+        it(`Space siblings vertical scaling`, () => {
+            cy.get('[data-cy="feature-model-toolbar-view"]').click();
+            cy.contains('Change direction to horizontally', { matchCase: true }).click();
+
+            cy.get('[class*="feature-node-container"]').children().contains('Feature A').parent().parent().then(($featureATransform) => {
+                const transf = $featureATransform.attr('transform');
+                
+                const startIndex = transf.indexOf(" ");
+
+                const numberWithClosingBracket = transf.substring(startIndex);
+                const yAxisNumberString = numberWithClosingBracket.replace(")", "");
+                const yAxisNumber = parseFloat(yAxisNumberString);
+
+                cy.get('[class*="feature-node-container"]').children().contains('Feature B').parent().parent().then(($featureBTransform) => {
+                    const transfB = $featureBTransform.attr('transform');
+                
+                    const startIndexB = transfB.indexOf(" ");
+
+                    const numberWithClosingBracketB = transfB.substring(startIndexB);
+                    const yAxisNumberStringB = numberWithClosingBracketB.replace(")", "");
+                    const yAxisNumberB = parseFloat(yAxisNumberStringB);
+
+                    cy.get('[data-cy="feature-model-toolbar-view"]').click();
+                    cy.get('[data-cy="sibling-space-slider"]').parent().clickVSlider(0.50);
+
+
+                    cy.get('[class*="feature-node-container"]').children().contains('Feature A').parent().parent().then(($featureATransformChanged) => {
+                        const transf2 = $featureATransformChanged.attr('transform');
+                    
+                        const startIndex2 = transf2.indexOf(" ");
+
+                        const numberWithClosingBracket2 = transf2.substring(startIndex2);
+                        const yAxisNumberString2 = numberWithClosingBracket2.replace(")", "");
+                        const yAxisNumber2 = parseFloat(yAxisNumberString2);
+
+                        cy.get('[class*="feature-node-container"]').children().contains('Feature B').parent().parent().then(($featureBTransformChanged) => {
+                            const transfB2 = $featureBTransformChanged.attr('transform');
+                    
+                            const startIndexB2 = transfB2.indexOf(" ");
+
+                            const numberWithClosingBracketB2 = transfB2.substring(startIndexB2);
+                            const yAxisNumberStringB2 = numberWithClosingBracketB2.replace(")", "");
+                            const yAxisNumberB2 = parseFloat(yAxisNumberStringB2);
+
+                            cy.wrap(yAxisNumber2).should('be.lt', yAxisNumber);
+                            cy.wrap(yAxisNumberB2).should('be.gt', yAxisNumberB);
+                        })
+                    })
+                })
+            })
+        })
+
+        it(`export file`, () => {
+            cy.get('[data-cy="feature-model-toolbar-export"]').click();
+            cy.readFile('cypress\\Downloads\\featureModel.xml');
+        })
+
+        it(`collaboration`, () => {
+            cy.get('[data-cy="feature-model-toolbar-collaboration"]').click();
+            cy.get('[data-cy="feature-model-start-collaboration-button"]').click();
+            // A request to peerjs is going out via websocket call (something like: ws://localhost:9000/myapp/peerjs?key=peerjs&id=cf1b17ddd&token=yv6f99sng3j&version=1.4.7)
+            // it's not possible to intercept websocket calls with cypress: https://stackoverflow.com/questions/71705986/capture-websocket-request-in-cypress
+            // TODO: find a solution to test peerjs start
+        })
+
+        it(`tutorial`, () => {
+            cy.get('[data-cy="feature-model-toolbar-tutorial"]').click();
+            cy.contains('START TUTORIAL', { matchCase: false }).click();
+            cy.contains('Welcome to the tutorial!', { matchCase: false }).should('exist');
+        })
+
+        it(`settings -> adjust levels`, () => {
+            cy.get('.feature-node-container').children().should('have.length', 3);
+            cy.get('[data-cy="feature-model-toolbar-settings"]').click();
+            cy.get('[data-cy="feature-model-toolbar-adjust-levels"]').clear();
+            cy.get('[data-cy="feature-model-toolbar-adjust-levels"]').type('0{enter}');
+            cy.get('.feature-node-container').children().should('have.length', 1);
+        })
+
+        it(`settings -> adjust max children`, () => {
+            cy.get('.feature-node-container').children().should('have.length', 3);
+            cy.get('[data-cy="feature-model-toolbar-settings"]').click();
+            cy.get('[data-cy="feature-model-toolbar-adjust-max-children"]').clear();
+            cy.get('[data-cy="feature-model-toolbar-adjust-max-children"]').type('1{enter}');
+            cy.get('.feature-node-container').children().should('have.length', 1);
+            cy.get('[data-cy="feature-model-toolbar-adjust-max-children"]').clear();
+            cy.get('[data-cy="feature-model-toolbar-adjust-max-children"]').type('0{enter}');
+            cy.get('.feature-node-container').children().should('have.length', 1);
+        })
+
+        it(`settings -> semantic editing`, () => {
+            cy.get('[data-cy="feature-model-toolbar-settings"]').click();
+            cy.get('[data-cy="feature-model-toolbar-semantic-editing-checkbox"]').click({force: true});
+
+            // drag and drop
+            const dataTransfer = new DataTransfer();
+            cy.get('[class*="feature-node-container"]').parent().trigger('dragstart', 'bottomLeft', { dataTransfer });
+            cy.get('[class*="feature-node-container"]').parent().trigger('drop', 'bottomRight', { dataTransfer });
+            cy.get('[class*="feature-node-container"]').parent().trigger('dragend', 'bottomLeft');  
+
+            // cy.get('[class*="feature-node-container"]').children().contains('Feature A').parent().parent().trigger('dragstart', { dataTransfer });
+            // cy.get('[class*="feature-node-container"]').children().contains('Feature B').parent().parent().trigger('drop', 'bottom', { dataTransfer });
+            // cy.get('[class*="feature-node-container"]').children().contains('Feature A').parent().parent().trigger('dragend');  
+
+
+            //cy.get('[class*="feature-node-container"]').children().contains('Feature A').trigger('dragstart');
+            //cy.get('[class*="feature-node-container"]').children().contains('Feature B').trigger('drop', 'bottom');
+
+            // It seems the D3 drag and drop events are not supported by cypress...
+            // https://stackoverflow.com/questions/54027884/testing-d3-js-drag-events-with-cypress-js
+            // TODO: wait for a solution on this topic
+        })
+
+        it(`settings -> quick edit`, () => {
+            cy.get('[data-cy="feature-model-toolbar-settings"]').click();
+            cy.get('[data-cy="feature-model-toolbar-quick-edit-checkbox"]').click({force: true});
+
+            cy.get('[class*="feature-node-container"]').children().contains('Feature A').parent().parent().click('left');
+            cy.get('[data-cy="add-feature-name"]').should('exist');
+            cy.get('[data-cy="tree-add-dialog-discard-btn"]').click();
+
+            cy.get('[class*="feature-node-container"]').children().contains('Feature A').parent().parent().click('bottom');
+            cy.get('[data-cy="add-feature-name"]').should('exist');
+            cy.get('[data-cy="tree-add-dialog-discard-btn"]').click();
+
+            cy.get('[class*="feature-node-container"]').children().contains('Feature A').parent().parent().click('right');
+            cy.get('[data-cy="add-feature-name"]').should('exist');
+            cy.get('[data-cy="tree-add-dialog-discard-btn"]').click();
+        })
     })
 })

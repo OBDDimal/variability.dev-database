@@ -41,7 +41,7 @@
 
 					<v-card-actions>
 						<v-spacer></v-spacer>
-						<v-btn color="secondary" text @click="discard">
+						<v-btn data-cy="tree-add-dialog-discard-btn" color="secondary" text @click="discard">
 							Discard</v-btn
 						>
 						<v-btn :disabled="!name" color="primary" text type="submit" data-cy="tree-add-dialog-add-btn"> Add</v-btn>
