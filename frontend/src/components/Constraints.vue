@@ -32,6 +32,7 @@
                     ></v-text-field>
 
                     <v-btn
+                        data-cy="add-constraint-button"
                         icon
                         outlined
                         :disabled="!editRights"
@@ -64,7 +65,10 @@
                         <v-icon>mdi-redo</v-icon>
                     </v-btn>
 
-                    <v-btn icon @click="$emit('close')">
+                    <v-btn
+                        data-cy="close-constraint-window-button"
+                        icon
+                        @click="$emit('close')">
                         <v-icon>mdi-close</v-icon>
                     </v-btn>
                 </div>

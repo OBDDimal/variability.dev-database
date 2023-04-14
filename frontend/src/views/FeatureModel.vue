@@ -39,6 +39,7 @@
         </v-btn>
 
         <v-btn
+            data-cy="feature-model-constraints-button"
             id="feature-model-constraints"
             absolute
             bottom

@@ -187,7 +187,7 @@
                     <template v-slot:activator="{ on, attrs }">
                         <v-list-item v-bind="attrs" v-on="on">
                             <v-list-item-icon>
-                                <v-icon>mdi-eye</v-icon>
+                                <v-icon data-cy="feature-model-toolbar-view">mdi-eye</v-icon>
                             </v-list-item-icon>
 
                             <v-list-item-content>

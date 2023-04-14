@@ -12,6 +12,7 @@
                 <v-form @submit.prevent="save">
                     <v-card-text>
                         <v-combobox
+                            data-cy="add-constraint-select-node-input"
                             ref="allNodes"
                             v-model="selectedFeatureNode"
                             :items="allNodes"
@@ -25,6 +26,7 @@
                         <v-row justify="space-between">
                             <v-col cols="6" sm="auto">
                                 <v-btn
+                                    data-cy="add-constraint-and-button"
                                     outlined
                                     @click="appendText('AND', true, true)"
                                 >and
@@ -106,6 +108,7 @@
                         </v-btn
                         >
                         <v-btn
+                            data-cy="add-constraint-add-button"
                             :disabled="!isValid"
                             color="primary"
                             text
