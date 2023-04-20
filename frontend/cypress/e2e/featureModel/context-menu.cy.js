@@ -1,4 +1,4 @@
-describe('Search tests', () => {
+describe('Context menu tests', () => {
     context('720p resolution', () => {
     
         beforeEach(() => {
