@@ -27,7 +27,8 @@ describe('Tags page tests', () => {
 
                 return response.body;
             })
-            cy.intercept('tags/').as('getTags');
+            cy.intercept('GET', 'tags/').as('getTags');
+            cy.intercept('POST', 'tags/').as('postTags');
             cy.visit('localhost:8080/tags');
         })
 
@@ -49,22 +50,24 @@ describe('Tags page tests', () => {
                     cy.get('[data-cy="tag-edit-description-textfield"]').type('cypresstagdescription');
                     cy.get('[data-cy="tag-edit-is-public-checkbox"]').click({force: true});
                     cy.get('[data-cy="tag-edit-save-button"]').click();
-                    cy.get('[data-cy="tag-table"]').get('tr').should('have.length', $oldRowNumber+1);
-                    cy.get('[data-cy="tag-table"]').get('tr').contains('cypresstagtabel').should('exist');
-                    cy.get('[data-cy="tag-table"]').get('tr').contains('cypresstagdescription').should('exist');
-                    
-                    //delete the tag
-                    cy.get('[data-cy="tag-delete-button"]').should('have.length', $oldRowNumber);
-                    cy.get('[data-cy="tag-delete-button"]').last().click();
-                    cy.get('[data-cy="tag-delete-confirm-button"]').click();
-                    cy.get('[data-cy="tag-delete-button"]').should('have.length', $oldRowNumber-1);
-                    cy.get('[data-cy="tag-table"]').get('tr').should('have.length', $oldRowNumber);
-                    cy.get('[data-cy="tag-table"]').get('tr').contains('cypresstagtabel').should('not.exist');
-                    cy.get('[data-cy="tag-table"]').get('tr').contains('cypresstagdescription').should('not.exist');
+                    cy.wait(['@postTags', '@getTags']).then((interception) => {
+                        cy.get('[data-cy="tag-table"]').get('tr').should('have.length', $oldRowNumber+1);
+                        cy.get('[data-cy="tag-table"]').get('tr').contains('cypresstagtabel').should('exist');
+                        cy.get('[data-cy="tag-table"]').get('tr').contains('cypresstagdescription').should('exist');
+                        
+                        //delete the tag
+                        cy.get('[data-cy="tag-delete-button"]').should('have.length', $oldRowNumber);
+                        cy.get('[data-cy="tag-delete-button"]').last().click();
+                        cy.get('[data-cy="tag-delete-confirm-button"]').click();
+                        cy.get('[data-cy="tag-delete-button"]').should('have.length', $oldRowNumber-1);
+                        cy.get('[data-cy="tag-table"]').get('tr').should('have.length', $oldRowNumber);
+                        cy.get('[data-cy="tag-table"]').get('tr').contains('cypresstagtabel').should('not.exist');
+                        cy.get('[data-cy="tag-table"]').get('tr').contains('cypresstagdescription').should('not.exist');
 
-                    // TODO: These "cypresstaglabel" and "cypresstagdescription" tags probably need to be sanitized in the live system,
-                    // so the tests don't break if users create same labels or descriptions.
-                    // Not sure how to achieve this.
+                        // TODO: These "cypresstaglabel" and "cypresstagdescription" tags probably need to be sanitized in the live system,
+                        // so the tests don't break if users create same labels or descriptions.
+                        // Not sure how to achieve this.
+                    })
                 })
             })
         })
@@ -78,27 +81,29 @@ describe('Tags page tests', () => {
                     cy.get('[data-cy="tag-edit-description-textfield"]').type('cypresstagdescription');
                     cy.get('[data-cy="tag-edit-is-public-checkbox"]').click({force: true});
                     cy.get('[data-cy="tag-edit-save-button"]').click();
-                    cy.get('[data-cy="tag-table"]').get('tr').should('have.length', $oldRowNumber+1);
-                    cy.get('[data-cy="tag-table"]').get('tr').contains('cypresstagtabel').should('exist');
-                    cy.get('[data-cy="tag-table"]').get('tr').contains('cypresstagdescription').should('exist');
+                    cy.wait(['@postTags', '@getTags']).then((interception) => {
+                        cy.get('[data-cy="tag-table"]').get('tr').should('have.length', $oldRowNumber+1);
+                        cy.get('[data-cy="tag-table"]').get('tr').contains('cypresstagtabel').should('exist');
+                        cy.get('[data-cy="tag-table"]').get('tr').contains('cypresstagdescription').should('exist');
 
-                    //search the tag
-                    cy.get('[data-cy="tag-search"]').type('cypresstagtabel');
-                    cy.get('[data-cy="tag-table"]').get('tr').should('have.length', 2);
-                    cy.get('[data-cy="tag-table"]').get('tr').contains('cypresstagtabel').should('exist');
-                    cy.get('[data-cy="tag-table"]').get('tr').contains('cypresstagdescription').should('exist');
+                        //search the tag
+                        cy.get('[data-cy="tag-search"]').type('cypresstagtabel');
+                        cy.get('[data-cy="tag-table"]').get('tr').should('have.length', 2);
+                        cy.get('[data-cy="tag-table"]').get('tr').contains('cypresstagtabel').should('exist');
+                        cy.get('[data-cy="tag-table"]').get('tr').contains('cypresstagdescription').should('exist');
 
-                    //clear search
-                    cy.get('[data-cy="tag-search"]').clear();
-                    
-                    //delete the tag
-                    cy.get('[data-cy="tag-delete-button"]').should('have.length', $oldRowNumber);
-                    cy.get('[data-cy="tag-delete-button"]').last().click();
-                    cy.get('[data-cy="tag-delete-confirm-button"]').click();
-                    cy.get('[data-cy="tag-delete-button"]').should('have.length', $oldRowNumber-1);
-                    cy.get('[data-cy="tag-table"]').get('tr').should('have.length', $oldRowNumber);
-                    cy.get('[data-cy="tag-table"]').get('tr').contains('cypresstagtabel').should('not.exist');
-                    cy.get('[data-cy="tag-table"]').get('tr').contains('cypresstagdescription').should('not.exist');
+                        //clear search
+                        cy.get('[data-cy="tag-search"]').clear();
+                        
+                        //delete the tag
+                        cy.get('[data-cy="tag-delete-button"]').should('have.length', $oldRowNumber);
+                        cy.get('[data-cy="tag-delete-button"]').last().click();
+                        cy.get('[data-cy="tag-delete-confirm-button"]').click();
+                        cy.get('[data-cy="tag-delete-button"]').should('have.length', $oldRowNumber-1);
+                        cy.get('[data-cy="tag-table"]').get('tr').should('have.length', $oldRowNumber);
+                        cy.get('[data-cy="tag-table"]').get('tr').contains('cypresstagtabel').should('not.exist');
+                        cy.get('[data-cy="tag-table"]').get('tr').contains('cypresstagdescription').should('not.exist');
+                    })
                 })
             })
         })

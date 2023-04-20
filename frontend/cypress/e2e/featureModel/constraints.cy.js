@@ -1,4 +1,4 @@
-describe('Search tests', () => {
+describe('Constraints tests', () => {
     context('720p resolution', () => {
     
         beforeEach(() => {
