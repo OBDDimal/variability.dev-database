@@ -18,6 +18,7 @@
             local-storage-identifier="homeTutorialCompleted"
         ></tutorial-mode>
         <v-btn
+            data-cy="tutorial-mode-button"
             id="tutorial-mode"
             fab
             fixed
