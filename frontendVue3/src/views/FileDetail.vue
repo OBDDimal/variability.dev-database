@@ -411,36 +411,96 @@
             fullscreen
             transition="dialog-bottom-transition"
         >
-            <v-toolbar dark>
-                <v-icon class="mr-2">mdi-file-compare</v-icon>
-                <v-toolbar-title
-                    >View and compare Feature Model artifacts:
-                    <span class="font-weight-bold">{{
-                        selectedArtifact.title
-                    }}</span></v-toolbar-title
-                >
+            <v-toolbar dark color="primary">
+                <!--                <v-icon icon="mdi-file-compare" class="mx-2"></v-icon>-->
+                <v-toolbar-title>
+                    View and compare Feature Model artifacts:
+                    <span class="font-weight-bold">
+                        {{ selectedArtifact.title }}
+                    </span>
+                </v-toolbar-title>
                 <v-spacer></v-spacer>
                 <v-toolbar-items>
-                    <v-btn icon dark @click="dialogArtifact = false">
-                        <v-icon>mdi-close</v-icon>
+                    <v-btn
+                        icon="mdi-close"
+                        dark
+                        @click="dialogArtifact = false"
+                    >
                     </v-btn>
                 </v-toolbar-items>
             </v-toolbar>
             <v-card>
                 <v-card-text>
+                    <v-row>
+                        <v-col cols="12" class="pb-0">
+                            <div class="text-subtitle-2">Toggle Headers</div>
+                        </v-col>
+                        <v-col cols="12" class="d-flex">
+                            <v-btn-toggle
+                                v-model="selectedCols"
+                                multiple
+                                density="compact"
+                                rounded="xl"
+                            >
+                                <v-btn
+                                    v-for="(
+                                        item, index
+                                    ) in headerCsvArtifactFull"
+                                    :key="index"
+                                    size="small"
+                                    variant="outlined"
+                                    :value="item.key"
+                                    :prepend-icon="
+                                        selectedCols.includes(item.key)
+                                            ? 'mdi-check'
+                                            : null
+                                    "
+                                >
+                                    {{ item.title }}
+                                </v-btn>
+                            </v-btn-toggle>
+                            <v-spacer></v-spacer>
+                            <v-btn
+                                :disabled="selectedCols.length === 0"
+                                variant="tonal"
+                                value="collapse"
+                                rounded="xl"
+                                @click="selectedCols = []"
+                            >
+                                Collapse all
+                            </v-btn>
+                            <v-btn
+                                :disabled="
+                                    selectedCols.length ===
+                                    headerCsvArtifactFull.length
+                                "
+                                variant="tonal"
+                                value="collapse"
+                                rounded="xl"
+                                class="ml-2"
+                                @click="
+                                    selectedCols = headerCsvArtifactFull.map(
+                                        (el) => el.key
+                                    )
+                                "
+                            >
+                                Expand all
+                            </v-btn>
+                        </v-col>
+                    </v-row>
+                    <v-divider class="mt-4"></v-divider>
                     <v-row class="ma-1">
                         <v-col
                             cols="12"
-                            :md="isRightFmSelected ? 6 : 8"
-                            :lg="isRightFmSelected ? 6 : 9"
+                            :md="isRightFmSelected ? 6 : 12"
+                            :lg="isRightFmSelected ? 6 : 12"
                             class="pa-2"
                         >
                             <h6 class="text-h6">
                                 Feature Model: {{ file.label }}
                             </h6>
-
                             <v-data-table
-                                v-if="selectedArtifact.title === 'CSV'"
+                                v-if="selectedArtifact.value.title === 'CSV'"
                                 :headers="headerCsvArtifact"
                                 :items="itemsCsvArtifact"
                                 :items-per-page="10"
@@ -457,12 +517,25 @@
                                 >
                                 </textarea>
                             </div>
-                            <v-btn color="success">
-                                <v-icon left>mdi-download</v-icon>
-                                Download Artifact
-                            </v-btn>
+                            <div
+                                class="d-flex justify-space-between"
+                                style="width: 100%"
+                            >
+                                <v-btn
+                                    color="success"
+                                    prepend-icon="mdi-download"
+                                >
+                                    Download Artifact
+                                </v-btn>
+                                <v-btn
+                                    color="primary"
+                                    prepend-icon="mdi-compare-horizontal"
+                                >
+                                    Compare
+                                </v-btn>
+                            </div>
                         </v-col>
-                        <v-col
+                        <!--                        <v-col
                             v-if="!isRightFmSelected"
                             cols="12"
                             md="4"
@@ -536,9 +609,9 @@
                                     </v-list-item-group>
                                 </v-list>
                             </div>
-                        </v-col>
+                        </v-col>-->
                         <v-col
-                            v-else
+                            v-if="isRightFmSelected"
                             cols="12"
                             md="6"
                             lg="6"
@@ -598,7 +671,7 @@
 </template>
 
 <script setup>
-import { computed, onMounted, reactive, ref } from 'vue';
+import { computed, onMounted, reactive, ref, watch } from 'vue';
 import api from '@/services/api.service';
 import { useFileStore } from '@/store/file';
 import { useRouter, useRoute } from 'vue-router';
@@ -698,18 +771,30 @@ const artifacts = [
         subtitle: 'Generated from analysis: complex analysis',
     },
 ];
-const headerCsvArtifact = [
-    { text: 'Input File', value: 'input_file' },
-    { text: 'Input Hash', value: 'input_hash' },
-    { text: 'SVO', value: 'svo' },
-    { text: 'DVO', value: 'dvo' },
-    { text: 'DVO Time', value: 'dvo_time' },
-    { text: 'BDD Compiler', value: 'bdd_compiler' },
-    { text: 'BDD Bootstrap', value: 'bdd_bootstrap' },
-    { text: 'BDD Compile', value: 'bdd_compile' },
-    { text: 'BDD Timeout', value: 'bdd_timeout' },
-    { text: 'BDD Size', value: 'bdd_size' },
+const headerCsvArtifactFull = [
+    { title: 'Input File', key: 'input_file' },
+    { title: 'Input Hash', key: 'input_hash' },
+    { title: 'SVO', key: 'svo' },
+    { title: 'DVO', key: 'dvo' },
+    { title: 'DVO Time', key: 'dvo_time' },
+    { title: 'BDD Compiler', key: 'bdd_compiler' },
+    { title: 'BDD Bootstrap', key: 'bdd_bootstrap' },
+    { title: 'BDD Compile', key: 'bdd_compile' },
+    { title: 'BDD Timeout', key: 'bdd_timeout' },
+    { title: 'BDD Size', key: 'bdd_size' },
 ];
+const headerCsvArtifact = ref([
+    { title: 'Input File', key: 'input_file' },
+    { title: 'Input Hash', key: 'input_hash' },
+    { title: 'SVO', key: 'svo' },
+    { title: 'DVO', key: 'dvo' },
+    { title: 'DVO Time', key: 'dvo_time' },
+    { title: 'BDD Compiler', key: 'bdd_compiler' },
+    { title: 'BDD Bootstrap', key: 'bdd_bootstrap' },
+    { title: 'BDD Compile', key: 'bdd_compile' },
+    { title: 'BDD Timeout', key: 'bdd_timeout' },
+    { title: 'BDD Size', key: 'bdd_size' },
+]);
 const itemsCsvArtifact = [
     {
         input_file: 'busybox.dimacs',
@@ -3102,6 +3187,34 @@ C1164:~FEATURE_SH_NOFORK  or  FEATURE_PREFER_APPLETS
 
     `;
 
+const selectedCols = ref([
+    'input_file',
+    'input_hash',
+    'svo',
+    'dvo',
+    'dvo_time',
+    'bdd_compiler',
+    'bdd_bootstrap',
+    'bdd_compile',
+    'bdd_timeout',
+    'bdd_size',
+]);
+
+watch(
+    () => selectedCols.value,
+    (newValue) => {
+        console.log('moin');
+        /*console.log(
+            headerCsvArtifactFull.filter(
+                (el) => newValue.indexOf(el.key) !== -1
+            )
+        );*/
+        headerCsvArtifact.value = headerCsvArtifactFull.filter(
+            (el) => newValue.indexOf(el.key) !== -1
+        );
+    }
+);
+
 onMounted(async () => {
     loading.value = true;
     await getFile();
@@ -3117,7 +3230,7 @@ onMounted(async () => {
         },
     },*/
 const isRightFmSelected = computed(() => {
-    return this.selectedRightFM !== -1;
+    return selectedRightFM.value !== -1;
 });
 const getMyFM = computed(() => {
     return fileStore.myConfirmedFeatureModels;
@@ -3167,21 +3280,21 @@ function closeDelete() {
     this.dialogDelete = false;
 }
 async function deleteItemConfirm() {
-    this.removeLoading = true;
-    await fileStore.deleteFeatureModel(this.file.id);
+    removeLoading.value = true;
+    await fileStore.deleteFeatureModel(file.value.id);
     await fileStore.fetchConfirmedFeatureModels;
-    this.removeLoading = false;
+    removeLoading.value = false;
     await router.push('/');
 }
 function showArtifactDialog(item) {
-    this.selectedArtifact = item;
-    this.dialogArtifact = true;
+    selectedArtifact.value = item;
+    dialogArtifact.value = true;
 }
 async function compare() {
-    this.shouldCompare = true;
-    this.loadingComparableFM = true;
-    await this.$store.dispatch('fetchFeatureModels');
-    this.loadingComparableFM = false;
+    shouldCompare.value = true;
+    loadingComparableFM.value = true;
+    fileStore.fetchConfirmedFeatureModels();
+    loadingComparableFM.value = false;
 }
 /*async fetchFeatureModelOfFamily(value) {
   await api
