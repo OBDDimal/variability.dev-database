@@ -27,6 +27,7 @@
                                 <v-row>
                                     <v-col class="py-0" cols="12">
                                         <v-text-field
+                                            data-cy="file-create-label-textfield"
                                             v-model="label"
                                             :rules="labelRules"
                                             dense
@@ -39,6 +40,7 @@
                                     </v-col>
                                     <v-col class="py-0" cols="12">
                                         <v-textarea
+                                            data-cy="file-create-description-textfield"
                                             v-model="description"
                                             :rules="descriptionRules"
                                             counter="250"
@@ -53,6 +55,7 @@
                                     </v-col>
                                     <v-col class="py-0" cols="12" md="6">
                                         <v-file-input
+                                            data-cy="file-create-file-input"
                                             v-model="file"
                                             :rules="fileRules"
                                             accept=".xml"
@@ -68,6 +71,7 @@
                                     </v-col>
                                     <v-col class="py-0" cols="12" md="6">
                                         <v-select
+                                            data-cy="file-create-license-select"
                                             v-model="license"
                                             :items="getLicenses"
                                             :rules="licenseRules"
@@ -84,6 +88,7 @@
                                     <v-col class="py-0" cols="12" md="6">
                                         <!-- Change back to v-combobox when new family upload is working properly -->
                                         <v-combobox
+                                            data-cy="file-create-family-label-combobox"
                                             v-model="family"
                                             :items="gottenFamilies"
                                             :required="true"
@@ -93,6 +98,7 @@
                                             outlined
                                         ></v-combobox>
                                         <v-text-field
+                                            data-cy="file-create-family-description-textfield"
                                             v-if="isNewFamily"
                                             v-model="newFamilyDescription"
                                             dense
@@ -141,6 +147,7 @@
                                             }}</span>
                                         </div>
                                         <v-text-field
+                                            data-cy="file-create-version-textfield"
                                             v-model="version"
                                             :rules="versionRules"
                                             :required="true"
@@ -174,6 +181,7 @@
                                     </v-col>
                                     <v-col class="pb-0" cols="12">
                                         <v-checkbox
+                                            data-cy="file-create-legal-share-checkbox"
                                             v-model="legalShare"
                                             class="mt-0"
                                             hide-details
@@ -185,6 +193,7 @@
                                     </v-col>
                                     <v-col class="py-0" cols="12">
                                         <v-checkbox
+                                            data-cy="file-create-user-data-checkbox"
                                             v-model="userData"
                                             class="mt-0"
                                             hide-details
@@ -196,6 +205,7 @@
                                     </v-col>
                                     <v-col class="py-0" cols="12">
                                         <v-checkbox
+                                            data-cy="file-create-open-source-checkbox"
                                             v-model="openSource"
                                             class="mt-0"
                                             hide-details
@@ -221,6 +231,7 @@
                                                 Cancel</v-btn
                                             >
                                             <v-btn
+                                                data-cy="file-create-upload-button"
                                                 :disabled="
                                                     !valid ||
                                                     !openSource ||
