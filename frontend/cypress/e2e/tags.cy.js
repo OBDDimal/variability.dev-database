@@ -46,13 +46,13 @@ describe('Tags page tests', () => {
                 cy.get('[data-cy="tag-table"]').get('tr').its('length').then(($oldRowNumber) => {
                     //create the tag
                     cy.get('[data-cy="new-tag-button"]').click();
-                    cy.get('[data-cy="tag-edit-label-textfield"]').type('cypresstagtabel');
+                    cy.get('[data-cy="tag-edit-label-textfield"]').type('cypresstaglabel');
                     cy.get('[data-cy="tag-edit-description-textfield"]').type('cypresstagdescription');
                     cy.get('[data-cy="tag-edit-is-public-checkbox"]').click({force: true});
                     cy.get('[data-cy="tag-edit-save-button"]').click();
                     cy.wait(['@postTags', '@getTags']).then((interception) => {
                         cy.get('[data-cy="tag-table"]').get('tr').should('have.length', $oldRowNumber+1);
-                        cy.get('[data-cy="tag-table"]').get('tr').contains('cypresstagtabel').should('exist');
+                        cy.get('[data-cy="tag-table"]').get('tr').contains('cypresstaglabel').should('exist');
                         cy.get('[data-cy="tag-table"]').get('tr').contains('cypresstagdescription').should('exist');
                         
                         //delete the tag
@@ -61,7 +61,7 @@ describe('Tags page tests', () => {
                         cy.get('[data-cy="tag-delete-confirm-button"]').click();
                         cy.get('[data-cy="tag-delete-button"]').should('have.length', $oldRowNumber-1);
                         cy.get('[data-cy="tag-table"]').get('tr').should('have.length', $oldRowNumber);
-                        cy.get('[data-cy="tag-table"]').get('tr').contains('cypresstagtabel').should('not.exist');
+                        cy.get('[data-cy="tag-table"]').get('tr').contains('cypresstaglabel').should('not.exist');
                         cy.get('[data-cy="tag-table"]').get('tr').contains('cypresstagdescription').should('not.exist');
 
                         // TODO: These "cypresstaglabel" and "cypresstagdescription" tags probably need to be sanitized in the live system,
@@ -77,19 +77,19 @@ describe('Tags page tests', () => {
                 cy.get('[data-cy="tag-table"]').get('tr').its('length').then(($oldRowNumber) => {
                     //create the tag
                     cy.get('[data-cy="new-tag-button"]').click();
-                    cy.get('[data-cy="tag-edit-label-textfield"]').type('cypresstagtabel');
+                    cy.get('[data-cy="tag-edit-label-textfield"]').type('cypresstaglabel');
                     cy.get('[data-cy="tag-edit-description-textfield"]').type('cypresstagdescription');
                     cy.get('[data-cy="tag-edit-is-public-checkbox"]').click({force: true});
                     cy.get('[data-cy="tag-edit-save-button"]').click();
                     cy.wait(['@postTags', '@getTags']).then((interception) => {
                         cy.get('[data-cy="tag-table"]').get('tr').should('have.length', $oldRowNumber+1);
-                        cy.get('[data-cy="tag-table"]').get('tr').contains('cypresstagtabel').should('exist');
+                        cy.get('[data-cy="tag-table"]').get('tr').contains('cypresstaglabel').should('exist');
                         cy.get('[data-cy="tag-table"]').get('tr').contains('cypresstagdescription').should('exist');
 
                         //search the tag
-                        cy.get('[data-cy="tag-search"]').type('cypresstagtabel');
+                        cy.get('[data-cy="tag-search"]').type('cypresstaglabel');
                         cy.get('[data-cy="tag-table"]').get('tr').should('have.length', 2);
-                        cy.get('[data-cy="tag-table"]').get('tr').contains('cypresstagtabel').should('exist');
+                        cy.get('[data-cy="tag-table"]').get('tr').contains('cypresstaglabel').should('exist');
                         cy.get('[data-cy="tag-table"]').get('tr').contains('cypresstagdescription').should('exist');
 
                         //clear search
@@ -101,7 +101,7 @@ describe('Tags page tests', () => {
                         cy.get('[data-cy="tag-delete-confirm-button"]').click();
                         cy.get('[data-cy="tag-delete-button"]').should('have.length', $oldRowNumber-1);
                         cy.get('[data-cy="tag-table"]').get('tr').should('have.length', $oldRowNumber);
-                        cy.get('[data-cy="tag-table"]').get('tr').contains('cypresstagtabel').should('not.exist');
+                        cy.get('[data-cy="tag-table"]').get('tr').contains('cypresstaglabel').should('not.exist');
                         cy.get('[data-cy="tag-table"]').get('tr').contains('cypresstagdescription').should('not.exist');
                     })
                 })

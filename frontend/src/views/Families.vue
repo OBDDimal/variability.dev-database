@@ -3,6 +3,7 @@
         <h3 class="text-h3 mb-2 mt-8">My Families</h3>
         <h5 class="text-h5 mb-4">Here you can add new families</h5>
         <v-data-table
+            data-cy="family-table"
             :headers="headers"
             :items="$store.state.families"
             :loading="loading"
@@ -22,6 +23,7 @@
                     ></v-divider>
                     <v-spacer class="hidden-sm-and-down"></v-spacer>
                     <v-text-field
+                        data-cy="family-search"
                         v-model="search"
                         append-icon="mdi-magnify"
                         hide-details
@@ -31,6 +33,7 @@
                     <v-dialog v-model="dialog" max-width="500px">
                         <template v-slot:activator="{ on, attrs }">
                             <v-btn
+                                data-cy="new-family-button"
                                 class="mb-2 ml-4"
                                 color="primary"
                                 dark
@@ -52,12 +55,14 @@
                                     <v-row>
                                         <v-col cols="12">
                                             <v-text-field
+                                                data-cy="family-edit-label-textfield"
                                                 v-model="editedItem.label"
                                                 label="Label"
                                             ></v-text-field>
                                         </v-col>
                                         <v-col cols="12">
                                             <v-text-field
+                                                data-cy="family-edit-description-textfield"
                                                 v-model="editedItem.description"
                                                 label="Description"
                                             ></v-text-field>
@@ -76,6 +81,7 @@
                                     Cancel
                                 </v-btn>
                                 <v-btn
+                                    data-cy="family-edit-save-button"
                                     :loading="addLoading"
                                     color="blue darken-1"
                                     text
