@@ -10,6 +10,7 @@ export class SelectionCommand extends ConfigurationCommand {
         this.executed = false;
         this.newSatCount = 0;
     }
+
     execute() {
         if (!this.executed) {
             if (this.featureOrVersion.selectionState === this.newSelectionState) {
@@ -27,7 +28,7 @@ export class SelectionCommand extends ConfigurationCommand {
             api.post(`${process.env.VUE_APP_DOMAIN}configurator/`, ({"config": config, "selected_roots": selected_roots, "available_roots": available_roots}))
                 .then((d) => {
                     const data = d.data;
-                    this.newSatCount = data.count;
+                    this.newSatCount = new Intl.NumberFormat("en-US", {notation: 'standard'}).format(data.count);
 
                     this.newExplicitlySelectedVersions = this.featureModel.versions.filter(v => data.selected_roots.includes(v.id) && v.selectionState === SelectionState.ExplicitlySelected)
                     this.newImplicitlySelectedVersions = this.featureModel.versions.filter(v => data.selected_roots.includes(v.id) && v.selectionState !== SelectionState.ExplicitlySelected)

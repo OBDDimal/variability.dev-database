@@ -1,5 +1,7 @@
 <template>
   <div class="mainView">
+    <v-btn @click="reset">Reset</v-btn>
+
     <v-data-table
         :headers="headersCommands"
         :items="commandManager.commands"
@@ -150,6 +152,7 @@ import {Version} from "@/classes/Configurator/Version";
 import FeatureModelViewer from "@/components/Configurator/FeatureModelViewer.vue";
 import {CommandManager} from "@/classes/Commands/CommandManager";
 import {SelectionCommand} from "@/classes/Commands/Configurator/SelectionCommand";
+import {ResetCommand} from "@/classes/Commands/Configurator/ResetCommand";
 
 
 
@@ -164,6 +167,7 @@ export default Vue.extend({
 
   data: () => ({
     commandManager: new CommandManager(),
+    resetCommand: undefined,
     featureModel: FeatureModel,
     headersVersions: [{text: 'Version', value: 'version'}, {text: 'RootId', value: 'id'}],
     headersFeatures: [{text: 'All features', value: 'name'}, {text: 'Id', value: 'id'}],
@@ -179,11 +183,17 @@ export default Vue.extend({
     initData() {
       this.featureModel = FeatureModel.create(xmlVersions, features);
       this.selectedVersion = this.featureModel.versions[0];
+      this.resetCommand = new ResetCommand(this.featureModel);
+      this.commandManager.execute(this.resetCommand);
     },
 
     select(item, selectionState) {
-      console.log("Select")
-      let command = new SelectionCommand(this.featureModel, item, selectionState);
+      const command = new SelectionCommand(this.featureModel, item, selectionState);
+      this.commandManager.execute(command);
+    },
+
+    reset() {
+      const command = this.resetCommand.copy();
       this.commandManager.execute(command);
     }
   },
