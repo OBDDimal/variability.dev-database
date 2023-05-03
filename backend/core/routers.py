@@ -1,6 +1,8 @@
 from django.conf.urls.static import static
 from django.urls import path, re_path, include
 from rest_framework import routers
+
+from core.configurator.viewsets import ConfiguratorList
 from core.fileupload.viewsets import (
     BulkUploadApiView,
     ZipUploadApiView,
@@ -45,6 +47,7 @@ router.register(r"licenses", LicensesViewSet, basename="licenses")
 router.register(r"families", FamiliesViewSet, basename="families")
 router.register(r"analysis", AnalysesViewSet, basename="analysis")
 router.register(r"docker", DockerProcessesViewSet, basename="docker")
+#router.register(r"configurator", ConfiguratorViewSet, basename="configurator")
 
 
 urlpatterns = [
@@ -55,6 +58,7 @@ urlpatterns = [
     re_path(r"files/uploaded/unconfirmed/delete/(?P<token>[\w\d]+)", DeleteFileUploadApiView.as_view()),
     path("api-auth/", include("rest_framework.urls")),
     path("user-info/", UserInfoApiView.as_view()),
+    path('configurator/', ConfiguratorList.as_view(), name='book-list'),
 ]
 urlpatterns += static(STATIC_URL, document_root=STATIC_ROOT)
 urlpatterns += static(MEDIA_URL, document_root=MEDIA_ROOT)
