@@ -452,7 +452,6 @@ export default Vue.extend({
 
 #svg-container {
   width: 100%;
-  height: calc(100vh - 64px);
 }
 
 .node {

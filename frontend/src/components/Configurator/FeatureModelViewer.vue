@@ -41,7 +41,6 @@ export default Vue.extend({
       },
       spaceBetweenParentChild: 75,
       spaceBetweenSiblings: 20,
-      d3AddNodeIndex: 0,
       coloringIndex: -1,
       direction: 'v', // h = horizontally, v = vertically
       maxHorizontallyLevelWidth: [],
@@ -62,16 +61,19 @@ export default Vue.extend({
   watch: {
     version() {
       document.getElementById("svg-container").innerHTML = "";
+      this.d3Data.flexLayout = undefined;
+      this.d3Data.root = undefined;
+      this.d3Data.nodeIdCounter = 0;
+
       this.init();
+      console.log(this.d3Data.root);
     }
   },
 
   methods: {
     init() {
       init.initialize(this.d3Data, this.version.root)
-      view.reset(this.d3Data)
-      update.updateSvg(this.d3Data)
-      zoomFit(this.d3Data);
+      this.resetView(4, 3);
     },
 
     resetView(levels, maxChildren) {
@@ -213,18 +215,9 @@ export default Vue.extend({
 </script>
 
 <style lang="scss">
-.ghost-circle {
-  fill: red;
-  fill-opacity: 0.2;
-}
-
-.ghost-circle-highlighted {
-  fill-opacity: 0.8;
-}
-
 #svg-container {
   width: 100%;
-  height: calc(100vh - 64px);
+  height: 40vh;
 }
 
 .node {

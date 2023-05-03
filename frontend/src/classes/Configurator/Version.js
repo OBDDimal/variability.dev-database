@@ -1,8 +1,9 @@
 import {SelectionState} from "@/classes/Configurator/SelectionState";
 
 export class Version {
-    constructor(version, root) {
+    constructor(version, id, root) {
         this.version = version;
+        this.id = id;
         this.root = root;
         this.selectionState = SelectionState.Unselected;
     }

@@ -5,17 +5,24 @@ import {Version} from "@/classes/Configurator/Version";
 import {Feature} from "@/classes/Configurator/Feature";
 
 export class FeatureModel {
-    constructor(name, versions, features) {
+    constructor(name, versions, features, featureDict) {
         this.name = name;
         this.versions = versions;
         this.features = features;
+        this.featureDict = featureDict;
     }
 
-    static create(xmlVersions) {
-        let versionIndex = 0;
-        const features = [];
+    static create(xmlVersions, features) {
+        const featureDict = {};
+        const featureList = [];
+        features.forEach(f => {
+            const feature = new Feature(f.id, f.name);
+            featureDict[f.name] = feature;
+            featureList.push(feature);
+        });
+
         const versions = xmlVersions.map(v => {
-            const xml = beautify(v);
+            const xml = beautify(v.model);
 
             // To remove the <?xml...?> line
             let m = xml.split('\n').splice(1).join('\n');
@@ -24,36 +31,32 @@ export class FeatureModel {
             const xmlDocument = parser.parseFromString(m, 'text/xml');
 
             const struct = xmlDocument.querySelector('struct');
-            const root = this.parseChildren(struct, null, features)[0];
+            const root = this.parseChildren(struct, null, featureDict)[0];
 
-            return new Version(versionIndex++, root);
+            const versionName = v.version.replace(".xml", "");
+            return new Version(versionName, v.root, root);
         });
 
-        return new FeatureModel("FM", versions, features);
+        return new FeatureModel("FM", versions, featureList, featureDict);
     }
 
-    static parseChildren(struct, parent, features) {
+    static parseChildren(struct, parent, featureDict) {
         let toReturn = [];
 
         for (const child of struct.childNodes) {
             // To remove #text nodes, as they don't have a tagName
             if (child.tagName) {
                 const featureName = child.getAttribute('name');
-                let feature = features.find(f => f.name === featureName);
-                if (!feature) {
-                    feature = new Feature(featureName);
-                    features.push(feature);
-                }
 
                 let toAppend = new FeatureNode(
-                    feature,
+                    featureDict[featureName],
                     parent,
                     featureName,
                     child.tagName,
                     child.getAttribute('mandatory') === 'true',
                     child.getAttribute('abstract') === 'true'
                 );
-                toAppend.children = this.parseChildren(child, toAppend, features);
+                toAppend.children = this.parseChildren(child, toAppend, featureDict);
                 toReturn.push(toAppend);
             }
         }
