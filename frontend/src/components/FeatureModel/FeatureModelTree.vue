@@ -147,7 +147,7 @@ import * as update from '@/services/FeatureModel/update.service.js'
 import * as init from '@/services/FeatureModel/init.service.js'
 import * as view from '@/services/FeatureModel/view.service.js'
 import * as search from '@/services/FeatureModel/search.service.js'
-import {CommandManager} from '@/classes/Commands/CommandManager'
+import {FeatureModelCommandManager} from '@/classes/Commands/FeatureModel/FeatureModelCommandManager'
 import {AddCommand} from '@/classes/Commands/FeatureModel/AddCommand'
 import {EditCommand} from '@/classes/Commands/FeatureModel/EditCommand'
 import * as update_service from '@/services/FeatureModel/update.service'
@@ -164,7 +164,7 @@ export default Vue.extend({
   },
 
   props: {
-    commandManager: CommandManager,
+    commandManager: FeatureModelCommandManager,
     remoteCommands: undefined,
     rootNode: undefined,
     constraints: undefined,

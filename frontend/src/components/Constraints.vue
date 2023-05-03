@@ -104,7 +104,7 @@
 import Vue from 'vue';
 import ConstraintAddEditDialog from '@/components/ConstraintAddEditDialog';
 import { AddCommand } from '@/classes/Commands/Constraints/AddCommand';
-import { CommandManager } from '@/classes/Commands/CommandManager';
+import { FeatureModelCommandManager } from '@/classes/Commands/FeatureModel/FeatureModelCommandManager';
 import { EditCommand } from '@/classes/Commands/Constraints/EditCommand';
 import { DeleteCommand } from '@/classes/Commands/Constraints/DeleteCommand';
 
@@ -116,7 +116,7 @@ export default Vue.extend({
     },
 
     props: {
-        commandManager: CommandManager,
+        commandManager: FeatureModelCommandManager,
         constraints: undefined,
         rootNode: undefined,
         editRights: undefined,

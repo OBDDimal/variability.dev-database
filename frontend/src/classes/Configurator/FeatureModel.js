@@ -10,6 +10,7 @@ export class FeatureModel {
         this.versions = versions;
         this.features = features;
         this.featureDict = featureDict;
+        this.satCount = 0;
     }
 
     static create(xmlVersions, features) {

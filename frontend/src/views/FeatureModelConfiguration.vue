@@ -1,5 +1,15 @@
 <template>
   <div class="mainView">
+    <v-data-table
+        :headers="headersCommands"
+        :items="commandManager.commands"
+        single-select
+        class="elevation-1"
+        @click:row="command => commandManager.redoCommand(command)"
+        :item-class="command => command.marked ? 'active-command' : ''"
+    >
+    </v-data-table>
+
     <v-container>
       <v-row>
 
@@ -41,8 +51,6 @@
         <!-- All features -->
         <v-col cols="12" sm="4">
           <v-data-table
-              disable-pagination
-              hide-default-footer
               :headers="headersFeatures"
               :items="featureModel.features"
               item-key="name"
@@ -76,7 +84,7 @@
 
         <!-- Tree hierarchy table for one selected version -->
         <v-col cols="12" sm="4">
-          <p>{{satCount}}</p>
+          <p>{{featureModel.satCount}}</p>
           <v-treeview
               :items="[selectedVersion.root]"
               selection-type="independent">
@@ -140,9 +148,10 @@ import {xmlVersions, features} from "@/classes/Configurator/example";
 import {SelectionState} from "@/classes/Configurator/SelectionState";
 import {Version} from "@/classes/Configurator/Version";
 import FeatureModelViewer from "@/components/Configurator/FeatureModelViewer.vue";
-import api from "@/services/api.service";
+import {CommandManager} from "@/classes/Commands/CommandManager";
+import {SelectionCommand} from "@/classes/Commands/Configurator/SelectionCommand";
 
-const API_URL = process.env.VUE_APP_DOMAIN;
+
 
 export default Vue.extend({
   name: 'FeatureModelConfiguration',
@@ -154,11 +163,12 @@ export default Vue.extend({
   },
 
   data: () => ({
+    commandManager: new CommandManager(),
     featureModel: FeatureModel,
     headersVersions: [{text: 'Version', value: 'version'}, {text: 'RootId', value: 'id'}],
     headersFeatures: [{text: 'All features', value: 'name'}, {text: 'Id', value: 'id'}],
+    headersCommands: [{text: 'Command', value: 'featureOrVersion.id'}, {text: 'SAT count', value: 'newSatCount'}],
     selectedVersion: Version,
-    satCount: 0,
   }),
 
   created() {
@@ -169,65 +179,12 @@ export default Vue.extend({
     initData() {
       this.featureModel = FeatureModel.create(xmlVersions, features);
       this.selectedVersion = this.featureModel.versions[0];
-
-      this.updateFeatureModel([], [], []);
     },
 
-    updateFeatureModel: function (config, selected_roots, available_roots) {
-      console.log(available_roots)
-      api.post(`${API_URL}configurator/`, ({"config": config, "selected_roots": selected_roots, "available_roots": available_roots}))
-          .then((d) => {
-            const data = d.data;
-
-            this.satCount = data.count;
-
-            this.featureModel.versions.forEach(v => {
-              if (data.deselected_roots.includes(v.id) && v.selectionState !== SelectionState.ExplicitlyDeselected) {
-                v.selectionState = SelectionState.ImplicitlyDeselected;
-              } else if (data.selected_roots.includes(v.id) && v.selectionState !== SelectionState.ExplicitlyDeselected) {
-                if (v.selectionState === SelectionState.ExplicitlySelected) {
-                  v.selectionState = SelectionState.ExplicitlySelected;
-                } else {
-                  v.selectionState = SelectionState.ImplicitlySelected;
-                }
-              } else if (v.selectionState === SelectionState.ExplicitlyDeselected) {
-                v.selectionState = SelectionState.ExplicitlyDeselected;
-              } else {
-                v.selectionState = SelectionState.Unselected;
-              }
-            });
-
-            this.featureModel.features.forEach(f => {
-              if (data.implicit_selected_vars.includes(f.id)) {
-                f.selectionState = SelectionState.ImplicitlySelected;
-              } else if (data.implicit_deselected_vars.includes(f.id)) {
-                f.selectionState = SelectionState.ImplicitlyDeselected;
-              } else if (data.config.includes(f.id)) {
-                f.selectionState = SelectionState.ExplicitlySelected;
-              } else if (data.config.includes(-f.id)) {
-                f.selectionState = SelectionState.ExplicitlyDeselected;
-              } else {
-                f.selectionState = SelectionState.Unselected;
-              }
-            });
-          })
-          .catch(() => {
-            this.addLoading = false;
-          });
-    }, select(item, selectionState) {
-      if (item.selectionState === selectionState) {
-        item.selectionState = SelectionState.Unselected;
-      } else {
-        item.selectionState = selectionState;
-      }
-
-      const selected_roots = this.featureModel.versions.filter(v => v.selectionState === SelectionState.ExplicitlySelected).map(v => v.id);
-      const available_roots = this.featureModel.versions.filter(v => !selected_roots.includes(v) && v.selectionState !== SelectionState.ExplicitlyDeselected).map(v => v.id)
-      const selected_vars = this.featureModel.features.filter(f => f.selectionState === SelectionState.ExplicitlySelected).map(f => f.id);
-      const deselected_vars = this.featureModel.features.filter(f => f.selectionState === SelectionState.ExplicitlyDeselected).map(f => -f.id);
-      const config = [...selected_vars, ...deselected_vars];
-
-      this.updateFeatureModel(config, selected_roots, available_roots);
+    select(item, selectionState) {
+      console.log("Select")
+      let command = new SelectionCommand(this.featureModel, item, selectionState);
+      this.commandManager.execute(command);
     }
   },
 
@@ -236,4 +193,8 @@ export default Vue.extend({
 </script>
 
 <style lang="scss">
+.active-command {
+  background-color: lightgoldenrodyellow;
+  color: black;
+}
 </style>
