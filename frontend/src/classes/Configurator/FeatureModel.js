@@ -3,13 +3,18 @@ import beautify from "xml-beautifier";
 import {FeatureNode} from "@/classes/Configurator/FeatureNode";
 import {Version} from "@/classes/Configurator/Version";
 import {Feature} from "@/classes/Configurator/Feature";
+import {Constraint} from "@/classes/Constraint";
+import {FeatureNodeConstraintItem} from "@/classes/Constraint/FeatureNodeConstraintItem";
+import {Disjunction} from "@/classes/Constraint/Disjunction";
+import {Conjunction} from "@/classes/Constraint/Conjunction";
+import {Implication} from "@/classes/Constraint/Implication";
+import {Negation} from "@/classes/Constraint/Negation";
 
 export class FeatureModel {
-    constructor(name, versions, features, featureDict) {
+    constructor(name, versions, features) {
         this.name = name;
         this.versions = versions;
         this.features = features;
-        this.featureDict = featureDict;
         this.satCount = 0;
     }
 
@@ -34,11 +39,16 @@ export class FeatureModel {
             const struct = xmlDocument.querySelector('struct');
             const root = this.parseChildren(struct, null, featureDict)[0];
 
+            const constraints = this.readConstraints(
+                [...xmlDocument.querySelector('constraints').childNodes],
+                data
+            );
+
             const versionName = v.version.replace(".xml", "");
             return new Version(versionName, v.root, root);
         });
 
-        return new FeatureModel("FM", versions, featureList, featureDict);
+        return new FeatureModel("FM", versions, featureList);
     }
 
     static parseChildren(struct, parent, featureDict) {
@@ -63,6 +73,41 @@ export class FeatureModel {
         }
 
         return toReturn;
+    }
+
+    static readConstraints(constraints, data) {
+        return constraints
+            .filter((rule) => rule.tagName)
+            .map((rule) => {
+                return [...rule.childNodes]
+                    .filter((item) => item.tagName)
+                    .map(
+                        (item) => new Constraint(this.readConstraintItem(item, data))
+                    )[0];
+            });
+    }
+
+    static readConstraintItem(item, data) {
+        if (item.tagName === 'var') {
+            return new FeatureNodeConstraintItem(
+                data.featureMap[item.innerHTML.trim()]
+            );
+        } else {
+            const childItems = [...item.childNodes]
+                .filter((childItem) => childItem.tagName)
+                .map((childItem) => this.readConstraintItem(childItem, data));
+
+            switch (item.tagName) {
+                case 'disj':
+                    return new Disjunction(childItems[0], childItems[1]);
+                case 'conj':
+                    return new Conjunction(childItems[0], childItems[1]);
+                case 'imp':
+                    return new Implication(childItems[0], childItems[1]);
+                case 'not':
+                    return new Negation(childItems[0]);
+            }
+        }
     }
 
     getAllFeatures(versions) {

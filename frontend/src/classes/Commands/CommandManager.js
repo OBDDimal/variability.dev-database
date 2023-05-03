@@ -16,7 +16,7 @@ export class CommandManager {
         command.markChanges();
 
         this.historyCommands.push(command);
-        this.commands = this.historyCommands;
+        this.commands = [...this.historyCommands].reverse();
 
         // Reset stack of future commands because a new command was already executed.
         this.futureCommands = [];
@@ -66,8 +66,8 @@ export class CommandManager {
         command.markChanges();
 
         const commandIndex = this.commands.indexOf(command);
-        this.historyCommands = this.commands.slice(0, commandIndex + 1);
-        this.futureCommands = this.commands.slice(commandIndex + 1)
+        this.futureCommands = this.commands.slice(0, commandIndex);
+        this.historyCommands = [...this.commands.slice(commandIndex)].reverse()
     }
 
     isUndoAvailable() {

@@ -17,6 +17,8 @@ class ConfiguratorList(APIView):
             config = request.data['config']
             selected_roots = request.data['selected_roots']
             available_roots = request.data['available_roots']
+            if len(available_roots) == 0:
+                available_roots = None
 
             bdd = parse_from_ddueruem("toybox.bdd")
 
