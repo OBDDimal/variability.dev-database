@@ -14,6 +14,7 @@ export class FeatureNode {
         this.isRoot = parent === null;
         this.isMandatory = mandatory;
         this.isAbstract = abstract;
+        this.name = name;
 
         // Cross tree constraint references
         this.constraints = [];

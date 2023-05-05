@@ -36,22 +36,23 @@ export class FeatureModel {
             const parser = new DOMParser();
             const xmlDocument = parser.parseFromString(m, 'text/xml');
 
+            const featureMapForConstraints = {};
             const struct = xmlDocument.querySelector('struct');
-            const root = this.parseChildren(struct, null, featureDict)[0];
+            const root = this.parseChildren(struct, null, featureDict, featureMapForConstraints)[0];
 
             const constraints = this.readConstraints(
                 [...xmlDocument.querySelector('constraints').childNodes],
-                data
+                featureMapForConstraints
             );
 
             const versionName = v.version.replace(".xml", "");
-            return new Version(versionName, v.root, root);
+            return new Version(versionName, v.root, root, constraints);
         });
 
         return new FeatureModel("FM", versions, featureList);
     }
 
-    static parseChildren(struct, parent, featureDict) {
+    static parseChildren(struct, parent, featureDict, featureMapForConstraints) {
         let toReturn = [];
 
         for (const child of struct.childNodes) {
@@ -67,7 +68,8 @@ export class FeatureModel {
                     child.getAttribute('mandatory') === 'true',
                     child.getAttribute('abstract') === 'true'
                 );
-                toAppend.children = this.parseChildren(child, toAppend, featureDict);
+                toAppend.children = this.parseChildren(child, toAppend, featureDict, featureMapForConstraints);
+                featureMapForConstraints[toAppend.feature.name] = toAppend;
                 toReturn.push(toAppend);
             }
         }
@@ -75,27 +77,27 @@ export class FeatureModel {
         return toReturn;
     }
 
-    static readConstraints(constraints, data) {
+    static readConstraints(constraints, featureMap) {
         return constraints
             .filter((rule) => rule.tagName)
             .map((rule) => {
                 return [...rule.childNodes]
                     .filter((item) => item.tagName)
                     .map(
-                        (item) => new Constraint(this.readConstraintItem(item, data))
+                        (item) => new Constraint(this.readConstraintItem(item, featureMap))
                     )[0];
             });
     }
 
-    static readConstraintItem(item, data) {
+    static readConstraintItem(item, featureMap) {
         if (item.tagName === 'var') {
             return new FeatureNodeConstraintItem(
-                data.featureMap[item.innerHTML.trim()]
+                featureMap[item.innerHTML.trim()]
             );
         } else {
             const childItems = [...item.childNodes]
                 .filter((childItem) => childItem.tagName)
-                .map((childItem) => this.readConstraintItem(childItem, data));
+                .map((childItem) => this.readConstraintItem(childItem, featureMap));
 
             switch (item.tagName) {
                 case 'disj':

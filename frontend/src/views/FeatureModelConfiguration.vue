@@ -204,8 +204,16 @@
                     </v-treeview>
                   </v-tab-item>
 
-                  <v-tab-item key="ctc">CTC</v-tab-item>
+                  <v-tab-item key="ctc">
+                    <v-data-table
+                        :headers="headersConstraints"
+                        :items="tableConstraints"
+                        hide-default-header
+                    >
+                    </v-data-table>
+                  </v-tab-item>
                 </v-tabs-items>
+
               </v-col>
             </v-row>
 
@@ -220,22 +228,17 @@
 import Vue from 'vue';
 import {FeatureModel} from "@/classes/Configurator/FeatureModel";
 import {xmlVersions, features} from "@/classes/Configurator/example";
-import {SelectionState} from "@/classes/Configurator/SelectionState";
 import {Version} from "@/classes/Configurator/Version";
 import FeatureModelViewer from "@/components/Configurator/FeatureModelViewer.vue";
 import {CommandManager} from "@/classes/Commands/CommandManager";
 import {SelectionCommand} from "@/classes/Commands/Configurator/SelectionCommand";
 import {ResetCommand} from "@/classes/Commands/Configurator/ResetCommand";
+import {SelectionState} from "@/classes/Configurator/SelectionState";
 
 
 export default Vue.extend({
   name: 'FeatureModelConfiguration',
   components: {FeatureModelViewer},
-  computed: {
-    SelectionState() {
-      return SelectionState
-    }
-  },
 
   data: () => ({
     commandManager: new CommandManager(),
@@ -244,6 +247,7 @@ export default Vue.extend({
     headersVersions: [{text: 'Version', value: 'version'}, {text: 'RootId', value: 'id'}],
     headersFeatures: [{text: 'All features', value: 'name'}, {text: 'Id', value: 'id'}],
     headersCommands: [{text: 'Command', value: 'featureOrVersion.id'}, {text: '#SAT', value: 'newSatCount'}],
+    headersConstraints: [{text: 'Constraints', value: 'formula'}],
     selectedVersion: Version,
     searchAllFeatures: "",
     searchVersions: "",
@@ -273,6 +277,19 @@ export default Vue.extend({
     }
   },
 
+  computed: {
+    SelectionState() {
+      return SelectionState
+    },
+
+    tableConstraints() {
+      return this.selectedVersion.constraints.map((e) => ({
+        constraint: e,
+        formula: e.toString(),
+        checked: false,
+      }));
+    },
+  },
 
 });
 </script>
