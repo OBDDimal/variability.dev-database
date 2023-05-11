@@ -924,17 +924,27 @@ class BDD(BDD_CE):
         return count, free, available, selected_impl, deselected_impl
 
     def explanations_feature(self, var, config, selected_roots):
-        selected_roots = set(selected_roots)
-        _, _, _, simpl_without_config, dimpl_without_config = self.decision_propagation_multiversion_features([], selected_roots)
+        remaining_versions = set(selected_roots)
 
-        valid_versions = [root for root in selected_roots if self.verify_multiversion([-var], [root])]
-        invalid_versions = selected_roots.difference(valid_versions)
+        if var < 0:
+            invalid_versions = set([root for root in selected_roots if var not in self.get_nodes(root)])
+            remaining_versions = remaining_versions.difference(invalid_versions)
+
+            if len(remaining_versions) == 0:
+                return [(invalid_versions, set())]
+
+
+        #_, _, _, simpl_without_config, dimpl_without_config = self.decision_propagation_multiversion_features([], selected_roots)
+
+        valid_versions = [root for root in remaining_versions if self.verify_multiversion([-var], [root])]
+        invalid_versions = remaining_versions.difference(valid_versions)
+        remaining_versions = valid_versions
         reselection = []
 
-        if len(valid_versions) == 0:
+        if len(remaining_versions) == 0:
             return [(invalid_versions, set())]
 
-        c_root = tuple([root for root in valid_versions])
+        c_root = tuple([root for root in remaining_versions])
         c_node = c_root
         c_config = config
         alternatives = []
@@ -1020,7 +1030,7 @@ class BDD(BDD_CE):
                     break
 
         if len(reselection) == 0:
-            return [invalid_versions, set()]
+            return [(invalid_versions, set())]
         return [(a, config.difference(b)) for a, b in reselection]
 
     def determine_high_low_min_var(self, c_node, config, var_indices):
@@ -1440,13 +1450,25 @@ def demo_dp_multiversion_versions_and_features():
 
 
 def demo_explanations_features():
-    bdd = parse_from_ddueruem("../../examples/one.bdd")
+    #bdd = parse_from_ddueruem("../../examples/one.bdd")
+    bdd = parse_from_ddueruem("../../data/uclibc/uclibc.bdd")
+
+    start_time = time.time()
+    count = bdd.verify_multiversion([1, 3, 8, 25, 284], [40726])
+    #count = bdd.count_config([1, 3, 8, 25, 284], 40726)
+    end_time = time.time()
+    elapsed_time = end_time - start_time
+    print(count)
+    print("\tTime".ljust(20), (elapsed_time * 1000).__round__(), "ms")
+    exit()
+
 
     #features, versions = bdd.explanations_feature(5, [1], [29])
     #features, versions = bdd.explanations_feature(-1, [], [13, 17])
-    features, versions = bdd.explanations_feature(1, [], [19, 24])
+    features, versions = bdd.explanations_feature(284, {}, [1138238])
 
     print(features, versions)
+    exit()
 
 
 
@@ -1500,6 +1522,6 @@ def demo_explanations_features():
 
 
 if __name__ == '__main__':
-    #demo_explanations_features()
-    demo_dp_multiversion_versions_and_features()
+    demo_explanations_features()
+    #demo_dp_multiversion_versions_and_features()
     #demo_dp_multiversion_features()

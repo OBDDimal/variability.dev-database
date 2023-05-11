@@ -66,7 +66,7 @@
 					</v-chip>
 				</div>-->
             </v-main>
-            <Footer v-if="$route.name !== 'FeatureModel'"></Footer>
+            <Footer v-if="$route.name !== 'FeatureModel' && $route.name !== 'Configurator'"></Footer>
         </v-app>
     </vue-scroll-snap>
 </template>

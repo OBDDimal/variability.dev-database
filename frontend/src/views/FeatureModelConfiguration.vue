@@ -1,188 +1,293 @@
 <template>
   <div class="main">
-
     <v-container fluid>
       <v-row>
 
-        <!-- Left column -->
-        <v-col cols="2">
+        <!-- Versions -->
+        <v-col cols="4">
           <v-card>
-            <v-card-title>Number of possible configurations</v-card-title>
-            <v-card-subtitle>{{ featureModel.satCount }}</v-card-subtitle>
-            <v-card-actions>
-              <v-btn @click="reset">Reset Config</v-btn>
-              <v-btn :disabled="!commandManager.isUndoAvailable()" @click="commandManager.undo()">
-                <v-icon>mdi-undo</v-icon>
-              </v-btn>
-              <v-btn :disabled="!commandManager.isRedoAvailable()" @click="commandManager.redo()">
-                <v-icon>mdi-redo</v-icon>
-              </v-btn>
-            </v-card-actions>
-          </v-card>
+            <v-card-title>
+              Versions ({{ featureModel.versions.length }})
 
-          <v-card>
-            <v-card-title>Configuration history</v-card-title>
+              <v-tooltip bottom>
+                <template v-slot:activator="{ on, attrs }">
+                  <v-icon v-on="on" v-bind="attrs">mdi-information</v-icon>
+                </template>
+                <table>
+                  <tr>
+                    <th>Selection</th>
+                    <th>All</th>
+                  </tr>
+                  <tr>
+                    <td>All</td>
+                    <td>{{ featureModel.versions.length }}</td>
+                  </tr>
+                  <tr>
+                    <td>Unselected</td>
+                    <td>{{ countSelectionState(featureModel.versions, SelectionState.Unselected) }}</td>
+                  </tr>
+                  <tr>
+                    <td>Explicitly selected</td>
+                    <td>{{ countSelectionState(featureModel.versions, SelectionState.ExplicitlySelected) }}</td>
+                  </tr>
+                  <tr>
+                    <td>Explicitly deselected</td>
+                    <td>{{countSelectionState(featureModel.versions, SelectionState.ExplicitlyDeselected)}}</td>
+                  </tr>
+                  <tr>
+                    <td>Implicitly selected</td>
+                    <td>{{countSelectionState(featureModel.versions, SelectionState.ImplicitlySelected)}}</td>
+                  </tr>
+                  <tr>
+                    <td>Implicitly deselected</td>
+                    <td>{{countSelectionState(featureModel.versions, SelectionState.ImplicitlyDeselected)}}</td>
+                  </tr>
+                </table>
+              </v-tooltip>
+
+              <v-spacer></v-spacer>
+              <v-text-field
+                  v-model="searchVersions"
+                  append-icon="mdi-magnify"
+                  label="Search"
+                  single-line
+                  hide-details
+              ></v-text-field>
+            </v-card-title>
+
             <v-data-table
-                :headers="headersCommands"
-                :items="commandManager.commands"
-                single-select
-                class="elevation-1"
-                @click:row="command => commandManager.redoCommand(command)"
-                :item-class="command => command.marked ? 'active-command clickable' : 'clickable'"
-                disable-sort
-                disable-filtering
+                :search="searchVersions"
+                :headers="[{text: 'Selection', value: 'selectionState'}, {text: 'Version', value: 'version', groupable: false}, {text: '', value: 'actions', groupable: false}]"
+                :items="featureModel.versions"
+                item-key="version"
+                show-group-by
                 fixed-header
-                height="400px"
+                height="40vh"
+                single-select
                 disable-pagination
                 hide-default-footer
+                :item-class="v => v === selectedVersion ? 'selected-version clickable' : 'clickable'"
+                @click:row="selectVersion($event)"
             >
+              <template v-slot:item.version="{ item }">
+                <v-tooltip bottom>
+                  <template v-slot:activator="{ on, attrs }">
+                    <span v-bind="attrs" v-on="on">{{ item.version }}</span>
+                  </template>
+                  <span>BDD root ID: {{ item.rootId }}</span>
+                </v-tooltip>
+              </template>
+
+              <template v-slot:item.selectionState="{ item }">
+                <DoubleCheckbox v-bind:selection-item="item" @select="select(item, $event)"></DoubleCheckbox>
+              </template>
+
+              <template v-slot:item.actions="{ item }">
+                <div v-if="item === selectedVersion">
+                  <v-tooltip bottom>
+                    <template v-slot:activator="{ on, attrs }">
+                      <v-btn
+                          v-on="on"
+                          v-bind="attrs"
+                          rounded
+                          @click="filterFeaturesInVersion(item)">
+                        <v-icon>mdi-filter</v-icon>
+                      </v-btn>
+                    </template>
+                    <span>Filter features in this version</span>
+                  </v-tooltip>
+
+                  <v-tooltip bottom>
+                    <template v-slot:activator="{ on, attrs }">
+                      <v-btn
+                          rounded
+                          v-on="on"
+                          v-bind="attrs"
+                          @click="filterFeaturesNotInVersion(item)">
+                        <v-icon>mdi-filter-off</v-icon>
+                      </v-btn>
+                    </template>
+                    <span>Filter features not in this version</span>
+                  </v-tooltip>
+                </div>
+
+              </template>
             </v-data-table>
           </v-card>
         </v-col>
 
-        <!-- Right column -->
-        <v-col cols="10">
-          <v-container fluid>
-            <v-row>
+        <!-- Features -->
+        <v-col cols="4">
+          <v-card>
+            <v-card-title>
+              Features ({{ features.length }}/{{ featureModel.features.length }})
 
-              <!-- Versions -->
-              <v-col cols="4">
-                <v-card>
-                  <v-card-title>
-                    Versions
-                    <v-spacer></v-spacer>
-                    <v-text-field
-                        v-model="searchVersions"
-                        append-icon="mdi-magnify"
-                        label="Search"
-                        single-line
-                        hide-details
-                    ></v-text-field>
-                  </v-card-title>
+              <v-tooltip bottom>
+                <template v-slot:activator="{ on, attrs }">
+                  <v-icon v-on="on" v-bind="attrs">mdi-information</v-icon>
+                </template>
+                <table>
+                  <tr>
+                    <th>Selection</th>
+                    <th v-if="filteredFeaturesVersion">Filtered</th>
+                    <th>All</th>
+                  </tr>
+                  <tr>
+                    <td>All</td>
+                    <td v-if="filteredFeaturesVersion">{{ features.length }}</td>
+                    <td>{{ featureModel.features.length }}</td>
+                  </tr>
+                  <tr>
+                    <td>Unselected</td>
+                    <td v-if="filteredFeaturesVersion">{{ countSelectionState(features, SelectionState.Unselected) }}</td>
+                    <td>{{ countSelectionState(featureModel.features, SelectionState.Unselected) }}</td>
+                  </tr>
+                  <tr>
+                    <td>Explicitly selected</td>
+                    <td v-if="filteredFeaturesVersion">{{ countSelectionState(features, SelectionState.ExplicitlySelected) }}</td>
+                    <td>{{ countSelectionState(featureModel.features, SelectionState.ExplicitlySelected) }}</td>
+                  </tr>
+                  <tr>
+                    <td>Explicitly deselected</td>
+                    <td v-if="filteredFeaturesVersion">{{countSelectionState(features, SelectionState.ExplicitlyDeselected)}}</td>
+                    <td>{{countSelectionState(featureModel.features, SelectionState.ExplicitlyDeselected)}}</td>
+                  </tr>
+                  <tr>
+                    <td>Implicitly selected</td>
+                    <td v-if="filteredFeaturesVersion">{{countSelectionState(features, SelectionState.ImplicitlySelected)}}</td>
+                    <td>{{countSelectionState(featureModel.features, SelectionState.ImplicitlySelected)}}</td>
+                  </tr>
+                  <tr>
+                    <td>Implicitly deselected</td>
+                    <td v-if="filteredFeaturesVersion">{{countSelectionState(features, SelectionState.ImplicitlyDeselected)}}</td>
+                    <td>{{countSelectionState(featureModel.features, SelectionState.ImplicitlyDeselected)}}</td>
+                  </tr>
+                </table>
+              </v-tooltip>
 
-                  <v-data-table
-                      :search="searchVersions"
-                      :headers="[{text: 'Selection', value: 'selectionState'}, {text: 'Version', value: 'version', groupable: false}, {text: '', value: 'actions'}]"
-                      :items="featureModel.versions"
-                      item-key="version"
-                      show-group-by
-                      fixed-header
-                      height="40vh"
-                      single-select
-                      disable-pagination
-                      hide-default-footer
-                      :item-class="v => v === selectedVersion ? 'selected-version clickable' : 'clickable'"
-                      @click:row="selectVersion($event)"
-                  >
-                    <template v-slot:item.version="{ item }">
-                      <v-tooltip bottom>
-                        <template v-slot:activator="{ on, attrs }">
-                          <span v-bind="attrs" v-on="on">{{ item.version }}</span>
-                        </template>
-                        <span>BDD root ID: {{ item.rootId }}</span>
-                      </v-tooltip>
-                    </template>
+              <v-spacer></v-spacer>
+              <v-text-field
+                  v-model="searchFeatures"
+                  append-icon="mdi-magnify"
+                  label="Search"
+                  single-line
+                  hide-details
+              ></v-text-field>
 
-                    <template v-slot:item.selectionState="{ item }">
-                      <DoubleCheckbox v-bind:selection-item="item" @select="select(item, $event)"></DoubleCheckbox>
-                    </template>
+              <v-tooltip bottom>
+                <template v-slot:activator="{ on, attrs }">
+                  <v-btn
+                      rounded
+                      v-bind="attrs"
+                      v-on="on"
+                      @click="resetFeaturesTable()">
+                    <v-icon>mdi-close</v-icon>
+                  </v-btn>
+                </template>
+                <span>Reset search and filter</span>
+              </v-tooltip>
+            </v-card-title>
 
-                    <template v-slot:item.actions="{ item }">
-                      <div v-if="item === selectedVersion">
-                        <v-tooltip bottom>
-                          <template v-slot:activator="{ on, attrs }">
-                            <v-btn
-                                v-on="on"
-                                v-bind="attrs"
-                                rounded
-                                @click="features = item.features">
-                              <v-icon>mdi-filter</v-icon>
-                            </v-btn>
-                          </template>
-                          <span>Filter features in this version</span>
-                        </v-tooltip>
+            <v-card-subtitle v-if="filteredFeaturesVersion">
+              Filtered by version {{ filteredFeaturesVersion.version }}
+              {{ features.length }}
+            </v-card-subtitle>
 
-                        <v-tooltip bottom>
-                          <template v-slot:activator="{ on, attrs }">
-                            <v-btn
-                                rounded
-                                v-on="on"
-                                v-bind="attrs"
-                                @click="features = featureModel.features.filter(f => !item.features.includes(f))">
-                              <v-icon>mdi-filter-off</v-icon>
-                            </v-btn>
-                          </template>
-                          <span>Filter features not in this version</span>
-                        </v-tooltip>
-                      </div>
+            <v-data-table
+                :headers="[{text: 'Selection', value: 'selectionState'}, {text: 'Name', value: 'name', groupable: false}]"
+                :search="searchFeatures"
+                :items="features"
+                item-key="name"
+                show-group-by
+                fixed-header
+                height="40vh"
+                single-select
+                disable-pagination
+                hide-default-footer
+                @click:row="getFeatureExplanations($event)"
+            >
+              <template v-slot:item.name="{ item }">
+                <v-tooltip bottom>
+                  <template v-slot:activator="{ on, attrs }">
+                    <span v-bind="attrs" v-on="on">{{ item.name }}</span>
+                  </template>
+                  <span>Var ID: {{ item.id }}</span>
+                </v-tooltip>
+              </template>
 
-                    </template>
-                  </v-data-table>
-                </v-card>
-              </v-col>
+              <template v-slot:item.selectionState="{ item }">
+                <DoubleCheckbox v-bind:selection-item="item" @select="select(item, $event)"></DoubleCheckbox>
+              </template>
+            </v-data-table>
+          </v-card>
+        </v-col>
 
-              <!-- Features -->
-              <v-col cols="4">
-                <v-card>
-                  <v-card-title>
-                    Features
-                    <v-spacer></v-spacer>
-                    <v-text-field
-                        v-model="searchFeatures"
-                        append-icon="mdi-magnify"
-                        label="Search"
-                        single-line
-                        hide-details
-                    ></v-text-field>
+        <!-- Third column -->
+        <v-col cols="4">
+          <!-- #SAT -->
+          <v-card height="5vh;">
+            <v-card-title>{{ featureModel.satCount }}</v-card-title>
+            <v-card-subtitle>Number of possible configurations</v-card-subtitle>
+            <v-card-actions>
 
-                    <v-tooltip bottom>
-                      <template v-slot:activator="{ on, attrs }">
-                        <v-btn
-                            rounded
-                            v-bind="attrs"
-                            v-on="on"
-                            @click="resetFeaturesTable()">
-                          <v-icon>mdi-close</v-icon>
-                        </v-btn>
-                      </template>
-                      <span>Reset search and filter</span>
-                    </v-tooltip>
-                  </v-card-title>
+              <v-tooltip bottom>
+                <template v-slot:activator="{ on, attrs }">
+                  <v-btn
+                      rounded
+                      v-on="on"
+                      v-bind="attrs"
+                      @click="reset">
+                    Reset Config
+                  </v-btn>
+                </template>
+                <span>Reset all configuration steps and start with an empty selection. This step can be undone.</span>
+              </v-tooltip>
 
-                  <v-data-table
-                      :headers="[{text: 'Selection', value: 'selectionState'}, {text: 'Name', value: 'name', groupable: false}]"
-                      :search="searchFeatures"
-                      :items="features"
-                      item-key="name"
-                      show-group-by
-                      fixed-header
-                      height="40vh"
-                      single-select
-                      disable-pagination
-                      hide-default-footer
-                      @click:row="getFeatureExplanations($event)"
-                  >
-                    <template v-slot:item.name="{ item }">
-                      <v-tooltip bottom>
-                        <template v-slot:activator="{ on, attrs }">
-                          <span v-bind="attrs" v-on="on">{{ item.name }}</span>
-                        </template>
-                        <span>Var ID: {{ item.id }}</span>
-                      </v-tooltip>
-                    </template>
+              <v-tooltip bottom>
+                <template v-slot:activator="{ on, attrs }">
+                  <v-btn
+                      rounded
+                      v-on="on"
+                      v-bind="attrs"
+                      :disabled="!commandManager.isUndoAvailable()"
+                      @click="commandManager.undo()">
+                    <v-icon>mdi-undo</v-icon>
+                  </v-btn>
+                </template>
+                <span>Undo last configuration step</span>
+              </v-tooltip>
 
-                    <template v-slot:item.selectionState="{ item }">
-                      <DoubleCheckbox v-bind:selection-item="item" @select="select(item, $event)"></DoubleCheckbox>
-                    </template>
-                  </v-data-table>
-                </v-card>
-              </v-col>
 
-              <!-- Tree hierarchy table for one selected version -->
-              <v-col cols="4">
-                <v-card>
-                  <v-card-title style="height:80px">Explanations</v-card-title>
-                  <div style="height:40vh">
+              <v-tooltip bottom>
+                <template v-slot:activator="{ on, attrs }">
+                  <v-btn
+                      rounded
+                      v-on="on"
+                      v-bind="attrs"
+                      :disabled="!commandManager.isRedoAvailable()"
+                      @click="commandManager.redo()">
+                    <v-icon>mdi-redo</v-icon>
+                  </v-btn>
+                </template>
+                <span>Redo last undone configuration step</span>
+              </v-tooltip>
+
+            </v-card-actions>
+          </v-card>
+
+          <!-- Explanations and configuration history -->
+          <v-card style="margin-top:1vh;" height="35.4vh">
+            <v-card-title>
+              <v-tabs v-model="tabTopRight">
+                <v-tab key="explanations">Explanations</v-tab>
+                <v-tab key="configurationHistory">Configuration history</v-tab>
+              </v-tabs>
+            </v-card-title>
+
+            <v-card-text>
+              <v-tabs-items v-model="tabTopRight">
+                <v-tab-item key="explanations">
+                  <div style="height: 29vh;">
                     <div v-if="selectedVersion?.selectionState === SelectionState.ImplicitlySelected">Impliziert
                       selektiert, weil
                       {{
@@ -196,114 +301,127 @@
                       {{ schuldigeFeaturesWeilNichtVorhanden.map(f => f.name) }}
                     </div>
                   </div>
-                </v-card>
-              </v-col>
-            </v-row>
+                </v-tab-item>
 
-            <!-- feature model viewer, ctc and tree view -->
-            <v-row v-if="selectedVersion?.root">
-              <v-col>
-                <v-card>
-                  <v-card-title>Details for version: {{ selectedVersion.version }}</v-card-title>
-                  <v-tabs v-model="tab">
-                    <v-tab key="featureModelViewer">Feature Model Viewer</v-tab>
-                    <v-tab key="listTree">List Tree</v-tab>
-                    <v-tab key="ctc">Cross Tree Constraints</v-tab>
-                  </v-tabs>
-                </v-card>
+                <v-tab-item key="configurationHistory">
+                  <v-data-table
+                      :headers="[{text: 'Description', value: 'description'}, {text: '# Possible configs', value: 'newSatCount'}]"
+                      :items="commandManager.commands"
+                      single-select
+                      class="elevation-1"
+                      @click:row="command => commandManager.redoCommand(command)"
+                      :item-class="command => command.marked ? 'active-command clickable' : 'clickable'"
+                      disable-sort
+                      disable-filtering
+                      fixed-header
+                      height="29vh"
+                      disable-pagination
+                      hide-default-footer
+                  >
+                  </v-data-table>
+                </v-tab-item>
+              </v-tabs-items>
+            </v-card-text>
+          </v-card>
 
-                <v-tabs-items v-model="tab">
-                  <v-tab-item key="featureModelViewer">
-                    <feature-model-viewer :version="selectedVersion"></feature-model-viewer>
-                  </v-tab-item>
 
-                  <v-tab-item key="listTree">
-                    <v-treeview
-                        :items="[selectedVersion.root]"
-                        selection-type="independent">
-                      <template v-slot:prepend="{ item }">
-                        <v-row>
-                          <v-col cols="auto" sm="1">
-                            <v-simple-checkbox
-                                :value="item.feature.selectionState === SelectionState.ImplicitlySelected || item.feature.selectionState === SelectionState.ExplicitlySelected"
-                                :disabled="item.feature.selectionState === SelectionState.ImplicitlyDeselected || item.feature.selectionState === SelectionState.ExplicitlyDeselected"
-                                :color="item.feature.selectionState === SelectionState.ImplicitlySelected ? 'grey' : 'green'"
-                                @input="select(item.feature, SelectionState.ExplicitlySelected)">
-                            </v-simple-checkbox>
-                          </v-col>
-                          <v-col cols="auto" sm="1">
-                            <v-simple-checkbox
-                                on-icon="mdi-close-box"
-                                :value="item.feature.selectionState === SelectionState.ImplicitlyDeselected || item.feature.selectionState === SelectionState.ExplicitlyDeselected"
-                                :disabled="item.feature.selectionState === SelectionState.ImplicitlySelected || item.feature.selectionState === SelectionState.ExplicitlySelected"
-                                :color="item.feature.selectionState === SelectionState.ImplicitlyDeselected ? 'grey' : 'red'"
-                                @input="select(item.feature, SelectionState.ExplicitlyDeselected)">
-                            </v-simple-checkbox>
-                          </v-col>
-                        </v-row>
-                      </template>
-
-                      <template v-slot:label="{item}">
-                        <span class="v-treeview-node__label">{{ item.feature.name }}</span>
-                        <span
-                            class="v-treeview-node__label">{{
-                            item.isAnd() ? " (AND)" : item.isOr() ? " (OR)" : item.isAlt() ? " (ALT)" : ""
-                          }}</span>
-                        <span class="v-treeview-node__label">{{
-                            item.parent?.isAnd() && item.isMandatory ? " (MANDATORY)" : ""
-                          }}</span>
-                      </template>
-                    </v-treeview>
-                  </v-tab-item>
-
-                  <v-tab-item key="ctc">
-
-                    <v-btn @click="filteredConstraints = allConstraints.filter(c => c.evaluation === false)">Only
-                      invalid
-                    </v-btn>
-                    <v-btn @click="filteredConstraints = allConstraints">Reset</v-btn>
-
-                    <v-data-table
-                        :items="filteredConstraints"
-                        show-group-by
-                        disable-pagination
-                        hide-default-footer
-                        height="400px"
-                        fixed-header
-                        :headers="[{text: 'Valid', value: 'evaluation', key: 'evaluation'}, {text: 'Constraints', value: 'formula', groupable: false}]"
-                        :sort-by="[{key: 'evaluation', ord: 'desc'}]"
-                    >
-
-                      <template v-slot:item.formula="{ item }">
-                        <div v-for="(f, i) in item.formula" :key="i" style="display: inline;">
-                          <v-chip
-                              class="ma-2"
-                              v-if="f instanceof FeatureNodeConstraintItem"
-                              :color="color(f)"
-                              @click="searchFeatures = f.featureNode.name"
-                          >
-                            {{ f.featureNode.name }}
-                          </v-chip>
-                          <span v-else>{{ f }}</span>
-                        </div>
-                      </template>
-
-                      <template v-slot:item.evaluation="{ item }">
-                        <v-avatar size="30"
-                                  :color="item.evaluation ? 'green' : (item.evaluation === undefined ? '' : 'red')"></v-avatar>
-                      </template>
-
-                    </v-data-table>
-
-                  </v-tab-item>
-                </v-tabs-items>
-
-              </v-col>
-            </v-row>
-
-          </v-container>
         </v-col>
       </v-row>
+
+      <!-- feature model viewer, ctc and tree view -->
+      <v-row>
+        <v-col>
+          <v-card height="47vh">
+            <v-card-title>Details for version: {{ selectedVersion?.version }}</v-card-title>
+            <v-tabs v-model="tabBottom">
+              <v-tab key="featureModelViewer">Feature Model Viewer</v-tab>
+              <v-tab key="listTree">List Tree</v-tab>
+              <v-tab key="ctc">Cross Tree Constraints</v-tab>
+            </v-tabs>
+
+            <v-card-text v-if="selectedVersion?.root">
+              <v-tabs-items v-model="tabBottom">
+                <v-tab-item key="featureModelViewer">
+                  <feature-model-viewer :version="selectedVersion"></feature-model-viewer>
+                </v-tab-item>
+
+                <v-tab-item key="listTree">
+
+                  <v-container class="fill-height">
+                    <v-layout column class="fill-height">
+                      <v-flex class="flex overflow-auto">
+                        <v-treeview
+                            style="height: 35vh;"
+                            :items="[selectedVersion.root]"
+                            selection-type="independent">
+                          <template v-slot:prepend="{ item }">
+                            <DoubleCheckbox :selection-item="item.feature"
+                                            @select="select(item.feature, $event)"></DoubleCheckbox>
+                          </template>
+
+                          <template v-slot:label="{item}">
+                            <span class="v-treeview-node__label">{{ item.feature.name }}</span>
+                            <span
+                                class="v-treeview-node__label">{{
+                                item.isAnd() ? " (AND)" : item.isOr() ? " (OR)" : item.isAlt() ? " (ALT)" : ""
+                              }}</span>
+                            <span class="v-treeview-node__label">{{
+                                item.parent?.isAnd() && item.isMandatory ? " (MANDATORY)" : ""
+                              }}</span>
+                          </template>
+                        </v-treeview>
+                      </v-flex>
+                    </v-layout>
+                  </v-container>
+
+                </v-tab-item>
+
+                <v-tab-item key="ctc">
+
+                  <v-btn @click="filteredConstraints = allConstraints.filter(c => c.evaluation === false)">Only
+                    invalid
+                  </v-btn>
+                  <v-btn @click="filteredConstraints = allConstraints">Reset</v-btn>
+
+                  <v-data-table
+                      height="32vh"
+                      :items="filteredConstraints"
+                      show-group-by
+                      :footer-props="{'items-per-page-options': [10, 20, 50, 100, 200]}"
+                      :headers="[{text: 'Valid', value: 'evaluation', key: 'evaluation'}, {text: 'Constraints', value: 'formula', groupable: false}]"
+                      :sort-by="[{key: 'evaluation', ord: 'desc'}]"
+                  >
+
+                    <template v-slot:item.formula="{ item }">
+                      <div v-for="(f, i) in item.formula" :key="i" style="display: inline;">
+                        <v-chip
+                            class="ml-2 mr-2"
+                            v-if="f instanceof FeatureNodeConstraintItem"
+                            :color="color(f)"
+                            @click="searchFeatures = f.featureNode.name"
+                        >
+                          {{ f.featureNode.name }}
+                        </v-chip>
+                        <span v-else>{{ f }}</span>
+                      </div>
+                    </template>
+
+                    <template v-slot:item.evaluation="{ item }">
+                      <v-avatar size="30"
+                                :color="item.evaluation ? 'green' : (item.evaluation === undefined ? '' : 'red')"></v-avatar>
+                    </template>
+
+                  </v-data-table>
+
+                </v-tab-item>
+              </v-tabs-items>
+
+            </v-card-text>
+          </v-card>
+
+        </v-col>
+      </v-row>
+
     </v-container>
   </div>
 </template>
@@ -331,14 +449,15 @@ export default Vue.extend({
     resetCommand: undefined,
     featureModel: FeatureModel,
     features: undefined,
-    headersCommands: [{text: 'Command', value: 'featureOrVersion.id'}, {text: '#SAT', value: 'newSatCount'}],
     selectedVersion: undefined,
     filteredConstraints: undefined,
     allConstraints: undefined,
     searchFeatures: "",
     searchVersions: "",
     hoveredVersion: undefined,
-    tab: undefined,
+    tabBottom: undefined,
+    tabTopRight: undefined,
+    filteredFeaturesVersion: undefined,
   }),
 
   props: {
@@ -367,6 +486,20 @@ export default Vue.extend({
           });
     },
 
+    filterFeaturesInVersion(version) {
+      this.filteredFeaturesVersion = version;
+      this.features = version.features;
+    },
+
+    filterFeaturesNotInVersion(version) {
+      this.features = this.featureModel.features.filter(f => !version.features.includes(f))
+    },
+
+    resetFilterFeatures() {
+      this.features = this.featureModel.features;
+      this.filteredFeaturesVersion = undefined;
+    },
+
     selectVersion(version) {
       this.selectedVersion.empty();
       this.featureModel.loadXmlData(version).then(() => {
@@ -383,6 +516,7 @@ export default Vue.extend({
     resetFeaturesTable() {
       this.searchFeatures = "";
       this.features = this.featureModel.features;
+      this.filteredFeaturesVersion = undefined;
     },
 
     getFeatureExplanations(feature) {
@@ -417,6 +551,10 @@ export default Vue.extend({
 
     reset() {
       this.commandManager.execute(this.resetCommand.copy());
+    },
+
+    countSelectionState(list, selectionState) {
+      return list.filter(x => x.selectionState === selectionState).length;
     },
 
     color(featureNodeConstraintItem) {

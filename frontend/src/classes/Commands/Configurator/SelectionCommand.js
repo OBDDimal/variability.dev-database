@@ -1,6 +1,7 @@
 import {ConfigurationCommand} from "@/classes/Commands/Configurator/ConfigurationCommand";
 import {SelectionState} from "@/classes/Configurator/SelectionState";
 import api from "@/services/api.service";
+import {Version} from "@/classes/Configurator/Version";
 
 export class SelectionCommand extends ConfigurationCommand {
     constructor(featureModel, featureOrVersion, newSelectionState) {
@@ -9,6 +10,22 @@ export class SelectionCommand extends ConfigurationCommand {
         this.newSelectionState = newSelectionState;
         this.executed = false;
         this.newSatCount = 0;
+
+        if (this.featureOrVersion.selectionState === this.newSelectionState) {
+            if (newSelectionState === SelectionState.ExplicitlySelected) {
+                this.description = "Undone selection"
+            } else if (newSelectionState === SelectionState.ExplicitlyDeselected) {
+                this.description = "Undone deselection";
+            }
+        } else {
+            if (newSelectionState === SelectionState.ExplicitlySelected) {
+                this.description = "Selected"
+            } else if (newSelectionState === SelectionState.ExplicitlyDeselected) {
+                this.description = "Deselected";
+            }
+        }
+
+        this.description +=  " " + (featureOrVersion instanceof Version ? featureOrVersion.version : featureOrVersion.name);
     }
 
     execute() {
@@ -25,10 +42,15 @@ export class SelectionCommand extends ConfigurationCommand {
             const deselected_vars = this.featureModel.features.filter(f => f.selectionState === SelectionState.ExplicitlyDeselected).map(f => -f.id);
             const config = [...selected_vars, ...deselected_vars];
 
-            api.post(`${process.env.VUE_APP_DOMAIN}configurator/decision-propagation`, ({"name": this.featureModel.name, "config": config, "selected_roots": selected_roots, "available_roots": available_roots}))
+            api.post(`${process.env.VUE_APP_DOMAIN}configurator/decision-propagation`, ({
+                "name": this.featureModel.name,
+                "config": config,
+                "selected_roots": selected_roots,
+                "available_roots": available_roots
+            }))
                 .then((d) => {
                     const data = d.data;
-                    this.newSatCount = new Intl.NumberFormat("en-US", {notation: 'standard'}).format(data.count);
+                    this.newSatCount = this.formatScientificNotation(data.count);
 
                     this.newExplicitlySelectedVersions = this.featureModel.versions.filter(v => data.selected_roots.includes(v.rootId) && v.selectionState === SelectionState.ExplicitlySelected)
                     this.newImplicitlySelectedVersions = this.featureModel.versions.filter(v => data.selected_roots.includes(v.rootId) && v.selectionState !== SelectionState.ExplicitlySelected)
@@ -55,3 +77,4 @@ export class SelectionCommand extends ConfigurationCommand {
         }
     }
 }
+

@@ -6,6 +6,8 @@ export class ResetCommand extends ConfigurationCommand {
         super(featureModel);
         this.executed = false;
         this.newSatCount = 0;
+
+        this.description = "Reset";
     }
 
     execute() {
@@ -13,13 +15,13 @@ export class ResetCommand extends ConfigurationCommand {
             api.post(`${process.env.VUE_APP_DOMAIN}configurator/decision-propagation`, ({"name": this.featureModel.name, "config": [], "selected_roots": [], "available_roots": []}))
                 .then((d) => {
                     const data = d.data;
-                    this.newSatCount = new Intl.NumberFormat("en-US", {notation: 'standard'}).format(data.count);
+                    this.newSatCount = this.formatScientificNotation(data.count);
 
                     this.newExplicitlySelectedVersions = [];
-                    this.newImplicitlySelectedVersions = this.featureModel.versions.filter(v => data.selected_roots.includes(v.id))
+                    this.newImplicitlySelectedVersions = this.featureModel.versions.filter(v => data.selected_roots.includes(v.rootId))
                     this.newExplicitlyDeselectedVersions = [];
-                    this.newImplicitlyDeselectedVersions = this.featureModel.versions.filter(v => data.deselected_roots.includes(v.id))
-                    this.newUnselectedVersions = this.featureModel.versions.filter(v => data.available_roots.includes(v.id))
+                    this.newImplicitlyDeselectedVersions = this.featureModel.versions.filter(v => data.deselected_roots.includes(v.rootId))
+                    this.newUnselectedVersions = this.featureModel.versions.filter(v => data.available_roots.includes(v.rootId))
 
                     this.newExplicitlySelectedFeatures = [];
                     this.newImplicitlySelectedFeatures = this.featureModel.features.filter(f => data.implicit_selected_vars.includes(f.id))

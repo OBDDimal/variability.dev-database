@@ -62,4 +62,17 @@ export class ConfigurationCommand extends Command {
     markChanges() {
         this.marked = true;
     }
+
+    formatScientificNotation(number) {
+        const exponential = number.toExponential();
+        const parts = exponential.split("e+");
+
+
+        const coefficient = (Math.round(parseFloat(parts[0]) * 10, 2) / 10).toLocaleString("en-US");
+        const exponent = parts[1];
+        if (exponent < 8) {
+            return new Intl.NumberFormat("en-US", {notation: 'standard'}).format(number);
+        }
+        return `${coefficient} * 10^${exponent}`;
+    }
 }
