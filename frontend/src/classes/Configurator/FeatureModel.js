@@ -9,50 +9,56 @@ import {Disjunction} from "@/classes/Constraint/Disjunction";
 import {Conjunction} from "@/classes/Constraint/Conjunction";
 import {Implication} from "@/classes/Constraint/Implication";
 import {Negation} from "@/classes/Constraint/Negation";
+import api from "@/services/api.service";
 
 export class FeatureModel {
-    constructor(name, versions, features) {
-        this.name = name;
-        this.versions = versions;
+    constructor(versions, featureDict, features) {
+        this.featureDict = featureDict;
         this.features = features;
         this.satCount = 0;
+        this.versions = versions;
+        this.name = undefined;
     }
 
-    static create(xmlVersions, features) {
+    static create(versions, features) {
         const featureDict = {};
         const featureList = [];
         features.forEach(f => {
-            const feature = new Feature(f.id, f.name);
-            featureDict[f.name] = feature;
+            const feature = new Feature(f["var-id"], f["var-name"]);
+            featureDict[f["var-name"]] = feature;
             featureList.push(feature);
         });
 
-        const versions = xmlVersions.map(v => {
-            const xml = beautify(v.model);
-
-            // To remove the <?xml...?> line
-            let m = xml.split('\n').splice(1).join('\n');
-
-            const parser = new DOMParser();
-            const xmlDocument = parser.parseFromString(m, 'text/xml');
-
-            const featureMapForConstraints = {};
-            const struct = xmlDocument.querySelector('struct');
-            const root = this.parseChildren(struct, null, featureDict, featureMapForConstraints)[0];
-
-            const constraints = this.readConstraints(
-                [...xmlDocument.querySelector('constraints').childNodes],
-                featureMapForConstraints
-            );
-
-            const versionName = v.version.replace(".xml", "");
-            return new Version(versionName, v.root, root, constraints);
-        });
-
-        return new FeatureModel("FM", versions, featureList);
+        return new FeatureModel(versions.map(v => new Version(v["version-name"], v["root-id"])), featureDict, featureList);
     }
 
-    static parseChildren(struct, parent, featureDict, featureMapForConstraints) {
+    loadXmlData(version) {
+        return api.get(`${process.env.VUE_APP_DOMAIN}configurator/feature-models/${this.name}/${version.version}`)
+            .then((xmlRaw) => {
+                const xml = beautify(xmlRaw.data);
+
+                // To remove the <?xml...?> line
+                let m = xml.split('\n').splice(1).join('\n');
+
+                const parser = new DOMParser();
+                const xmlDocument = parser.parseFromString(m, 'text/xml');
+
+                const struct = xmlDocument.querySelector('struct');
+                const usedFeatures = [];
+                const root = this.parseChildren(struct, null, usedFeatures)[0];
+
+                const constraints = this.readConstraints(
+                    [...xmlDocument.querySelector('constraints').childNodes],
+                    this.featureDict
+                );
+
+                version.root = root;
+                version.constraints = constraints;
+                version.features = usedFeatures;
+            });
+    }
+
+    parseChildren(struct, parent, usedFeatures) {
         let toReturn = [];
 
         for (const child of struct.childNodes) {
@@ -60,16 +66,17 @@ export class FeatureModel {
             if (child.tagName) {
                 const featureName = child.getAttribute('name');
 
+                const feature = this.featureDict[featureName];
+                usedFeatures.push(feature);
                 let toAppend = new FeatureNode(
-                    featureDict[featureName],
+                    feature,
                     parent,
                     featureName,
                     child.tagName,
                     child.getAttribute('mandatory') === 'true',
                     child.getAttribute('abstract') === 'true'
                 );
-                toAppend.children = this.parseChildren(child, toAppend, featureDict, featureMapForConstraints);
-                featureMapForConstraints[toAppend.feature.name] = toAppend;
+                toAppend.children = this.parseChildren(child, toAppend, usedFeatures);
                 toReturn.push(toAppend);
             }
         }
@@ -77,7 +84,7 @@ export class FeatureModel {
         return toReturn;
     }
 
-    static readConstraints(constraints, featureMap) {
+    readConstraints(constraints, featureMap) {
         return constraints
             .filter((rule) => rule.tagName)
             .map((rule) => {
@@ -89,7 +96,7 @@ export class FeatureModel {
             });
     }
 
-    static readConstraintItem(item, featureMap) {
+    readConstraintItem(item, featureMap) {
         if (item.tagName === 'var') {
             return new FeatureNodeConstraintItem(
                 featureMap[item.innerHTML.trim()]
@@ -101,9 +108,9 @@ export class FeatureModel {
 
             switch (item.tagName) {
                 case 'disj':
-                    return new Disjunction(childItems[0], childItems[1]);
+                    return new Disjunction(childItems);
                 case 'conj':
-                    return new Conjunction(childItems[0], childItems[1]);
+                    return new Conjunction(childItems);
                 case 'imp':
                     return new Implication(childItems[0], childItems[1]);
                 case 'not':

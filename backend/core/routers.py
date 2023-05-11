@@ -2,7 +2,7 @@ from django.conf.urls.static import static
 from django.urls import path, re_path, include
 from rest_framework import routers
 
-from core.configurator.viewsets import ConfiguratorList
+from core.configurator.viewsets import DecisionPropagation, FeatureModels, Mappings, Explanations
 from core.fileupload.viewsets import (
     BulkUploadApiView,
     ZipUploadApiView,
@@ -58,7 +58,10 @@ urlpatterns = [
     re_path(r"files/uploaded/unconfirmed/delete/(?P<token>[\w\d]+)", DeleteFileUploadApiView.as_view()),
     path("api-auth/", include("rest_framework.urls")),
     path("user-info/", UserInfoApiView.as_view()),
-    path('configurator/', ConfiguratorList.as_view(), name='book-list'),
+    path('configurator/decision-propagation', DecisionPropagation.as_view()),
+    re_path("configurator/feature-models/(?P<name>[\w\d]+)/(?P<version_name>.*)", FeatureModels.as_view()),
+    re_path("configurator/mappings/(?P<name>[\w\d]+)", Mappings.as_view()),
+    re_path("configurator/feature-explanations/(?P<name>[\w\d]+)", Explanations.as_view()),
 ]
 urlpatterns += static(STATIC_URL, document_root=STATIC_ROOT)
 urlpatterns += static(MEDIA_URL, document_root=MEDIA_ROOT)

@@ -2,6 +2,7 @@ from rest_framework import serializers
 
 
 class ConfigurationRequestSerializer(serializers.Serializer):
+    name = serializers.CharField()
     config = serializers.ListField()
     selected_roots = serializers.ListField()
     available_roots = serializers.ListField()
@@ -18,3 +19,13 @@ class DecisionPropagationSerializer(serializers.Serializer):
     available_roots = serializers.ListField()
     deselected_roots = serializers.ListField()
 
+
+class ConfigurationMappingsSerializer(serializers.Serializer):
+    features_mapping = serializers.ListField()
+    root_mapping = serializers.ListField()
+
+
+class ExplanationsSerializer(serializers.Serializer):
+    var = serializers.CharField()
+    config = serializers.ListField()
+    selected_roots = serializers.ListField()

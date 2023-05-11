@@ -17,7 +17,6 @@ function updateFeatureNodes(d3Data, visibleD3Nodes) {
             (d3Node) => d3Node.id || (d3Node.id = ++d3Data.nodeIdCounter)
         );
 
-    console.log("test1")
     // Enter new nodes
     const featureNodeEnter = featureNode
         .enter()
@@ -47,7 +46,6 @@ function updateFeatureNodes(d3Data, visibleD3Nodes) {
             dblClickEvent(event, d3Data, d3Node);
             collapse.collapseShortcut(d3Data, event, d3Node); // Collapse d3Node with Ctrl + left-click on d3Node.
         });
-    console.log("test2")
 
     const rectAndTextEnter = featureNodeEnter
         .append('g')

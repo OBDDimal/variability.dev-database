@@ -10,7 +10,7 @@ export class ResetCommand extends ConfigurationCommand {
 
     execute() {
         if (!this.executed) {
-            api.post(`${process.env.VUE_APP_DOMAIN}configurator/`, ({"config": [], "selected_roots": [], "available_roots": []}))
+            api.post(`${process.env.VUE_APP_DOMAIN}configurator/decision-propagation`, ({"name": this.featureModel.name, "config": [], "selected_roots": [], "available_roots": []}))
                 .then((d) => {
                     const data = d.data;
                     this.newSatCount = new Intl.NumberFormat("en-US", {notation: 'standard'}).format(data.count);

@@ -66,7 +66,6 @@ export default Vue.extend({
       this.d3Data.nodeIdCounter = 0;
 
       this.init();
-      console.log(this.d3Data.root);
     }
   },
 

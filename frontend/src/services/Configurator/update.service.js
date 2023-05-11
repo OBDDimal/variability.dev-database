@@ -6,7 +6,6 @@ import {PseudoNode} from '@/classes/PseudoNode';
 import * as count from '@/services/FeatureModel/count.service';
 
 function updateFeatureNodes(d3Data, visibleD3Nodes) {
-    console.log(visibleD3Nodes)
     const featureNode = d3Data.container.featureNodesContainer
         .selectAll('g.node')
         .data(

@@ -6,5 +6,6 @@ export class Feature {
         this.name = name;
         this.selectionState = SelectionState.Unselected;
         this.featureNodes = [];
+        this.constraints = [];
     }
 }

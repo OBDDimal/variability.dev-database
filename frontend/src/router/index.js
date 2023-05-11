@@ -159,12 +159,12 @@ const routes = [
 		},
 	},
 	{
-		path: '/configurations/:id',
-		name: 'Configuration',
+		path: '/configurator/:name',
+		name: 'Configurator',
 		props: true,
 		component: FeatureModelConfiguration,
 		meta: {
-			title: 'Feature Model Configurator',
+			title: 'Multiversion Feature Model Configurator',
 		},
 	},
 ]

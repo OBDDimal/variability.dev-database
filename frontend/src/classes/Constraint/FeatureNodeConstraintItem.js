@@ -1,4 +1,5 @@
 import {ConstraintItem} from "@/classes/Constraint/ConstraintItem";
+import {SelectionState} from "@/classes/Configurator/SelectionState";
 
 export class FeatureNodeConstraintItem extends ConstraintItem {
     constructor(featureNode) {
@@ -17,6 +18,10 @@ export class FeatureNodeConstraintItem extends ConstraintItem {
         } else {
             return str;
         }
+    }
+
+    toList() {
+        return [this];
     }
 
     toStringForEdit() {
@@ -45,5 +50,17 @@ export class FeatureNodeConstraintItem extends ConstraintItem {
     removeConstraint() {
         this.featureNode.constraints = this.featureNode.constraints.filter((c) => c !== this.constraint);
         this.constraint = null;
+    }
+
+    evaluate() {
+        if (this.featureNode.selectionState === SelectionState.ImplicitlySelected ||
+            this.featureNode.selectionState === SelectionState.ExplicitlySelected
+        ) {
+            return true;
+        } else if(this.featureNode.selectionState === SelectionState.Unselected) {
+            return undefined;
+        } else {
+            return false;
+        }
     }
 }
