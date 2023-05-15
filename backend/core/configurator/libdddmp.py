@@ -926,26 +926,19 @@ class BDD(BDD_CE):
     def explanations_feature(self, var, config, selected_roots):
         remaining_versions = set(selected_roots)
 
-        if var < 0:
-            invalid_versions = set([root for root in selected_roots if var not in self.get_nodes(root)])
-            remaining_versions = remaining_versions.difference(invalid_versions)
-
-            if len(remaining_versions) == 0:
-                return [(invalid_versions, set())]
+        valid_versions = set([root for root in remaining_versions if self.verify_multiversion([-var], [root])])
+        versions_without_var = remaining_versions.difference(valid_versions)
+        remaining_versions = list(valid_versions)
 
 
-        #_, _, _, simpl_without_config, dimpl_without_config = self.decision_propagation_multiversion_features([], selected_roots)
 
-        valid_versions = [root for root in remaining_versions if self.verify_multiversion([-var], [root])]
-        invalid_versions = remaining_versions.difference(valid_versions)
-        remaining_versions = valid_versions
+        #if len(versions_without_var) != 0:
+        #    return {"versions_without_var": versions_without_var}
+
         reselection = []
-
-        if len(remaining_versions) == 0:
-            return [(invalid_versions, set())]
-
         c_root = tuple([root for root in remaining_versions])
         c_node = c_root
+        config = set(config)
         c_config = config
         alternatives = []
         var_indices = self.create_var_indices()
@@ -965,9 +958,9 @@ class BDD(BDD_CE):
             for i, id in enumerate(c_node):
                 if id is not None:
                     _, v, h, l = self.nodes[id]
+                    high = (high + 1) if h != 0 else high
+                    low = (low + 1) if l != 0 else low
                     if v == min_var:
-                        high = (high + 1) if h != 0 else high
-                        low = (low + 1) if l != 0 else low
                         t_high.append(h if h != 0 else None)
                         t_low.append(l if l != 0 else None)
                     else:
@@ -993,19 +986,28 @@ class BDD(BDD_CE):
             deselected_roots = set()
             for i, id in enumerate(c_node):
                 if id is None:
-                    deselected_roots.add(valid_versions[i])
+                    deselected_roots.add(remaining_versions[i])
 
             in_cache = False
             if len(deselected_roots) != 0 or len(c_config) != len(config):
                 for deselected_versions, new_config in reselection:
-                    if deselected_versions.issubset(deselected_roots) and new_config.issubset(c_config):
+                    if deselected_versions.issubset(deselected_roots) and c_config.issubset(new_config):
                         in_cache = True
                         break
 
             is_valid = [1 if id == 1 else 0 for id in c_node if id == 1 or id is None]
-            is_valid = len(is_valid) == len(valid_versions) and sum(is_valid) >= 1
-            if is_valid and not in_cache and (len(deselected_roots) != 0 or len(c_config) != len(config)):
-                reselection.append((deselected_roots, c_config))
+            is_valid = len(is_valid) == len(remaining_versions) and sum(is_valid) >= 1
+            if is_valid and (len(deselected_roots) != 0 or len(c_config) != len(config)):
+                if in_cache:
+                    new_reselection = []
+                    for deselected_versions, new_config in reselection:
+                        if deselected_roots.issubset(deselected_versions) and new_config.issubset(c_config):
+                            new_reselection.append((deselected_roots, c_config))
+                        else:
+                            new_reselection.append((deselected_versions, new_config))
+                    reselection = new_reselection
+                else:
+                    reselection.append((deselected_roots, c_config))
 
             if high == 0 and low == 0 or is_valid or in_cache:
                 if alternatives:
@@ -1022,6 +1024,8 @@ class BDD(BDD_CE):
             elif low != 0 and -var != min_var:
                 c_node = c_node_low
                 c_config = c_config_low
+                if high != 0 and var != min_var:
+                    alternatives.append((c_node_high, c_config_high))
 
             else:
                 if alternatives:
@@ -1030,8 +1034,8 @@ class BDD(BDD_CE):
                     break
 
         if len(reselection) == 0:
-            return [(invalid_versions, set())]
-        return [(a, config.difference(b)) for a, b in reselection]
+            return [{"versions": versions_without_var, "features": set()}]
+        return [{"versions": list(a) + list(versions_without_var), "features": config.difference(b)} for a, b in reselection]
 
     def determine_high_low_min_var(self, c_node, config, var_indices):
         # Get the minimum var of all current nodes

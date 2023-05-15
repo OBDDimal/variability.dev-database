@@ -286,8 +286,8 @@
 
             <v-card-text>
               <v-tabs-items v-model="tabTopRight">
-                <v-tab-item key="explanations">
-                  <div style="height: 29vh;">
+                <v-tab-item key="explanations" style="height: 29vh;">
+                  <div>
                     <div v-if="selectedVersion?.selectionState === SelectionState.ImplicitlySelected">Impliziert
                       selektiert, weil
                       {{
@@ -300,6 +300,15 @@
                     <div v-if="schuldigeFeaturesWeilNichtVorhanden.length !== 0">Fehlende Features:
                       {{ schuldigeFeaturesWeilNichtVorhanden.map(f => f.name) }}
                     </div>
+                  </div>
+
+                  <div v-if="featureExplanations">
+                    <v-data-table
+                      :headers="[{text: 'Versions', value: 'versions'}, {text: 'Features', value: 'features'}]"
+                      :items="featureExplanations"
+                      single-select
+                  >
+                  </v-data-table>
                   </div>
                 </v-tab-item>
 
@@ -458,6 +467,7 @@ export default Vue.extend({
     tabBottom: undefined,
     tabTopRight: undefined,
     filteredFeaturesVersion: undefined,
+    featureExplanations: undefined,
   }),
 
   props: {
@@ -538,7 +548,8 @@ export default Vue.extend({
         "selected_roots": selected_roots
       }))
           .then((explanations) => {
-            console.log(explanations.data);
+            this.featureExplanations = explanations.data;
+            console.log(explanations.data)
           })
           .catch(() => {
           });

@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><featureModel><properties></properties><struct><and name="root"><and name="x1"><feature name="x2"/><feature name="x4"/></and><feature name="x3"/><feature name="x5"/></and></struct><constraints><rule><imp><not><var>x1</var></not> <var>x5</var></imp></rule><rule><imp><conj>
+        <var>x2</var>
+<not><var>x4</var></not> 
+        </conj> <var>x5</var></imp></rule></constraints><comments></comments></featureModel>

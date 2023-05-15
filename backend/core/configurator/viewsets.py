@@ -25,12 +25,7 @@ class DecisionPropagation(APIView):
             if len(available_roots) == 0:
                 available_roots = None
 
-            if name in DecisionPropagation.bdds:
-                bdd = DecisionPropagation.bdds[name]
-            else:
-                bdd = parse_from_ddueruem("data/" + name + "/" + name + ".bdd")
-                bdd.nodes_per_root = [set([var for _, var, high, low in bdd.get_nodes(root) if high != 0]) for root in bdd.roots]
-                DecisionPropagation.bdds[name] = bdd
+            bdd = init(name)
 
             count, free_vars, available_vars, simpl_vars, dimpl_vars = bdd.decision_propagation_multiversion_features(config, selected_roots, available_roots)
             available_roots, deselected_roots = bdd.decision_propagation_multiversion_versions(config, selected_roots, available_roots)
@@ -44,6 +39,16 @@ class DecisionPropagation(APIView):
 
             return Response(serializer.data, status=201)
         return Response(serializer.errors, status=400)
+
+def init(name):
+    if name in DecisionPropagation.bdds:
+        return DecisionPropagation.bdds[name]
+    else:
+        bdd = parse_from_ddueruem("data/" + name + "/" + name + ".bdd")
+        bdd.nodes_per_root = dict(
+            [(root, set([var for _, var, high, low in bdd.get_nodes(root)])) for root in bdd.roots])
+        DecisionPropagation.bdds[name] = bdd
+        return bdd
 
 
 class FeatureModels(APIView):
@@ -90,11 +95,7 @@ class Explanations(APIView):
             config = request.data['config']
             selected_roots = request.data['selected_roots']
 
-            if name in DecisionPropagation.bdds:
-                bdd = DecisionPropagation.bdds[name]
-            else:
-                bdd = parse_from_ddueruem("data/" + name + "/" + name + ".bdd")
-                DecisionPropagation.bdds[name] = bdd
+            bdd = init(name)
 
             explanations = bdd.explanations_feature(var, config, selected_roots)
 
