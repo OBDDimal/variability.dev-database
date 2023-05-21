@@ -294,11 +294,28 @@
                         featureModel.versions.filter(v => selectedVersion.id === v.id && v.selectionState === SelectionState.ExplicitlySelected).map(v => v.version)
                       }}
                     </div>
-                    <div v-if="crossTreeConstraintsSindSchuld">Cross-Tree-Constraints sind schuld:
-                      {{ crossTreeConstraintsSindSchuld }}
+                    <div class="text-h5" v-if="crossTreeConstraintsSindSchuld">
+                      Conflicting Cross-Tree-Constraints
+                      <v-btn @click="tabBottom = 'ctc'">
+                        <v-icon>mdi-arrow-top-right</v-icon>
+                      </v-btn>
                     </div>
-                    <div v-if="schuldigeFeaturesWeilNichtVorhanden.length !== 0">Fehlende Features:
-                      {{ schuldigeFeaturesWeilNichtVorhanden.map(f => f.name) }}
+                    <div v-if="schuldigeFeaturesWeilNichtVorhanden.length !== 0">
+                      <div class="text-h5">These features are selected but are missing in this version</div>
+                      <v-list lines="one">
+                        <v-simple-table>
+                          <template v-slot:default>
+                            <tbody>
+                            <tr
+                                v-for="item in schuldigeFeaturesWeilNichtVorhanden"
+                                :key="item.name"
+                            >
+                              <td>{{ item.name }}</td>
+                            </tr>
+                            </tbody>
+                          </template>
+                        </v-simple-table>
+                      </v-list>
                     </div>
                   </div>
 
@@ -343,18 +360,18 @@
           <v-card height="47vh">
             <v-card-title>Details for version: {{ selectedVersion?.version }}</v-card-title>
             <v-tabs v-model="tabBottom">
-              <v-tab key="featureModelViewer">Feature Model Viewer</v-tab>
-              <v-tab key="listTree">List Tree</v-tab>
-              <v-tab key="ctc">Cross Tree Constraints</v-tab>
+              <v-tab key="featureModelViewer" href="#featureModelViewer">Feature Model Viewer</v-tab>
+              <v-tab key="listTree" href="#listTree">List Tree</v-tab>
+              <v-tab key="ctc" href="#ctc">Cross Tree Constraints</v-tab>
             </v-tabs>
 
             <v-card-text v-if="selectedVersion?.root">
               <v-tabs-items v-model="tabBottom">
-                <v-tab-item key="featureModelViewer">
+                <v-tab-item value="featureModelViewer" key="featureModelViewer">
                   <feature-model-viewer :version="selectedVersion"></feature-model-viewer>
                 </v-tab-item>
 
-                <v-tab-item key="listTree">
+                <v-tab-item value="listTree" key="listTree">
 
                   <v-container class="fill-height">
                     <v-layout column class="fill-height">
@@ -385,7 +402,7 @@
 
                 </v-tab-item>
 
-                <v-tab-item key="ctc">
+                <v-tab-item value="ctc" key="ctc">
 
                   <v-btn @click="filteredConstraints = allConstraints.filter(c => c.evaluation === false)">Only
                     invalid
