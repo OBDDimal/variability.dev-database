@@ -434,7 +434,7 @@
 
                     <template v-slot:item.evaluation="{ item }">
                       <v-avatar size="30"
-                                :color="item.evaluation ? 'green' : (item.evaluation === undefined ? '' : 'red')"></v-avatar>
+                                :color="evaluateCTC(item)"></v-avatar>
                     </template>
 
                   </v-data-table>
@@ -594,7 +594,13 @@ export default Vue.extend({
       } else {
         return 'red';
       }
+    },
+
+    evaluateCTC(item) {
+      const evaluation = item.constraint.evaluate();
+      return evaluation ? 'green' : (evaluation === undefined ? '' : 'red')
     }
+
   },
 
   computed: {
