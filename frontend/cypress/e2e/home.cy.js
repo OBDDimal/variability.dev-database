@@ -137,7 +137,7 @@ describe('Home page tests', () => {
             }
         })
 
-        it.only(`Uploading a zip file should send a mail`, () => {
+        it(`Uploading a zip file should send a mail`, () => {
             cy.wait(['@getFilesUploadedConfirmed', '@getFamilies', '@getTags']).then(
                 (interceptions) => {
                     cy.intercept('GET', '/Licenses/').as('getLicenses');
@@ -155,10 +155,10 @@ describe('Home page tests', () => {
                     cy.get('[data-cy="file-create-zip-open-source-checkbox"]').click({force: true});
 
                     cy.intercept('POST', '/families/').as('postFamilies');
-                    cy.intercept('POST', '/bulk-upload/').as('postBulkUpload');
+                    cy.intercept('POST', '/zip-upload/').as('postZipUpload');
 
                     cy.get('[data-cy="file-create-zip-upload-button"]').click();
-                    cy.wait(['@postFamilies', '@postBulkUpload']).then(
+                    cy.wait(['@postFamilies', '@postZipUpload']).then(
                         (interceptions2) => {
                             //check for mail popup
                             cy.contains('Check your mails', { matchCase: false }).should('exist'); //click tutorial away
