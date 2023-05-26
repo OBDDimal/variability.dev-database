@@ -97,9 +97,33 @@ class Explanations(APIView):
 
             bdd = init(name)
 
-            explanations = bdd.explanations_feature(var, config, selected_roots)
+            #explanations = bdd.explanations_feature(var, config, selected_roots)
 
-            return Response(explanations, status=200)
+            if len(selected_roots) == 0:
+                available_versions = set(bdd.roots)
+                conflicting_versions = set()
+            else:
+                available_versions, conflicting_versions = bdd.decision_propagation_multiversion_versions({-var}, [], selected_roots)
+
+            sexpl = set([f for f in config if f > 0])
+            dexpl = set([-f for f in config if f < 0])
+
+            pc = {-var}
+            conflicting_features = set()
+            while True:
+                _, _, available_features, simpl, dimpl = bdd.decision_propagation_multiversion_features(pc, selected_roots, available_versions)
+                conflicting_features = conflicting_features.union(dimpl.intersection(sexpl).union(simpl.intersection(dexpl)))
+                sexpl = sexpl.difference(conflicting_features)
+                dexpl = dexpl.difference(conflicting_features)
+
+                b = [f for f in config if f in sexpl or f in dexpl]
+                if len(b) == 0:
+                    break
+                pc = pc.union([b[0]])
+
+
+
+            return Response({'conflicting_versions': conflicting_versions, 'conflicting_features': conflicting_features}, status=200)
         return Response(serializer.errors, status=400)
 
 
