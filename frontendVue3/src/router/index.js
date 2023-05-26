@@ -47,6 +47,13 @@ const routes = [
             title: 'File Detail',
         },
     },
+    {
+        path: '/feature-model/:id',
+        name: 'FeatureModel',
+        props: true,
+        component: () =>
+            import(/* webpackChunkName: "home" */ '@/views/FeatureModel.vue'),
+    },
 ];
 
 const router = createRouter({

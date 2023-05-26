@@ -29,7 +29,7 @@
                 </template>
             </v-snackbar>
         </v-main>
-        <TheFooter></TheFooter>
+        <TheFooter v-if="route.name !== 'FeatureModel'"></TheFooter>
     </v-app>
 </template>
 
@@ -39,7 +39,9 @@ import TheFooter from '@/components/Footer.vue';
 import { useAppStore } from '@/store/app';
 import { storeToRefs } from 'pinia';
 import { useDisplay } from 'vuetify';
+import { useRoute } from 'vue-router';
 
+const route = useRoute();
 const breakpoints = useDisplay();
 const appStore = useAppStore();
 

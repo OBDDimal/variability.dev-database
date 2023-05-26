@@ -12,12 +12,20 @@
     "@mdi/font": "7.0.96",
     "axios": "^1.3.4",
     "core-js": "^3.8.3",
+    "d3": "^7.4.4",
+    "d3-flextree": "^2.1.2",
+    "d3-hierarchy": "^3.1.2",
+    "js-levenshtein": "^1.1.6",
     "pinia": "^2.0.23",
+    "qrcode.vue": "^3.4.0",
     "roboto-fontface": "*",
     "vue": "^3.2.13",
     "vue-router": "^4.0.0",
     "vuetify": "^3.0.0",
-    "webfontloader": "^1.0.0"
+    "webfontloader": "^1.0.0",
+    "xml-beautifier": "^0.5.0",
+    "peerjs": "^1.4.7",
+    "unique-names-generator": "^4.7.1"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^3.0.3",
