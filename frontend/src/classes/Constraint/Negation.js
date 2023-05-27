@@ -51,4 +51,13 @@ export class Negation extends ConstraintItem {
             return !item;
         }
     }
+
+    quickFix(target) {
+        if (this.item.evaluate() === target) {
+            return this.item.quickFix(!target);
+        }
+
+        console.error("Quick fix, Negation")
+        return [];
+    }
 }

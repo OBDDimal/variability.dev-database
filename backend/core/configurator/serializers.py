@@ -26,6 +26,6 @@ class ConfigurationMappingsSerializer(serializers.Serializer):
 
 
 class ExplanationsSerializer(serializers.Serializer):
-    var = serializers.CharField()
+    vars = serializers.ListField()
     config = serializers.ListField()
     selected_roots = serializers.ListField()

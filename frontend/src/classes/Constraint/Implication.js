@@ -61,4 +61,26 @@ export class Implication extends ConstraintItem {
             return conclusion;
         }
     }
+
+    quickFix(target) {
+        const premise = this.premise.evaluate();
+        const conclusion = this.conclusion.evaluate();
+
+        if (target) {
+            if (premise === true && conclusion === false) {
+                // Try to evaluate conclusion to true
+                return this.conclusion.quickFix(true);
+            } else {
+                console.error("Implication error 1, Quick Fix")
+                return [];
+            }
+        } else {
+           if (premise === true) {
+               return [...this.premise.quickFix(true), ...this.conclusion.quickFix(false)];
+           } else {
+               console.error("Implication error 2, Quick Fix")
+               return [];
+           }
+        }
+    }
 }

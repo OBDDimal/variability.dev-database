@@ -16,4 +16,20 @@ export class Conjunction extends GroupConstraintItem {
             return true;
         }
     }
+
+    quickFix(target) {
+        if (target) {
+            return this.items.map(i => (i, i.evaluate())).filter(i => i[1] === false).forEach(i => i[0].quickFix(true));
+        } else {
+            for (let i = 0; i < this.items.length; i++) {
+                const evaluation = this.items[i].evaluate();
+                if (evaluation === true) {
+                    return this.items[i].quickFix(false);
+                }
+            }
+        }
+
+        console.error("Quick Fix, Conjunction")
+        return [];
+    }
 }

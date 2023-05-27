@@ -220,7 +220,7 @@
 
               <template v-slot:item.actions="{ item }">
                 <v-btn v-if="!item.fix && (item.selectionState === SelectionState.ImplicitlyDeselected || item.selectionState === SelectionState.ImplicitlySelected)"
-                       @click="getFeatureExplanations(item)">
+                       @click="quickFixFeature(item)">
                   Quick Fix
                 </v-btn>
               </template>
@@ -471,6 +471,7 @@ import {Feature} from "@/classes/Configurator/Feature";
 import api from "@/services/api.service";
 import DoubleCheckbox from "@/components/Configurator/DoubleCheckbox.vue";
 import {QuickFixFeatureCommand} from "@/classes/Commands/Configurator/QuickFixFeatureCommand";
+import {QuickFixCTCCommand} from "@/classes/Commands/Configurator/QuickFixCTCCommand";
 
 
 export default Vue.extend({
@@ -521,7 +522,11 @@ export default Vue.extend({
     },
 
     constraintQuickFix(item) {
-      console.log(item);
+      const pc = item.constraint.quickFix(true);
+      console.log(pc);
+
+      const command = new QuickFixCTCCommand(this.featureModel, pc);
+      this.commandManager.execute(command);
     },
 
     filterFeaturesInVersion(version) {
@@ -557,7 +562,7 @@ export default Vue.extend({
       this.filteredFeaturesVersion = undefined;
     },
 
-    getFeatureExplanations(feature) {
+    quickFixFeature(feature) {
       if (feature.selectionState === SelectionState.Unselected || feature.selectionState === SelectionState.ExplicitlySelected || feature.selectionState === SelectionState.ExplicitlyDeselected) {
         return;
       }

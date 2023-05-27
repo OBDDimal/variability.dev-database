@@ -63,4 +63,11 @@ export class FeatureNodeConstraintItem extends ConstraintItem {
             return false;
         }
     }
+
+    quickFix(target) {
+        if (this.evaluate() === !target) {
+            return [(target ? 1 : -1) * this.featureNode.id];
+        }
+        return [];
+    }
 }

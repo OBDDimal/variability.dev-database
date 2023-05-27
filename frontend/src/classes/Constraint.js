@@ -58,4 +58,8 @@ export class Constraint {
     evaluate() {
         return this.rule.evaluate();
     }
+
+    quickFix(target) {
+        return this.rule.quickFix(target);
+    }
 }

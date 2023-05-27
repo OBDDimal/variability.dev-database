@@ -2,14 +2,14 @@ import {ConfigurationCommand} from "@/classes/Commands/Configurator/Configuratio
 import {SelectionState} from "@/classes/Configurator/SelectionState";
 import api from "@/services/api.service";
 
-export class QuickFixFeatureCommand extends ConfigurationCommand {
-    constructor(featureModel, feature) {
+export class QuickFixCTCCommand extends ConfigurationCommand {
+    constructor(featureModel, partialConfig) {
         super(featureModel);
-        this.feature = feature;
+        this.partialConfig = partialConfig;
         this.executed = false;
         this.newSatCount = 0;
 
-        this.description = "Quick fix " + this.feature.name;
+        this.description = "Quick fix constraint";
     }
 
     execute() {
@@ -19,17 +19,14 @@ export class QuickFixFeatureCommand extends ConfigurationCommand {
             const deselected_vars = this.featureModel.features.filter(f => f.selectionState === SelectionState.ExplicitlyDeselected).map(f => -f.id);
             const config = [...selected_vars, ...deselected_vars];
 
-            const variable = this.feature.selectionState === SelectionState.ImplicitlyDeselected ? -this.feature.id : this.feature.id;
-
             api.post(`${process.env.VUE_APP_DOMAIN}configurator/feature-explanations/${this.featureModel.name}`, ({
-                "vars": [-variable],
+                "vars": this.partialConfig,
                 "config": config,
                 "selected_roots": selected_roots
             }))
             .then((d) => {
                 const data = d.data;
                 this.newSatCount = this.formatScientificNotation(data.count);
-                console.log(data);
 
                 this.newExplicitlySelectedVersions = this.featureModel.versions.filter(v => data.selected_roots.includes(v.rootId) && v.selectionState === SelectionState.ExplicitlySelected)
                 this.newImplicitlySelectedVersions = this.featureModel.versions.filter(v => data.selected_roots.includes(v.rootId) && v.selectionState !== SelectionState.ExplicitlySelected)

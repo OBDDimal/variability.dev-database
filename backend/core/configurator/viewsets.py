@@ -91,7 +91,7 @@ class Explanations(APIView):
     def post(self, request, name):
         serializer = ExplanationsSerializer(data=request.data)
         if serializer.is_valid():
-            var = request.data['var']
+            vars = request.data['vars']
             config = request.data['config']
             selected_roots = request.data['selected_roots']
 
@@ -106,19 +106,19 @@ class Explanations(APIView):
                 available_versions = set(bdd.roots)
             else:
                 # Step 1: Test if versions are valid
-                if not bdd.verify_multiversion({-var}, selected_roots):
+                if not bdd.verify_multiversion(vars, selected_roots):
 
                     # Step 2: Find all conflicting single versions
-                    available_versions, conflicting_versions = bdd.decision_propagation_multiversion_versions({-var}, [], selected_roots)
+                    available_versions, conflicting_versions = bdd.decision_propagation_multiversion_versions(vars, [], selected_roots)
 
                     roots = []
                     for root in available_versions:
-                        if bdd.verify_multiversion({-var}, [root] + roots):
+                        if bdd.verify_multiversion(vars, [root] + roots):
                             roots = roots + [root]
                     conflicting_versions = conflicting_versions.union(selected_roots.difference(roots))
                     selected_roots = selected_roots.difference(conflicting_versions)
 
-            pc = [-var]
+            pc = vars
             if len(selected_roots) == 0:
                 roots = set(bdd.roots)
                 for c in config:

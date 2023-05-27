@@ -16,4 +16,20 @@ export class Disjunction extends GroupConstraintItem {
             return undefined;
         }
     }
+
+    quickFix(target) {
+        if (target) {
+            for (let i = 0; i < this.items.length; i++) {
+                const evaluation = this.items[i].evaluate();
+                if (evaluation === false) {
+                    return this.items[i].quickFix(true);
+                }
+            }
+        } else {
+            return this.items.map(i => (i, i.evaluate())).filter(i => i[1] === true).forEach(i => i[0].quickFix(false));
+        }
+
+        console.error("Quick Fix, Disjunction")
+        return [];
+    }
 }
