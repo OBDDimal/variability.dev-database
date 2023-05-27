@@ -25,10 +25,18 @@ export class ConfigurationCommand extends Command {
 
     execute() {
         this.newExplicitlySelectedVersions.forEach(v => v.selectionState = SelectionState.ExplicitlySelected);
-        this.newImplicitlySelectedVersions.forEach(v => v.selectionState = SelectionState.ImplicitlySelected);
+        this.newImplicitlySelectedVersions.forEach(v => {
+            v.selectionState = SelectionState.ImplicitlySelected;
+            v.selectionStateDescription = "Version with same root id is selected: " + this.newExplicitlySelectedVersions.filter(i => i.rootId === v.rootId).map(i => i.version);
+        });
         this.newExplicitlyDeselectedVersions.forEach(v => v.selectionState = SelectionState.ExplicitlyDeselected);
         this.newImplicitlyDeselectedVersions.forEach(v => v.selectionState = SelectionState.ImplicitlyDeselected);
         this.newUnselectedVersions.forEach(v => v.selectionState = SelectionState.Unselected);
+
+        if (this.newImplicitlySelectedVersions.length === 0 && this.newExplicitlySelectedVersions.length === 0 && this.newUnselectedVersions.length === 1) {
+            this.newUnselectedVersions[0].selectionState = SelectionState.ImplicitlySelected;
+            this.newUnselectedVersions[0].selectionStateDescription = "The only available version";
+        }
 
         this.newExplicitlySelectedFeatures.forEach(f => f.selectionState = SelectionState.ExplicitlySelected);
         this.newImplicitlySelectedFeatures.forEach(f => f.selectionState = SelectionState.ImplicitlySelected);

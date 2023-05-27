@@ -319,11 +319,8 @@
               <v-tabs-items v-model="tabTopRight">
                 <v-tab-item key="explanations" style="height: 25vh;">
                   <div>
-                    <div v-if="selectedVersion?.selectionState === SelectionState.ImplicitlySelected">Impliziert
-                      selektiert, weil
-                      {{
-                        featureModel.versions.filter(v => selectedVersion.id === v.id && v.selectionState === SelectionState.ExplicitlySelected).map(v => v.version)
-                      }}
+                    <div class="text-h5" v-if="selectedVersion?.selectionState === SelectionState.ImplicitlySelected">
+                      {{selectedVersion.selectionStateDescription}}
                     </div>
                     <div class="text-h5" v-if="crossTreeConstraintsSindSchuld">
                       Conflicting Cross-Tree-Constraints
@@ -348,11 +345,6 @@
                         </v-simple-table>
                       </v-list>
                     </div>
-                  </div>
-
-                  <div v-if="featureExplanations">
-                    <span>{{ featureExplanations.conflicting_versions }}</span>
-                    <span>{{ featureExplanations.conflicting_features }}</span>
                   </div>
                 </v-tab-item>
 
@@ -519,7 +511,6 @@ export default Vue.extend({
     tabBottom: undefined,
     tabTopRight: undefined,
     filteredFeaturesVersion: undefined,
-    featureExplanations: undefined,
   }),
 
   props: {
