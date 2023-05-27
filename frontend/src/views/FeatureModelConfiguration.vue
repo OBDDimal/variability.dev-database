@@ -563,6 +563,7 @@ export default Vue.extend({
 
     selectVersion(version) {
       this.selectedVersion.empty();
+      this.featureModel.loading = true;
       this.featureModel.loadXmlData(version).then(() => {
         this.selectedVersion = version;
         this.allConstraints = this.selectedVersion.constraints.map((e) => ({
@@ -571,6 +572,7 @@ export default Vue.extend({
           evaluation: e.evaluate()
         }))
         this.filteredConstraints = this.allConstraints;
+        this.featureModel.loading = false;
       });
     },
 
