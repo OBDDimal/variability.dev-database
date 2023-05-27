@@ -31,6 +31,7 @@ export class ResetCommand extends ConfigurationCommand {
 
                     this.executed = true;
 
+                    this.markAllFeaturesAsPermanantImplicit();
                     super.execute();
                 })
                 .catch(() => {
@@ -40,6 +41,11 @@ export class ResetCommand extends ConfigurationCommand {
         } else {
             super.execute();
         }
+    }
+
+    markAllFeaturesAsPermanantImplicit() {
+        this.newImplicitlySelectedFeatures.forEach(f => f.fix = true);
+        this.newImplicitlyDeselectedFeatures.forEach(f => f.fix = true);
     }
 
     copy() {

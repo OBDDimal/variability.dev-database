@@ -98,32 +98,56 @@ class Explanations(APIView):
             bdd = init(name)
 
             #explanations = bdd.explanations_feature(var, config, selected_roots)
+            selected_roots = set(selected_roots)
 
+            conflicting_versions = set()
+            available_versions = set()
             if len(selected_roots) == 0:
                 available_versions = set(bdd.roots)
-                conflicting_versions = set()
             else:
-                available_versions, conflicting_versions = bdd.decision_propagation_multiversion_versions({-var}, [], selected_roots)
+                # Step 1: Test if versions are valid
+                if not bdd.verify_multiversion({-var}, selected_roots):
 
-            sexpl = set([f for f in config if f > 0])
-            dexpl = set([-f for f in config if f < 0])
+                    # Step 2: Find all conflicting single versions
+                    available_versions, conflicting_versions = bdd.decision_propagation_multiversion_versions({-var}, [], selected_roots)
 
-            pc = {-var}
-            conflicting_features = set()
-            while True:
-                _, _, available_features, simpl, dimpl = bdd.decision_propagation_multiversion_features(pc, selected_roots, available_versions)
-                conflicting_features = conflicting_features.union(dimpl.intersection(sexpl).union(simpl.intersection(dexpl)))
-                sexpl = sexpl.difference(conflicting_features)
-                dexpl = dexpl.difference(conflicting_features)
+                    roots = []
+                    for root in available_versions:
+                        if bdd.verify_multiversion({-var}, [root] + roots):
+                            roots = roots + [root]
+                    conflicting_versions = conflicting_versions.union(selected_roots.difference(roots))
+                    selected_roots = selected_roots.difference(conflicting_versions)
 
-                b = [f for f in config if f in sexpl or f in dexpl]
-                if len(b) == 0:
-                    break
-                pc = pc.union([b[0]])
+            pc = [-var]
+            if len(selected_roots) == 0:
+                roots = set(bdd.roots)
+                for c in config:
+                    invalid_roots = set()
+                    for root in roots:
+                    #count, _, _, _, _ = bdd.decision_propagation2([c] + pc, roots)
+                        if bdd.verify_multiversion([c] + pc, [root]):
+                            #if count != 0:
+                            pc = pc + [c]
+                            roots = roots.difference(invalid_roots)
+                            break
+                        else:
+                            invalid_roots.add(root)
+            else:
+                for c in config:
+                    if bdd.verify_multiversion([c] + pc, selected_roots):
+                        pc = pc + [c]
 
+            available_roots, deselected_roots = bdd.decision_propagation_multiversion_versions(config, list(selected_roots), set(bdd.roots).difference(conflicting_versions))
+            count, free_vars, available_vars, simpl_vars, dimpl_vars = bdd.decision_propagation_multiversion_features(pc, selected_roots, set(bdd.roots).difference(conflicting_versions))
 
+            results = {"config": pc, "selected_roots": selected_roots, "count": count,
+                       "free_vars": free_vars, "available_vars": available_vars,
+                       "implicit_selected_vars": simpl_vars, "implicit_deselected_vars": dimpl_vars,
+                       "available_roots": available_roots, "deselected_roots": deselected_roots.union(conflicting_versions)}
 
-            return Response({'conflicting_versions': conflicting_versions, 'conflicting_features': conflicting_features}, status=200)
+            serializer = DecisionPropagationSerializer(results)
+
+            return Response(serializer.data, status=201)
         return Response(serializer.errors, status=400)
 
 

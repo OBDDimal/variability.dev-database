@@ -194,7 +194,7 @@
             </v-card-subtitle>
 
             <v-data-table
-                :headers="[{text: 'Selection', value: 'selectionState'}, {text: 'Name', value: 'name', groupable: false}]"
+                :headers="[{text: 'Selection', value: 'selectionState'}, {text: 'Name', value: 'name', groupable: false}, {text: 'Actions', groupable: false, value: 'actions'}]"
                 :search="searchFeatures"
                 :items="features"
                 item-key="name"
@@ -204,7 +204,6 @@
                 single-select
                 disable-pagination
                 hide-default-footer
-                @click:row="getFeatureExplanations($event)"
             >
               <template v-slot:item.name="{ item }">
                 <v-tooltip bottom>
@@ -217,6 +216,13 @@
 
               <template v-slot:item.selectionState="{ item }">
                 <DoubleCheckbox v-bind:selection-item="item" @select="select(item, $event)"></DoubleCheckbox>
+              </template>
+
+              <template v-slot:item.actions="{ item }">
+                <v-btn v-if="!item.fix && (item.selectionState === SelectionState.ImplicitlyDeselected || item.selectionState === SelectionState.ImplicitlySelected)"
+                       @click="getFeatureExplanations(item)">
+                  Quick Fix
+                </v-btn>
               </template>
             </v-data-table>
           </v-card>
@@ -276,7 +282,7 @@
           </v-card>
 
           <!-- Explanations and configuration history -->
-          <v-card style="margin-top:1vh;" height="35.4vh">
+          <v-card style="margin-top:1vh;" height="33.5vh">
             <v-card-title>
               <v-tabs v-model="tabTopRight">
                 <v-tab key="explanations">Explanations</v-tab>
@@ -286,7 +292,7 @@
 
             <v-card-text>
               <v-tabs-items v-model="tabTopRight">
-                <v-tab-item key="explanations" style="height: 29vh;">
+                <v-tab-item key="explanations" style="height: 25vh;">
                   <div>
                     <div v-if="selectedVersion?.selectionState === SelectionState.ImplicitlySelected">Impliziert
                       selektiert, weil
@@ -320,12 +326,8 @@
                   </div>
 
                   <div v-if="featureExplanations">
-                    <v-data-table
-                      :headers="[{text: 'Versions', value: 'versions'}, {text: 'Features', value: 'features'}]"
-                      :items="featureExplanations"
-                      single-select
-                  >
-                  </v-data-table>
+                    <span>{{featureExplanations.conflicting_versions}}</span>
+                    <span>{{featureExplanations.conflicting_features}}</span>
                   </div>
                 </v-tab-item>
 
@@ -340,7 +342,7 @@
                       disable-sort
                       disable-filtering
                       fixed-header
-                      height="29vh"
+                      height="25vh"
                       disable-pagination
                       hide-default-footer
                   >
@@ -414,7 +416,7 @@
                       :items="filteredConstraints"
                       show-group-by
                       :footer-props="{'items-per-page-options': [10, 20, 50, 100, 200]}"
-                      :headers="[{text: 'Valid', value: 'evaluation', key: 'evaluation'}, {text: 'Constraints', value: 'formula', groupable: false}]"
+                      :headers="[{text: 'Valid', value: 'evaluation', key: 'evaluation'}, {text: 'Constraints', key: 'formula', value: 'formula', groupable: false}, {text: 'Actions', key: 'actions', value: 'actions', groupable: false}]"
                       :sort-by="[{key: 'evaluation', ord: 'desc'}]"
                   >
 
@@ -435,6 +437,10 @@
                     <template v-slot:item.evaluation="{ item }">
                       <v-avatar size="30"
                                 :color="evaluateCTC(item)"></v-avatar>
+                    </template>
+
+                    <template v-slot:item.actions="{ item }">
+                      <v-btn @click="constraintQuickFix(item)">Quick Fix</v-btn>
                     </template>
 
                   </v-data-table>
@@ -464,6 +470,7 @@ import {FeatureNodeConstraintItem} from "@/classes/Constraint/FeatureNodeConstra
 import {Feature} from "@/classes/Configurator/Feature";
 import api from "@/services/api.service";
 import DoubleCheckbox from "@/components/Configurator/DoubleCheckbox.vue";
+import {QuickFixFeatureCommand} from "@/classes/Commands/Configurator/QuickFixFeatureCommand";
 
 
 export default Vue.extend({
@@ -513,6 +520,10 @@ export default Vue.extend({
           });
     },
 
+    constraintQuickFix(item) {
+      console.log(item);
+    },
+
     filterFeaturesInVersion(version) {
       this.filteredFeaturesVersion = version;
       this.features = version.features;
@@ -551,25 +562,8 @@ export default Vue.extend({
         return;
       }
 
-      const selected_roots = this.featureModel.versions.filter(v => v.selectionState === SelectionState.ExplicitlySelected).map(v => v.rootId);
-      const selected_vars = this.featureModel.features.filter(f => f.selectionState === SelectionState.ExplicitlySelected).map(f => f.id);
-      const deselected_vars = this.featureModel.features.filter(f => f.selectionState === SelectionState.ExplicitlyDeselected).map(f => -f.id);
-      const config = [...selected_vars, ...deselected_vars];
-
-      const variable = feature.selectionState === SelectionState.ImplicitlyDeselected ? -feature.id : feature.id;
-
-      console.log(feature)
-      api.post(`${process.env.VUE_APP_DOMAIN}configurator/feature-explanations/${this.name}`, ({
-        "var": variable,
-        "config": config,
-        "selected_roots": selected_roots
-      }))
-          .then((explanations) => {
-            this.featureExplanations = explanations.data;
-            console.log(explanations.data)
-          })
-          .catch(() => {
-          });
+      const command = new QuickFixFeatureCommand(this.featureModel, feature);
+      this.commandManager.execute(command);
     },
 
     select(item, selectionState) {
