@@ -14,6 +14,7 @@ export class QuickFixCTCCommand extends ConfigurationCommand {
 
     execute() {
         if (!this.executed) {
+            this.featureModel.loading = true;
             const selected_roots = this.featureModel.versions.filter(v => v.selectionState === SelectionState.ExplicitlySelected).map(v => v.rootId);
             const selected_vars = this.featureModel.features.filter(f => f.selectionState === SelectionState.ExplicitlySelected).map(f => f.id);
             const deselected_vars = this.featureModel.features.filter(f => f.selectionState === SelectionState.ExplicitlyDeselected).map(f => -f.id);
@@ -43,8 +44,10 @@ export class QuickFixCTCCommand extends ConfigurationCommand {
                 this.executed = true;
 
                 super.execute();
+                this.featureModel.loading = false;
             })
             .catch(() => {
+                this.featureModel.loading = false;
             });
         } else {
             super.execute();

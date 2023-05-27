@@ -3,7 +3,7 @@
         <fullscreen></fullscreen>
 
         <v-app>
-            <navigation title="ddueruem" />
+            <navigation title="ddueruem" hide-overlay/>
 
             <v-main style="position: relative">
                 <div>

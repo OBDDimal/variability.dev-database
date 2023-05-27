@@ -1,8 +1,21 @@
 <template>
   <div class="main">
-    <v-container fluid>
-      <v-row>
+    <v-overlay
+        contained
+        class="align-center justify-center"
+        :opacity="featureModel.loadingOpacity"
+        :value="featureModel.loading"
+        style="margin-top: 64px;"
+    >
+      <v-progress-circular
+          color="primary"
+          indeterminate
+          size="64"
+      ></v-progress-circular>
+    </v-overlay>
 
+    <v-container fluid v-if="featureModel.loadingOpacity !== 0">
+      <v-row>
         <!-- Versions -->
         <v-col cols="4">
           <v-card>
@@ -32,15 +45,15 @@
                   </tr>
                   <tr>
                     <td>Explicitly deselected</td>
-                    <td>{{countSelectionState(featureModel.versions, SelectionState.ExplicitlyDeselected)}}</td>
+                    <td>{{ countSelectionState(featureModel.versions, SelectionState.ExplicitlyDeselected) }}</td>
                   </tr>
                   <tr>
                     <td>Implicitly selected</td>
-                    <td>{{countSelectionState(featureModel.versions, SelectionState.ImplicitlySelected)}}</td>
+                    <td>{{ countSelectionState(featureModel.versions, SelectionState.ImplicitlySelected) }}</td>
                   </tr>
                   <tr>
                     <td>Implicitly deselected</td>
-                    <td>{{countSelectionState(featureModel.versions, SelectionState.ImplicitlyDeselected)}}</td>
+                    <td>{{ countSelectionState(featureModel.versions, SelectionState.ImplicitlyDeselected) }}</td>
                   </tr>
                 </table>
               </v-tooltip>
@@ -139,28 +152,39 @@
                   </tr>
                   <tr>
                     <td>Unselected</td>
-                    <td v-if="filteredFeaturesVersion">{{ countSelectionState(features, SelectionState.Unselected) }}</td>
+                    <td v-if="filteredFeaturesVersion">{{
+                        countSelectionState(features, SelectionState.Unselected)
+                      }}
+                    </td>
                     <td>{{ countSelectionState(featureModel.features, SelectionState.Unselected) }}</td>
                   </tr>
                   <tr>
                     <td>Explicitly selected</td>
-                    <td v-if="filteredFeaturesVersion">{{ countSelectionState(features, SelectionState.ExplicitlySelected) }}</td>
+                    <td v-if="filteredFeaturesVersion">
+                      {{ countSelectionState(features, SelectionState.ExplicitlySelected) }}
+                    </td>
                     <td>{{ countSelectionState(featureModel.features, SelectionState.ExplicitlySelected) }}</td>
                   </tr>
                   <tr>
                     <td>Explicitly deselected</td>
-                    <td v-if="filteredFeaturesVersion">{{countSelectionState(features, SelectionState.ExplicitlyDeselected)}}</td>
-                    <td>{{countSelectionState(featureModel.features, SelectionState.ExplicitlyDeselected)}}</td>
+                    <td v-if="filteredFeaturesVersion">
+                      {{ countSelectionState(features, SelectionState.ExplicitlyDeselected) }}
+                    </td>
+                    <td>{{ countSelectionState(featureModel.features, SelectionState.ExplicitlyDeselected) }}</td>
                   </tr>
                   <tr>
                     <td>Implicitly selected</td>
-                    <td v-if="filteredFeaturesVersion">{{countSelectionState(features, SelectionState.ImplicitlySelected)}}</td>
-                    <td>{{countSelectionState(featureModel.features, SelectionState.ImplicitlySelected)}}</td>
+                    <td v-if="filteredFeaturesVersion">
+                      {{ countSelectionState(features, SelectionState.ImplicitlySelected) }}
+                    </td>
+                    <td>{{ countSelectionState(featureModel.features, SelectionState.ImplicitlySelected) }}</td>
                   </tr>
                   <tr>
                     <td>Implicitly deselected</td>
-                    <td v-if="filteredFeaturesVersion">{{countSelectionState(features, SelectionState.ImplicitlyDeselected)}}</td>
-                    <td>{{countSelectionState(featureModel.features, SelectionState.ImplicitlyDeselected)}}</td>
+                    <td v-if="filteredFeaturesVersion">
+                      {{ countSelectionState(features, SelectionState.ImplicitlyDeselected) }}
+                    </td>
+                    <td>{{ countSelectionState(featureModel.features, SelectionState.ImplicitlyDeselected) }}</td>
                   </tr>
                 </table>
               </v-tooltip>
@@ -219,8 +243,9 @@
               </template>
 
               <template v-slot:item.actions="{ item }">
-                <v-btn v-if="!item.fix && (item.selectionState === SelectionState.ImplicitlyDeselected || item.selectionState === SelectionState.ImplicitlySelected)"
-                       @click="quickFixFeature(item)">
+                <v-btn
+                    v-if="!item.fix && (item.selectionState === SelectionState.ImplicitlyDeselected || item.selectionState === SelectionState.ImplicitlySelected)"
+                    @click="quickFixFeature(item)">
                   Quick Fix
                 </v-btn>
               </template>
@@ -326,8 +351,8 @@
                   </div>
 
                   <div v-if="featureExplanations">
-                    <span>{{featureExplanations.conflicting_versions}}</span>
-                    <span>{{featureExplanations.conflicting_features}}</span>
+                    <span>{{ featureExplanations.conflicting_versions }}</span>
+                    <span>{{ featureExplanations.conflicting_features }}</span>
                   </div>
                 </v-tab-item>
 
@@ -455,6 +480,8 @@
       </v-row>
 
     </v-container>
+
+
   </div>
 </template>
 

@@ -30,6 +30,7 @@ export class SelectionCommand extends ConfigurationCommand {
 
     execute() {
         if (!this.executed) {
+            this.featureModel.loading = true;
             if (this.featureOrVersion.selectionState === this.newSelectionState) {
                 this.featureOrVersion.selectionState = SelectionState.Unselected;
             } else {
@@ -67,9 +68,10 @@ export class SelectionCommand extends ConfigurationCommand {
                     this.executed = true;
 
                     super.execute();
+                    this.featureModel.loading = false;
                 })
                 .catch(() => {
-                    this.addLoading = false;
+                    this.featureModel.loading = false;
                 });
 
         } else {

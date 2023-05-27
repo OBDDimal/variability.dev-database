@@ -18,6 +18,8 @@ export class FeatureModel {
         this.satCount = 0;
         this.versions = versions;
         this.name = undefined;
+        this.loading = true;
+        this.loadingOpacity = 0;
     }
 
     static create(versions, features) {

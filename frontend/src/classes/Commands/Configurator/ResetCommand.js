@@ -12,6 +12,7 @@ export class ResetCommand extends ConfigurationCommand {
 
     execute() {
         if (!this.executed) {
+            this.featureModel.loading = true;
             api.post(`${process.env.VUE_APP_DOMAIN}configurator/decision-propagation`, ({"name": this.featureModel.name, "config": [], "selected_roots": [], "available_roots": []}))
                 .then((d) => {
                     const data = d.data;
@@ -33,9 +34,11 @@ export class ResetCommand extends ConfigurationCommand {
 
                     this.markAllFeaturesAsPermanantImplicit();
                     super.execute();
+                    this.featureModel.loading = false;
+                    this.featureModel.loadingOpacity = 0.5;
                 })
                 .catch(() => {
-                    this.addLoading = false;
+                    this.featureModel.loading = false;
                 });
 
         } else {
