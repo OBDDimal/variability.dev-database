@@ -1,7 +1,6 @@
 import levenshtein from 'js-levenshtein';
 import * as view from "@/services/FeatureModel/view.service.js";
 import * as update from '@/services/FeatureModel/update.service.js';
-import {zoomFit} from "@/services/FeatureModel/view.service.js";
 
 export function resetSearch(d3Data) {
     d3Data.root.data.each(node => {
@@ -10,8 +9,6 @@ export function resetSearch(d3Data) {
     });
 
     view.reset(d3Data);
-    update.updateSvg(d3Data);
-    zoomFit(d3Data);
 }
 
 export function markNodeAsSearched(d3Data, foundNode) {

@@ -1,1 +1,0 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?><featureModel><properties></properties><struct><and abstract="true" name="Coffee machine"><feature mandatory="true" name="Coffee"/><feature name="Milk"/><feature name="Sugar"/></and></struct><constraints></constraints><comments></comments></featureModel>

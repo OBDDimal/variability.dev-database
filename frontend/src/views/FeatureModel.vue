@@ -131,7 +131,7 @@ import * as update from '@/services/FeatureModel/update.service';
 import api from '@/services/api.service';
 import beautify from 'xml-beautifier';
 import CollaborationManager from '@/classes/CollaborationManager';
-import { FeatureModelCommandManager } from '@/classes/Commands/FeatureModel/FeatureModelCommandManager';
+import { CommandManager } from '@/classes/Commands/CommandManager';
 import * as xmlTranspiler from '@/services/xmlTranspiler.service';
 import { jsonToXML } from '@/services/xmlTranspiler.service';
 import CollaborationToolbar from '@/components/CollaborationToolbar';
@@ -173,8 +173,8 @@ export default Vue.extend({
         xml: undefined,
         reloadKey: 0,
         collaborationReloadKey: 10000,
-        featureModelCommandManager: new FeatureModelCommandManager(),
-        constraintCommandManager: new FeatureModelCommandManager(),
+        featureModelCommandManager: new CommandManager(),
+        constraintCommandManager: new CommandManager(),
         collaborationManager: null,
         editRights: true,
         showStartCollaborationSessionDialog: false,

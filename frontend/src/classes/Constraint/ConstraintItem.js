@@ -10,14 +10,6 @@ export class ConstraintItem {
         }
     }
 
-    addPossibleBracketsToList(item) {
-        if (item.count() === 1 || this.getPrecedence() >= item.getPrecedence()) {
-            return item.toList();
-        } else {
-            return ['(', ...item.toList(), ')'];
-        }
-    }
-
     addPossibleBracketsForEdit(item) {
         if (item.count() === 1 || this.getPrecedence() >= item.getPrecedence()) {
             return `${item.toStringForEdit()}`;

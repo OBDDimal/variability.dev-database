@@ -1,1 +1,0 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?><featureModel><properties></properties><struct><and name="root"><feature name="x1"/><feature name="x2"/><feature mandatory="true" name="x3"/><feature name="x5"/></and></struct><constraints></constraints><comments></comments></featureModel>

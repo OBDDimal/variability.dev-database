@@ -78,9 +78,9 @@ function convertToConstraintItem(operator, stack) {
         const first = stack.pop();
 
         if (operator === 'and') {
-            constraintItem = new Conjunction([first, second]);
+            constraintItem = new Conjunction(first, second);
         } else if (operator === 'or') {
-            constraintItem = new Disjunction([first, second]);
+            constraintItem = new Disjunction(first, second);
         } else if (operator === 'implies') {
             constraintItem = new Implication(first, second);
         }

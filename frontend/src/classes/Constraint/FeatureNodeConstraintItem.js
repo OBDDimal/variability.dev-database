@@ -1,5 +1,4 @@
 import {ConstraintItem} from "@/classes/Constraint/ConstraintItem";
-import {SelectionState} from "@/classes/Configurator/SelectionState";
 
 export class FeatureNodeConstraintItem extends ConstraintItem {
     constructor(featureNode) {
@@ -18,10 +17,6 @@ export class FeatureNodeConstraintItem extends ConstraintItem {
         } else {
             return str;
         }
-    }
-
-    toList() {
-        return [this];
     }
 
     toStringForEdit() {
@@ -50,36 +45,5 @@ export class FeatureNodeConstraintItem extends ConstraintItem {
     removeConstraint() {
         this.featureNode.constraints = this.featureNode.constraints.filter((c) => c !== this.constraint);
         this.constraint = null;
-    }
-
-    evaluate(tmp = false) {
-        if (!tmp) {
-            if (this.featureNode.selectionState === SelectionState.ImplicitlySelected ||
-                this.featureNode.selectionState === SelectionState.ExplicitlySelected
-            ) {
-                return true;
-            } else if (this.featureNode.selectionState === SelectionState.Unselected) {
-                return undefined;
-            } else {
-                return false;
-            }
-        } else {
-            if (this.featureNode.selectionStateTmp === SelectionState.ImplicitlySelected ||
-                this.featureNode.selectionStateTmp === SelectionState.ExplicitlySelected
-            ) {
-                return true;
-            } else if(this.featureNode.selectionStateTmp === SelectionState.Unselected) {
-                return undefined;
-            } else {
-                return false;
-            }
-        }
-    }
-
-    quickFix(target) {
-        if (this.evaluate() === !target) {
-            return [(target ? 1 : -1) * this.featureNode.id];
-        }
-        return [];
     }
 }
