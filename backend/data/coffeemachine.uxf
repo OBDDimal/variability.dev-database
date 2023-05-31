@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <diagram program="umlet" version="15.0.0">
-  <zoom_level>11</zoom_level>
+  <zoom_level>12</zoom_level>
   <element>
     <id>UMLUseCase</id>
     <coordinates>
-      <x>517</x>
-      <y>22</y>
-      <w>77</w>
-      <h>44</h>
+      <x>708</x>
+      <y>24</y>
+      <w>84</w>
+      <h>48</h>
     </coordinates>
     <panel_attributes>x1</panel_attributes>
     <additional_attributes/>
@@ -15,10 +15,10 @@
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>605</x>
-      <y>242</y>
-      <w>33</w>
-      <h>33</h>
+      <x>804</x>
+      <y>264</y>
+      <w>36</w>
+      <h>36</h>
     </coordinates>
     <panel_attributes>1</panel_attributes>
     <additional_attributes/>
@@ -26,10 +26,10 @@
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>616</x>
-      <y>143</y>
-      <w>33</w>
-      <h>121</h>
+      <x>816</x>
+      <y>156</y>
+      <w>36</w>
+      <h>132</h>
     </coordinates>
     <panel_attributes>lt=.</panel_attributes>
     <additional_attributes>10.0;10.0;10.0;90.0</additional_attributes>
@@ -37,10 +37,10 @@
   <element>
     <id>UMLObject</id>
     <coordinates>
-      <x>132</x>
+      <x>288</x>
       <y>0</y>
-      <w>132</w>
-      <h>44</h>
+      <w>144</w>
+      <h>48</h>
     </coordinates>
     <panel_attributes>Coffee machine</panel_attributes>
     <additional_attributes/>
@@ -48,10 +48,10 @@
   <element>
     <id>UMLObject</id>
     <coordinates>
-      <x>0</x>
-      <y>99</y>
-      <w>110</w>
-      <h>44</h>
+      <x>144</x>
+      <y>108</y>
+      <w>120</w>
+      <h>48</h>
     </coordinates>
     <panel_attributes>Coffee</panel_attributes>
     <additional_attributes/>
@@ -59,10 +59,10 @@
   <element>
     <id>UMLUseCase</id>
     <coordinates>
-      <x>165</x>
-      <y>253</y>
-      <w>77</w>
-      <h>44</h>
+      <x>324</x>
+      <y>276</y>
+      <w>84</w>
+      <h>48</h>
     </coordinates>
     <panel_attributes>Small</panel_attributes>
     <additional_attributes/>
@@ -70,10 +70,10 @@
   <element>
     <id>UMLUseCase</id>
     <coordinates>
-      <x>451</x>
-      <y>110</y>
-      <w>77</w>
-      <h>44</h>
+      <x>636</x>
+      <y>120</y>
+      <w>84</w>
+      <h>48</h>
     </coordinates>
     <panel_attributes>x2</panel_attributes>
     <additional_attributes/>
@@ -81,10 +81,10 @@
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>473</x>
-      <y>55</y>
-      <w>110</w>
-      <h>77</h>
+      <x>660</x>
+      <y>60</y>
+      <w>120</w>
+      <h>84</h>
     </coordinates>
     <panel_attributes>lt=.</panel_attributes>
     <additional_attributes>80.0;10.0;10.0;50.0</additional_attributes>
@@ -92,10 +92,10 @@
   <element>
     <id>UMLUseCase</id>
     <coordinates>
-      <x>594</x>
-      <y>110</y>
-      <w>77</w>
-      <h>44</h>
+      <x>792</x>
+      <y>120</y>
+      <w>84</w>
+      <h>48</h>
     </coordinates>
     <panel_attributes>x2</panel_attributes>
     <additional_attributes/>
@@ -103,10 +103,10 @@
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>550</x>
-      <y>55</y>
-      <w>99</w>
-      <h>77</h>
+      <x>744</x>
+      <y>60</y>
+      <w>108</w>
+      <h>84</h>
     </coordinates>
     <panel_attributes>lt=-</panel_attributes>
     <additional_attributes>10.0;10.0;70.0;50.0</additional_attributes>
@@ -114,10 +114,10 @@
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>484</x>
-      <y>143</y>
-      <w>165</w>
-      <h>121</h>
+      <x>672</x>
+      <y>156</y>
+      <w>180</w>
+      <h>132</h>
     </coordinates>
     <panel_attributes>lt=-</panel_attributes>
     <additional_attributes>10.0;10.0;130.0;90.0</additional_attributes>
@@ -125,10 +125,10 @@
   <element>
     <id>UMLObject</id>
     <coordinates>
-      <x>286</x>
-      <y>99</y>
-      <w>110</w>
-      <h>44</h>
+      <x>456</x>
+      <y>108</y>
+      <w>120</w>
+      <h>48</h>
     </coordinates>
     <panel_attributes>Large</panel_attributes>
     <additional_attributes/>
@@ -136,10 +136,10 @@
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>473</x>
-      <y>242</y>
-      <w>33</w>
-      <h>33</h>
+      <x>660</x>
+      <y>264</y>
+      <w>36</w>
+      <h>36</h>
     </coordinates>
     <panel_attributes>0</panel_attributes>
     <additional_attributes/>
@@ -147,10 +147,10 @@
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>484</x>
-      <y>143</y>
-      <w>33</w>
-      <h>121</h>
+      <x>672</x>
+      <y>156</y>
+      <w>36</w>
+      <h>132</h>
     </coordinates>
     <panel_attributes>lt=.</panel_attributes>
     <additional_attributes>10.0;10.0;10.0;90.0</additional_attributes>
@@ -158,10 +158,10 @@
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>484</x>
-      <y>143</y>
-      <w>165</w>
-      <h>121</h>
+      <x>672</x>
+      <y>156</y>
+      <w>180</w>
+      <h>132</h>
     </coordinates>
     <panel_attributes>lt=-</panel_attributes>
     <additional_attributes>130.0;10.0;10.0;90.0</additional_attributes>
@@ -169,10 +169,10 @@
   <element>
     <id>UMLUseCase</id>
     <coordinates>
-      <x>154</x>
-      <y>385</y>
-      <w>121</w>
-      <h>44</h>
+      <x>312</x>
+      <y>420</y>
+      <w>132</w>
+      <h>48</h>
     </coordinates>
     <panel_attributes>Coffee machine</panel_attributes>
     <additional_attributes/>
@@ -180,10 +180,10 @@
   <element>
     <id>UMLUseCase</id>
     <coordinates>
-      <x>187</x>
-      <y>473</y>
-      <w>77</w>
-      <h>44</h>
+      <x>348</x>
+      <y>516</y>
+      <w>84</w>
+      <h>48</h>
     </coordinates>
     <panel_attributes>Coffee</panel_attributes>
     <additional_attributes/>
@@ -191,10 +191,10 @@
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>209</x>
-      <y>418</y>
-      <w>33</w>
-      <h>77</h>
+      <x>372</x>
+      <y>456</y>
+      <w>36</w>
+      <h>84</h>
     </coordinates>
     <panel_attributes>lt=-</panel_attributes>
     <additional_attributes>10.0;10.0;10.0;50.0</additional_attributes>
@@ -202,10 +202,10 @@
   <element>
     <id>UMLUseCase</id>
     <coordinates>
-      <x>132</x>
-      <y>561</y>
-      <w>77</w>
-      <h>44</h>
+      <x>288</x>
+      <y>612</y>
+      <w>84</w>
+      <h>48</h>
     </coordinates>
     <panel_attributes>Espresso</panel_attributes>
     <additional_attributes/>
@@ -213,10 +213,10 @@
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>154</x>
-      <y>506</y>
-      <w>88</w>
-      <h>77</h>
+      <x>312</x>
+      <y>552</y>
+      <w>96</w>
+      <h>84</h>
     </coordinates>
     <panel_attributes>lt=-</panel_attributes>
     <additional_attributes>60.0;10.0;10.0;50.0</additional_attributes>
@@ -224,10 +224,10 @@
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>143</x>
-      <y>770</y>
-      <w>33</w>
-      <h>33</h>
+      <x>300</x>
+      <y>840</y>
+      <w>36</w>
+      <h>36</h>
     </coordinates>
     <panel_attributes>0</panel_attributes>
     <additional_attributes/>
@@ -235,10 +235,10 @@
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>275</x>
-      <y>770</y>
-      <w>33</w>
-      <h>33</h>
+      <x>444</x>
+      <y>840</y>
+      <w>36</w>
+      <h>36</h>
     </coordinates>
     <panel_attributes>1</panel_attributes>
     <additional_attributes/>
@@ -246,10 +246,10 @@
   <element>
     <id>UMLObject</id>
     <coordinates>
-      <x>132</x>
-      <y>99</y>
-      <w>110</w>
-      <h>44</h>
+      <x>288</x>
+      <y>108</y>
+      <w>120</w>
+      <h>48</h>
     </coordinates>
     <panel_attributes>Espresso</panel_attributes>
     <additional_attributes/>
@@ -257,10 +257,10 @@
   <element>
     <id>UMLUseCase</id>
     <coordinates>
-      <x>253</x>
-      <y>561</y>
-      <w>77</w>
-      <h>44</h>
+      <x>420</x>
+      <y>612</y>
+      <w>84</w>
+      <h>48</h>
     </coordinates>
     <panel_attributes>Espresso</panel_attributes>
     <additional_attributes/>
@@ -268,10 +268,10 @@
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>209</x>
-      <y>506</y>
-      <w>99</w>
-      <h>77</h>
+      <x>372</x>
+      <y>552</y>
+      <w>108</w>
+      <h>84</h>
     </coordinates>
     <panel_attributes>lt=.</panel_attributes>
     <additional_attributes>10.0;10.0;70.0;50.0</additional_attributes>
@@ -279,10 +279,10 @@
   <element>
     <id>UMLUseCase</id>
     <coordinates>
-      <x>253</x>
-      <y>649</y>
-      <w>77</w>
-      <h>44</h>
+      <x>420</x>
+      <y>708</y>
+      <w>84</w>
+      <h>48</h>
     </coordinates>
     <panel_attributes>Large</panel_attributes>
     <additional_attributes/>
@@ -290,10 +290,10 @@
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>286</x>
-      <y>594</y>
-      <w>33</w>
-      <h>77</h>
+      <x>456</x>
+      <y>648</y>
+      <w>36</w>
+      <h>84</h>
     </coordinates>
     <panel_attributes>lt=-</panel_attributes>
     <additional_attributes>10.0;10.0;10.0;50.0</additional_attributes>
@@ -301,10 +301,10 @@
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>286</x>
-      <y>682</y>
-      <w>33</w>
-      <h>110</h>
+      <x>456</x>
+      <y>744</y>
+      <w>36</w>
+      <h>120</h>
     </coordinates>
     <panel_attributes>lt=.</panel_attributes>
     <additional_attributes>10.0;10.0;10.0;80.0</additional_attributes>
@@ -312,10 +312,10 @@
   <element>
     <id>UMLUseCase</id>
     <coordinates>
-      <x>132</x>
-      <y>649</y>
-      <w>77</w>
-      <h>44</h>
+      <x>288</x>
+      <y>708</y>
+      <w>84</w>
+      <h>48</h>
     </coordinates>
     <panel_attributes>Large</panel_attributes>
     <additional_attributes/>
@@ -323,10 +323,10 @@
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>154</x>
-      <y>682</y>
-      <w>154</w>
-      <h>110</h>
+      <x>312</x>
+      <y>744</y>
+      <w>168</w>
+      <h>120</h>
     </coordinates>
     <panel_attributes>lt=.</panel_attributes>
     <additional_attributes>10.0;10.0;120.0;80.0</additional_attributes>
@@ -334,10 +334,10 @@
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>154</x>
-      <y>682</y>
-      <w>33</w>
-      <h>110</h>
+      <x>312</x>
+      <y>744</y>
+      <w>36</w>
+      <h>120</h>
     </coordinates>
     <panel_attributes>lt=-</panel_attributes>
     <additional_attributes>10.0;10.0;10.0;80.0</additional_attributes>
@@ -345,10 +345,10 @@
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>154</x>
-      <y>594</y>
-      <w>33</w>
-      <h>77</h>
+      <x>312</x>
+      <y>648</y>
+      <w>36</w>
+      <h>84</h>
     </coordinates>
     <panel_attributes>lt=.</panel_attributes>
     <additional_attributes>10.0;10.0;10.0;50.0</additional_attributes>
@@ -356,10 +356,10 @@
   <element>
     <id>UMLUseCase</id>
     <coordinates>
-      <x>550</x>
-      <y>583</y>
-      <w>44</w>
-      <h>44</h>
+      <x>744</x>
+      <y>636</y>
+      <w>48</w>
+      <h>48</h>
     </coordinates>
     <panel_attributes>x2</panel_attributes>
     <additional_attributes/>
@@ -367,10 +367,10 @@
   <element>
     <id>UMLUseCase</id>
     <coordinates>
-      <x>550</x>
-      <y>704</y>
-      <w>44</w>
-      <h>44</h>
+      <x>744</x>
+      <y>768</y>
+      <w>48</w>
+      <h>48</h>
     </coordinates>
     <panel_attributes>x3</panel_attributes>
     <additional_attributes/>
@@ -378,10 +378,10 @@
   <element>
     <id>UMLUseCase</id>
     <coordinates>
-      <x>649</x>
-      <y>704</y>
-      <w>44</w>
-      <h>44</h>
+      <x>852</x>
+      <y>768</y>
+      <w>48</w>
+      <h>48</h>
     </coordinates>
     <panel_attributes>x3</panel_attributes>
     <additional_attributes/>
@@ -389,10 +389,10 @@
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>660</x>
-      <y>737</y>
-      <w>33</w>
-      <h>121</h>
+      <x>864</x>
+      <y>804</y>
+      <w>36</w>
+      <h>132</h>
     </coordinates>
     <panel_attributes>lt=.</panel_attributes>
     <additional_attributes>10.0;10.0;10.0;90.0</additional_attributes>
@@ -400,10 +400,10 @@
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>561</x>
-      <y>737</y>
-      <w>44</w>
-      <h>121</h>
+      <x>756</x>
+      <y>804</y>
+      <w>48</w>
+      <h>132</h>
     </coordinates>
     <panel_attributes>lt=.</panel_attributes>
     <additional_attributes>10.0;10.0;20.0;50.0;10.0;90.0</additional_attributes>
@@ -411,10 +411,10 @@
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>550</x>
-      <y>737</y>
-      <w>44</w>
-      <h>121</h>
+      <x>744</x>
+      <y>804</y>
+      <w>48</w>
+      <h>132</h>
     </coordinates>
     <panel_attributes>lt=-</panel_attributes>
     <additional_attributes>20.0;10.0;10.0;50.0;20.0;90.0</additional_attributes>
@@ -422,10 +422,10 @@
   <element>
     <id>UMLUseCase</id>
     <coordinates>
-      <x>605</x>
-      <y>484</y>
-      <w>44</w>
-      <h>44</h>
+      <x>804</x>
+      <y>528</y>
+      <w>48</w>
+      <h>48</h>
     </coordinates>
     <panel_attributes>x1</panel_attributes>
     <additional_attributes/>
@@ -433,10 +433,10 @@
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>561</x>
-      <y>517</y>
-      <w>88</w>
-      <h>88</h>
+      <x>756</x>
+      <y>564</y>
+      <w>96</w>
+      <h>96</h>
     </coordinates>
     <panel_attributes>lt=-</panel_attributes>
     <additional_attributes>60.0;10.0;10.0;60.0</additional_attributes>
@@ -444,10 +444,10 @@
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>660</x>
-      <y>836</y>
-      <w>33</w>
-      <h>33</h>
+      <x>864</x>
+      <y>912</y>
+      <w>36</w>
+      <h>36</h>
     </coordinates>
     <panel_attributes>0</panel_attributes>
     <additional_attributes/>
@@ -455,10 +455,10 @@
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>550</x>
-      <y>836</y>
-      <w>33</w>
-      <h>33</h>
+      <x>744</x>
+      <y>912</y>
+      <w>36</w>
+      <h>36</h>
     </coordinates>
     <panel_attributes>1</panel_attributes>
     <additional_attributes/>
@@ -466,10 +466,10 @@
   <element>
     <id>UMLUseCase</id>
     <coordinates>
-      <x>649</x>
-      <y>583</y>
-      <w>44</w>
-      <h>44</h>
+      <x>852</x>
+      <y>636</y>
+      <w>48</w>
+      <h>48</h>
     </coordinates>
     <panel_attributes>x2</panel_attributes>
     <additional_attributes/>
@@ -477,10 +477,10 @@
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>616</x>
-      <y>517</y>
-      <w>77</w>
-      <h>88</h>
+      <x>816</x>
+      <y>564</y>
+      <w>84</w>
+      <h>96</h>
     </coordinates>
     <panel_attributes>lt=.</panel_attributes>
     <additional_attributes>10.0;10.0;50.0;60.0</additional_attributes>
@@ -488,10 +488,10 @@
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>561</x>
-      <y>737</y>
-      <w>132</w>
-      <h>121</h>
+      <x>756</x>
+      <y>804</y>
+      <w>144</w>
+      <h>132</h>
     </coordinates>
     <panel_attributes>lt=-</panel_attributes>
     <additional_attributes>100.0;10.0;10.0;90.0</additional_attributes>
@@ -499,10 +499,10 @@
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>561</x>
-      <y>616</y>
-      <w>121</w>
-      <h>110</h>
+      <x>756</x>
+      <y>672</y>
+      <w>132</w>
+      <h>120</h>
     </coordinates>
     <panel_attributes>lt=.</panel_attributes>
     <additional_attributes>10.0;10.0;90.0;80.0</additional_attributes>
@@ -510,10 +510,10 @@
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>561</x>
-      <y>616</y>
-      <w>33</w>
-      <h>110</h>
+      <x>756</x>
+      <y>672</y>
+      <w>36</w>
+      <h>120</h>
     </coordinates>
     <panel_attributes>lt=-</panel_attributes>
     <additional_attributes>10.0;10.0;10.0;80.0</additional_attributes>
@@ -521,10 +521,10 @@
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>660</x>
-      <y>616</y>
-      <w>44</w>
-      <h>110</h>
+      <x>864</x>
+      <y>672</y>
+      <w>48</w>
+      <h>120</h>
     </coordinates>
     <panel_attributes>lt=.</panel_attributes>
     <additional_attributes>10.0;10.0;20.0;50.0;10.0;80.0</additional_attributes>
@@ -532,10 +532,10 @@
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>649</x>
-      <y>616</y>
-      <w>44</w>
-      <h>110</h>
+      <x>852</x>
+      <y>672</y>
+      <w>48</w>
+      <h>120</h>
     </coordinates>
     <panel_attributes>lt=-</panel_attributes>
     <additional_attributes>20.0;10.0;10.0;50.0;20.0;80.0</additional_attributes>
@@ -543,10 +543,10 @@
   <element>
     <id>UMLObject</id>
     <coordinates>
-      <x>308</x>
-      <y>1111</y>
-      <w>132</w>
-      <h>44</h>
+      <x>480</x>
+      <y>1212</y>
+      <w>144</w>
+      <h>48</h>
     </coordinates>
     <panel_attributes>Coffee machine
 bg=blue</panel_attributes>
@@ -555,10 +555,10 @@ bg=blue</panel_attributes>
   <element>
     <id>UMLObject</id>
     <coordinates>
-      <x>176</x>
-      <y>1210</y>
-      <w>110</w>
-      <h>44</h>
+      <x>336</x>
+      <y>1320</y>
+      <w>120</w>
+      <h>48</h>
     </coordinates>
     <panel_attributes>Coffee</panel_attributes>
     <additional_attributes/>
@@ -566,10 +566,10 @@ bg=blue</panel_attributes>
   <element>
     <id>UMLObject</id>
     <coordinates>
-      <x>319</x>
-      <y>1210</y>
-      <w>110</w>
-      <h>44</h>
+      <x>492</x>
+      <y>1320</y>
+      <w>120</w>
+      <h>48</h>
     </coordinates>
     <panel_attributes>Milk</panel_attributes>
     <additional_attributes/>
@@ -577,10 +577,10 @@ bg=blue</panel_attributes>
   <element>
     <id>UMLObject</id>
     <coordinates>
-      <x>462</x>
-      <y>1210</y>
-      <w>110</w>
-      <h>44</h>
+      <x>648</x>
+      <y>1320</y>
+      <w>120</w>
+      <h>48</h>
     </coordinates>
     <panel_attributes>Sugar</panel_attributes>
     <additional_attributes/>
@@ -588,10 +588,10 @@ bg=blue</panel_attributes>
   <element>
     <id>UMLSpecialState</id>
     <coordinates>
-      <x>363</x>
-      <y>1199</y>
-      <w>22</w>
-      <h>22</h>
+      <x>540</x>
+      <y>1308</y>
+      <w>24</w>
+      <h>24</h>
     </coordinates>
     <panel_attributes>type=decision</panel_attributes>
     <additional_attributes/>
@@ -599,10 +599,10 @@ bg=blue</panel_attributes>
   <element>
     <id>UMLSpecialState</id>
     <coordinates>
-      <x>506</x>
-      <y>1199</y>
-      <w>22</w>
-      <h>22</h>
+      <x>696</x>
+      <y>1308</y>
+      <w>24</w>
+      <h>24</h>
     </coordinates>
     <panel_attributes>type=decision</panel_attributes>
     <additional_attributes/>
@@ -610,10 +610,10 @@ bg=blue</panel_attributes>
   <element>
     <id>UMLSpecialState</id>
     <coordinates>
-      <x>220</x>
-      <y>1199</y>
-      <w>22</w>
-      <h>22</h>
+      <x>384</x>
+      <y>1308</y>
+      <w>24</w>
+      <h>24</h>
     </coordinates>
     <panel_attributes>type=initial</panel_attributes>
     <additional_attributes/>
@@ -621,10 +621,10 @@ bg=blue</panel_attributes>
   <element>
     <id>UMLObject</id>
     <coordinates>
-      <x>1067</x>
-      <y>1056</y>
-      <w>132</w>
-      <h>44</h>
+      <x>1308</x>
+      <y>1152</y>
+      <w>144</w>
+      <h>48</h>
     </coordinates>
     <panel_attributes>Coffee machine
 bg=blue</panel_attributes>
@@ -633,10 +633,10 @@ bg=blue</panel_attributes>
   <element>
     <id>UMLObject</id>
     <coordinates>
-      <x>671</x>
-      <y>1265</y>
-      <w>110</w>
-      <h>44</h>
+      <x>876</x>
+      <y>1380</y>
+      <w>120</w>
+      <h>48</h>
     </coordinates>
     <panel_attributes>Coffee</panel_attributes>
     <additional_attributes/>
@@ -644,10 +644,10 @@ bg=blue</panel_attributes>
   <element>
     <id>UMLObject</id>
     <coordinates>
-      <x>1012</x>
-      <y>1265</y>
-      <w>110</w>
-      <h>44</h>
+      <x>1248</x>
+      <y>1380</y>
+      <w>120</w>
+      <h>48</h>
     </coordinates>
     <panel_attributes>Normal</panel_attributes>
     <additional_attributes/>
@@ -655,10 +655,10 @@ bg=blue</panel_attributes>
   <element>
     <id>UMLObject</id>
     <coordinates>
-      <x>1155</x>
-      <y>1265</y>
-      <w>110</w>
-      <h>44</h>
+      <x>1404</x>
+      <y>1380</y>
+      <w>120</w>
+      <h>48</h>
     </coordinates>
     <panel_attributes>Large</panel_attributes>
     <additional_attributes/>
@@ -666,10 +666,10 @@ bg=blue</panel_attributes>
   <element>
     <id>UMLSpecialState</id>
     <coordinates>
-      <x>781</x>
-      <y>1155</y>
-      <w>22</w>
-      <h>22</h>
+      <x>996</x>
+      <y>1260</y>
+      <w>24</w>
+      <h>24</h>
     </coordinates>
     <panel_attributes>type=initial</panel_attributes>
     <additional_attributes/>
@@ -677,10 +677,10 @@ bg=blue</panel_attributes>
   <element>
     <id>UMLObject</id>
     <coordinates>
-      <x>1067</x>
-      <y>1166</y>
-      <w>132</w>
-      <h>44</h>
+      <x>1308</x>
+      <y>1272</y>
+      <w>144</w>
+      <h>48</h>
     </coordinates>
     <panel_attributes>Portion
 bg=blue</panel_attributes>
@@ -689,10 +689,10 @@ bg=blue</panel_attributes>
   <element>
     <id>UMLObject</id>
     <coordinates>
-      <x>803</x>
-      <y>1265</y>
-      <w>110</w>
-      <h>44</h>
+      <x>1020</x>
+      <y>1380</y>
+      <w>120</w>
+      <h>48</h>
     </coordinates>
     <panel_attributes>Espresso</panel_attributes>
     <additional_attributes/>
@@ -700,10 +700,10 @@ bg=blue</panel_attributes>
   <element>
     <id>UMLObject</id>
     <coordinates>
-      <x>737</x>
-      <y>1166</y>
-      <w>110</w>
-      <h>44</h>
+      <x>948</x>
+      <y>1272</y>
+      <w>120</w>
+      <h>48</h>
     </coordinates>
     <panel_attributes>Beverage
 bg=blue</panel_attributes>
@@ -712,10 +712,10 @@ bg=blue</panel_attributes>
   <element>
     <id>UMLObject</id>
     <coordinates>
-      <x>1342</x>
-      <y>1265</y>
-      <w>110</w>
-      <h>44</h>
+      <x>1608</x>
+      <y>1380</y>
+      <w>120</w>
+      <h>48</h>
     </coordinates>
     <panel_attributes>Milk</panel_attributes>
     <additional_attributes/>
@@ -723,10 +723,10 @@ bg=blue</panel_attributes>
   <element>
     <id>UMLObject</id>
     <coordinates>
-      <x>1485</x>
-      <y>1265</y>
-      <w>110</w>
-      <h>44</h>
+      <x>1764</x>
+      <y>1380</y>
+      <w>120</w>
+      <h>48</h>
     </coordinates>
     <panel_attributes>Sugar</panel_attributes>
     <additional_attributes/>
@@ -734,10 +734,10 @@ bg=blue</panel_attributes>
   <element>
     <id>UMLSpecialState</id>
     <coordinates>
-      <x>1452</x>
-      <y>1155</y>
-      <w>22</w>
-      <h>22</h>
+      <x>1728</x>
+      <y>1260</y>
+      <w>24</w>
+      <h>24</h>
     </coordinates>
     <panel_attributes>type=decision</panel_attributes>
     <additional_attributes/>
@@ -745,10 +745,10 @@ bg=blue</panel_attributes>
   <element>
     <id>UMLObject</id>
     <coordinates>
-      <x>1397</x>
-      <y>1166</y>
-      <w>132</w>
-      <h>44</h>
+      <x>1668</x>
+      <y>1272</y>
+      <w>144</w>
+      <h>48</h>
     </coordinates>
     <panel_attributes>Toppings
 bg=blue</panel_attributes>
@@ -757,10 +757,10 @@ bg=blue</panel_attributes>
   <element>
     <id>UMLNote</id>
     <coordinates>
-      <x>1012</x>
-      <y>1331</y>
-      <w>253</w>
-      <h>55</h>
+      <x>1248</x>
+      <y>1452</y>
+      <w>276</w>
+      <h>60</h>
     </coordinates>
     <panel_attributes>Espresso =&gt; ~Milk and Normal</panel_attributes>
     <additional_attributes/>
@@ -768,10 +768,10 @@ bg=blue</panel_attributes>
   <element>
     <id>UMLObject</id>
     <coordinates>
-      <x>2244</x>
-      <y>1056</y>
-      <w>132</w>
-      <h>44</h>
+      <x>2592</x>
+      <y>1152</y>
+      <w>144</w>
+      <h>48</h>
     </coordinates>
     <panel_attributes>Coffee machine</panel_attributes>
     <additional_attributes/>
@@ -779,10 +779,10 @@ bg=blue</panel_attributes>
   <element>
     <id>UMLObject</id>
     <coordinates>
-      <x>1848</x>
-      <y>1265</y>
-      <w>110</w>
-      <h>44</h>
+      <x>2160</x>
+      <y>1380</y>
+      <w>120</w>
+      <h>48</h>
     </coordinates>
     <panel_attributes>Coffee</panel_attributes>
     <additional_attributes/>
@@ -790,10 +790,10 @@ bg=blue</panel_attributes>
   <element>
     <id>UMLObject</id>
     <coordinates>
-      <x>2189</x>
-      <y>1265</y>
-      <w>110</w>
-      <h>44</h>
+      <x>2532</x>
+      <y>1380</y>
+      <w>120</w>
+      <h>48</h>
     </coordinates>
     <panel_attributes>Normal</panel_attributes>
     <additional_attributes/>
@@ -801,10 +801,10 @@ bg=blue</panel_attributes>
   <element>
     <id>UMLObject</id>
     <coordinates>
-      <x>2332</x>
-      <y>1265</y>
-      <w>110</w>
-      <h>44</h>
+      <x>2688</x>
+      <y>1380</y>
+      <w>120</w>
+      <h>48</h>
     </coordinates>
     <panel_attributes>Large</panel_attributes>
     <additional_attributes/>
@@ -812,10 +812,10 @@ bg=blue</panel_attributes>
   <element>
     <id>UMLSpecialState</id>
     <coordinates>
-      <x>1958</x>
-      <y>1155</y>
-      <w>22</w>
-      <h>22</h>
+      <x>2280</x>
+      <y>1260</y>
+      <w>24</w>
+      <h>24</h>
     </coordinates>
     <panel_attributes>type=initial</panel_attributes>
     <additional_attributes/>
@@ -823,10 +823,10 @@ bg=blue</panel_attributes>
   <element>
     <id>UMLObject</id>
     <coordinates>
-      <x>2244</x>
-      <y>1166</y>
-      <w>132</w>
-      <h>44</h>
+      <x>2592</x>
+      <y>1272</y>
+      <w>144</w>
+      <h>48</h>
     </coordinates>
     <panel_attributes>Portion</panel_attributes>
     <additional_attributes/>
@@ -834,10 +834,10 @@ bg=blue</panel_attributes>
   <element>
     <id>UMLObject</id>
     <coordinates>
-      <x>1980</x>
-      <y>1265</y>
-      <w>110</w>
-      <h>44</h>
+      <x>2304</x>
+      <y>1380</y>
+      <w>120</w>
+      <h>48</h>
     </coordinates>
     <panel_attributes>Espresso</panel_attributes>
     <additional_attributes/>
@@ -845,10 +845,10 @@ bg=blue</panel_attributes>
   <element>
     <id>UMLObject</id>
     <coordinates>
-      <x>1914</x>
-      <y>1166</y>
-      <w>110</w>
-      <h>44</h>
+      <x>2232</x>
+      <y>1272</y>
+      <w>120</w>
+      <h>48</h>
     </coordinates>
     <panel_attributes>Beverage</panel_attributes>
     <additional_attributes/>
@@ -856,10 +856,10 @@ bg=blue</panel_attributes>
   <element>
     <id>UMLObject</id>
     <coordinates>
-      <x>2519</x>
-      <y>1265</y>
-      <w>110</w>
-      <h>44</h>
+      <x>2892</x>
+      <y>1380</y>
+      <w>120</w>
+      <h>48</h>
     </coordinates>
     <panel_attributes>Milk</panel_attributes>
     <additional_attributes/>
@@ -867,10 +867,10 @@ bg=blue</panel_attributes>
   <element>
     <id>UMLObject</id>
     <coordinates>
-      <x>2662</x>
-      <y>1265</y>
-      <w>110</w>
-      <h>44</h>
+      <x>3048</x>
+      <y>1380</y>
+      <w>120</w>
+      <h>48</h>
     </coordinates>
     <panel_attributes>Sugar</panel_attributes>
     <additional_attributes/>
@@ -878,10 +878,10 @@ bg=blue</panel_attributes>
   <element>
     <id>UMLSpecialState</id>
     <coordinates>
-      <x>2629</x>
-      <y>1155</y>
-      <w>22</w>
-      <h>22</h>
+      <x>3012</x>
+      <y>1260</y>
+      <w>24</w>
+      <h>24</h>
     </coordinates>
     <panel_attributes>type=decision</panel_attributes>
     <additional_attributes/>
@@ -889,10 +889,10 @@ bg=blue</panel_attributes>
   <element>
     <id>UMLObject</id>
     <coordinates>
-      <x>2574</x>
-      <y>1166</y>
-      <w>132</w>
-      <h>44</h>
+      <x>2952</x>
+      <y>1272</y>
+      <w>144</w>
+      <h>48</h>
     </coordinates>
     <panel_attributes>Toppings</panel_attributes>
     <additional_attributes/>
@@ -900,10 +900,10 @@ bg=blue</panel_attributes>
   <element>
     <id>UMLNote</id>
     <coordinates>
-      <x>2189</x>
-      <y>1331</y>
-      <w>253</w>
-      <h>55</h>
+      <x>2532</x>
+      <y>1452</y>
+      <w>276</w>
+      <h>60</h>
     </coordinates>
     <panel_attributes>Espresso =&gt; ~Milk and Normal
 Coffee and Milk =&gt; Large</panel_attributes>
@@ -912,10 +912,10 @@ Coffee and Milk =&gt; Large</panel_attributes>
   <element>
     <id>UMLSpecialState</id>
     <coordinates>
-      <x>1122</x>
-      <y>1155</y>
-      <w>22</w>
-      <h>22</h>
+      <x>1368</x>
+      <y>1260</y>
+      <w>24</w>
+      <h>24</h>
     </coordinates>
     <panel_attributes>type=initial</panel_attributes>
     <additional_attributes/>
@@ -923,10 +923,10 @@ Coffee and Milk =&gt; Large</panel_attributes>
   <element>
     <id>UMLSpecialState</id>
     <coordinates>
-      <x>2299</x>
-      <y>1155</y>
-      <w>22</w>
-      <h>22</h>
+      <x>2652</x>
+      <y>1260</y>
+      <w>24</w>
+      <h>24</h>
     </coordinates>
     <panel_attributes>type=initial</panel_attributes>
     <additional_attributes/>
@@ -934,10 +934,10 @@ Coffee and Milk =&gt; Large</panel_attributes>
   <element>
     <id>UMLUseCase</id>
     <coordinates>
-      <x>1100</x>
-      <y>1639</y>
-      <w>77</w>
-      <h>44</h>
+      <x>1344</x>
+      <y>1788</y>
+      <w>84</w>
+      <h>48</h>
     </coordinates>
     <panel_attributes>Coffee
 4 / 13</panel_attributes>
@@ -946,10 +946,10 @@ Coffee and Milk =&gt; Large</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>1122</x>
-      <y>1584</y>
-      <w>33</w>
-      <h>77</h>
+      <x>1368</x>
+      <y>1728</y>
+      <w>36</w>
+      <h>84</h>
     </coordinates>
     <panel_attributes>lt=-</panel_attributes>
     <additional_attributes>10.0;10.0;10.0;50.0</additional_attributes>
@@ -957,10 +957,10 @@ Coffee and Milk =&gt; Large</panel_attributes>
   <element>
     <id>UMLUseCase</id>
     <coordinates>
-      <x>979</x>
-      <y>1749</y>
-      <w>77</w>
-      <h>44</h>
+      <x>1212</x>
+      <y>1908</y>
+      <w>84</w>
+      <h>48</h>
     </coordinates>
     <panel_attributes>Espresso
 5 /14</panel_attributes>
@@ -969,10 +969,10 @@ Coffee and Milk =&gt; Large</panel_attributes>
   <element>
     <id>UMLUseCase</id>
     <coordinates>
-      <x>1078</x>
-      <y>1958</y>
-      <w>77</w>
-      <h>44</h>
+      <x>1320</x>
+      <y>2136</y>
+      <w>84</w>
+      <h>48</h>
     </coordinates>
     <panel_attributes>Normal
 7 / 19</panel_attributes>
@@ -981,10 +981,10 @@ Coffee and Milk =&gt; Large</panel_attributes>
   <element>
     <id>UMLUseCase</id>
     <coordinates>
-      <x>1221</x>
-      <y>1848</y>
-      <w>77</w>
-      <h>44</h>
+      <x>1476</x>
+      <y>2016</y>
+      <w>84</w>
+      <h>48</h>
     </coordinates>
     <panel_attributes>Milk
 6 / 17</panel_attributes>
@@ -993,10 +993,10 @@ Coffee and Milk =&gt; Large</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>1001</x>
-      <y>1672</y>
-      <w>154</w>
-      <h>99</h>
+      <x>1236</x>
+      <y>1824</y>
+      <w>168</w>
+      <h>108</h>
     </coordinates>
     <panel_attributes>lt=-</panel_attributes>
     <additional_attributes>120.0;10.0;15.0;70.0</additional_attributes>
@@ -1004,10 +1004,10 @@ Coffee and Milk =&gt; Large</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>1122</x>
-      <y>1672</y>
-      <w>154</w>
-      <h>99</h>
+      <x>1368</x>
+      <y>1824</y>
+      <w>168</w>
+      <h>108</h>
     </coordinates>
     <panel_attributes>lt=.</panel_attributes>
     <additional_attributes>10.0;10.0;120.0;70.0</additional_attributes>
@@ -1015,10 +1015,10 @@ Coffee and Milk =&gt; Large</panel_attributes>
   <element>
     <id>UMLUseCase</id>
     <coordinates>
-      <x>1221</x>
-      <y>1749</y>
-      <w>77</w>
-      <h>44</h>
+      <x>1476</x>
+      <y>1908</y>
+      <w>84</w>
+      <h>48</h>
     </coordinates>
     <panel_attributes>Espresso
 5 / 15</panel_attributes>
@@ -1027,10 +1027,10 @@ Coffee and Milk =&gt; Large</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>1243</x>
-      <y>1782</y>
-      <w>44</w>
-      <h>88</h>
+      <x>1500</x>
+      <y>1944</y>
+      <w>48</w>
+      <h>96</h>
     </coordinates>
     <panel_attributes>lt=-</panel_attributes>
     <additional_attributes>10.0;10.0;15.0;60.0</additional_attributes>
@@ -1038,10 +1038,10 @@ Coffee and Milk =&gt; Large</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>1001</x>
-      <y>1782</y>
-      <w>33</w>
-      <h>88</h>
+      <x>1236</x>
+      <y>1944</y>
+      <w>36</w>
+      <h>96</h>
     </coordinates>
     <panel_attributes>lt=.</panel_attributes>
     <additional_attributes>10.0;10.0;10.0;60.0</additional_attributes>
@@ -1049,10 +1049,10 @@ Coffee and Milk =&gt; Large</panel_attributes>
   <element>
     <id>UMLUseCase</id>
     <coordinates>
-      <x>1166</x>
-      <y>2057</y>
-      <w>77</w>
-      <h>44</h>
+      <x>1416</x>
+      <y>2244</y>
+      <w>84</w>
+      <h>48</h>
     </coordinates>
     <panel_attributes>Large
 8 / 24</panel_attributes>
@@ -1061,10 +1061,10 @@ Coffee and Milk =&gt; Large</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>1188</x>
-      <y>1991</y>
-      <w>77</w>
-      <h>88</h>
+      <x>1440</x>
+      <y>2172</y>
+      <w>84</w>
+      <h>96</h>
     </coordinates>
     <panel_attributes>lt=-</panel_attributes>
     <additional_attributes>50.0;10.0;10.0;60.0</additional_attributes>
@@ -1072,10 +1072,10 @@ Coffee and Milk =&gt; Large</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>1100</x>
-      <y>1991</y>
-      <w>121</w>
-      <h>88</h>
+      <x>1344</x>
+      <y>2172</y>
+      <w>132</w>
+      <h>96</h>
     </coordinates>
     <panel_attributes>lt=-</panel_attributes>
     <additional_attributes>10.0;10.0;85.0;60.0</additional_attributes>
@@ -1083,10 +1083,10 @@ Coffee and Milk =&gt; Large</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>1133</x>
-      <y>2090</y>
-      <w>88</w>
-      <h>99</h>
+      <x>1380</x>
+      <y>2280</y>
+      <w>96</w>
+      <h>108</h>
     </coordinates>
     <panel_attributes>lt=.</panel_attributes>
     <additional_attributes>60.0;10.0;15.0;70.0</additional_attributes>
@@ -1094,10 +1094,10 @@ Coffee and Milk =&gt; Large</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>1243</x>
-      <y>1881</y>
-      <w>33</w>
-      <h>99</h>
+      <x>1500</x>
+      <y>2052</y>
+      <w>36</w>
+      <h>108</h>
     </coordinates>
     <panel_attributes>lt=.</panel_attributes>
     <additional_attributes>10.0;10.0;10.0;70.0</additional_attributes>
@@ -1105,10 +1105,10 @@ Coffee and Milk =&gt; Large</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>946</x>
-      <y>2211</y>
-      <w>231</w>
-      <h>187</h>
+      <x>1176</x>
+      <y>2412</y>
+      <w>252</w>
+      <h>204</h>
     </coordinates>
     <panel_attributes>lt=-</panel_attributes>
     <additional_attributes>10.0;10.0;185.0;150.0</additional_attributes>
@@ -1116,10 +1116,10 @@ Coffee and Milk =&gt; Large</panel_attributes>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>1133</x>
-      <y>2376</y>
-      <w>33</w>
-      <h>33</h>
+      <x>1380</x>
+      <y>2592</y>
+      <w>36</w>
+      <h>36</h>
     </coordinates>
     <panel_attributes>1</panel_attributes>
     <additional_attributes/>
@@ -1127,10 +1127,10 @@ Coffee and Milk =&gt; Large</panel_attributes>
   <element>
     <id>UMLUseCase</id>
     <coordinates>
-      <x>1210</x>
-      <y>1958</y>
-      <w>77</w>
-      <h>44</h>
+      <x>1464</x>
+      <y>2136</y>
+      <w>84</w>
+      <h>48</h>
     </coordinates>
     <panel_attributes>Normal
 7 / 20</panel_attributes>
@@ -1139,10 +1139,10 @@ Coffee and Milk =&gt; Large</panel_attributes>
   <element>
     <id>UMLUseCase</id>
     <coordinates>
-      <x>1045</x>
-      <y>2057</y>
-      <w>77</w>
-      <h>44</h>
+      <x>1284</x>
+      <y>2244</y>
+      <w>84</w>
+      <h>48</h>
     </coordinates>
     <panel_attributes>Large
 8 / 23</panel_attributes>
@@ -1151,10 +1151,10 @@ Coffee and Milk =&gt; Large</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>1067</x>
-      <y>1991</y>
-      <w>66</w>
-      <h>88</h>
+      <x>1308</x>
+      <y>2172</y>
+      <w>72</w>
+      <h>96</h>
     </coordinates>
     <panel_attributes>lt=.</panel_attributes>
     <additional_attributes>40.0;10.0;10.0;60.0</additional_attributes>
@@ -1162,10 +1162,10 @@ Coffee and Milk =&gt; Large</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>1078</x>
-      <y>2090</y>
-      <w>99</w>
-      <h>99</h>
+      <x>1320</x>
+      <y>2280</y>
+      <w>108</w>
+      <h>108</h>
     </coordinates>
     <panel_attributes>lt=-</panel_attributes>
     <additional_attributes>10.0;10.0;65.0;70.0</additional_attributes>
@@ -1173,10 +1173,10 @@ Coffee and Milk =&gt; Large</panel_attributes>
   <element>
     <id>UMLUseCase</id>
     <coordinates>
-      <x>2255</x>
-      <y>1419</y>
-      <w>121</w>
-      <h>44</h>
+      <x>2604</x>
+      <y>1548</y>
+      <w>132</w>
+      <h>48</h>
     </coordinates>
     <panel_attributes>Coffee machine
 1 / 29</panel_attributes>
@@ -1185,10 +1185,10 @@ Coffee and Milk =&gt; Large</panel_attributes>
   <element>
     <id>UMLUseCase</id>
     <coordinates>
-      <x>2288</x>
-      <y>1617</y>
-      <w>77</w>
-      <h>44</h>
+      <x>2640</x>
+      <y>1764</y>
+      <w>84</w>
+      <h>48</h>
     </coordinates>
     <panel_attributes>Coffee
 4 / 32</panel_attributes>
@@ -1197,10 +1197,10 @@ Coffee and Milk =&gt; Large</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>2310</x>
-      <y>1584</y>
-      <w>33</w>
-      <h>55</h>
+      <x>2664</x>
+      <y>1728</y>
+      <w>36</w>
+      <h>60</h>
     </coordinates>
     <panel_attributes>lt=-</panel_attributes>
     <additional_attributes>10.0;10.0;10.0;30.0</additional_attributes>
@@ -1208,10 +1208,10 @@ Coffee and Milk =&gt; Large</panel_attributes>
   <element>
     <id>UMLUseCase</id>
     <coordinates>
-      <x>2222</x>
-      <y>1727</y>
-      <w>77</w>
-      <h>44</h>
+      <x>2568</x>
+      <y>1884</y>
+      <w>84</w>
+      <h>48</h>
     </coordinates>
     <panel_attributes>Espresso
 5 / 33</panel_attributes>
@@ -1220,10 +1220,10 @@ Coffee and Milk =&gt; Large</panel_attributes>
   <element>
     <id>UMLUseCase</id>
     <coordinates>
-      <x>2156</x>
-      <y>1969</y>
-      <w>77</w>
-      <h>44</h>
+      <x>2496</x>
+      <y>2148</y>
+      <w>84</w>
+      <h>48</h>
     </coordinates>
     <panel_attributes>Normal
 7 / 37</panel_attributes>
@@ -1232,10 +1232,10 @@ Coffee and Milk =&gt; Large</panel_attributes>
   <element>
     <id>UMLUseCase</id>
     <coordinates>
-      <x>2365</x>
-      <y>1848</y>
-      <w>77</w>
-      <h>44</h>
+      <x>2724</x>
+      <y>2016</y>
+      <w>84</w>
+      <h>48</h>
     </coordinates>
     <panel_attributes>Milk
 6 / 36</panel_attributes>
@@ -1244,10 +1244,10 @@ Coffee and Milk =&gt; Large</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>2244</x>
-      <y>1650</y>
-      <w>99</w>
-      <h>99</h>
+      <x>2592</x>
+      <y>1800</y>
+      <w>108</w>
+      <h>108</h>
     </coordinates>
     <panel_attributes>lt=-</panel_attributes>
     <additional_attributes>70.0;10.0;15.0;70.0</additional_attributes>
@@ -1255,10 +1255,10 @@ Coffee and Milk =&gt; Large</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>2310</x>
-      <y>1650</y>
-      <w>110</w>
-      <h>99</h>
+      <x>2664</x>
+      <y>1800</y>
+      <w>120</w>
+      <h>108</h>
     </coordinates>
     <panel_attributes>lt=.</panel_attributes>
     <additional_attributes>10.0;10.0;80.0;70.0</additional_attributes>
@@ -1266,10 +1266,10 @@ Coffee and Milk =&gt; Large</panel_attributes>
   <element>
     <id>UMLUseCase</id>
     <coordinates>
-      <x>2365</x>
-      <y>1727</y>
-      <w>77</w>
-      <h>44</h>
+      <x>2724</x>
+      <y>1884</y>
+      <w>84</w>
+      <h>48</h>
     </coordinates>
     <panel_attributes>Espresso
 5 / 34</panel_attributes>
@@ -1278,10 +1278,10 @@ Coffee and Milk =&gt; Large</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>2387</x>
-      <y>1760</y>
-      <w>44</w>
-      <h>110</h>
+      <x>2748</x>
+      <y>1920</y>
+      <w>48</w>
+      <h>120</h>
     </coordinates>
     <panel_attributes>lt=-</panel_attributes>
     <additional_attributes>10.0;10.0;15.0;80.0</additional_attributes>
@@ -1289,10 +1289,10 @@ Coffee and Milk =&gt; Large</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>2255</x>
-      <y>1760</y>
-      <w>33</w>
-      <h>110</h>
+      <x>2604</x>
+      <y>1920</y>
+      <w>36</w>
+      <h>120</h>
     </coordinates>
     <panel_attributes>lt=.</panel_attributes>
     <additional_attributes>10.0;10.0;10.0;80.0</additional_attributes>
@@ -1300,10 +1300,10 @@ Coffee and Milk =&gt; Large</panel_attributes>
   <element>
     <id>UMLUseCase</id>
     <coordinates>
-      <x>2387</x>
-      <y>2068</y>
-      <w>77</w>
-      <h>44</h>
+      <x>2748</x>
+      <y>2256</y>
+      <w>84</w>
+      <h>48</h>
     </coordinates>
     <panel_attributes>Large
 8 / 42</panel_attributes>
@@ -1312,10 +1312,10 @@ Coffee and Milk =&gt; Large</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>2409</x>
-      <y>2002</y>
-      <w>44</w>
-      <h>88</h>
+      <x>2772</x>
+      <y>2184</y>
+      <w>48</w>
+      <h>96</h>
     </coordinates>
     <panel_attributes>lt=-</panel_attributes>
     <additional_attributes>10.0;10.0;15.0;60.0</additional_attributes>
@@ -1323,10 +1323,10 @@ Coffee and Milk =&gt; Large</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>2409</x>
-      <y>2101</y>
-      <w>44</w>
-      <h>88</h>
+      <x>2772</x>
+      <y>2292</y>
+      <w>48</w>
+      <h>96</h>
     </coordinates>
     <panel_attributes>lt=.</panel_attributes>
     <additional_attributes>10.0;10.0;15.0;60.0</additional_attributes>
@@ -1334,10 +1334,10 @@ Coffee and Milk =&gt; Large</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>2387</x>
-      <y>1881</y>
-      <w>66</w>
-      <h>110</h>
+      <x>2748</x>
+      <y>2052</y>
+      <w>72</w>
+      <h>120</h>
     </coordinates>
     <panel_attributes>lt=.</panel_attributes>
     <additional_attributes>10.0;10.0;40.0;80.0</additional_attributes>
@@ -1345,10 +1345,10 @@ Coffee and Milk =&gt; Large</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>2167</x>
-      <y>1881</y>
-      <w>121</w>
-      <h>110</h>
+      <x>2508</x>
+      <y>2052</y>
+      <w>132</w>
+      <h>120</h>
     </coordinates>
     <panel_attributes>lt=-</panel_attributes>
     <additional_attributes>90.0;10.0;15.0;80.0</additional_attributes>
@@ -1356,10 +1356,10 @@ Coffee and Milk =&gt; Large</panel_attributes>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>2288</x>
-      <y>2387</y>
-      <w>33</w>
-      <h>33</h>
+      <x>2640</x>
+      <y>2604</y>
+      <w>36</w>
+      <h>36</h>
     </coordinates>
     <panel_attributes>1</panel_attributes>
     <additional_attributes/>
@@ -1367,10 +1367,10 @@ Coffee and Milk =&gt; Large</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>2266</x>
-      <y>1881</y>
-      <w>77</w>
-      <h>110</h>
+      <x>2616</x>
+      <y>2052</y>
+      <w>84</w>
+      <h>120</h>
     </coordinates>
     <panel_attributes>lt=.</panel_attributes>
     <additional_attributes>10.0;10.0;50.0;80.0</additional_attributes>
@@ -1378,10 +1378,10 @@ Coffee and Milk =&gt; Large</panel_attributes>
   <element>
     <id>UMLUseCase</id>
     <coordinates>
-      <x>2156</x>
-      <y>2068</y>
-      <w>77</w>
-      <h>44</h>
+      <x>2496</x>
+      <y>2256</y>
+      <w>84</w>
+      <h>48</h>
     </coordinates>
     <panel_attributes>Large
 8 / 40</panel_attributes>
@@ -1390,10 +1390,10 @@ Coffee and Milk =&gt; Large</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>2178</x>
-      <y>2002</y>
-      <w>33</w>
-      <h>88</h>
+      <x>2520</x>
+      <y>2184</y>
+      <w>36</w>
+      <h>96</h>
     </coordinates>
     <panel_attributes>lt=.</panel_attributes>
     <additional_attributes>10.0;10.0;10.0;60.0</additional_attributes>
@@ -1401,10 +1401,10 @@ Coffee and Milk =&gt; Large</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>2189</x>
-      <y>2101</y>
-      <w>44</w>
-      <h>88</h>
+      <x>2532</x>
+      <y>2292</y>
+      <w>48</w>
+      <h>96</h>
     </coordinates>
     <panel_attributes>lt=-</panel_attributes>
     <additional_attributes>10.0;10.0;15.0;60.0</additional_attributes>
@@ -1412,10 +1412,10 @@ Coffee and Milk =&gt; Large</panel_attributes>
   <element>
     <id>UMLUseCase</id>
     <coordinates>
-      <x>2387</x>
-      <y>1969</y>
-      <w>77</w>
-      <h>44</h>
+      <x>2748</x>
+      <y>2148</y>
+      <w>84</w>
+      <h>48</h>
     </coordinates>
     <panel_attributes>Normal
 7 / 39</panel_attributes>
@@ -1424,10 +1424,10 @@ Coffee and Milk =&gt; Large</panel_attributes>
   <element>
     <id>UMLUseCase</id>
     <coordinates>
-      <x>2255</x>
-      <y>1485</y>
-      <w>121</w>
-      <h>44</h>
+      <x>2604</x>
+      <y>1620</y>
+      <w>132</w>
+      <h>48</h>
     </coordinates>
     <panel_attributes>Beverage
 2 / 30</panel_attributes>
@@ -1436,10 +1436,10 @@ Coffee and Milk =&gt; Large</panel_attributes>
   <element>
     <id>UMLUseCase</id>
     <coordinates>
-      <x>2255</x>
-      <y>1551</y>
-      <w>121</w>
-      <h>44</h>
+      <x>2604</x>
+      <y>1692</y>
+      <w>132</w>
+      <h>48</h>
     </coordinates>
     <panel_attributes>Portion
 3 / 31</panel_attributes>
@@ -1448,10 +1448,10 @@ Coffee and Milk =&gt; Large</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>2310</x>
-      <y>1518</y>
-      <w>33</w>
-      <h>55</h>
+      <x>2664</x>
+      <y>1656</y>
+      <w>36</w>
+      <h>60</h>
     </coordinates>
     <panel_attributes>lt=-</panel_attributes>
     <additional_attributes>10.0;10.0;10.0;30.0</additional_attributes>
@@ -1459,10 +1459,10 @@ Coffee and Milk =&gt; Large</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>2310</x>
-      <y>1452</y>
-      <w>33</w>
-      <h>55</h>
+      <x>2664</x>
+      <y>1584</y>
+      <w>36</w>
+      <h>60</h>
     </coordinates>
     <panel_attributes>lt=-</panel_attributes>
     <additional_attributes>10.0;10.0;10.0;30.0</additional_attributes>
@@ -1470,10 +1470,10 @@ Coffee and Milk =&gt; Large</panel_attributes>
   <element>
     <id>UMLUseCase</id>
     <coordinates>
-      <x>2387</x>
-      <y>2167</y>
-      <w>77</w>
-      <h>44</h>
+      <x>2748</x>
+      <y>2364</y>
+      <w>84</w>
+      <h>48</h>
     </coordinates>
     <panel_attributes>Toppings
 9 / 44</panel_attributes>
@@ -1482,10 +1482,10 @@ Coffee and Milk =&gt; Large</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>2420</x>
-      <y>2200</y>
-      <w>99</w>
-      <h>99</h>
+      <x>2784</x>
+      <y>2400</y>
+      <w>108</w>
+      <h>108</h>
     </coordinates>
     <panel_attributes>lt=.</panel_attributes>
     <additional_attributes>10.0;10.0;65.0;70.0</additional_attributes>
@@ -1493,10 +1493,10 @@ Coffee and Milk =&gt; Large</panel_attributes>
   <element>
     <id>UMLUseCase</id>
     <coordinates>
-      <x>2442</x>
-      <y>2277</y>
-      <w>77</w>
-      <h>44</h>
+      <x>2808</x>
+      <y>2484</y>
+      <w>84</w>
+      <h>48</h>
     </coordinates>
     <panel_attributes>Sugar
 10 / 46</panel_attributes>
@@ -1505,10 +1505,10 @@ Coffee and Milk =&gt; Large</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>2354</x>
-      <y>2200</y>
-      <w>88</w>
-      <h>99</h>
+      <x>2712</x>
+      <y>2400</y>
+      <w>96</w>
+      <h>108</h>
     </coordinates>
     <panel_attributes>lt=-</panel_attributes>
     <additional_attributes>60.0;10.0;15.0;70.0</additional_attributes>
@@ -1516,10 +1516,10 @@ Coffee and Milk =&gt; Large</panel_attributes>
   <element>
     <id>UMLUseCase</id>
     <coordinates>
-      <x>2343</x>
-      <y>2277</y>
-      <w>77</w>
-      <h>44</h>
+      <x>2700</x>
+      <y>2484</y>
+      <w>84</w>
+      <h>48</h>
     </coordinates>
     <panel_attributes>Sugar
 10 / 45</panel_attributes>
@@ -1528,10 +1528,10 @@ Coffee and Milk =&gt; Large</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>2299</x>
-      <y>2310</y>
-      <w>99</w>
-      <h>99</h>
+      <x>2652</x>
+      <y>2520</y>
+      <w>108</w>
+      <h>108</h>
     </coordinates>
     <panel_attributes>lt=-</panel_attributes>
     <additional_attributes>70.0;10.0;15.0;70.0</additional_attributes>
@@ -1539,10 +1539,10 @@ Coffee and Milk =&gt; Large</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>2299</x>
-      <y>2310</y>
-      <w>198</w>
-      <h>99</h>
+      <x>2652</x>
+      <y>2520</y>
+      <w>216</w>
+      <h>108</h>
     </coordinates>
     <panel_attributes>lt=.</panel_attributes>
     <additional_attributes>160.0;10.0;15.0;70.0</additional_attributes>
@@ -1550,10 +1550,10 @@ Coffee and Milk =&gt; Large</panel_attributes>
   <element>
     <id>UMLUseCase</id>
     <coordinates>
-      <x>2167</x>
-      <y>2167</y>
-      <w>77</w>
-      <h>44</h>
+      <x>2508</x>
+      <y>2364</y>
+      <w>84</w>
+      <h>48</h>
     </coordinates>
     <panel_attributes>Toppings
 9 / 43</panel_attributes>
@@ -1562,10 +1562,10 @@ Coffee and Milk =&gt; Large</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>2200</x>
-      <y>2200</y>
-      <w>132</w>
-      <h>209</h>
+      <x>2544</x>
+      <y>2400</y>
+      <w>144</w>
+      <h>228</h>
     </coordinates>
     <panel_attributes>lt=-</panel_attributes>
     <additional_attributes>10.0;10.0;95.0;170.0</additional_attributes>
@@ -1573,10 +1573,10 @@ Coffee and Milk =&gt; Large</panel_attributes>
   <element>
     <id>UMLUseCase</id>
     <coordinates>
-      <x>1078</x>
-      <y>1419</y>
-      <w>121</w>
-      <h>44</h>
+      <x>1320</x>
+      <y>1548</y>
+      <w>132</w>
+      <h>48</h>
     </coordinates>
     <panel_attributes>Coffee machine
 1 / 10</panel_attributes>
@@ -1585,10 +1585,10 @@ Coffee and Milk =&gt; Large</panel_attributes>
   <element>
     <id>UMLUseCase</id>
     <coordinates>
-      <x>1078</x>
-      <y>1485</y>
-      <w>121</w>
-      <h>44</h>
+      <x>1320</x>
+      <y>1620</y>
+      <w>132</w>
+      <h>48</h>
     </coordinates>
     <panel_attributes>Beverage
 2 / 11</panel_attributes>
@@ -1597,10 +1597,10 @@ Coffee and Milk =&gt; Large</panel_attributes>
   <element>
     <id>UMLUseCase</id>
     <coordinates>
-      <x>1078</x>
-      <y>1551</y>
-      <w>121</w>
-      <h>44</h>
+      <x>1320</x>
+      <y>1692</y>
+      <w>132</w>
+      <h>48</h>
     </coordinates>
     <panel_attributes>Portion
 3 / 12</panel_attributes>
@@ -1609,10 +1609,10 @@ Coffee and Milk =&gt; Large</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>1133</x>
-      <y>1518</y>
-      <w>33</w>
-      <h>55</h>
+      <x>1380</x>
+      <y>1656</y>
+      <w>36</w>
+      <h>60</h>
     </coordinates>
     <panel_attributes>lt=-</panel_attributes>
     <additional_attributes>10.0;10.0;10.0;30.0</additional_attributes>
@@ -1620,10 +1620,10 @@ Coffee and Milk =&gt; Large</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>1133</x>
-      <y>1452</y>
-      <w>33</w>
-      <h>55</h>
+      <x>1380</x>
+      <y>1584</y>
+      <w>36</w>
+      <h>60</h>
     </coordinates>
     <panel_attributes>lt=-</panel_attributes>
     <additional_attributes>10.0;10.0;10.0;30.0</additional_attributes>
@@ -1631,10 +1631,10 @@ Coffee and Milk =&gt; Large</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>913</x>
-      <y>1881</y>
-      <w>121</w>
-      <h>99</h>
+      <x>1140</x>
+      <y>2052</y>
+      <w>132</w>
+      <h>108</h>
     </coordinates>
     <panel_attributes>lt=-</panel_attributes>
     <additional_attributes>90.0;10.0;15.0;70.0</additional_attributes>
@@ -1642,10 +1642,10 @@ Coffee and Milk =&gt; Large</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>1012</x>
-      <y>1881</y>
-      <w>121</w>
-      <h>99</h>
+      <x>1248</x>
+      <y>2052</y>
+      <w>132</w>
+      <h>108</h>
     </coordinates>
     <panel_attributes>lt=.</panel_attributes>
     <additional_attributes>10.0;10.0;90.0;70.0</additional_attributes>
@@ -1653,10 +1653,10 @@ Coffee and Milk =&gt; Large</panel_attributes>
   <element>
     <id>UMLUseCase</id>
     <coordinates>
-      <x>979</x>
-      <y>1848</y>
-      <w>77</w>
-      <h>44</h>
+      <x>1212</x>
+      <y>2016</y>
+      <w>84</w>
+      <h>48</h>
     </coordinates>
     <panel_attributes>Milk
 6 / 16</panel_attributes>
@@ -1665,10 +1665,10 @@ Coffee and Milk =&gt; Large</panel_attributes>
   <element>
     <id>UMLUseCase</id>
     <coordinates>
-      <x>1111</x>
-      <y>2167</y>
-      <w>77</w>
-      <h>44</h>
+      <x>1356</x>
+      <y>2364</y>
+      <w>84</w>
+      <h>48</h>
     </coordinates>
     <panel_attributes>Toppings
 9 / 26</panel_attributes>
@@ -1677,10 +1677,10 @@ Coffee and Milk =&gt; Large</panel_attributes>
   <element>
     <id>UMLUseCase</id>
     <coordinates>
-      <x>1188</x>
-      <y>2266</y>
-      <w>77</w>
-      <h>44</h>
+      <x>1440</x>
+      <y>2472</y>
+      <w>84</w>
+      <h>48</h>
     </coordinates>
     <panel_attributes>Sugar
 10 / 28</panel_attributes>
@@ -1689,10 +1689,10 @@ Coffee and Milk =&gt; Large</panel_attributes>
   <element>
     <id>UMLUseCase</id>
     <coordinates>
-      <x>1078</x>
-      <y>2266</y>
-      <w>77</w>
-      <h>44</h>
+      <x>1320</x>
+      <y>2472</y>
+      <w>84</w>
+      <h>48</h>
     </coordinates>
     <panel_attributes>Sugar
 10 / 27</panel_attributes>
@@ -1701,10 +1701,10 @@ Coffee and Milk =&gt; Large</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>1144</x>
-      <y>2200</y>
-      <w>110</w>
-      <h>88</h>
+      <x>1392</x>
+      <y>2400</y>
+      <w>120</w>
+      <h>96</h>
     </coordinates>
     <panel_attributes>lt=.</panel_attributes>
     <additional_attributes>10.0;10.0;75.0;60.0</additional_attributes>
@@ -1712,10 +1712,10 @@ Coffee and Milk =&gt; Large</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>1100</x>
-      <y>2200</y>
-      <w>77</w>
-      <h>88</h>
+      <x>1344</x>
+      <y>2400</y>
+      <w>84</w>
+      <h>96</h>
     </coordinates>
     <panel_attributes>lt=-</panel_attributes>
     <additional_attributes>50.0;10.0;15.0;60.0</additional_attributes>
@@ -1723,10 +1723,10 @@ Coffee and Milk =&gt; Large</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>1133</x>
-      <y>2299</y>
-      <w>121</w>
-      <h>99</h>
+      <x>1380</x>
+      <y>2508</y>
+      <w>132</w>
+      <h>108</h>
     </coordinates>
     <panel_attributes>lt=.</panel_attributes>
     <additional_attributes>90.0;10.0;15.0;70.0</additional_attributes>
@@ -1734,10 +1734,10 @@ Coffee and Milk =&gt; Large</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>1111</x>
-      <y>2299</y>
-      <w>66</w>
-      <h>99</h>
+      <x>1356</x>
+      <y>2508</y>
+      <w>72</w>
+      <h>108</h>
     </coordinates>
     <panel_attributes>lt=-</panel_attributes>
     <additional_attributes>10.0;10.0;35.0;70.0</additional_attributes>
@@ -1745,10 +1745,10 @@ Coffee and Milk =&gt; Large</panel_attributes>
   <element>
     <id>UMLUseCase</id>
     <coordinates>
-      <x>913</x>
-      <y>2178</y>
-      <w>77</w>
-      <h>44</h>
+      <x>1140</x>
+      <y>2376</y>
+      <w>84</w>
+      <h>48</h>
     </coordinates>
     <panel_attributes>Toppings
 9 / 25</panel_attributes>
@@ -1757,10 +1757,10 @@ Coffee and Milk =&gt; Large</panel_attributes>
   <element>
     <id>UMLUseCase</id>
     <coordinates>
-      <x>847</x>
-      <y>2057</y>
-      <w>77</w>
-      <h>44</h>
+      <x>1068</x>
+      <y>2244</y>
+      <w>84</w>
+      <h>48</h>
     </coordinates>
     <panel_attributes>Large
 8 / 21</panel_attributes>
@@ -1769,10 +1769,10 @@ Coffee and Milk =&gt; Large</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>880</x>
-      <y>2090</y>
-      <w>88</w>
-      <h>110</h>
+      <x>1104</x>
+      <y>2280</y>
+      <w>96</w>
+      <h>120</h>
     </coordinates>
     <panel_attributes>lt=-</panel_attributes>
     <additional_attributes>10.0;10.0;55.0;80.0</additional_attributes>
@@ -1780,10 +1780,10 @@ Coffee and Milk =&gt; Large</panel_attributes>
   <element>
     <id>UMLUseCase</id>
     <coordinates>
-      <x>902</x>
-      <y>1958</y>
-      <w>77</w>
-      <h>44</h>
+      <x>1128</x>
+      <y>2136</y>
+      <w>84</w>
+      <h>48</h>
     </coordinates>
     <panel_attributes>Normal
 7 / 18</panel_attributes>
@@ -1792,10 +1792,10 @@ Coffee and Milk =&gt; Large</panel_attributes>
   <element>
     <id>UMLUseCase</id>
     <coordinates>
-      <x>946</x>
-      <y>2057</y>
-      <w>77</w>
-      <h>44</h>
+      <x>1176</x>
+      <y>2244</y>
+      <w>84</w>
+      <h>48</h>
     </coordinates>
     <panel_attributes>Large
 8 / 22</panel_attributes>
@@ -1804,10 +1804,10 @@ Coffee and Milk =&gt; Large</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>869</x>
-      <y>1991</y>
-      <w>99</w>
-      <h>88</h>
+      <x>1092</x>
+      <y>2172</y>
+      <w>108</w>
+      <h>96</h>
     </coordinates>
     <panel_attributes>lt=.</panel_attributes>
     <additional_attributes>70.0;10.0;10.0;60.0</additional_attributes>
@@ -1815,10 +1815,10 @@ Coffee and Milk =&gt; Large</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>935</x>
-      <y>1991</y>
-      <w>77</w>
-      <h>88</h>
+      <x>1164</x>
+      <y>2172</y>
+      <w>84</w>
+      <h>96</h>
     </coordinates>
     <panel_attributes>lt=-</panel_attributes>
     <additional_attributes>10.0;10.0;45.0;60.0</additional_attributes>
@@ -1826,10 +1826,10 @@ Coffee and Milk =&gt; Large</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>935</x>
-      <y>2090</y>
-      <w>77</w>
-      <h>110</h>
+      <x>1164</x>
+      <y>2280</y>
+      <w>84</w>
+      <h>120</h>
     </coordinates>
     <panel_attributes>lt=.</panel_attributes>
     <additional_attributes>50.0;10.0;15.0;80.0</additional_attributes>
@@ -1837,10 +1837,10 @@ Coffee and Milk =&gt; Large</panel_attributes>
   <element>
     <id>UMLUseCase</id>
     <coordinates>
-      <x>330</x>
-      <y>1628</y>
-      <w>77</w>
-      <h>44</h>
+      <x>504</x>
+      <y>1776</y>
+      <w>84</w>
+      <h>48</h>
     </coordinates>
     <panel_attributes>Coffee
 4 / 5</panel_attributes>
@@ -1849,10 +1849,10 @@ Coffee and Milk =&gt; Large</panel_attributes>
   <element>
     <id>UMLUseCase</id>
     <coordinates>
-      <x>319</x>
-      <y>1727</y>
-      <w>77</w>
-      <h>44</h>
+      <x>492</x>
+      <y>1884</y>
+      <w>84</w>
+      <h>48</h>
     </coordinates>
     <panel_attributes>Espresso
 5 / 6</panel_attributes>
@@ -1861,10 +1861,10 @@ Coffee and Milk =&gt; Large</panel_attributes>
   <element>
     <id>UMLUseCase</id>
     <coordinates>
-      <x>319</x>
-      <y>1947</y>
-      <w>77</w>
-      <h>44</h>
+      <x>492</x>
+      <y>2124</y>
+      <w>84</w>
+      <h>48</h>
     </coordinates>
     <panel_attributes>Normal
 7 / 7</panel_attributes>
@@ -1873,10 +1873,10 @@ Coffee and Milk =&gt; Large</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>341</x>
-      <y>1760</y>
-      <w>33</w>
-      <h>209</h>
+      <x>516</x>
+      <y>1920</y>
+      <w>36</w>
+      <h>228</h>
     </coordinates>
     <panel_attributes>lt=.</panel_attributes>
     <additional_attributes>10.0;10.0;10.0;170.0</additional_attributes>
@@ -1884,10 +1884,10 @@ Coffee and Milk =&gt; Large</panel_attributes>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>363</x>
-      <y>2365</y>
-      <w>33</w>
-      <h>33</h>
+      <x>540</x>
+      <y>2580</y>
+      <w>36</w>
+      <h>36</h>
     </coordinates>
     <panel_attributes>1</panel_attributes>
     <additional_attributes/>
@@ -1895,10 +1895,10 @@ Coffee and Milk =&gt; Large</panel_attributes>
   <element>
     <id>UMLUseCase</id>
     <coordinates>
-      <x>330</x>
-      <y>2046</y>
-      <w>77</w>
-      <h>44</h>
+      <x>504</x>
+      <y>2232</y>
+      <w>84</w>
+      <h>48</h>
     </coordinates>
     <panel_attributes>Large
 8 / 8</panel_attributes>
@@ -1907,10 +1907,10 @@ Coffee and Milk =&gt; Large</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>341</x>
-      <y>1980</y>
-      <w>44</w>
-      <h>88</h>
+      <x>516</x>
+      <y>2160</y>
+      <w>48</w>
+      <h>96</h>
     </coordinates>
     <panel_attributes>lt=.</panel_attributes>
     <additional_attributes>10.0;10.0;20.0;60.0</additional_attributes>
@@ -1918,10 +1918,10 @@ Coffee and Milk =&gt; Large</panel_attributes>
   <element>
     <id>UMLUseCase</id>
     <coordinates>
-      <x>319</x>
-      <y>1397</y>
-      <w>121</w>
-      <h>55</h>
+      <x>492</x>
+      <y>1524</y>
+      <w>132</w>
+      <h>60</h>
     </coordinates>
     <panel_attributes>Coffee machine
 1 / 2</panel_attributes>
@@ -1930,10 +1930,10 @@ Coffee and Milk =&gt; Large</panel_attributes>
   <element>
     <id>UMLUseCase</id>
     <coordinates>
-      <x>319</x>
-      <y>1474</y>
-      <w>121</w>
-      <h>44</h>
+      <x>492</x>
+      <y>1608</y>
+      <w>132</w>
+      <h>48</h>
     </coordinates>
     <panel_attributes>Beverage
 2 / 3</panel_attributes>
@@ -1942,10 +1942,10 @@ Coffee and Milk =&gt; Large</panel_attributes>
   <element>
     <id>UMLUseCase</id>
     <coordinates>
-      <x>319</x>
-      <y>1540</y>
-      <w>121</w>
-      <h>44</h>
+      <x>492</x>
+      <y>1680</y>
+      <w>132</w>
+      <h>48</h>
     </coordinates>
     <panel_attributes>Portion
 3 / 4</panel_attributes>
@@ -1954,10 +1954,10 @@ Coffee and Milk =&gt; Large</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>374</x>
-      <y>1441</y>
-      <w>33</w>
-      <h>55</h>
+      <x>552</x>
+      <y>1572</y>
+      <w>36</w>
+      <h>60</h>
     </coordinates>
     <panel_attributes>lt=-</panel_attributes>
     <additional_attributes>10.0;10.0;10.0;30.0</additional_attributes>
@@ -1965,10 +1965,10 @@ Coffee and Milk =&gt; Large</panel_attributes>
   <element>
     <id>UMLUseCase</id>
     <coordinates>
-      <x>330</x>
-      <y>2156</y>
-      <w>77</w>
-      <h>44</h>
+      <x>504</x>
+      <y>2352</y>
+      <w>84</w>
+      <h>48</h>
     </coordinates>
     <panel_attributes>Toppings
 9 / 9</panel_attributes>
@@ -1977,10 +1977,10 @@ Coffee and Milk =&gt; Large</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>352</x>
-      <y>2079</y>
-      <w>33</w>
-      <h>99</h>
+      <x>528</x>
+      <y>2268</y>
+      <w>36</w>
+      <h>108</h>
     </coordinates>
     <panel_attributes>lt=.</panel_attributes>
     <additional_attributes>10.0;10.0;10.0;70.0</additional_attributes>
@@ -1988,10 +1988,10 @@ Coffee and Milk =&gt; Large</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>363</x>
-      <y>2189</y>
-      <w>33</w>
-      <h>198</h>
+      <x>540</x>
+      <y>2388</y>
+      <w>36</w>
+      <h>216</h>
     </coordinates>
     <panel_attributes>lt=.</panel_attributes>
     <additional_attributes>10.0;10.0;10.0;160.0</additional_attributes>
@@ -1999,10 +1999,10 @@ Coffee and Milk =&gt; Large</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>352</x>
-      <y>1661</y>
-      <w>33</w>
-      <h>88</h>
+      <x>528</x>
+      <y>1812</y>
+      <w>36</w>
+      <h>96</h>
     </coordinates>
     <panel_attributes>lt=-</panel_attributes>
     <additional_attributes>10.0;10.0;10.0;60.0</additional_attributes>
@@ -2010,10 +2010,10 @@ Coffee and Milk =&gt; Large</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>363</x>
-      <y>1573</y>
-      <w>33</w>
-      <h>77</h>
+      <x>540</x>
+      <y>1716</y>
+      <w>36</w>
+      <h>84</h>
     </coordinates>
     <panel_attributes>lt=.</panel_attributes>
     <additional_attributes>10.0;10.0;10.0;50.0</additional_attributes>
@@ -2021,10 +2021,10 @@ Coffee and Milk =&gt; Large</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>363</x>
-      <y>1507</y>
-      <w>33</w>
-      <h>55</h>
+      <x>540</x>
+      <y>1644</y>
+      <w>36</w>
+      <h>60</h>
     </coordinates>
     <panel_attributes>lt=.</panel_attributes>
     <additional_attributes>10.0;10.0;10.0;30.0</additional_attributes>
@@ -2032,10 +2032,10 @@ Coffee and Milk =&gt; Large</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>1056</x>
-      <y>1199</y>
-      <w>99</w>
-      <h>88</h>
+      <x>1296</x>
+      <y>1308</y>
+      <w>108</w>
+      <h>96</h>
     </coordinates>
     <panel_attributes>lt=-</panel_attributes>
     <additional_attributes>70.0;10.0;10.0;60.0</additional_attributes>
@@ -2043,10 +2043,10 @@ Coffee and Milk =&gt; Large</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>1122</x>
-      <y>1199</y>
-      <w>99</w>
-      <h>88</h>
+      <x>1368</x>
+      <y>1308</y>
+      <w>108</w>
+      <h>96</h>
     </coordinates>
     <panel_attributes>lt=-</panel_attributes>
     <additional_attributes>10.0;10.0;70.0;60.0</additional_attributes>
@@ -2054,10 +2054,10 @@ Coffee and Milk =&gt; Large</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>1452</x>
-      <y>1199</y>
-      <w>99</w>
-      <h>88</h>
+      <x>1728</x>
+      <y>1308</y>
+      <w>108</w>
+      <h>96</h>
     </coordinates>
     <panel_attributes>lt=-</panel_attributes>
     <additional_attributes>10.0;10.0;70.0;60.0</additional_attributes>
@@ -2065,10 +2065,10 @@ Coffee and Milk =&gt; Large</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>1386</x>
-      <y>1199</y>
-      <w>99</w>
-      <h>88</h>
+      <x>1656</x>
+      <y>1308</y>
+      <w>108</w>
+      <h>96</h>
     </coordinates>
     <panel_attributes>lt=-</panel_attributes>
     <additional_attributes>70.0;10.0;10.0;60.0</additional_attributes>
@@ -2076,10 +2076,10 @@ Coffee and Milk =&gt; Large</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>715</x>
-      <y>1199</y>
-      <w>88</w>
-      <h>88</h>
+      <x>924</x>
+      <y>1308</y>
+      <w>96</w>
+      <h>96</h>
     </coordinates>
     <panel_attributes>lt=-</panel_attributes>
     <additional_attributes>60.0;10.0;10.0;60.0</additional_attributes>
@@ -2087,10 +2087,10 @@ Coffee and Milk =&gt; Large</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>781</x>
-      <y>1199</y>
-      <w>99</w>
-      <h>88</h>
+      <x>996</x>
+      <y>1308</y>
+      <w>108</w>
+      <h>96</h>
     </coordinates>
     <panel_attributes>lt=-</panel_attributes>
     <additional_attributes>10.0;10.0;70.0;60.0</additional_attributes>
@@ -2098,10 +2098,10 @@ Coffee and Milk =&gt; Large</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>1122</x>
-      <y>1089</y>
-      <w>33</w>
-      <h>99</h>
+      <x>1368</x>
+      <y>1188</y>
+      <w>36</w>
+      <h>108</h>
     </coordinates>
     <panel_attributes>lt=-</panel_attributes>
     <additional_attributes>10.0;10.0;10.0;70.0</additional_attributes>
@@ -2109,10 +2109,10 @@ Coffee and Milk =&gt; Large</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>1122</x>
-      <y>1089</y>
-      <w>363</w>
-      <h>99</h>
+      <x>1368</x>
+      <y>1188</y>
+      <w>396</w>
+      <h>108</h>
     </coordinates>
     <panel_attributes>lt=-</panel_attributes>
     <additional_attributes>10.0;10.0;310.0;70.0</additional_attributes>
@@ -2120,10 +2120,10 @@ Coffee and Milk =&gt; Large</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>781</x>
-      <y>1089</y>
-      <w>374</w>
-      <h>99</h>
+      <x>996</x>
+      <y>1188</y>
+      <w>408</w>
+      <h>108</h>
     </coordinates>
     <panel_attributes>lt=-</panel_attributes>
     <additional_attributes>320.0;10.0;10.0;70.0</additional_attributes>
@@ -2131,10 +2131,10 @@ Coffee and Milk =&gt; Large</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>363</x>
-      <y>1144</y>
-      <w>33</w>
-      <h>88</h>
+      <x>540</x>
+      <y>1248</y>
+      <w>36</w>
+      <h>96</h>
     </coordinates>
     <panel_attributes>lt=-</panel_attributes>
     <additional_attributes>10.0;60.0;10.0;10.0</additional_attributes>
@@ -2142,10 +2142,10 @@ Coffee and Milk =&gt; Large</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>363</x>
-      <y>1144</y>
-      <w>176</w>
-      <h>88</h>
+      <x>540</x>
+      <y>1248</y>
+      <w>192</w>
+      <h>96</h>
     </coordinates>
     <panel_attributes>lt=-</panel_attributes>
     <additional_attributes>140.0;60.0;10.0;10.0</additional_attributes>
@@ -2153,10 +2153,10 @@ Coffee and Milk =&gt; Large</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>220</x>
-      <y>1144</y>
-      <w>176</w>
-      <h>88</h>
+      <x>384</x>
+      <y>1248</y>
+      <w>192</w>
+      <h>96</h>
     </coordinates>
     <panel_attributes>lt=-</panel_attributes>
     <additional_attributes>10.0;60.0;140.0;10.0</additional_attributes>
@@ -2164,10 +2164,10 @@ Coffee and Milk =&gt; Large</panel_attributes>
   <element>
     <id>UMLObject</id>
     <coordinates>
-      <x>319</x>
-      <y>2816</y>
-      <w>132</w>
-      <h>44</h>
+      <x>492</x>
+      <y>3072</y>
+      <w>144</w>
+      <h>48</h>
     </coordinates>
     <panel_attributes>Coffee machine
 bg=blue</panel_attributes>
@@ -2176,10 +2176,10 @@ bg=blue</panel_attributes>
   <element>
     <id>UMLObject</id>
     <coordinates>
-      <x>187</x>
-      <y>2915</y>
-      <w>110</w>
-      <h>44</h>
+      <x>348</x>
+      <y>3180</y>
+      <w>120</w>
+      <h>48</h>
     </coordinates>
     <panel_attributes>Coffee</panel_attributes>
     <additional_attributes/>
@@ -2187,10 +2187,10 @@ bg=blue</panel_attributes>
   <element>
     <id>UMLObject</id>
     <coordinates>
-      <x>330</x>
-      <y>2915</y>
-      <w>110</w>
-      <h>44</h>
+      <x>504</x>
+      <y>3180</y>
+      <w>120</w>
+      <h>48</h>
     </coordinates>
     <panel_attributes>Milk</panel_attributes>
     <additional_attributes/>
@@ -2198,10 +2198,10 @@ bg=blue</panel_attributes>
   <element>
     <id>UMLObject</id>
     <coordinates>
-      <x>473</x>
-      <y>2915</y>
-      <w>110</w>
-      <h>44</h>
+      <x>660</x>
+      <y>3180</y>
+      <w>120</w>
+      <h>48</h>
     </coordinates>
     <panel_attributes>Sugar</panel_attributes>
     <additional_attributes/>
@@ -2209,10 +2209,10 @@ bg=blue</panel_attributes>
   <element>
     <id>UMLSpecialState</id>
     <coordinates>
-      <x>374</x>
-      <y>2904</y>
-      <w>22</w>
-      <h>22</h>
+      <x>552</x>
+      <y>3168</y>
+      <w>24</w>
+      <h>24</h>
     </coordinates>
     <panel_attributes>type=decision</panel_attributes>
     <additional_attributes/>
@@ -2220,10 +2220,10 @@ bg=blue</panel_attributes>
   <element>
     <id>UMLSpecialState</id>
     <coordinates>
-      <x>517</x>
-      <y>2904</y>
-      <w>22</w>
-      <h>22</h>
+      <x>708</x>
+      <y>3168</y>
+      <w>24</w>
+      <h>24</h>
     </coordinates>
     <panel_attributes>type=decision</panel_attributes>
     <additional_attributes/>
@@ -2231,10 +2231,10 @@ bg=blue</panel_attributes>
   <element>
     <id>UMLSpecialState</id>
     <coordinates>
-      <x>231</x>
-      <y>2904</y>
-      <w>22</w>
-      <h>22</h>
+      <x>396</x>
+      <y>3168</y>
+      <w>24</w>
+      <h>24</h>
     </coordinates>
     <panel_attributes>type=initial</panel_attributes>
     <additional_attributes/>
@@ -2242,10 +2242,10 @@ bg=blue</panel_attributes>
   <element>
     <id>UMLObject</id>
     <coordinates>
-      <x>869</x>
-      <y>2761</y>
-      <w>132</w>
-      <h>44</h>
+      <x>1092</x>
+      <y>3012</y>
+      <w>144</w>
+      <h>48</h>
     </coordinates>
     <panel_attributes>Coffee machine
 bg=blue</panel_attributes>
@@ -2254,10 +2254,10 @@ bg=blue</panel_attributes>
   <element>
     <id>UMLObject</id>
     <coordinates>
-      <x>671</x>
-      <y>2970</y>
-      <w>110</w>
-      <h>44</h>
+      <x>876</x>
+      <y>3240</y>
+      <w>120</w>
+      <h>48</h>
     </coordinates>
     <panel_attributes>Coffee</panel_attributes>
     <additional_attributes/>
@@ -2265,10 +2265,10 @@ bg=blue</panel_attributes>
   <element>
     <id>UMLSpecialState</id>
     <coordinates>
-      <x>781</x>
-      <y>2860</y>
-      <w>22</w>
-      <h>22</h>
+      <x>996</x>
+      <y>3120</y>
+      <w>24</w>
+      <h>24</h>
     </coordinates>
     <panel_attributes>type=initial</panel_attributes>
     <additional_attributes/>
@@ -2276,10 +2276,10 @@ bg=blue</panel_attributes>
   <element>
     <id>UMLObject</id>
     <coordinates>
-      <x>803</x>
-      <y>2970</y>
-      <w>110</w>
-      <h>44</h>
+      <x>1020</x>
+      <y>3240</y>
+      <w>120</w>
+      <h>48</h>
     </coordinates>
     <panel_attributes>Espresso</panel_attributes>
     <additional_attributes/>
@@ -2287,10 +2287,10 @@ bg=blue</panel_attributes>
   <element>
     <id>UMLObject</id>
     <coordinates>
-      <x>737</x>
-      <y>2871</y>
-      <w>110</w>
-      <h>44</h>
+      <x>948</x>
+      <y>3132</y>
+      <w>120</w>
+      <h>48</h>
     </coordinates>
     <panel_attributes>Beverage
 bg=blue</panel_attributes>
@@ -2299,10 +2299,10 @@ bg=blue</panel_attributes>
   <element>
     <id>UMLObject</id>
     <coordinates>
-      <x>990</x>
-      <y>2970</y>
-      <w>110</w>
-      <h>44</h>
+      <x>1224</x>
+      <y>3240</y>
+      <w>120</w>
+      <h>48</h>
     </coordinates>
     <panel_attributes>Milk</panel_attributes>
     <additional_attributes/>
@@ -2310,10 +2310,10 @@ bg=blue</panel_attributes>
   <element>
     <id>UMLObject</id>
     <coordinates>
-      <x>1133</x>
-      <y>2970</y>
-      <w>110</w>
-      <h>44</h>
+      <x>1380</x>
+      <y>3240</y>
+      <w>120</w>
+      <h>48</h>
     </coordinates>
     <panel_attributes>Sugar</panel_attributes>
     <additional_attributes/>
@@ -2321,10 +2321,10 @@ bg=blue</panel_attributes>
   <element>
     <id>UMLSpecialState</id>
     <coordinates>
-      <x>1100</x>
-      <y>2860</y>
-      <w>22</w>
-      <h>22</h>
+      <x>1344</x>
+      <y>3120</y>
+      <w>24</w>
+      <h>24</h>
     </coordinates>
     <panel_attributes>type=decision</panel_attributes>
     <additional_attributes/>
@@ -2332,10 +2332,10 @@ bg=blue</panel_attributes>
   <element>
     <id>UMLObject</id>
     <coordinates>
-      <x>1045</x>
-      <y>2871</y>
-      <w>132</w>
-      <h>44</h>
+      <x>1284</x>
+      <y>3132</y>
+      <w>144</w>
+      <h>48</h>
     </coordinates>
     <panel_attributes>Toppings
 bg=blue</panel_attributes>
@@ -2344,10 +2344,10 @@ bg=blue</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>1100</x>
-      <y>2904</y>
-      <w>99</w>
-      <h>88</h>
+      <x>1344</x>
+      <y>3168</y>
+      <w>108</w>
+      <h>96</h>
     </coordinates>
     <panel_attributes>lt=-</panel_attributes>
     <additional_attributes>10.0;10.0;70.0;60.0</additional_attributes>
@@ -2355,10 +2355,10 @@ bg=blue</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>1034</x>
-      <y>2904</y>
-      <w>99</w>
-      <h>88</h>
+      <x>1272</x>
+      <y>3168</y>
+      <w>108</w>
+      <h>96</h>
     </coordinates>
     <panel_attributes>lt=-</panel_attributes>
     <additional_attributes>70.0;10.0;10.0;60.0</additional_attributes>
@@ -2366,10 +2366,10 @@ bg=blue</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>715</x>
-      <y>2904</y>
-      <w>88</w>
-      <h>88</h>
+      <x>924</x>
+      <y>3168</y>
+      <w>96</w>
+      <h>96</h>
     </coordinates>
     <panel_attributes>lt=-</panel_attributes>
     <additional_attributes>60.0;10.0;10.0;60.0</additional_attributes>
@@ -2377,10 +2377,10 @@ bg=blue</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>781</x>
-      <y>2904</y>
-      <w>99</w>
-      <h>88</h>
+      <x>996</x>
+      <y>3168</y>
+      <w>108</w>
+      <h>96</h>
     </coordinates>
     <panel_attributes>lt=-</panel_attributes>
     <additional_attributes>10.0;10.0;70.0;60.0</additional_attributes>
@@ -2388,10 +2388,10 @@ bg=blue</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>924</x>
-      <y>2794</y>
-      <w>209</w>
-      <h>99</h>
+      <x>1152</x>
+      <y>3048</y>
+      <w>228</w>
+      <h>108</h>
     </coordinates>
     <panel_attributes>lt=-</panel_attributes>
     <additional_attributes>10.0;10.0;170.0;70.0</additional_attributes>
@@ -2399,10 +2399,10 @@ bg=blue</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>781</x>
-      <y>2794</y>
-      <w>176</w>
-      <h>99</h>
+      <x>996</x>
+      <y>3048</y>
+      <w>192</w>
+      <h>108</h>
     </coordinates>
     <panel_attributes>lt=-</panel_attributes>
     <additional_attributes>140.0;10.0;10.0;70.0</additional_attributes>
@@ -2410,10 +2410,10 @@ bg=blue</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>374</x>
-      <y>2849</y>
-      <w>33</w>
-      <h>88</h>
+      <x>552</x>
+      <y>3108</y>
+      <w>36</w>
+      <h>96</h>
     </coordinates>
     <panel_attributes>lt=-</panel_attributes>
     <additional_attributes>10.0;60.0;10.0;10.0</additional_attributes>
@@ -2421,10 +2421,10 @@ bg=blue</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>374</x>
-      <y>2849</y>
-      <w>176</w>
-      <h>88</h>
+      <x>552</x>
+      <y>3108</y>
+      <w>192</w>
+      <h>96</h>
     </coordinates>
     <panel_attributes>lt=-</panel_attributes>
     <additional_attributes>140.0;60.0;10.0;10.0</additional_attributes>
@@ -2432,10 +2432,10 @@ bg=blue</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>231</x>
-      <y>2849</y>
-      <w>176</w>
-      <h>88</h>
+      <x>396</x>
+      <y>3108</y>
+      <w>192</w>
+      <h>96</h>
     </coordinates>
     <panel_attributes>lt=-</panel_attributes>
     <additional_attributes>10.0;60.0;140.0;10.0</additional_attributes>
@@ -2443,10 +2443,10 @@ bg=blue</panel_attributes>
   <element>
     <id>UMLUseCase</id>
     <coordinates>
-      <x>2233</x>
-      <y>1848</y>
-      <w>77</w>
-      <h>44</h>
+      <x>2580</x>
+      <y>2016</y>
+      <w>84</w>
+      <h>48</h>
     </coordinates>
     <panel_attributes>Milk
 6 / 35</panel_attributes>
@@ -2455,10 +2455,10 @@ bg=blue</panel_attributes>
   <element>
     <id>UMLUseCase</id>
     <coordinates>
-      <x>2277</x>
-      <y>1969</y>
-      <w>77</w>
-      <h>44</h>
+      <x>2628</x>
+      <y>2148</y>
+      <w>84</w>
+      <h>48</h>
     </coordinates>
     <panel_attributes>Normal
 7 / 38</panel_attributes>
@@ -2467,10 +2467,10 @@ bg=blue</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>2299</x>
-      <y>2002</y>
-      <w>33</w>
-      <h>88</h>
+      <x>2652</x>
+      <y>2184</y>
+      <w>36</w>
+      <h>96</h>
     </coordinates>
     <panel_attributes>lt=.</panel_attributes>
     <additional_attributes>10.0;10.0;10.0;60.0</additional_attributes>
@@ -2478,10 +2478,10 @@ bg=blue</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>2299</x>
-      <y>2002</y>
-      <w>154</w>
-      <h>88</h>
+      <x>2652</x>
+      <y>2184</y>
+      <w>168</w>
+      <h>96</h>
     </coordinates>
     <panel_attributes>lt=-</panel_attributes>
     <additional_attributes>10.0;10.0;115.0;60.0</additional_attributes>
@@ -2489,10 +2489,10 @@ bg=blue</panel_attributes>
   <element>
     <id>UMLUseCase</id>
     <coordinates>
-      <x>2266</x>
-      <y>2068</y>
-      <w>77</w>
-      <h>44</h>
+      <x>2616</x>
+      <y>2256</y>
+      <w>84</w>
+      <h>48</h>
     </coordinates>
     <panel_attributes>Large
 8 / 41</panel_attributes>
@@ -2501,10 +2501,10 @@ bg=blue</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>2299</x>
-      <y>2101</y>
-      <w>154</w>
-      <h>88</h>
+      <x>2652</x>
+      <y>2292</y>
+      <w>168</w>
+      <h>96</h>
     </coordinates>
     <panel_attributes>lt=-</panel_attributes>
     <additional_attributes>10.0;10.0;115.0;60.0</additional_attributes>

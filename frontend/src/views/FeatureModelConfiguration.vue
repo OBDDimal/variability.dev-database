@@ -243,11 +243,34 @@
               </template>
 
               <template v-slot:item.actions="{ item }">
-                <v-btn
-                    v-if="!item.fix && (item.selectionState === SelectionState.ImplicitlyDeselected || item.selectionState === SelectionState.ImplicitlySelected)"
-                    @click="quickFixFeature(item)">
-                  Quick Fix
-                </v-btn>
+                <v-menu offset-y
+                        v-if="!item.fix && (item.selectionState === SelectionState.ImplicitlyDeselected || item.selectionState === SelectionState.ImplicitlySelected)">
+                  <template v-slot:activator="{ on, attrs }">
+                    <v-btn icon rounded outlined v-bind="attrs" v-on="on">
+                      <v-icon>mdi-dots-vertical</v-icon>
+                    </v-btn>
+                  </template>
+
+                  <v-list>
+                    <v-list-item @click="rollbackFixFeature(item)">
+                      <v-tooltip bottom>
+                        <template v-slot:activator="{ on, attrs }">
+                          <div v-on="on" v-bind="attrs">Rollback Fix</div>
+                        </template>
+                        <span>Rollback all steps in the configuration history until this implicit decision was made</span>
+                      </v-tooltip>
+                    </v-list-item>
+
+                    <v-list-item @click="quickFixFeature(item)">
+                      <v-tooltip bottom>
+                        <template v-slot:activator="{ on, attrs }">
+                          <div v-on="on" v-bind="attrs">Quick Fix</div>
+                        </template>
+                        <span>Reselects the current config (versions and features) to allow a reselection of this feature</span>
+                      </v-tooltip>
+                    </v-list-item>
+                  </v-list>
+                </v-menu>
               </template>
             </v-data-table>
           </v-card>
@@ -320,7 +343,7 @@
                 <v-tab-item key="explanations" style="height: 25vh;">
                   <div>
                     <div class="text-h5" v-if="selectedVersion?.selectionState === SelectionState.ImplicitlySelected">
-                      {{selectedVersion.selectionStateDescription}}
+                      {{ selectedVersion.selectionStateDescription }}
                     </div>
                     <div class="text-h5" v-if="crossTreeConstraintsSindSchuld">
                       Conflicting Cross-Tree-Constraints
@@ -457,7 +480,7 @@
                     </template>
 
                     <template v-slot:item.actions="{ item }">
-                      <v-btn @click="constraintQuickFix(item)">Quick Fix</v-btn>
+                      <v-btn v-if="item.evaluation === false" @click="constraintQuickFix(item)">Quick Fix</v-btn>
                     </template>
 
                   </v-data-table>
@@ -491,6 +514,7 @@ import api from "@/services/api.service";
 import DoubleCheckbox from "@/components/Configurator/DoubleCheckbox.vue";
 import {QuickFixFeatureCommand} from "@/classes/Commands/Configurator/QuickFixFeatureCommand";
 import {QuickFixCTCCommand} from "@/classes/Commands/Configurator/QuickFixCTCCommand";
+import {RollbackFixFeatureCommand} from "@/classes/Commands/Configurator/RollbackFixFeatureCommand";
 
 
 export default Vue.extend({
@@ -533,7 +557,7 @@ export default Vue.extend({
             this.featureModel.loadXmlData(this.featureModel.versions[0]);
             this.selectedVersion = this.featureModel.versions[0];
             this.resetCommand = new ResetCommand(this.featureModel);
-            this.resetCommand.execute()
+            this.commandManager.execute(this.resetCommand);
           })
           .catch(() => {
           });
@@ -541,9 +565,18 @@ export default Vue.extend({
 
     constraintQuickFix(item) {
       const pc = item.constraint.quickFix(true);
-      console.log(pc);
 
       const command = new QuickFixCTCCommand(this.featureModel, pc);
+      this.commandManager.execute(command);
+    },
+
+    quickFixFeature(feature) {
+      const command = new QuickFixFeatureCommand(this.featureModel, feature);
+      this.commandManager.execute(command);
+    },
+
+    rollbackFixFeature(feature) {
+      const command = new RollbackFixFeatureCommand(this.featureModel, this.commandManager, feature);
       this.commandManager.execute(command);
     },
 
@@ -580,15 +613,6 @@ export default Vue.extend({
       this.searchFeatures = "";
       this.features = this.featureModel.features;
       this.filteredFeaturesVersion = undefined;
-    },
-
-    quickFixFeature(feature) {
-      if (feature.selectionState === SelectionState.Unselected || feature.selectionState === SelectionState.ExplicitlySelected || feature.selectionState === SelectionState.ExplicitlyDeselected) {
-        return;
-      }
-
-      const command = new QuickFixFeatureCommand(this.featureModel, feature);
-      this.commandManager.execute(command);
     },
 
     select(item, selectionState) {
