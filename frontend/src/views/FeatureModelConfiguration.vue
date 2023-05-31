@@ -1,5 +1,6 @@
 <template>
   <div class="main">
+    <!-- Loading screen -->
     <v-overlay
         contained
         class="align-center justify-center"
@@ -14,16 +15,21 @@
       ></v-progress-circular>
     </v-overlay>
 
+    <!-- Main content of the configurator -->
     <v-container fluid v-if="featureModel.loadingOpacity !== 0">
+
+      <!-- First row with the three columns: Versions, Features, Third Column (#SAT, Explanations, Configuration history) -->
       <v-row>
         <!-- Versions -->
         <v-col cols="4">
           <v-card>
             <v-card-title>
+              <!-- Heading Versions -->
               <div class="mr-2" v-if="featureModel && featureModel.versions">
                 Versions ({{ featureModel.versions?.length }})
               </div>
 
+              <!-- Statistics about the versions as tooltip-->
               <v-tooltip bottom>
                 <template v-slot:activator="{ on, attrs }">
                   <v-icon v-on="on" v-bind="attrs">mdi-information</v-icon>
@@ -39,28 +45,30 @@
                   </tr>
                   <tr>
                     <td>Unselected</td>
-                    <td>{{ countSelectionState(featureModel.versions, SelectionState.Unselected) }}</td>
+                    <td>{{ countSelectionStateInList(featureModel.versions, SelectionState.Unselected) }}</td>
                   </tr>
                   <tr>
                     <td>Explicitly selected</td>
-                    <td>{{ countSelectionState(featureModel.versions, SelectionState.ExplicitlySelected) }}</td>
+                    <td>{{ countSelectionStateInList(featureModel.versions, SelectionState.ExplicitlySelected) }}</td>
                   </tr>
                   <tr>
                     <td>Explicitly deselected</td>
-                    <td>{{ countSelectionState(featureModel.versions, SelectionState.ExplicitlyDeselected) }}</td>
+                    <td>{{ countSelectionStateInList(featureModel.versions, SelectionState.ExplicitlyDeselected) }}</td>
                   </tr>
                   <tr>
                     <td>Implicitly selected</td>
-                    <td>{{ countSelectionState(featureModel.versions, SelectionState.ImplicitlySelected) }}</td>
+                    <td>{{ countSelectionStateInList(featureModel.versions, SelectionState.ImplicitlySelected) }}</td>
                   </tr>
                   <tr>
                     <td>Implicitly deselected</td>
-                    <td>{{ countSelectionState(featureModel.versions, SelectionState.ImplicitlyDeselected) }}</td>
+                    <td>{{ countSelectionStateInList(featureModel.versions, SelectionState.ImplicitlyDeselected) }}</td>
                   </tr>
                 </table>
               </v-tooltip>
 
               <v-spacer></v-spacer>
+
+              <!-- Search box for versions -->
               <v-text-field
                   v-model="searchVersions"
                   append-icon="mdi-magnify"
@@ -70,6 +78,7 @@
                   class="mr-2"
               ></v-text-field>
 
+              <!-- Reset button to reset the searchbox -->
               <v-tooltip bottom>
                 <template v-slot:activator="{ on, attrs }">
                   <v-btn
@@ -86,6 +95,7 @@
               </v-tooltip>
             </v-card-title>
 
+            <!-- Table with all versions -->
             <v-data-table
                 :search="searchVersions"
                 :headers="[{text: 'Selection', value: 'selectionState'}, {text: 'Version', value: 'version', groupable: false}, {text: 'Actions', value: 'actions', groupable: false}]"
@@ -100,6 +110,7 @@
                 :item-class="v => v === selectedVersion ? 'selected-version clickable' : 'clickable'"
                 @click:row="selectVersion($event)"
             >
+              <!-- Customization of the column VERSION -->
               <template v-slot:item.version="{ item }">
                 <v-tooltip bottom>
                   <template v-slot:activator="{ on, attrs }">
@@ -109,11 +120,14 @@
                 </v-tooltip>
               </template>
 
+              <!-- Customization of the column SELECTIONSTATE -->
               <template v-slot:item.selectionState="{ item }">
-                <DoubleCheckbox v-bind:selection-item="item" @select="select(item, $event)"></DoubleCheckbox>
+                <DoubleCheckbox v-bind:selection-item="item" @select="decisionPropagation(item, $event)"></DoubleCheckbox>
               </template>
 
+              <!-- Customization of the column ACTIONS -->
               <template v-slot:item.actions="{ item }">
+                <!-- Context menu for selected version -->
                 <v-menu offset-y
                         v-if="item === selectedVersion">
                   <template v-slot:activator="{ on, attrs }">
@@ -123,6 +137,7 @@
                   </template>
 
                   <v-list>
+                    <!-- Filter features button -->
                     <v-list-item @click="filterFeaturesInVersion(item)">
                       <v-tooltip bottom>
                         <template v-slot:activator="{ on, attrs }">
@@ -132,6 +147,7 @@
                       </v-tooltip>
                     </v-list-item>
 
+                    <!-- Filter inverted features button -->
                     <v-list-item @click="filterFeaturesNotInVersion(item)">
                       <v-tooltip bottom>
                         <template v-slot:activator="{ on, attrs }">
@@ -141,6 +157,7 @@
                       </v-tooltip>
                     </v-list-item>
 
+                    <!-- Fix by rollback button -->
                     <v-list-item @click="rollbackFixVersion(item)" v-if="item.selectionState === SelectionState.ImplicitlyDeselected">
                       <v-tooltip bottom>
                         <template v-slot:activator="{ on, attrs }">
@@ -151,7 +168,6 @@
                     </v-list-item>
                   </v-list>
                 </v-menu>
-
               </template>
             </v-data-table>
           </v-card>
@@ -161,11 +177,13 @@
         <v-col cols="4">
           <v-card>
             <v-card-title>
+              <!-- Heading features -->
               <div class="mr-2">
                 <span v-if="features?.length === featureModel.features?.length">Features ({{ featureModel.features?.length }}) </span>
                 <span v-else>Features ({{ features?.length }}/{{ featureModel.features?.length }}) </span>
               </div>
 
+              <!-- Statistics about the features as tooltip-->
               <v-tooltip bottom>
                 <template v-slot:activator="{ on, attrs }">
                   <v-icon v-on="on" v-bind="attrs">mdi-information</v-icon>
@@ -173,54 +191,56 @@
                 <table>
                   <tr>
                     <th>Selection</th>
-                    <th v-if="filteredFeaturesVersion">Filtered</th>
+                    <th v-if="versionForFilteringFeatures">Filtered</th>
                     <th>All</th>
                   </tr>
                   <tr>
                     <td>All</td>
-                    <td v-if="filteredFeaturesVersion">{{ features?.length }}</td>
+                    <td v-if="versionForFilteringFeatures">{{ features?.length }}</td>
                     <td>{{ featureModel.features?.length }}</td>
                   </tr>
                   <tr>
                     <td>Unselected</td>
-                    <td v-if="filteredFeaturesVersion">{{
-                        countSelectionState(features, SelectionState.Unselected)
+                    <td v-if="versionForFilteringFeatures">{{
+                        countSelectionStateInList(features, SelectionState.Unselected)
                       }}
                     </td>
-                    <td>{{ countSelectionState(featureModel.features, SelectionState.Unselected) }}</td>
+                    <td>{{ countSelectionStateInList(featureModel.features, SelectionState.Unselected) }}</td>
                   </tr>
                   <tr>
                     <td>Explicitly selected</td>
-                    <td v-if="filteredFeaturesVersion">
-                      {{ countSelectionState(features, SelectionState.ExplicitlySelected) }}
+                    <td v-if="versionForFilteringFeatures">
+                      {{ countSelectionStateInList(features, SelectionState.ExplicitlySelected) }}
                     </td>
-                    <td>{{ countSelectionState(featureModel.features, SelectionState.ExplicitlySelected) }}</td>
+                    <td>{{ countSelectionStateInList(featureModel.features, SelectionState.ExplicitlySelected) }}</td>
                   </tr>
                   <tr>
                     <td>Explicitly deselected</td>
-                    <td v-if="filteredFeaturesVersion">
-                      {{ countSelectionState(features, SelectionState.ExplicitlyDeselected) }}
+                    <td v-if="versionForFilteringFeatures">
+                      {{ countSelectionStateInList(features, SelectionState.ExplicitlyDeselected) }}
                     </td>
-                    <td>{{ countSelectionState(featureModel.features, SelectionState.ExplicitlyDeselected) }}</td>
+                    <td>{{ countSelectionStateInList(featureModel.features, SelectionState.ExplicitlyDeselected) }}</td>
                   </tr>
                   <tr>
                     <td>Implicitly selected</td>
-                    <td v-if="filteredFeaturesVersion">
-                      {{ countSelectionState(features, SelectionState.ImplicitlySelected) }}
+                    <td v-if="versionForFilteringFeatures">
+                      {{ countSelectionStateInList(features, SelectionState.ImplicitlySelected) }}
                     </td>
-                    <td>{{ countSelectionState(featureModel.features, SelectionState.ImplicitlySelected) }}</td>
+                    <td>{{ countSelectionStateInList(featureModel.features, SelectionState.ImplicitlySelected) }}</td>
                   </tr>
                   <tr>
                     <td>Implicitly deselected</td>
-                    <td v-if="filteredFeaturesVersion">
-                      {{ countSelectionState(features, SelectionState.ImplicitlyDeselected) }}
+                    <td v-if="versionForFilteringFeatures">
+                      {{ countSelectionStateInList(features, SelectionState.ImplicitlyDeselected) }}
                     </td>
-                    <td>{{ countSelectionState(featureModel.features, SelectionState.ImplicitlyDeselected) }}</td>
+                    <td>{{ countSelectionStateInList(featureModel.features, SelectionState.ImplicitlyDeselected) }}</td>
                   </tr>
                 </table>
               </v-tooltip>
 
               <v-spacer></v-spacer>
+
+              <!-- Search box for features -->
               <v-text-field
                   v-model="searchFeatures"
                   append-icon="mdi-magnify"
@@ -230,6 +250,7 @@
                   class="mr-2"
               ></v-text-field>
 
+              <!-- Reset button to reset the searchbox -->
               <v-tooltip bottom>
                 <template v-slot:activator="{ on, attrs }">
                   <v-btn
@@ -246,11 +267,13 @@
               </v-tooltip>
             </v-card-title>
 
-            <v-card-subtitle v-if="filteredFeaturesVersion">
-              Filtered by version {{ filteredFeaturesVersion.version }}
+            <!-- Optional information when filtered by features initiated from on single version -->
+            <v-card-subtitle v-if="versionForFilteringFeatures">
+              Filtered by version {{ versionForFilteringFeatures.version }}
               {{ features?.length }}
             </v-card-subtitle>
 
+            <!-- Table with all features that are currently fitlered and searched -->
             <v-data-table
                 :headers="[{text: 'Selection', value: 'selectionState'}, {text: 'Name', value: 'name', groupable: false}, {text: 'Actions', groupable: false, value: 'actions'}]"
                 :search="searchFeatures"
@@ -263,6 +286,7 @@
                 disable-pagination
                 hide-default-footer
             >
+              <!-- Customization of the column NAME -->
               <template v-slot:item.name="{ item }">
                 <v-tooltip bottom>
                   <template v-slot:activator="{ on, attrs }">
@@ -272,11 +296,14 @@
                 </v-tooltip>
               </template>
 
+              <!-- Customization of the column SELECTIONSTATE -->
               <template v-slot:item.selectionState="{ item }">
-                <DoubleCheckbox v-bind:selection-item="item" @select="select(item, $event)"></DoubleCheckbox>
+                <DoubleCheckbox v-bind:selection-item="item" @select="decisionPropagation(item, $event)"></DoubleCheckbox>
               </template>
 
+              <!-- Customization of the column ACTIONS -->
               <template v-slot:item.actions="{ item }">
+                <!-- Context menu -->
                 <v-menu offset-y
                         v-if="!item.fix && (item.selectionState === SelectionState.ImplicitlyDeselected || item.selectionState === SelectionState.ImplicitlySelected)">
                   <template v-slot:activator="{ on, attrs }">
@@ -286,6 +313,7 @@
                   </template>
 
                   <v-list>
+                    <!-- Fix feature by rollback button -->
                     <v-list-item @click="rollbackFixFeature(item)">
                       <v-tooltip bottom>
                         <template v-slot:activator="{ on, attrs }">
@@ -295,6 +323,7 @@
                       </v-tooltip>
                     </v-list-item>
 
+                    <!-- Fix feature by quick fix button -->
                     <v-list-item @click="quickFixFeature(item)">
                       <v-tooltip bottom>
                         <template v-slot:activator="{ on, attrs }">
@@ -310,7 +339,7 @@
           </v-card>
         </v-col>
 
-        <!-- Third column -->
+        <!-- Third column (#SAT, Explanations, Configuration history) -->
         <v-col cols="4">
           <!-- #SAT -->
           <v-card height="5vh;">
@@ -318,6 +347,7 @@
             <v-card-subtitle>Number of possible configurations</v-card-subtitle>
             <v-card-actions>
 
+              <!-- Reset config button -->
               <v-tooltip bottom>
                 <template v-slot:activator="{ on, attrs }">
                   <v-btn
@@ -325,13 +355,14 @@
                       outlined
                       v-on="on"
                       v-bind="attrs"
-                      @click="reset">
+                      @click="resetCommand">
                     Reset Config
                   </v-btn>
                 </template>
                 <span>Reset all configuration steps and start with an empty selection. This step can be undone.</span>
               </v-tooltip>
 
+              <!-- Undo button -->
               <v-tooltip bottom>
                 <template v-slot:activator="{ on, attrs }">
                   <v-btn
@@ -349,7 +380,7 @@
                 <span>Undo last configuration step</span>
               </v-tooltip>
 
-
+              <!-- Redo button -->
               <v-tooltip bottom>
                 <template v-slot:activator="{ on, attrs }">
                   <v-btn
@@ -372,33 +403,40 @@
           <!-- Explanations and configuration history -->
           <v-card style="margin-top:1vh;" height="33.5vh">
             <v-card-title>
-              <v-tabs v-model="tabTopRight">
+              <v-tabs v-model="tabsColumnTopRight">
                 <v-tab key="explanations">Explanations</v-tab>
                 <v-tab key="configurationHistory">Configuration history</v-tab>
               </v-tabs>
             </v-card-title>
 
             <v-card-text>
-              <v-tabs-items v-model="tabTopRight" class="mt-2">
+              <v-tabs-items v-model="tabsColumnTopRight" class="mt-2">
+
+                <!-- Explanations tab -->
                 <v-tab-item key="explanations" style="height: 25vh;">
                   <div>
+                    <!-- Reason 1 -->
                     <div class="text-h6" v-if="selectedVersion?.selectionState === SelectionState.ImplicitlySelected">
                       {{ selectedVersion.selectionStateDescription }}
                     </div>
-                    <div class="text-h6" v-if="crossTreeConstraintsSindSchuld">
+
+                    <!-- Reason 2 -->
+                    <div class="text-h6" v-if="conflictingCTCsOfSelectedVersion">
                       Conflicting Cross-Tree-Constraints
-                      <v-btn icon outlined rounded @click="tabBottom = 'ctc'">
+                      <v-btn icon outlined rounded @click="tabsBottom = 'ctc'">
                         <v-icon>mdi-arrow-top-right</v-icon>
                       </v-btn>
                     </div>
-                    <div v-if="schuldigeFeaturesWeilNichtVorhanden?.length !== 0">
+
+                    <!-- Reason 3 -->
+                    <div v-if="missingFeaturesOfSelectedVersion?.length !== 0">
                       <div class="text-h6">These features are selected but are missing in the selected version</div>
                       <v-list lines="one">
                         <v-simple-table>
                           <template v-slot:default>
                             <tbody>
                             <tr
-                                v-for="item in schuldigeFeaturesWeilNichtVorhanden"
+                                v-for="item in missingFeaturesOfSelectedVersion"
                                 :key="item.name"
                             >
                               <td>{{ item.name }}</td>
@@ -411,6 +449,7 @@
                   </div>
                 </v-tab-item>
 
+                <!-- Configuration history tab -->
                 <v-tab-item key="configurationHistory">
                   <v-data-table
                       :headers="[{text: 'Description', value: 'description'}, {text: '# Possible configs', value: 'newSatCount'}]"
@@ -432,27 +471,32 @@
             </v-card-text>
           </v-card>
 
-
         </v-col>
       </v-row>
 
-      <!-- feature model viewer, ctc and tree view -->
+      <!-- Feature model viewer, Tree view and CTC-Viewer -->
       <v-row>
         <v-col>
+          <!-- Details of the selected version -->
           <v-card height="47vh">
             <v-card-title>Details for version: {{ selectedVersion?.version }}</v-card-title>
-            <v-tabs v-model="tabBottom">
+
+            <!-- Tabs to select (Feature Model Viewer, List Tree, Cross-Tree Constraints -->
+            <v-tabs v-model="tabsBottom">
               <v-tab key="featureModelViewer" href="#featureModelViewer">Feature Model Viewer</v-tab>
               <v-tab key="listTree" href="#listTree">List Tree</v-tab>
               <v-tab key="ctc" href="#ctc">Cross Tree Constraints</v-tab>
             </v-tabs>
 
             <v-card-text v-if="selectedVersion?.root">
-              <v-tabs-items v-model="tabBottom">
+              <v-tabs-items v-model="tabsBottom">
+
+                <!-- Feature Model Viewer -->
                 <v-tab-item value="featureModelViewer" key="featureModelViewer">
                   <feature-model-viewer :version="selectedVersion"></feature-model-viewer>
                 </v-tab-item>
 
+                <!-- List Tree -->
                 <v-tab-item value="listTree" key="listTree">
 
                   <v-container class="fill-height">
@@ -464,7 +508,7 @@
                             selection-type="independent">
                           <template v-slot:prepend="{ item }">
                             <DoubleCheckbox :selection-item="item.feature"
-                                            @select="select(item.feature, $event)"></DoubleCheckbox>
+                                            @select="decisionPropagation(item.feature, $event)"></DoubleCheckbox>
                           </template>
 
                           <template v-slot:label="{item}">
@@ -484,11 +528,14 @@
 
                 </v-tab-item>
 
+                <!-- Cross-Tree Constraint Viewer -->
                 <v-tab-item value="ctc" key="ctc">
 
+                  <!-- Filter only the invalid ctcs and reset them to default -->
                   <v-btn rounded outlined @click="filteredConstraints = allConstraints.filter(c => c.evaluation === false)" class="mx-2">Only invalid </v-btn>
                   <v-btn rounded outlined @click="filteredConstraints = allConstraints">Reset</v-btn>
 
+                  <!-- Table with all ctcs -->
                   <v-data-table
                       height="32vh"
                       :items="filteredConstraints"
@@ -498,12 +545,13 @@
                       :sort-by="[{key: 'evaluation', ord: 'desc'}]"
                   >
 
+                    <!-- Customization of the column FORMULA -->
                     <template v-slot:item.formula="{ item }">
                       <div v-for="(f, i) in item.formula" :key="i" style="display: inline;">
                         <v-chip
                             class="ml-2 mr-2"
                             v-if="f instanceof FeatureNodeConstraintItem"
-                            :color="color(f)"
+                            :color="getColorOfConstraintItem(f)"
                             @click="searchFeatures = f.featureNode.name"
                         >
                           {{ f.featureNode.name }}
@@ -512,12 +560,15 @@
                       </div>
                     </template>
 
+                    <!-- Customization of the column EVALUATION -->
                     <template v-slot:item.evaluation="{ item }">
                       <v-avatar size="30"
                                 :color="evaluateCTC(item)"></v-avatar>
                     </template>
 
+                    <!-- Customization of the column ACTIONS -->
                     <template v-slot:item.actions="{ item }">
+                      <!-- Context menu -->
                       <v-menu offset-y
                               v-if="item.evaluation === false">
                         <template v-slot:activator="{ on, attrs }">
@@ -527,6 +578,7 @@
                         </template>
 
                         <v-list>
+                          <!-- Fix ctc by rollback button -->
                           <v-list-item @click="rollbackFixCTC(item)">
                             <v-tooltip bottom>
                               <template v-slot:activator="{ on, attrs }">
@@ -536,6 +588,7 @@
                             </v-tooltip>
                           </v-list-item>
 
+                          <!-- Fix ctc by quick fix button -->
                           <v-list-item @click="quickFixCTC(item)">
                             <v-tooltip bottom>
                               <template v-slot:activator="{ on, attrs }">
@@ -561,7 +614,6 @@
 
     </v-container>
 
-
   </div>
 </template>
 
@@ -570,7 +622,7 @@ import Vue from 'vue';
 import {FeatureModel} from "@/classes/Configurator/FeatureModel";
 import FeatureModelViewer from "@/components/Configurator/FeatureModelViewer.vue";
 import {CommandManager} from "@/classes/Commands/CommandManager";
-import {SelectionCommand} from "@/classes/Commands/Configurator/SelectionCommand";
+import {DecisionPropagationCommand} from "@/classes/Commands/Configurator/DecisionPropagationCommand";
 import {ResetCommand} from "@/classes/Commands/Configurator/ResetCommand";
 import {SelectionState} from "@/classes/Configurator/SelectionState";
 import {FeatureNodeConstraintItem} from "@/classes/Constraint/FeatureNodeConstraintItem";
@@ -598,13 +650,13 @@ export default Vue.extend({
     allConstraints: undefined,
     searchFeatures: "",
     searchVersions: "",
-    tabBottom: undefined,
-    tabTopRight: undefined,
-    filteredFeaturesVersion: undefined,
+    tabsColumnTopRight: undefined,
+    tabsBottom: undefined,
+    versionForFilteringFeatures: undefined,
   }),
 
   props: {
-    name
+    productLineName: undefined
   },
 
   created() {
@@ -613,10 +665,10 @@ export default Vue.extend({
 
   methods: {
     initData() {
-      api.get(`${process.env.VUE_APP_DOMAIN}configurator/mappings/${this.name}`)
+      api.get(`${process.env.VUE_APP_DOMAIN}configurator/mappings/${this.productLineName}`)
           .then((mappings) => {
             this.featureModel = FeatureModel.create(mappings.data["root-mapping"], mappings.data["feature-mapping"]);
-            this.featureModel.name = this.name;
+            this.featureModel.productLineName = this.productLineName;
 
             this.features = this.featureModel.features;
 
@@ -659,17 +711,12 @@ export default Vue.extend({
     },
 
     filterFeaturesInVersion(version) {
-      this.filteredFeaturesVersion = version;
+      this.versionForFilteringFeatures = version;
       this.features = version.features;
     },
 
     filterFeaturesNotInVersion(version) {
       this.features = this.featureModel.features.filter(f => !version.features.includes(f))
-    },
-
-    resetFilterFeatures() {
-      this.features = this.featureModel.features;
-      this.filteredFeaturesVersion = undefined;
     },
 
     selectVersion(version) {
@@ -690,19 +737,19 @@ export default Vue.extend({
     resetFeaturesTable() {
       this.searchFeatures = "";
       this.features = this.featureModel.features;
-      this.filteredFeaturesVersion = undefined;
+      this.versionForFilteringFeatures = undefined;
     },
 
-    select(item, selectionState) {
-      const command = new SelectionCommand(this.featureModel, item, selectionState);
+    decisionPropagation(item, selectionState) {
+      const command = new DecisionPropagationCommand(this.featureModel, item, selectionState);
       this.commandManager.execute(command);
     },
 
-    reset() {
+    resetCommand() {
       this.commandManager.execute(this.initialResetCommand.copy());
     },
 
-    countSelectionState(list, selectionState) {
+    countSelectionStateInList(list, selectionState) {
       if (list) {
         return list.filter(x => x.selectionState === selectionState).length;
       } else {
@@ -710,7 +757,7 @@ export default Vue.extend({
       }
     },
 
-    color(featureNodeConstraintItem) {
+    getColorOfConstraintItem(featureNodeConstraintItem) {
       const e = featureNodeConstraintItem.evaluate()
       if (e === undefined) {
         return undefined;
@@ -725,7 +772,6 @@ export default Vue.extend({
       const evaluation = item.constraint.evaluate();
       return evaluation ? 'green' : (evaluation === undefined ? '' : 'red')
     }
-
   },
 
   computed: {
@@ -741,7 +787,7 @@ export default Vue.extend({
       return SelectionState
     },
 
-    schuldigeFeaturesWeilNichtVorhanden() {
+    missingFeaturesOfSelectedVersion() {
       if (!this.featureModel || !this.selectedVersion || !this.selectedVersion.root) {
         return [];
       }
@@ -751,7 +797,7 @@ export default Vue.extend({
           .filter(f => !this.selectedVersion.features.includes(f));
     },
 
-    crossTreeConstraintsSindSchuld() {
+    conflictingCTCsOfSelectedVersion() {
       if (!this.featureModel || !this.selectedVersion || !this.selectedVersion.root) {
         return [];
       }

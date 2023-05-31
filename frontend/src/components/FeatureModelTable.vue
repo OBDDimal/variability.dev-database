@@ -315,7 +315,7 @@ export default Vue.extend({
         },
         handleClick(value) {
             this.$router.push({
-                name: 'FileDetail',
+                productLineName: 'FileDetail',
                 params: { id: value.id, slug: value.slug },
             });
         },

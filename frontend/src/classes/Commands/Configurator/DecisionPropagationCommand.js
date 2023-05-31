@@ -3,7 +3,7 @@ import {SelectionState} from "@/classes/Configurator/SelectionState";
 import api from "@/services/api.service";
 import {Version} from "@/classes/Configurator/Version";
 
-export class SelectionCommand extends ConfigurationCommand {
+export class DecisionPropagationCommand extends ConfigurationCommand {
     constructor(featureModel, featureOrVersion, newSelectionState) {
         super(featureModel);
         this.featureOrVersion = featureOrVersion;
@@ -44,7 +44,7 @@ export class SelectionCommand extends ConfigurationCommand {
             const config = [...selected_vars, ...deselected_vars];
 
             api.post(`${process.env.VUE_APP_DOMAIN}configurator/decision-propagation`, ({
-                "name": this.featureModel.name,
+                "name": this.featureModel.productLineName,
                 "config": config,
                 "selected_roots": selected_roots,
                 "available_roots": available_roots

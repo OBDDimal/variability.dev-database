@@ -17,6 +17,7 @@ export class FeatureModel {
         this.features = features;
         this.satCount = 0;
         this.versions = versions;
+        this.productLineName = undefined;
         this.name = undefined;
         this.loading = true;
         this.loadingOpacity = 0;
@@ -35,7 +36,7 @@ export class FeatureModel {
     }
 
     loadXmlData(version) {
-        return api.get(`${process.env.VUE_APP_DOMAIN}configurator/feature-models/${this.name}/${version.version}`)
+        return api.get(`${process.env.VUE_APP_DOMAIN}configurator/feature-models/${this.productLineName}/${version.version}`)
             .then((xmlRaw) => {
                 const xml = beautify(xmlRaw.data);
 

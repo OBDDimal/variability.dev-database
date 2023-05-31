@@ -159,7 +159,7 @@ const routes = [
 		},
 	},
 	{
-		path: '/configurator/:name',
+		path: '/configurator/:productLineName',
 		name: 'Configurator',
 		props: true,
 		component: FeatureModelConfiguration,

@@ -20,7 +20,7 @@ export class QuickFixCTCCommand extends ConfigurationCommand {
             const deselected_vars = this.featureModel.features.filter(f => f.selectionState === SelectionState.ExplicitlyDeselected).map(f => -f.id);
             const config = [...selected_vars, ...deselected_vars];
 
-            api.post(`${process.env.VUE_APP_DOMAIN}configurator/feature-explanations/${this.featureModel.name}`, ({
+            api.post(`${process.env.VUE_APP_DOMAIN}configurator/feature-explanations/${this.featureModel.productLineName}`, ({
                 "vars": this.partialConfig,
                 "config": config,
                 "selected_roots": selected_roots

@@ -22,7 +22,7 @@ export class QuickFixFeatureCommand extends ConfigurationCommand {
 
             const variable = this.feature.selectionState === SelectionState.ImplicitlyDeselected ? -this.feature.id : this.feature.id;
 
-            api.post(`${process.env.VUE_APP_DOMAIN}configurator/feature-explanations/${this.featureModel.name}`, ({
+            api.post(`${process.env.VUE_APP_DOMAIN}configurator/feature-explanations/${this.featureModel.productLineName}`, ({
                 "vars": [-variable],
                 "config": config,
                 "selected_roots": selected_roots
@@ -30,7 +30,6 @@ export class QuickFixFeatureCommand extends ConfigurationCommand {
             .then((d) => {
                 const data = d.data;
                 this.newSatCount = this.formatScientificNotation(data.count);
-                console.log(data);
 
                 this.newExplicitlySelectedVersions = this.featureModel.versions.filter(v => data.selected_roots.includes(v.rootId) && v.selectionState === SelectionState.ExplicitlySelected)
                 this.newImplicitlySelectedVersions = this.featureModel.versions.filter(v => data.selected_roots.includes(v.rootId) && v.selectionState !== SelectionState.ExplicitlySelected)

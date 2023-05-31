@@ -179,7 +179,7 @@
                             color="primary"
                             @click="
                                 $router.push({
-                                    name: 'FamilyDetail',
+                                    productLineName: 'FamilyDetail',
                                     params: {
                                         id: file.family.id,
                                         slug: file.family.slug,
