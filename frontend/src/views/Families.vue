@@ -252,7 +252,7 @@ export default Vue.extend({
         },
         handleClick(value) {
             this.$router.push({
-                productLineName: 'FamilyDetail',
+                name: 'FamilyDetail',
                 params: { id: value.id, slug: value.slug },
             });
         },
