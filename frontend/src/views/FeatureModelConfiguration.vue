@@ -122,6 +122,15 @@
                         <span>Filter features that are not in this version</span>
                       </v-tooltip>
                     </v-list-item>
+
+                    <v-list-item @click="rollbackFixVersion(item)" v-if="item.selectionState === SelectionState.ImplicitlyDeselected">
+                      <v-tooltip bottom>
+                        <template v-slot:activator="{ on, attrs }">
+                          <div v-on="on" v-bind="attrs">Rollback Fix</div>
+                        </template>
+                        <span>Rollback all steps in the configuration history until this implicit decision was made</span>
+                      </v-tooltip>
+                    </v-list-item>
                   </v-list>
                 </v-menu>
 
@@ -543,6 +552,7 @@ import DoubleCheckbox from "@/components/Configurator/DoubleCheckbox.vue";
 import {QuickFixFeatureCommand} from "@/classes/Commands/Configurator/QuickFixFeatureCommand";
 import {QuickFixCTCCommand} from "@/classes/Commands/Configurator/QuickFixCTCCommand";
 import {RollbackFixFeatureCommand} from "@/classes/Commands/Configurator/RollbackFixFeatureCommand";
+import {RollbackFixVersionCommand} from "@/classes/Commands/Configurator/RollbackFixVersionCommand";
 import {RollbackFixCTCCommand} from "@/classes/Commands/Configurator/RollbackFixCTCCommand";
 
 
@@ -606,6 +616,11 @@ export default Vue.extend({
 
     rollbackFixFeature(feature) {
       const command = new RollbackFixFeatureCommand(this.featureModel, this.commandManager, feature);
+      this.commandManager.execute(command);
+    },
+
+    rollbackFixVersion(version) {
+      const command = new RollbackFixVersionCommand(this.featureModel, this.commandManager, version);
       this.commandManager.execute(command);
     },
 

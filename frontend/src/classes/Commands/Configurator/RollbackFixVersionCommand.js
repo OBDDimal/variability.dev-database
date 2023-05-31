@@ -1,15 +1,15 @@
 import {ConfigurationCommand} from "@/classes/Commands/Configurator/ConfigurationCommand";
 
-export class RollbackFixFeatureCommand extends ConfigurationCommand {
-    constructor(featureModel, commandManger, feature) {
+export class RollbackFixVersionCommand extends ConfigurationCommand {
+    constructor(featureModel, commandManger, version) {
         super(featureModel);
-        this.feature = feature;
+        this.version = version;
         this.commandManager = commandManger;
         this.executed = false;
         this.newSatCount = 0;
         this.rollbackCommand = undefined;
 
-        this.description = "Rollback fix feature" + this.feature.name;
+        this.description = "Rollback fix version " + this.version.version;
     }
 
     execute() {
@@ -19,7 +19,7 @@ export class RollbackFixFeatureCommand extends ConfigurationCommand {
             const commands = this.commandManager.historyCommands.filter(command => command instanceof ConfigurationCommand).reverse();
 
             for (let i in commands) {
-                if (commands[i].newUnselectedFeatures.includes(this.feature)) {
+                if (commands[i].newUnselectedVersions.includes(this.version)) {
                     this.rollbackCommand = commands[i];
                     break;
                 }
