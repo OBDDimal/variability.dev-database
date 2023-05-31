@@ -3,7 +3,7 @@
         <fullscreen></fullscreen>
 
         <v-app>
-            <navigation title="ddueruem" />
+            <navigation title="ddueruem" hide-overlay/>
 
             <v-main style="position: relative">
                 <div>
@@ -66,7 +66,7 @@
 					</v-chip>
 				</div>-->
             </v-main>
-            <Footer v-if="$route.name !== 'FeatureModel'"></Footer>
+            <Footer v-if="$route.name !== 'FeatureModel' && $route.name !== 'Configurator'"></Footer>
         </v-app>
     </vue-scroll-snap>
 </template>

@@ -1,5 +1,4 @@
 import * as d3 from "d3";
-import * as update from '@/services/FeatureModel/update.service.js';
 
 export function reset(d3Data, uncollapsedLevels = 4, maxChildrenCount = 3) {
     // Collapses all nodes after depth 1.
@@ -20,9 +19,6 @@ export function reset(d3Data, uncollapsedLevels = 4, maxChildrenCount = 3) {
             break;
         }
     }
-
-    update.updateSvg(d3Data);
-    zoomFit(d3Data);
 }
 
 export function zoomFit(d3Data, padding = 0.75) {
