@@ -70,7 +70,7 @@
 
             <v-data-table
                 :search="searchVersions"
-                :headers="[{text: 'Selection', value: 'selectionState'}, {text: 'Version', value: 'version', groupable: false}, {text: '', value: 'actions', groupable: false}]"
+                :headers="[{text: 'Selection', value: 'selectionState'}, {text: 'Version', value: 'version', groupable: false}, {text: 'Actions', value: 'actions', groupable: false}]"
                 :items="featureModel.versions"
                 item-key="version"
                 show-group-by
@@ -96,33 +96,34 @@
               </template>
 
               <template v-slot:item.actions="{ item }">
-                <div v-if="item === selectedVersion">
-                  <v-tooltip bottom>
-                    <template v-slot:activator="{ on, attrs }">
-                      <v-btn
-                          v-on="on"
-                          v-bind="attrs"
-                          rounded
-                          @click="filterFeaturesInVersion(item)">
-                        <v-icon>mdi-filter</v-icon>
-                      </v-btn>
-                    </template>
-                    <span>Filter features in this version</span>
-                  </v-tooltip>
+                <v-menu offset-y
+                        v-if="item === selectedVersion">
+                  <template v-slot:activator="{ on, attrs }">
+                    <v-btn icon rounded outlined v-bind="attrs" v-on="on">
+                      <v-icon>mdi-dots-vertical</v-icon>
+                    </v-btn>
+                  </template>
 
-                  <v-tooltip bottom>
-                    <template v-slot:activator="{ on, attrs }">
-                      <v-btn
-                          rounded
-                          v-on="on"
-                          v-bind="attrs"
-                          @click="filterFeaturesNotInVersion(item)">
-                        <v-icon>mdi-filter-off</v-icon>
-                      </v-btn>
-                    </template>
-                    <span>Filter features not in this version</span>
-                  </v-tooltip>
-                </div>
+                  <v-list>
+                    <v-list-item @click="filterFeaturesInVersion(item)">
+                      <v-tooltip bottom>
+                        <template v-slot:activator="{ on, attrs }">
+                          <div v-on="on" v-bind="attrs">Filter included features</div>
+                        </template>
+                        <span>Filter features that are in this version</span>
+                      </v-tooltip>
+                    </v-list-item>
+
+                    <v-list-item @click="filterFeaturesNotInVersion(item)">
+                      <v-tooltip bottom>
+                        <template v-slot:activator="{ on, attrs }">
+                          <div v-on="on" v-bind="attrs">Filter not included features</div>
+                        </template>
+                        <span>Filter features that are not in this version</span>
+                      </v-tooltip>
+                    </v-list-item>
+                  </v-list>
+                </v-menu>
 
               </template>
             </v-data-table>
@@ -480,7 +481,34 @@
                     </template>
 
                     <template v-slot:item.actions="{ item }">
-                      <v-btn v-if="item.evaluation === false" @click="constraintQuickFix(item)">Quick Fix</v-btn>
+                      <v-menu offset-y
+                              v-if="item.evaluation === false">
+                        <template v-slot:activator="{ on, attrs }">
+                          <v-btn icon rounded outlined v-bind="attrs" v-on="on">
+                            <v-icon>mdi-dots-vertical</v-icon>
+                          </v-btn>
+                        </template>
+
+                        <v-list>
+                          <v-list-item @click="rollbackFixCTC(item)">
+                            <v-tooltip bottom>
+                              <template v-slot:activator="{ on, attrs }">
+                                <div v-on="on" v-bind="attrs">Rollback Fix</div>
+                              </template>
+                              <span>Rollback all steps in the configuration history until this cross-tree constraint is valid or not invalid</span>
+                            </v-tooltip>
+                          </v-list-item>
+
+                          <v-list-item @click="quickFixCTC(item)">
+                            <v-tooltip bottom>
+                              <template v-slot:activator="{ on, attrs }">
+                                <div v-on="on" v-bind="attrs">Quick Fix</div>
+                              </template>
+                              <span>Reselects the current config (versions and features) until this cross-tree constraint is valid</span>
+                            </v-tooltip>
+                          </v-list-item>
+                        </v-list>
+                      </v-menu>
                     </template>
 
                   </v-data-table>
@@ -515,6 +543,7 @@ import DoubleCheckbox from "@/components/Configurator/DoubleCheckbox.vue";
 import {QuickFixFeatureCommand} from "@/classes/Commands/Configurator/QuickFixFeatureCommand";
 import {QuickFixCTCCommand} from "@/classes/Commands/Configurator/QuickFixCTCCommand";
 import {RollbackFixFeatureCommand} from "@/classes/Commands/Configurator/RollbackFixFeatureCommand";
+import {RollbackFixCTCCommand} from "@/classes/Commands/Configurator/RollbackFixCTCCommand";
 
 
 export default Vue.extend({
@@ -563,7 +592,7 @@ export default Vue.extend({
           });
     },
 
-    constraintQuickFix(item) {
+    quickFixCTC(item) {
       const pc = item.constraint.quickFix(true);
 
       const command = new QuickFixCTCCommand(this.featureModel, pc);
@@ -577,6 +606,13 @@ export default Vue.extend({
 
     rollbackFixFeature(feature) {
       const command = new RollbackFixFeatureCommand(this.featureModel, this.commandManager, feature);
+      this.commandManager.execute(command);
+    },
+
+    rollbackFixCTC(item) {
+      const constraint = item.constraint;
+
+      const command = new RollbackFixCTCCommand(this.featureModel, this.commandManager, constraint);
       this.commandManager.execute(command);
     },
 

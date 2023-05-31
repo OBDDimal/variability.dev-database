@@ -42,8 +42,8 @@ export class Negation extends ConstraintItem {
         this.item.removeConstraint();
     }
 
-    evaluate() {
-        const item = this.item.evaluate();
+    evaluate(tmp = false) {
+        const item = this.item.evaluate(tmp);
 
         if (item === undefined) {
             return undefined;

@@ -29,7 +29,6 @@ export class GroupConstraintItem extends ConstraintItem {
     }
 
     toStringForEdit() {
-        console.log(this.items)
         return this.items
             .map(item => item.constructor.name === this.constructor.name ? item.toStringForEdit() : this.addPossibleBracketsForEdit(item))
             .join(" " + this.operator + " ");

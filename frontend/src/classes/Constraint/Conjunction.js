@@ -5,8 +5,8 @@ export class Conjunction extends GroupConstraintItem {
         super(items, '∧', 'AND', 'conj');
     }
 
-    evaluate() {
-        const evaluations = this.items.map(i => i.evaluate());
+    evaluate(tmp = false) {
+        const evaluations = this.items.map(i => i.evaluate(tmp));
 
         if (evaluations.some(x => x === false)) {
             return false;

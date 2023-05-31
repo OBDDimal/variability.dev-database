@@ -52,15 +52,27 @@ export class FeatureNodeConstraintItem extends ConstraintItem {
         this.constraint = null;
     }
 
-    evaluate() {
-        if (this.featureNode.selectionState === SelectionState.ImplicitlySelected ||
-            this.featureNode.selectionState === SelectionState.ExplicitlySelected
-        ) {
-            return true;
-        } else if(this.featureNode.selectionState === SelectionState.Unselected) {
-            return undefined;
+    evaluate(tmp = false) {
+        if (!tmp) {
+            if (this.featureNode.selectionState === SelectionState.ImplicitlySelected ||
+                this.featureNode.selectionState === SelectionState.ExplicitlySelected
+            ) {
+                return true;
+            } else if (this.featureNode.selectionState === SelectionState.Unselected) {
+                return undefined;
+            } else {
+                return false;
+            }
         } else {
-            return false;
+            if (this.featureNode.selectionStateTmp === SelectionState.ImplicitlySelected ||
+                this.featureNode.selectionStateTmp === SelectionState.ExplicitlySelected
+            ) {
+                return true;
+            } else if(this.featureNode.selectionStateTmp === SelectionState.Unselected) {
+                return undefined;
+            } else {
+                return false;
+            }
         }
     }
 

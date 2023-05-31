@@ -5,8 +5,8 @@ export class Disjunction extends GroupConstraintItem {
         super(items, '∨', 'OR', 'disj');
     }
 
-    evaluate() {
-        const evaluations = this.items.map(i => i.evaluate());
+    evaluate(tmp = false) {
+        const evaluations = this.items.map(i => i.evaluate(tmp));
 
         if (evaluations.some(x => x === true)) {
             return true;

@@ -45,9 +45,9 @@ export class Implication extends ConstraintItem {
         this.conclusion.removeConstraint();
     }
 
-    evaluate() {
-        const premise = this.premise.evaluate();
-        const conclusion = this.conclusion.evaluate();
+    evaluate(tmp = false) {
+        const premise = this.premise.evaluate(tmp);
+        const conclusion = this.conclusion.evaluate(tmp);
 
         if (premise === undefined) {
             if (conclusion) {

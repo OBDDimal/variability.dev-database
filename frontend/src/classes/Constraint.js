@@ -55,8 +55,8 @@ export class Constraint {
         return this.rule.toStringXML();
     }
 
-    evaluate() {
-        return this.rule.evaluate();
+    evaluate(tmp = false) {
+        return this.rule.evaluate(tmp);
     }
 
     quickFix(target) {
