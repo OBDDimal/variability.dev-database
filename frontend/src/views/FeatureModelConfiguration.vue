@@ -598,7 +598,6 @@ export default Vue.extend({
     allConstraints: undefined,
     searchFeatures: "",
     searchVersions: "",
-    hoveredVersion: undefined,
     tabBottom: undefined,
     tabTopRight: undefined,
     filteredFeaturesVersion: undefined,
@@ -767,12 +766,12 @@ export default Vue.extend({
 
 <style lang="scss">
 .active-command {
-  background-color: lightcyan;
+  background-color: var(--v-accent-base);
   color: black;
 }
 
 .selected-version {
-  background-color: lightcyan;
+  background-color: var(--v-accent-base);
   color: black;
 }
 
