@@ -27,11 +27,11 @@ class DecisionPropagation(APIView):
 
             bdd = init(name)
 
-            count, free_vars, available_vars, simpl_vars, dimpl_vars = bdd.decision_propagation_multiversion_features(config, selected_roots, available_roots)
+            count, available_vars, simpl_vars, dimpl_vars = bdd.decision_propagation_multiversion_features(config, selected_roots, available_roots)
             available_roots, deselected_roots = bdd.decision_propagation_multiversion_versions(config, selected_roots, available_roots)
 
             results = {"config": config, "selected_roots": selected_roots, "count": count,
-                     "free_vars": free_vars, "available_vars": available_vars,
+                     "available_vars": available_vars,
                      "implicit_selected_vars": simpl_vars, "implicit_deselected_vars": dimpl_vars,
                      "available_roots": available_roots, "deselected_roots": deselected_roots}
 
@@ -138,10 +138,10 @@ class Explanations(APIView):
                         pc = pc + [c]
 
             available_roots, deselected_roots = bdd.decision_propagation_multiversion_versions(config, list(selected_roots), set(bdd.roots).difference(conflicting_versions))
-            count, free_vars, available_vars, simpl_vars, dimpl_vars = bdd.decision_propagation_multiversion_features(pc, selected_roots, set(bdd.roots).difference(conflicting_versions))
+            count, available_vars, simpl_vars, dimpl_vars = bdd.decision_propagation_multiversion_features(pc, selected_roots, set(bdd.roots).difference(conflicting_versions))
 
             results = {"config": pc, "selected_roots": selected_roots, "count": count,
-                       "free_vars": free_vars, "available_vars": available_vars,
+                       "available_vars": available_vars,
                        "implicit_selected_vars": simpl_vars, "implicit_deselected_vars": dimpl_vars,
                        "available_roots": available_roots, "deselected_roots": deselected_roots.union(conflicting_versions)}
 

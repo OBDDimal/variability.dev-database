@@ -152,12 +152,12 @@ def generate_configurations(operation, bdd, output_path, number_runs):
 
 
 if __name__ == '__main__':
-    bdd_path = "../../data/coffeemachine/coffeemachine.bdd"
-    #bdd_path = "../../data/uclibc/uclibc.bdd"
+    #bdd_path = "../../data/coffeemachine/coffeemachine.bdd"
+    bdd_path = "../../data/uclibc/uclibc.bdd"
     bdd = parse_from_ddueruem(bdd_path)
 
-    output_path = "../../data/coffeemachine/configs/"
-    #output_path = "../../data/uclibc/configs/"
+    #output_path = "../../data/coffeemachine/configs/"
+    output_path = "../../data/uclibc/configs/"
 
     number_runs = 1000
 

@@ -826,9 +826,9 @@ class BDD(BDD_CE):
 
     def decision_propagation_multiversion_features(self, config, selected_roots, available_roots = None):
         if len(selected_roots) == 0:
-            return self.decision_propagation2(config, available_roots if available_roots is not None else self.roots)
+            return self.single_decision_propagation_for_multiple_versions(config, available_roots if available_roots is not None else self.roots)
         elif len(selected_roots) == 1:
-            return self.decision_propagation2(config, selected_roots)
+            return self.single_decision_propagation_for_multiple_versions(config, selected_roots)
 
         selected = set()
         deselected = set()
@@ -907,11 +907,6 @@ class BDD(BDD_CE):
         deselected_config = [-x for x in config if x < 0]
         selected_config = [x for x in config if x > 0]
 
-        free = set()
-        for x in self.order:
-            if x not in selected and x not in deselected and x not in deselected_config and x not in selected_config:
-                free.add(x)
-
         selected_impl = selected.difference(deselected).difference(selected_and_deselected).difference(selected_config)
         deselected_impl = deselected.difference(selected).difference(selected_and_deselected).difference(
             deselected_config)
@@ -921,121 +916,7 @@ class BDD(BDD_CE):
         _, c_h, c_l = cache.get(c_root)
         count = c_h + c_l
 
-        return count, free, available, selected_impl, deselected_impl
-
-    def explanations_feature(self, var, config, selected_roots):
-        remaining_versions = set(selected_roots)
-
-        valid_versions = set([root for root in remaining_versions if self.verify_multiversion([-var], [root])])
-        versions_without_var = remaining_versions.difference(valid_versions)
-        remaining_versions = list(valid_versions)
-
-
-
-        #if len(versions_without_var) != 0:
-        #    return {"versions_without_var": versions_without_var}
-
-        reselection = []
-        c_root = tuple([root for root in remaining_versions])
-        c_node = c_root
-        config = set(config)
-        c_config = config
-        alternatives = []
-        var_indices = self.create_var_indices()
-        while True:
-            # Get the minimum var of all current nodes
-            min_var_index = min([var_indices[self.nodes[id][1]] for id in c_node if id is not None])
-            if min_var_index < len(self.order):
-                min_var = self.order[min_var_index]
-            else:
-                min_var = 0
-
-            # Determine if high and low decisions of current min_var are possible
-            high = 0
-            low = 0
-            t_high = []
-            t_low = []
-            for i, id in enumerate(c_node):
-                if id is not None:
-                    _, v, h, l = self.nodes[id]
-                    high = (high + 1) if h != 0 else high
-                    low = (low + 1) if l != 0 else low
-                    if v == min_var:
-                        t_high.append(h if h != 0 else None)
-                        t_low.append(l if l != 0 else None)
-                    else:
-                        t_high.append(id)
-                        t_low.append(id)
-                else:
-                    t_high.append(None)
-                    t_low.append(None)
-
-            c_node_high = tuple(t_high)
-            c_node_low = tuple(t_low)
-
-
-            c_config_high = c_config
-            c_config_low = c_config
-            if min_var in c_config:
-                c_config_low = copy(c_config)
-                c_config_low.remove(min_var)
-            elif -min_var in c_config:
-                c_config_high = copy(c_config)
-                c_config_high.remove(-min_var)
-
-            deselected_roots = set()
-            for i, id in enumerate(c_node):
-                if id is None:
-                    deselected_roots.add(remaining_versions[i])
-
-            in_cache = False
-            if len(deselected_roots) != 0 or len(c_config) != len(config):
-                for deselected_versions, new_config in reselection:
-                    if deselected_versions.issubset(deselected_roots) and c_config.issubset(new_config):
-                        in_cache = True
-                        break
-
-            is_valid = [1 if id == 1 else 0 for id in c_node if id == 1 or id is None]
-            is_valid = len(is_valid) == len(remaining_versions) and sum(is_valid) >= 1
-            if is_valid and (len(deselected_roots) != 0 or len(c_config) != len(config)):
-                if in_cache:
-                    new_reselection = []
-                    for deselected_versions, new_config in reselection:
-                        if deselected_roots.issubset(deselected_versions) and new_config.issubset(c_config):
-                            new_reselection.append((deselected_roots, c_config))
-                        else:
-                            new_reselection.append((deselected_versions, new_config))
-                    reselection = new_reselection
-                else:
-                    reselection.append((deselected_roots, c_config))
-
-            if high == 0 and low == 0 or is_valid or in_cache:
-                if alternatives:
-                    c_node, c_config = alternatives.pop()
-                else:
-                    break
-
-            elif high != 0 and var != min_var:
-                c_node = c_node_high
-                c_config = c_config_high
-                if low != 0 and -var != min_var:
-                    alternatives.append((c_node_low, c_config_low))
-
-            elif low != 0 and -var != min_var:
-                c_node = c_node_low
-                c_config = c_config_low
-                if high != 0 and var != min_var:
-                    alternatives.append((c_node_high, c_config_high))
-
-            else:
-                if alternatives:
-                    c_node, c_config = alternatives.pop()
-                else:
-                    break
-
-        if len(reselection) == 0:
-            return [{"versions": versions_without_var, "features": set()}]
-        return [{"versions": list(a) + list(versions_without_var), "features": config.difference(b)} for a, b in reselection]
+        return count, available, selected_impl, deselected_impl
 
     def determine_high_low_min_var(self, c_node, config, var_indices):
         # Get the minimum var of all current nodes
@@ -1071,23 +952,28 @@ class BDD(BDD_CE):
 
         return available_roots, deselected_roots
 
-    def decision_propagation2(self, config, roots):
+    def single_decision_propagation_for_multiple_versions(self, config, roots):
         selected = set()
         deselected = set()
         selected_and_deselected = set()
 
         var_indices = self.create_var_indices()
 
+        # Create one stack for each variable in the self.order array
+        # Additionally for the last row add one stack (e.g. 0 and 1 nodes in BDD)
         stacks = [set() for _ in self.order]
         stacks.append(set())
 
+        # Add the current root nodes to its stack position
         for root in roots:
             _, root_var, _, _ = self.nodes[root]
             stacks[root_var].add(root)
 
+        # Walk forward through the BDD based on the current config and add the next nodes to its stack positions
         for var in self.order:
             stack = stacks[var]
 
+            # For each entry in one var-stack get the next nodes and add them to the next stacks
             for node_id in stack:
                 node_id, var, high_id, low_id = self.nodes[node_id]
                 high_id, high_var, _, _ = self.nodes[high_id]
@@ -1101,6 +987,8 @@ class BDD(BDD_CE):
                     if low_id != 0:
                         stacks[low_var].add(low_id)
 
+        # Walk through the previous built stacks from leafs to the roots (in reversed order) to
+        # filter out not valid paths and count the possible satisfiable configurations
         cache = {1:1}
         for var in reversed(self.order):
             stack = stacks[var]
@@ -1150,7 +1038,6 @@ class BDD(BDD_CE):
         deselected_config = [-x for x in config if x < 0]
         selected_config = [x for x in config if x > 0]
 
-        free = selected_and_deselected.difference(selected).difference(deselected)
         selected_impl = selected.difference(deselected).difference(selected_and_deselected).difference(selected_config)
         deselected_impl = deselected.difference(selected).difference(selected_and_deselected).difference(deselected_config)
         available = selected_and_deselected.union(selected.intersection(deselected)).difference(selected_config).difference(deselected_config)
@@ -1158,9 +1045,7 @@ class BDD(BDD_CE):
         counts = [cache[root] for root in roots if cache.get(root) is not None] + [0]
         count = max(counts)
 
-        return count, free, available, selected_impl, deselected_impl
-
-
+        return count, available, selected_impl, deselected_impl
 
     # Checks if at least one configuration is possible when all versions from selected_roots are chosen simultaneously
     def verify_multiversion(self, config, selected_roots):
@@ -1225,6 +1110,8 @@ class BDD(BDD_CE):
                 t.append(id)
         return tuple(t)
 
+    # Create a list of indices that maps the var to its index in the self.order array
+    # Necessary for calculating in the given variable order
     def create_var_indices(self):
         max_var = max(self.order)
         var_indices = [0 for _ in range(max_var + 1)]
@@ -1286,7 +1173,7 @@ def demo_dp_multiversion_features():
 
     config = []
     selected_roots = [46, 29, 13]
-    count, free, available, simpl, dimpl = bdd.decision_propagation_multiversion_features(config, selected_roots)
+    count, available, simpl, dimpl = bdd.decision_propagation_multiversion_features(config, selected_roots)
 
 
 
@@ -1301,36 +1188,33 @@ def demo_dp_multiversion_features():
 
     config = []
     selected_roots = [202]
-    count, free, available, simpl1, dimpl1 = bdd.decision_propagation_multiversion_features(config, selected_roots)
+    count, available, simpl1, dimpl1 = bdd.decision_propagation_multiversion_features(config, selected_roots)
 
     print("Config".ljust(20), config)
     print("Selected roots".ljust(20), selected_roots)
     print("#SAT under config:".ljust(20), count)
-    print("Free variables:".ljust(20), free)
     print("Available".ljust(20), available)
     print("Impl. selected:".ljust(20), simpl1)
     print("Impl. deselected:".ljust(20), dimpl1)
     print()
 
     selected_roots = [889]
-    count, free, available, simpl2, dimpl2 = bdd.decision_propagation_multiversion_features(config, selected_roots)
+    count, available, simpl2, dimpl2 = bdd.decision_propagation_multiversion_features(config, selected_roots)
 
     print("Config".ljust(20), config)
     print("Selected roots".ljust(20), selected_roots)
     print("#SAT under config:".ljust(20), count)
-    print("Free variables:".ljust(20), free)
     print("Available".ljust(20), available)
     print("Impl. selected:".ljust(20), simpl2)
     print("Impl. deselected:".ljust(20), dimpl2)
     print()
 
     selected_roots = [202, 889]
-    count, free, available, simpl2, dimpl2 = bdd.decision_propagation_multiversion_features(config, selected_roots)
+    count, available, simpl2, dimpl2 = bdd.decision_propagation_multiversion_features(config, selected_roots)
 
     print("Config".ljust(20), config)
     print("Selected roots".ljust(20), selected_roots)
     print("#SAT under config:".ljust(20), count)
-    print("Free variables:".ljust(20), free)
     print("Available".ljust(20), available)
     print("Impl. selected:".ljust(20), simpl2)
     print("Impl. deselected:".ljust(20), dimpl2)
@@ -1371,12 +1255,11 @@ def demo_dp_multiversion_versions():
         print()
 
 
-def demo_print(selected_roots, config, count, available_roots, deselected_roots, free_vars, available_vars, simpl_vars, dimpl_vars):
+def demo_print(selected_roots, config, count, available_roots, deselected_roots, available_vars, simpl_vars, dimpl_vars):
     print("Partial config".ljust(25), config)
     print("Roots selected".ljust(25), selected_roots)
     print("-----")
     print("Vars available".ljust(25), available_vars)
-    print("Vars free:".ljust(25), free_vars)
     print("Vars impl. selected:".ljust(25), len(simpl_vars), simpl_vars)
     print("Vars impl. deselected:".ljust(25), len(dimpl_vars), dimpl_vars)
     # print("-----")
@@ -1400,7 +1283,7 @@ def demo_dp_multiversion_versions_and_features():
     while True:
         if calc:
             time_a = time.time()
-            count, free_vars, available_vars, simpl_vars, dimpl_vars = bdd.decision_propagation_multiversion_features(config, selected_roots)
+            count, available_vars, simpl_vars, dimpl_vars = bdd.decision_propagation_multiversion_features(config, selected_roots)
             time_b = time.time()
             print((time_b - time_a)*1000, "ms", "dp features")
 
@@ -1410,7 +1293,7 @@ def demo_dp_multiversion_versions_and_features():
             time_b = time.time()
             print((time_b - time_a)*1000, "ms", "dp versions")
 
-            demo_print(selected_roots, config, count, available_roots, deselected_roots, free_vars, available_vars, simpl_vars, dimpl_vars)
+            demo_print(selected_roots, config, count, available_roots, deselected_roots, available_vars, simpl_vars, dimpl_vars)
 
         calc = True
 
