@@ -20,8 +20,8 @@
         <v-col cols="4">
           <v-card>
             <v-card-title>
-              <div class="mr-2">
-                Versions ({{ featureModel.versions.length }})
+              <div class="mr-2" v-if="featureModel && featureModel.versions">
+                Versions ({{ featureModel.versions?.length }})
               </div>
 
               <v-tooltip bottom>
@@ -35,7 +35,7 @@
                   </tr>
                   <tr>
                     <td>All</td>
-                    <td>{{ featureModel.versions.length }}</td>
+                    <td>{{ featureModel.versions?.length }}</td>
                   </tr>
                   <tr>
                     <td>Unselected</td>
@@ -162,8 +162,8 @@
           <v-card>
             <v-card-title>
               <div class="mr-2">
-                <span v-if="features.length === featureModel.features.length">Features ({{ featureModel.features.length }}) </span>
-                <span v-else>Features ({{ features.length }}/{{ featureModel.features.length }}) </span>
+                <span v-if="features?.length === featureModel.features?.length">Features ({{ featureModel.features?.length }}) </span>
+                <span v-else>Features ({{ features?.length }}/{{ featureModel.features?.length }}) </span>
               </div>
 
               <v-tooltip bottom>
@@ -178,8 +178,8 @@
                   </tr>
                   <tr>
                     <td>All</td>
-                    <td v-if="filteredFeaturesVersion">{{ features.length }}</td>
-                    <td>{{ featureModel.features.length }}</td>
+                    <td v-if="filteredFeaturesVersion">{{ features?.length }}</td>
+                    <td>{{ featureModel.features?.length }}</td>
                   </tr>
                   <tr>
                     <td>Unselected</td>
@@ -248,7 +248,7 @@
 
             <v-card-subtitle v-if="filteredFeaturesVersion">
               Filtered by version {{ filteredFeaturesVersion.version }}
-              {{ features.length }}
+              {{ features?.length }}
             </v-card-subtitle>
 
             <v-data-table
@@ -391,7 +391,7 @@
                         <v-icon>mdi-arrow-top-right</v-icon>
                       </v-btn>
                     </div>
-                    <div v-if="schuldigeFeaturesWeilNichtVorhanden.length !== 0">
+                    <div v-if="schuldigeFeaturesWeilNichtVorhanden?.length !== 0">
                       <div class="text-h6">These features are selected but are missing in the selected version</div>
                       <v-list lines="one">
                         <v-simple-table>
@@ -704,7 +704,11 @@ export default Vue.extend({
     },
 
     countSelectionState(list, selectionState) {
-      return list.filter(x => x.selectionState === selectionState).length;
+      if (list) {
+        return list.filter(x => x.selectionState === selectionState).length;
+      } else {
+        return 0;
+      }
     },
 
     color(featureNodeConstraintItem) {
