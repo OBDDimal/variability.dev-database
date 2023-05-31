@@ -1,21 +1,17 @@
 import {ConfigurationCommand} from "@/classes/Commands/Configurator/ConfigurationCommand";
+import {RollbackCommand} from "@/classes/Commands/Configurator/RollbackCommand";
 
-export class RollbackFixFeatureCommand extends ConfigurationCommand {
-    constructor(featureModel, commandManger, feature) {
-        super(featureModel);
+export class RollbackFixFeatureCommand extends RollbackCommand {
+    constructor(featureModel, commandManger, feature, initialResetCommand) {
+        super(featureModel, commandManger, initialResetCommand);
         this.feature = feature;
-        this.commandManager = commandManger;
-        this.executed = false;
-        this.newSatCount = 0;
-        this.rollbackCommand = undefined;
-
         this.description = "Rollback fix feature" + this.feature.name;
     }
 
     execute() {
-        if (!this.executed) {
-            this.featureModel.loading = true;
+        this.featureModel.loading = true;
 
+        if (!this.executed) {
             const commands = this.commandManager.historyCommands.filter(command => command instanceof ConfigurationCommand).reverse();
 
             for (let i in commands) {
@@ -24,30 +20,8 @@ export class RollbackFixFeatureCommand extends ConfigurationCommand {
                     break;
                 }
             }
-
-            if (this.rollbackCommand) {
-                this.newExplicitlySelectedVersions = this.rollbackCommand.newExplicitlySelectedVersions;
-                this.newImplicitlySelectedVersions = this.rollbackCommand.newImplicitlySelectedVersions;
-                this.newExplicitlyDeselectedVersions = this.rollbackCommand.newExplicitlyDeselectedVersions;
-                this.newImplicitlyDeselectedVersions = this.rollbackCommand.newImplicitlyDeselectedVersions;
-                this.newUnselectedVersions = this.rollbackCommand.newUnselectedVersions;
-
-                this.newExplicitlySelectedFeatures = this.rollbackCommand.newExplicitlySelectedFeatures;
-                this.newImplicitlySelectedFeatures = this.rollbackCommand.newImplicitlySelectedFeatures;
-                this.newExplicitlyDeselectedFeatures = this.rollbackCommand.newExplicitlyDeselectedFeatures;
-                this.newImplicitlyDeselectedFeatures = this.rollbackCommand.newImplicitlyDeselectedFeatures;
-                this.newUnselectedFeatures = this.rollbackCommand.newUnselectedFeatures;
-
-                this.newSatCount = this.rollbackCommand.newSatCount;
-
-                this.executed = true;
-            }
-
-            super.execute();
-            this.featureModel.loading = false;
-        } else {
-            super.execute();
         }
+        super.execute();
     }
 }
 

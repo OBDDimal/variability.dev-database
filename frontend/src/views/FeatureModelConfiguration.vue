@@ -20,7 +20,9 @@
         <v-col cols="4">
           <v-card>
             <v-card-title>
-              Versions ({{ featureModel.versions.length }})
+              <div class="mr-2">
+                Versions ({{ featureModel.versions.length }})
+              </div>
 
               <v-tooltip bottom>
                 <template v-slot:activator="{ on, attrs }">
@@ -65,7 +67,23 @@
                   label="Search"
                   single-line
                   hide-details
+                  class="mr-2"
               ></v-text-field>
+
+              <v-tooltip bottom>
+                <template v-slot:activator="{ on, attrs }">
+                  <v-btn
+                      rounded
+                      outlined
+                      icon
+                      v-bind="attrs"
+                      v-on="on"
+                      @click="searchVersions = ''">
+                    <v-icon>mdi-close</v-icon>
+                  </v-btn>
+                </template>
+                <span>Reset search</span>
+              </v-tooltip>
             </v-card-title>
 
             <v-data-table
@@ -143,7 +161,10 @@
         <v-col cols="4">
           <v-card>
             <v-card-title>
-              Features ({{ features.length }}/{{ featureModel.features.length }})
+              <div class="mr-2">
+                <span v-if="features.length === featureModel.features.length">Features ({{ featureModel.features.length }}) </span>
+                <span v-else>Features ({{ features.length }}/{{ featureModel.features.length }}) </span>
+              </div>
 
               <v-tooltip bottom>
                 <template v-slot:activator="{ on, attrs }">
@@ -206,12 +227,15 @@
                   label="Search"
                   single-line
                   hide-details
+                  class="mr-2"
               ></v-text-field>
 
               <v-tooltip bottom>
                 <template v-slot:activator="{ on, attrs }">
                   <v-btn
                       rounded
+                      outlined
+                      icon
                       v-bind="attrs"
                       v-on="on"
                       @click="resetFeaturesTable()">
@@ -298,6 +322,7 @@
                 <template v-slot:activator="{ on, attrs }">
                   <v-btn
                       rounded
+                      outlined
                       v-on="on"
                       v-bind="attrs"
                       @click="reset">
@@ -310,9 +335,12 @@
               <v-tooltip bottom>
                 <template v-slot:activator="{ on, attrs }">
                   <v-btn
+                      icon
+                      outlined
                       rounded
                       v-on="on"
                       v-bind="attrs"
+                      class="mx-2"
                       :disabled="!commandManager.isUndoAvailable()"
                       @click="commandManager.undo()">
                     <v-icon>mdi-undo</v-icon>
@@ -325,6 +353,8 @@
               <v-tooltip bottom>
                 <template v-slot:activator="{ on, attrs }">
                   <v-btn
+                      icon
+                      outlined
                       rounded
                       v-on="on"
                       v-bind="attrs"
@@ -349,20 +379,20 @@
             </v-card-title>
 
             <v-card-text>
-              <v-tabs-items v-model="tabTopRight">
+              <v-tabs-items v-model="tabTopRight" class="mt-2">
                 <v-tab-item key="explanations" style="height: 25vh;">
                   <div>
-                    <div class="text-h5" v-if="selectedVersion?.selectionState === SelectionState.ImplicitlySelected">
+                    <div class="text-h6" v-if="selectedVersion?.selectionState === SelectionState.ImplicitlySelected">
                       {{ selectedVersion.selectionStateDescription }}
                     </div>
-                    <div class="text-h5" v-if="crossTreeConstraintsSindSchuld">
+                    <div class="text-h6" v-if="crossTreeConstraintsSindSchuld">
                       Conflicting Cross-Tree-Constraints
-                      <v-btn @click="tabBottom = 'ctc'">
+                      <v-btn icon outlined rounded @click="tabBottom = 'ctc'">
                         <v-icon>mdi-arrow-top-right</v-icon>
                       </v-btn>
                     </div>
                     <div v-if="schuldigeFeaturesWeilNichtVorhanden.length !== 0">
-                      <div class="text-h5">These features are selected but are missing in this version</div>
+                      <div class="text-h6">These features are selected but are missing in the selected version</div>
                       <v-list lines="one">
                         <v-simple-table>
                           <template v-slot:default>
@@ -456,10 +486,8 @@
 
                 <v-tab-item value="ctc" key="ctc">
 
-                  <v-btn @click="filteredConstraints = allConstraints.filter(c => c.evaluation === false)">Only
-                    invalid
-                  </v-btn>
-                  <v-btn @click="filteredConstraints = allConstraints">Reset</v-btn>
+                  <v-btn rounded outlined @click="filteredConstraints = allConstraints.filter(c => c.evaluation === false)" class="mx-2">Only invalid </v-btn>
+                  <v-btn rounded outlined @click="filteredConstraints = allConstraints">Reset</v-btn>
 
                   <v-data-table
                       height="32vh"
@@ -562,7 +590,7 @@ export default Vue.extend({
 
   data: () => ({
     commandManager: new CommandManager(),
-    resetCommand: undefined,
+    initialResetCommand: undefined,
     featureModel: FeatureModel,
     features: undefined,
     selectedVersion: undefined,
@@ -595,8 +623,8 @@ export default Vue.extend({
 
             this.featureModel.loadXmlData(this.featureModel.versions[0]);
             this.selectedVersion = this.featureModel.versions[0];
-            this.resetCommand = new ResetCommand(this.featureModel);
-            this.commandManager.execute(this.resetCommand);
+            this.initialResetCommand = new ResetCommand(this.featureModel);
+            this.initialResetCommand.execute();
           })
           .catch(() => {
           });
@@ -615,19 +643,19 @@ export default Vue.extend({
     },
 
     rollbackFixFeature(feature) {
-      const command = new RollbackFixFeatureCommand(this.featureModel, this.commandManager, feature);
+      const command = new RollbackFixFeatureCommand(this.featureModel, this.commandManager, feature, this.initialResetCommand);
       this.commandManager.execute(command);
     },
 
     rollbackFixVersion(version) {
-      const command = new RollbackFixVersionCommand(this.featureModel, this.commandManager, version);
+      const command = new RollbackFixVersionCommand(this.featureModel, this.commandManager, version, this.initialResetCommand);
       this.commandManager.execute(command);
     },
 
     rollbackFixCTC(item) {
       const constraint = item.constraint;
 
-      const command = new RollbackFixCTCCommand(this.featureModel, this.commandManager, constraint);
+      const command = new RollbackFixCTCCommand(this.featureModel, this.commandManager, constraint, this.initialResetCommand);
       this.commandManager.execute(command);
     },
 
@@ -672,7 +700,7 @@ export default Vue.extend({
     },
 
     reset() {
-      this.commandManager.execute(this.resetCommand.copy());
+      this.commandManager.execute(this.initialResetCommand.copy());
     },
 
     countSelectionState(list, selectionState) {
