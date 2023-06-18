@@ -16,6 +16,7 @@ import GithubConfirm from '../views/GithubConfirm.vue'
 import RegisterConfirmation from '../views/RegisterConfirmation.vue'
 import FileCreateConfirmation from '@/views/FileCreateConfirmation'
 import FeatureModel from '../views/FeatureModel.vue'
+import FeatureModelConfiguration from "@/views/FeatureModelConfiguration";
 
 Vue.use(VueRouter)
 
@@ -164,6 +165,15 @@ const routes = [
 		component: FileDetail,
 		meta: {
 			title: 'File Detail',
+		},
+	},
+	{
+		path: '/configurator/:productLineName',
+		name: 'Configurator',
+		props: true,
+		component: FeatureModelConfiguration,
+		meta: {
+			title: 'Multiversion Feature Model Configurator',
 		},
 	},
 ]

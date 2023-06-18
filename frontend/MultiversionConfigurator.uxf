@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<diagram program="umlet" version="15.0.0">
+  <zoom_level>10</zoom_level>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>690</x>
+      <y>330</y>
+      <w>230</w>
+      <h>190</h>
+    </coordinates>
+    <panel_attributes>Version
+--
+- version: String
+
+crossTreeConstraints : List&lt;CTC&gt;
+--
++ getFeatures() : List&lt;Feature&gt;</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>1050</x>
+      <y>330</y>
+      <w>210</w>
+      <h>190</h>
+    </coordinates>
+    <panel_attributes>FeatureNode
+--
+- isRoot
+- isMandatory
+- isAbstract
+- groupType: &lt;AND, OR, XOR&gt;
+--
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>910</x>
+      <y>400</y>
+      <w>160</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;
+root</panel_attributes>
+    <additional_attributes>10.0;20.0;140.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>1410</x>
+      <y>170</y>
+      <w>150</w>
+      <h>130</h>
+    </coordinates>
+    <panel_attributes>bg=orange
+&lt;&lt;enum&gt;&gt;
+SelectionState
+--
+Unselected
+ImplicitlySelected
+ImplicitlyDeselected
+ExplicitlySelected
+ExplicitlyDeselected</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1240</x>
+      <y>290</y>
+      <w>360</w>
+      <h>460</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+SelectionState</panel_attributes>
+    <additional_attributes>250.0;10.0;250.0;440.0;10.0;440.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>790</x>
+      <y>210</y>
+      <w>640</w>
+      <h>140</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+SelectionState</panel_attributes>
+    <additional_attributes>620.0;20.0;10.0;20.0;10.0;120.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>1050</x>
+      <y>630</y>
+      <w>200</w>
+      <h>190</h>
+    </coordinates>
+    <panel_attributes>Feature
+--
+name : String
+--
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1140</x>
+      <y>510</y>
+      <w>50</w>
+      <h>140</h>
+    </coordinates>
+    <panel_attributes>m2=1
+m1=0..n</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;120.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>110</x>
+      <y>290</y>
+      <w>450</w>
+      <h>250</h>
+    </coordinates>
+    <panel_attributes>FeatureModel
+--
+- name : String
+--
+_+ create(versionsXML : List&lt;XML&gt;) : FeatureModel_
+
++ getAllFeatures(versions: List&lt;Version&gt;) : List&lt;Feature&gt;
++ getCommonFeatures(versions: List&lt;Version&gt;) : List&lt;Feature&gt;
++ getNotCommonFeatures(versions: List&lt;Version&gt;) : List&lt;Feature&gt;
+
++ getAvailableVersions(): List&lt;Version&gt;
++ getSelectedVersions(): List&lt;Version&gt;
++ getDeselectedVersions(): List&lt;Version&gt;
+
++ calcVersionDecisionPropagation() : void
++ calcDecisionPropagation() : void</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>550</x>
+      <y>410</y>
+      <w>160</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;&lt;&lt;-
+m2=1..n</panel_attributes>
+    <additional_attributes>10.0;10.0;140.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>320</x>
+      <y>530</y>
+      <w>750</w>
+      <h>230</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;&lt;-
+m2=0..n</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;200.0;730.0;200.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1250</x>
+      <y>400</y>
+      <w>160</w>
+      <h>60</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+parent, children</panel_attributes>
+    <additional_attributes>10.0;10.0;40.0;10.0;40.0;40.0;10.0;40.0</additional_attributes>
+  </element>
+</diagram>

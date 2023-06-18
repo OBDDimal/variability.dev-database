@@ -1,10 +1,9 @@
 import {ConstraintItem} from "@/classes/Constraint/ConstraintItem";
 
 export class GroupConstraintItem extends ConstraintItem {
-    constructor(first, second, symbol, operator, tag) {
+    constructor(items, symbol, operator, tag) {
         super();
-        this.first = first;
-        this.second = second;
+        this.items = items;
         this.operator = operator;
         this.symbol = symbol;
         this.tag = tag;
@@ -15,9 +14,14 @@ export class GroupConstraintItem extends ConstraintItem {
     }
 
     toString() {
-        const firstText = this.first.constructor.name === this.constructor.name ? this.first.toString() : this.addPossibleBrackets(this.first);
-        const secondText = this.second.constructor.name === this.constructor.name ? this.second.toString() : this.addPossibleBrackets(this.second);
-        return `${firstText} ${this.symbol} ${secondText}`;
+        return this.items.map(item => item.constructor.name === this.constructor.name ? item.toString() : this.addPossibleBrackets(item)).join(this.symbol);
+    }
+
+    toList() {
+        return this.items
+            .map(item => item.constructor.name === this.constructor.name ? item.toList() : this.addPossibleBracketsToList(item))
+            .reduce((a, b) => [...a, ' ' + this.symbol + ' ', ...b], [])
+            .slice(1)
     }
 
     toStringPostfix() {
@@ -25,29 +29,26 @@ export class GroupConstraintItem extends ConstraintItem {
     }
 
     toStringForEdit() {
-        const firstText = this.first.constructor.name === this.constructor.name ? this.first.toStringForEdit() : this.addPossibleBracketsForEdit(this.first);
-        const secondText = this.second.constructor.name === this.constructor.name ? this.second.toStringForEdit() : this.addPossibleBracketsForEdit(this.second);
-        return `${firstText} ${this.operator} ${secondText}`;
+        return this.items
+            .map(item => item.constructor.name === this.constructor.name ? item.toStringForEdit() : this.addPossibleBracketsForEdit(item))
+            .join(" " + this.operator + " ");
     }
 
     toStringXML() {
         return `<${this.tag}>
-        ${this.first.toStringXML()} 
-        ${this.second.toStringXML()}
+        ${this.items.map(i => i.toStringXML()).join("\n")} 
         </${this.tag}>`;
     }
 
     getFeatureNodes() {
-        return [...this.first.getFeatureNodes(), ...this.second.getFeatureNodes()];
+        return this.items.map(i => i.getFeatureNodes()).flatten();
     }
 
     setConstraint(constraint) {
-        this.first.setConstraint(constraint);
-        this.second.setConstraint(constraint);
+        this.items.forEach(i => i.setConstraint(constraint));
     }
 
     removeConstraint() {
-        this.first.removeConstraint();
-        this.second.removeConstraint();
+        this.items.forEach(i => i.removeConstraint());
     }
 }
