@@ -151,17 +151,16 @@
                 </template>
                 <template v-slot:item.actions="{ item }">
                     <v-btn
-                        class="mr-2"
-                        color="primary"
+                        class="float-end mr-2"
+                        color="success"
                         variant="tonal"
-                        icon="mdi-eye"
                         size="small"
-                        :to="'/feature-model/' + item.id"
+                        icon="mdi-play"
                     >
                     </v-btn>
                     <v-btn
                         :disabled="item.owner === false"
-                        class="mr-2"
+                        class="float-end mr-2"
                         color="error"
                         variant="tonal"
                         icon="mdi-delete"
@@ -170,11 +169,12 @@
                     >
                     </v-btn>
                     <v-btn
-                        class="mr-2"
-                        color="success"
+                        class="float-end mr-2"
+                        color="primary"
                         variant="tonal"
+                        icon="mdi-eye"
                         size="small"
-                        icon="mdi-play"
+                        :to="'/feature-model/' + item.id"
                     >
                     </v-btn>
                     <!-- <v-btn small rounded color="error" class="mr-2"> <v-icon>mdi-delete</v-icon></v-btn> -->
@@ -277,7 +277,7 @@ const headers = [
     { title: 'Owner', key: 'owner' },
     { title: 'Family (Version)', key: 'family' },
     {
-        title: 'Actions',
+        title: '',
         align: 'center',
         key: 'actions',
         sortable: false,

@@ -5,44 +5,37 @@ const routes = [
     {
         path: '/',
         name: 'Home',
-        component: () =>
-            import(/* webpackChunkName: "home" */ '@/views/Home.vue'),
+        component: () => import('@/views/Home.vue'),
     },
     {
         path: '/login',
         name: 'Login',
-        component: () =>
-            import(/* webpackChunkName: "home" */ '@/views/Login.vue'),
+        component: () => import('@/views/Login.vue'),
     },
     {
         path: '/profile',
         name: 'Profile',
-        component: () =>
-            import(/* webpackChunkName: "home" */ '@/views/Profile.vue'),
+        component: () => import('@/views/Profile.vue'),
     },
     {
         path: '/models',
         name: 'Models',
-        component: () =>
-            import(/* webpackChunkName: "home" */ '@/views/Models.vue'),
+        component: () => import('@/views/Models.vue'),
     },
     {
         path: '/histories',
         name: 'Histories',
-        component: () =>
-            import(/* webpackChunkName: "home" */ '@/views/Histories.vue'),
+        component: () => import('@/views/Histories.vue'),
     },
     {
         path: '/dsgvo',
         name: 'DSGVO',
-        component: () =>
-            import(/* webpackChunkName: "home" */ '@/views/DSGVO.vue'),
+        component: () => import('@/views/DSGVO.vue'),
     },
     {
         path: '/files/:id/:slug',
         name: 'FileDetail',
-        component: () =>
-            import(/* webpackChunkName: "home" */ '@/views/FileDetail.vue'),
+        component: () => import('@/views/FileDetail.vue'),
         meta: {
             title: 'File Detail',
         },
@@ -51,8 +44,15 @@ const routes = [
         path: '/feature-model/:id',
         name: 'FeatureModel',
         props: true,
-        component: () =>
-            import(/* webpackChunkName: "home" */ '@/views/FeatureModel.vue'),
+        component: () => import('@/views/FeatureModel.vue'),
+    },
+    {
+        path: '/histories/:id/:slug',
+        name: 'HistoryDetail',
+        component: () => import('@/views/HistoryDetail.vue'),
+        meta: {
+            title: 'History Detail',
+        },
     },
 ];
 
