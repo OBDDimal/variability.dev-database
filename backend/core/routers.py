@@ -35,9 +35,6 @@ router.register(r"auth/refresh", RefreshViewSet, basename="auth-refresh")
 # FEATURE MODEL RELATED
 # details file upload https://djangotricks.blogspot.com/2020/03/how-to-upload-a-file-using-django-rest-framework.html
 router.register(r"files", FileUploadViewSet, basename="file-upload")
-""" router.register(
-    r"files/uploaded/confirmed", ConfirmedFileViewSet, basename="confirmed-files"
-) """
 router.register(
     r"files/uploaded/confirmed", ConfirmedFileViewSet, basename="confirmed-files"
 )
