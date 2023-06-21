@@ -10,6 +10,7 @@
 					<v-card-text>
 						<div>
 							<v-text-field
+								data-cy="add-feature-name"
 								v-model="name"
 								:rules="[(value) => !!value || 'Required.']"
 								label="Name"
@@ -40,10 +41,10 @@
 
 					<v-card-actions>
 						<v-spacer></v-spacer>
-						<v-btn color="secondary" text @click="discard">
+						<v-btn data-cy="tree-add-dialog-discard-btn" color="secondary" text @click="discard">
 							Discard</v-btn
 						>
-						<v-btn :disabled="!name" color="primary" text type="submit"> Add</v-btn>
+						<v-btn :disabled="!name" color="primary" text type="submit" data-cy="tree-add-dialog-add-btn"> Add</v-btn>
 					</v-card-actions>
 				</v-form>
 			</v-card>

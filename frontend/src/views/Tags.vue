@@ -5,6 +5,7 @@
             Here you can add new tags for your Feature Models
         </h5>
         <v-data-table
+            data-cy="tag-table"
             :headers="headers"
             :items="$store.state.tags"
             :loading="loading"
@@ -23,6 +24,7 @@
                     ></v-divider>
                     <v-spacer class="hidden-sm-and-down"></v-spacer>
                     <v-text-field
+                        data-cy="tag-search"
                         v-model="search"
                         append-icon="mdi-magnify"
                         hide-details
@@ -33,6 +35,7 @@
                     <v-dialog v-model="dialog" max-width="500px">
                         <template v-slot:activator="{ on, attrs }">
                             <v-btn
+                                data-cy="new-tag-button"
                                 class="mb-2 ml-4"
                                 color="primary"
                                 dark
@@ -54,12 +57,14 @@
                                     <v-row>
                                         <v-col cols="12">
                                             <v-text-field
+                                                data-cy="tag-edit-label-textfield"
                                                 v-model="editedItem.label"
                                                 label="Label"
                                             ></v-text-field>
                                         </v-col>
                                         <v-col cols="12">
                                             <v-text-field
+                                                data-cy="tag-edit-description-textfield"
                                                 v-model="editedItem.description"
                                                 label="Description"
                                             >
@@ -67,6 +72,7 @@
                                         </v-col>
                                         <v-col cols="12">
                                             <v-checkbox
+                                                data-cy="tag-edit-is-public-checkbox"
                                                 v-model="editedItem.is_public"
                                                 label="Public"
                                             ></v-checkbox>
@@ -85,6 +91,7 @@
                                     Cancel
                                 </v-btn>
                                 <v-btn
+                                    data-cy="tag-edit-save-button"
                                     :loading="addLoading"
                                     color="blue darken-1"
                                     text
@@ -107,6 +114,7 @@
                                 >
                                 <v-spacer></v-spacer>
                                 <v-btn
+                                    data-cy="tag-delete-confirm-button"
                                     :loading="removeLoading"
                                     color="primary"
                                     text
@@ -125,6 +133,7 @@
                             <v-icon>mdi-pencil</v-icon>
                         </v-btn> -->
                 <v-btn
+                    data-cy="tag-delete-button"
                     :disabled="item.owner === false"
                     class="mr-2"
                     color="error"

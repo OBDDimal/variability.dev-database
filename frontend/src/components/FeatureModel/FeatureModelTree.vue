@@ -10,6 +10,7 @@
                 width="auto"
             >
                 <v-btn
+                    data-cy="feature-model-search-left-button"
                     :disabled="search.foundNodeIndex === 0"
                     :small="$vuetify.breakpoint.smAndDown"
                     icon
@@ -19,6 +20,7 @@
                 </v-btn>
 
                 <v-btn
+                    data-cy="feature-model-search-right-button"
                     :disabled="
 						search.foundNodeDistances.length <=
 						search.foundNodeIndex + 1
@@ -31,6 +33,7 @@
                 </v-btn>
                 <v-spacer></v-spacer>
                 <v-text-field
+                    data-cy="feature-model-search"
                     v-model="search.searchText"
                     :class="search.showSearch ? '' : 'closed'"
                     :dense="$vuetify.breakpoint.smAndDown"
