@@ -5,6 +5,8 @@ from core.fileupload.viewsets import (
     BulkUploadApiView,
     ZipUploadApiView,
     FamiliesViewSet,
+    AnalysesViewSet,
+    AnalysisResultsViewSet,
     FileUploadViewSet,
     TagsViewSet,
     LicensesViewSet,
@@ -33,6 +35,9 @@ router.register(r"auth/refresh", RefreshViewSet, basename="auth-refresh")
 # FEATURE MODEL RELATED
 # details file upload https://djangotricks.blogspot.com/2020/03/how-to-upload-a-file-using-django-rest-framework.html
 router.register(r"files", FileUploadViewSet, basename="file-upload")
+""" router.register(
+    r"files/uploaded/confirmed", ConfirmedFileViewSet, basename="confirmed-files"
+) """
 router.register(
     r"files/uploaded/confirmed", ConfirmedFileViewSet, basename="confirmed-files"
 )
@@ -42,6 +47,8 @@ router.register(
 router.register(r"tags", TagsViewSet, basename="tags")
 router.register(r"licenses", LicensesViewSet, basename="licenses")
 router.register(r"families", FamiliesViewSet, basename="families")
+router.register(r"analyses", AnalysesViewSet, basename="analyses")
+router.register(r"analysisresults", AnalysisResultsViewSet, basename="analysisresults")
 
 
 urlpatterns = [

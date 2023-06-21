@@ -5,6 +5,7 @@ import Profile from '../views/Profile.vue'
 import Files from '../views/Files.vue'
 import Tags from '../views/Tags.vue'
 import Families from '../views/Families.vue'
+import Admin from '../views/Admin.vue'
 import DSGVO from '../views/DSGVO.vue'
 import Register from '../views/Register.vue'
 import FamilyDetail from '@/views/FamilyDetail'
@@ -57,6 +58,14 @@ const routes = [
 		component: Families,
 		meta: {
 			title: 'All Families',
+		},
+	},
+	{
+		path: '/admin',
+		name: 'Admin',
+		component: Admin,
+		meta: {
+			title: 'Admin Settings',
 		},
 	},
 	{

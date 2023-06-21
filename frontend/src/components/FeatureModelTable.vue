@@ -21,6 +21,8 @@
                         ></v-divider>
                         <v-spacer class="hidden-sm-and-down"></v-spacer>
                         <v-text-field
+                            data-cy="feature-model-table-search"
+                            id="feature-model-search"
                             v-model="search"
                             append-icon="mdi-magnify"
                             hide-details
@@ -31,6 +33,8 @@
                         <v-tooltip top>
                             <template v-slot:activator="{ on, attrs }">
                                 <v-btn
+                                    data-cy="feature-model-table-upload-button"
+                                    id="feature-model-upload"
                                     v-if="addable"
                                     class="mb-2 ml-4"
                                     color="primary"
@@ -49,6 +53,8 @@
                         <v-tooltip top>
                             <template v-slot:activator="{ on, attrs }">
                                 <v-btn
+                                    data-cy="feature-model-table-create-button"
+                                    id="feature-model-create"
                                     v-if="addable"
                                     class="mb-2 ml-4"
                                     color="success"
@@ -67,6 +73,7 @@
                         <v-tooltip top>
                             <template v-slot:activator="{ on, attrs }">
                                 <v-btn
+                                    id="feature-model-ls"
                                     v-if="addable"
                                     :disabled="!checkLocalStorage"
                                     class="mb-2 ml-4"
@@ -102,6 +109,7 @@
                                     </v-btn>
                                     <v-spacer></v-spacer>
                                     <v-btn
+                                        data-cy="feature-model-table-delete-dialog-confirm"
                                         :loading="removeLoading"
                                         color="primary"
                                         text
@@ -147,6 +155,7 @@
                         <v-icon>mdi-eye</v-icon>
                     </v-btn>
                     <v-btn
+                        data-cy="feature-model-table-delete-button"
                         :disabled="item.owner === false"
                         class="mr-2"
                         color="error"

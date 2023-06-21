@@ -26,3 +26,8 @@ def trigger_all_triggerable_analyses():
         # Set the analysis to triggered
         analysis_result.triggered = True
         analysis_result.save()
+
+def check_pending_analysis_results():
+    for analysis_result in AnalysisResult.objects.filter(triggered=True, result=None):
+        # Check if this analysis is done
+        pass

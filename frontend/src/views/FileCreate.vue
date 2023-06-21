@@ -15,9 +15,9 @@
                     color="primary"
                     centered
                 >
-                    <v-tab> Single Upload </v-tab>
-                    <v-tab> Multiple Upload </v-tab>
-                    <v-tab> Zip Upload </v-tab>
+                    <v-tab data-cy="file-create-single-upload-tab"> Single Upload </v-tab>
+                    <v-tab data-cy="file-create-multiple-upload-tab"> Multiple Upload </v-tab>
+                    <v-tab data-cy="file-create-zip-upload-tab"> Zip Upload </v-tab>
                 </v-tabs>
 
                 <v-tabs-items v-model="tab" class="pt-4">
@@ -27,6 +27,7 @@
                                 <v-row>
                                     <v-col class="py-0" cols="12">
                                         <v-text-field
+                                            data-cy="file-create-label-textfield"
                                             v-model="label"
                                             :rules="labelRules"
                                             dense
@@ -39,6 +40,7 @@
                                     </v-col>
                                     <v-col class="py-0" cols="12">
                                         <v-textarea
+                                            data-cy="file-create-description-textfield"
                                             v-model="description"
                                             :rules="descriptionRules"
                                             counter="250"
@@ -53,6 +55,7 @@
                                     </v-col>
                                     <v-col class="py-0" cols="12" md="6">
                                         <v-file-input
+                                            data-cy="file-create-file-input"
                                             v-model="file"
                                             :rules="fileRules"
                                             accept=".xml"
@@ -68,6 +71,7 @@
                                     </v-col>
                                     <v-col class="py-0" cols="12" md="6">
                                         <v-select
+                                            data-cy="file-create-license-select"
                                             v-model="license"
                                             :items="getLicenses"
                                             :rules="licenseRules"
@@ -84,6 +88,7 @@
                                     <v-col class="py-0" cols="12" md="6">
                                         <!-- Change back to v-combobox when new family upload is working properly -->
                                         <v-combobox
+                                            data-cy="file-create-family-label-combobox"
                                             v-model="family"
                                             :items="gottenFamilies"
                                             :required="true"
@@ -93,6 +98,7 @@
                                             outlined
                                         ></v-combobox>
                                         <v-text-field
+                                            data-cy="file-create-family-description-textfield"
                                             v-if="isNewFamily"
                                             v-model="newFamilyDescription"
                                             dense
@@ -141,6 +147,7 @@
                                             }}</span>
                                         </div>
                                         <v-text-field
+                                            data-cy="file-create-version-textfield"
                                             v-model="version"
                                             :rules="versionRules"
                                             :required="true"
@@ -174,6 +181,7 @@
                                     </v-col>
                                     <v-col class="pb-0" cols="12">
                                         <v-checkbox
+                                            data-cy="file-create-legal-share-checkbox"
                                             v-model="legalShare"
                                             class="mt-0"
                                             hide-details
@@ -185,6 +193,7 @@
                                     </v-col>
                                     <v-col class="py-0" cols="12">
                                         <v-checkbox
+                                            data-cy="file-create-user-data-checkbox"
                                             v-model="userData"
                                             class="mt-0"
                                             hide-details
@@ -196,6 +205,7 @@
                                     </v-col>
                                     <v-col class="py-0" cols="12">
                                         <v-checkbox
+                                            data-cy="file-create-open-source-checkbox"
                                             v-model="openSource"
                                             class="mt-0"
                                             hide-details
@@ -221,6 +231,7 @@
                                                 Cancel</v-btn
                                             >
                                             <v-btn
+                                                data-cy="file-create-upload-button"
                                                 :disabled="
                                                     !valid ||
                                                     !openSource ||
@@ -262,6 +273,7 @@
                                 <v-row>
                                     <v-col class="py-0" cols="12" md="6">
                                         <v-file-input
+                                            data-cy="file-create-multiple-file-input"
                                             v-model="file_bulk"
                                             :rules="fileRules"
                                             accept=".xml"
@@ -276,6 +288,7 @@
                                     </v-col>
                                     <v-col class="py-0" cols="12" md="6">
                                         <v-select
+                                            data-cy="file-create-multiple-license-select"
                                             v-model="license_bulk"
                                             :items="getLicenses"
                                             :rules="licenseRules"
@@ -290,6 +303,7 @@
                                     <v-col class="py-0" cols="12" md="6">
                                         <!-- Change back to v-combobox when new family upload is working properly -->
                                         <v-text-field
+                                            data-cy="file-create-multiple-family-label-textfield"
                                             v-model="family_bulk"
                                             :required="true"
                                             dense
@@ -300,6 +314,7 @@
                                     </v-col>
                                     <v-col class="py-0" cols="12" md="6">
                                         <v-text-field
+                                            data-cy="file-create-multiple-family-description-textfield"
                                             v-model="newFamilyDescription_bulk"
                                             dense
                                             hint="Describe your new family"
@@ -330,6 +345,7 @@
                                     </v-col>
                                     <v-col class="pb-0" cols="12">
                                         <v-checkbox
+                                            data-cy="file-create-multiple-legal-share-checkbox"
                                             v-model="legalShare_bulk"
                                             class="mt-0"
                                             hide-details
@@ -341,6 +357,7 @@
                                     </v-col>
                                     <v-col class="py-0" cols="12">
                                         <v-checkbox
+                                            data-cy="file-create-multiple-user-data-checkbox"
                                             v-model="userData_bulk"
                                             class="mt-0"
                                             hide-details
@@ -352,6 +369,7 @@
                                     </v-col>
                                     <v-col class="py-0" cols="12">
                                         <v-checkbox
+                                            data-cy="file-create-multiple-open-source-checkbox"
                                             v-model="openSource_bulk"
                                             class="mt-0"
                                             hide-details
@@ -377,6 +395,7 @@
                                                 Cancel
                                             </v-btn>
                                             <v-btn
+                                                data-cy="file-create-multiple-upload-button"
                                                 :disabled="
                                                     !valid_bulk ||
                                                     !openSource_bulk ||
@@ -413,6 +432,7 @@
                                 <v-row>
                                     <v-col class="py-0" cols="12">
                                         <v-text-field
+                                            data-cy="file-create-zip-label-textfield"
                                             v-model="label_zip"
                                             :rules="labelRules"
                                             dense
@@ -425,6 +445,7 @@
                                     </v-col>
                                     <v-col class="py-0" cols="12">
                                         <v-textarea
+                                            data-cy="file-create-zip-description-textfield"
                                             v-model="description_zip"
                                             :rules="descriptionRules"
                                             counter="250"
@@ -439,6 +460,7 @@
                                     </v-col>
                                     <v-col class="py-0" cols="12" md="6">
                                         <v-file-input
+                                            data-cy="file-create-zip-file-input"
                                             v-model="file_zip"
                                             :rules="fileRules"
                                             accept=".zip"
@@ -452,6 +474,7 @@
                                     </v-col>
                                     <v-col class="py-0" cols="12" md="6">
                                         <v-select
+                                            data-cy="file-create-zip-license-select"
                                             v-model="license_zip"
                                             :items="getLicenses"
                                             :rules="licenseRules"
@@ -466,6 +489,7 @@
                                     <v-col class="py-0" cols="12" md="6">
                                         <!-- Change back to v-combobox when new family upload is working properly -->
                                         <v-text-field
+                                            data-cy="file-create-zip-family-label-textfield"
                                             v-model="family_zip"
                                             :required="true"
                                             dense
@@ -476,6 +500,7 @@
                                     </v-col>
                                     <v-col class="py-0" cols="12" md="6">
                                         <v-text-field
+                                            data-cy="file-create-zip-family-description-textfield"
                                             v-model="newFamilyDescription_zip"
                                             dense
                                             hint="Describe your new family"
@@ -506,6 +531,7 @@
                                     </v-col>
                                     <v-col class="pb-0" cols="12">
                                         <v-checkbox
+                                            data-cy="file-create-zip-legal-share-checkbox"
                                             v-model="legalShare_zip"
                                             class="mt-0"
                                             hide-details
@@ -517,6 +543,7 @@
                                     </v-col>
                                     <v-col class="py-0" cols="12">
                                         <v-checkbox
+                                            data-cy="file-create-zip-user-data-checkbox"
                                             v-model="userData_zip"
                                             class="mt-0"
                                             hide-details
@@ -528,6 +555,7 @@
                                     </v-col>
                                     <v-col class="py-0" cols="12">
                                         <v-checkbox
+                                            data-cy="file-create-zip-open-source-checkbox"
                                             v-model="openSource_zip"
                                             class="mt-0"
                                             hide-details
@@ -553,6 +581,7 @@
                                                 Cancel
                                             </v-btn>
                                             <v-btn
+                                                data-cy="file-create-zip-upload-button"
                                                 :disabled="
                                                     !valid_zip ||
                                                     !openSource_zip ||

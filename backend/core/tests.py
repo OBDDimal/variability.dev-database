@@ -240,6 +240,16 @@ class AnalysisTests(TestCase):
             family=self.family,
         )
 
+    def assertQuerySetEquals(self, queryset, expected):
+        """Checks if all expected results are in the queryset and all elements in the queryset are expected."""
+        ids = [analysis_result.id for analysis_result in queryset]
+
+        for id in ids:
+            self.assertIn(id, expected)
+
+        for expected_id in expected:
+            self.assertIn(expected_id, ids)
+
 
     def test_get_triggerable_analyses(self):
         first_analysis = Analysis()
@@ -273,8 +283,59 @@ class AnalysisTests(TestCase):
         fifth_analysis_result = AnalysisResult(file_id=self.file.id, analysis_id=fifth_analysis.id)
         fifth_analysis_result.save()
 
-        for analysis_results in get_triggerable_analyses():
-            self.assertIn(analysis_results.id, [first_analysis_result.id, second_analysis_result.id, third_analysis.id])
+        self.assertQuerySetEquals(get_triggerable_analyses(), [first_analysis_result.id, second_analysis_result.id, third_analysis_result.id])
+
+    def test_get_triggerable_analyses_empty(self):
+        self.assertQuerySetEquals(get_triggerable_analyses(), [])
+
+    def test_get_triggerable_analyses_one(self):
+        first_analysis = Analysis()
+        first_analysis.save()
+        first_analysis_result = AnalysisResult(file_id=self.file.id, analysis_id=first_analysis.id)
+        first_analysis_result.save()
+
+        self.assertQuerySetEquals(get_triggerable_analyses(), [first_analysis_result.id])
+
+    def test_get_triggerable_analyses_non_dependent(self):
+        first_analysis = Analysis()
+        first_analysis.save()
+        first_analysis_result = AnalysisResult(file_id=self.file.id, analysis_id=first_analysis.id)
+        first_analysis_result.save()
+
+        second_analysis = Analysis()
+        second_analysis.save()
+        second_analysis_result = AnalysisResult(file_id=self.file.id, analysis_id=second_analysis.id)
+        second_analysis_result.save()
+
+        self.assertQuerySetEquals(get_triggerable_analyses(), [first_analysis_result.id, second_analysis.id])
+
+    def test_get_triggerable_analyses_dependent(self):
+        first_analysis = Analysis()
+        first_analysis.save()
+        first_analysis_result = AnalysisResult(file_id=self.file.id, analysis_id=first_analysis.id)
+        first_analysis_result.save()
+
+        second_analysis = Analysis()
+        second_analysis.save()
+        second_analysis.depends_on.add(first_analysis)
+        second_analysis_result = AnalysisResult(file_id=self.file.id, analysis_id=second_analysis.id)
+        second_analysis_result.save()
+
+        self.assertQuerySetEquals(get_triggerable_analyses(), [first_analysis_result.id])
+
+    def test_get_triggerable_analyses_dependent_done(self):
+        first_analysis = Analysis()
+        first_analysis.save()
+        first_analysis_result = AnalysisResult(file_id=self.file.id, analysis_id=first_analysis.id, result="\{\}")
+        first_analysis_result.save()
+
+        second_analysis = Analysis()
+        second_analysis.save()
+        second_analysis.depends_on.add(first_analysis)
+        second_analysis_result = AnalysisResult(file_id=self.file.id, analysis_id=second_analysis.id)
+        second_analysis_result.save()
+
+        self.assertQuerySetEquals(get_triggerable_analyses(), [first_analysis_result.id, second_analysis_result.id])
 
 
 # ####################### SINGLE ADMIN PANEL TESTS #######################
