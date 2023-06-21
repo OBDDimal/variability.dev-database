@@ -16,110 +16,67 @@
             <v-col cols="12" md="6" id="feature-model-details">
                 <h5 class="text-h5 mb-4">Details and more information</h5>
 
-                <v-list two-line>
+                <v-list lines="two">
                     <v-list-item>
-                        <v-list-item-icon>
-                            <v-icon color="primary"> mdi-information</v-icon>
-                        </v-list-item-icon>
+                        <template v-slot:prepend>
+                            <v-icon
+                                color="primary"
+                                icon="mdi-information"
+                            ></v-icon>
+                        </template>
 
-                        <v-list-item-content>
-                            <v-list-item-title>
-                                {{ loading ? '...' : file.label }}
-                            </v-list-item-title>
-                            <v-list-item-subtitle>Label</v-list-item-subtitle>
-                        </v-list-item-content>
+                        <v-list-item-title>
+                            {{ loading ? '...' : file.label }}
+                        </v-list-item-title>
+                        <v-list-item-subtitle>Label</v-list-item-subtitle>
 
-                        <v-list-item-action>
-                            <v-btn icon>
-                                <v-icon>mdi-pencil</v-icon>
-                            </v-btn>
-                        </v-list-item-action>
-                    </v-list-item>
-
-                    <v-list-item>
-                        <v-list-item-icon></v-list-item-icon>
-
-                        <v-list-item-content>
-                            <v-list-item-title>
-                                {{ loading ? '...' : file.description }}
-                            </v-list-item-title>
-                            <v-list-item-subtitle
-                                >Description
-                            </v-list-item-subtitle>
-                        </v-list-item-content>
-
-                        <v-list-item-action>
-                            <v-btn icon>
-                                <v-icon>mdi-pencil</v-icon>
-                            </v-btn>
-                        </v-list-item-action>
-                    </v-list-item>
-
-                    <v-divider inset></v-divider>
-
-                    <v-list-item>
-                        <v-list-item-icon>
-                            <v-icon color="primary"> mdi-license</v-icon>
-                        </v-list-item-icon>
-
-                        <v-list-item-content>
-                            <v-list-item-title>
-                                {{ loading ? '...' : file.license.label }}
-                            </v-list-item-title>
-                            <v-list-item-subtitle>License</v-list-item-subtitle>
-                        </v-list-item-content>
-
-                        <!--						<v-list-item-action>
-  <v-btn icon>
-    <v-icon>mdi-pencil</v-icon>
-  </v-btn>
-</v-list-item-action>-->
-                    </v-list-item>
-
-                    <v-divider inset></v-divider>
-
-                    <v-list-item>
-                        <v-list-item-icon>
-                            <v-icon color="primary"> mdi-tag</v-icon>
-                        </v-list-item-icon>
-
-                        <v-list-item-content>
-                            <v-list-item-title>
-                                <v-chip
-                                    class="mr-2"
-                                    v-for="tag in file.tags"
-                                    :key="tag.id"
+                        <template v-slot:append>
+                            <v-list-item-action end>
+                                <v-btn
+                                    icon="mdi-pencil"
+                                    variant="tonal"
+                                    color="primary"
+                                    size="small"
                                 >
-                                    {{ tag.label }}
-                                </v-chip>
-                            </v-list-item-title>
-                            <v-list-item-subtitle>Tags</v-list-item-subtitle>
-                        </v-list-item-content>
-
-                        <v-list-item-action>
-                            <v-btn icon>
-                                <v-icon>mdi-pencil</v-icon>
-                            </v-btn>
-                        </v-list-item-action>
+                                </v-btn>
+                            </v-list-item-action>
+                        </template>
                     </v-list-item>
-                    <v-divider inset></v-divider>
-                    <v-list-item>
-                        <v-list-item-icon>
-                            <v-icon color="primary"> mdi-calendar</v-icon>
-                        </v-list-item-icon>
 
-                        <v-list-item-content>
-                            <v-list-item-title>
-                                {{
-                                    new Date(file.uploaded_at).toLocaleString(
-                                        'en-US'
-                                    )
-                                }}
-                            </v-list-item-title>
-                            <v-list-item-subtitle
-                                >Uploaded on
-                            </v-list-item-subtitle>
-                        </v-list-item-content>
+                    <v-list-item>
+                        <template v-slot:prepend>
+                            <v-icon></v-icon>
+                        </template>
+                        <v-list-item-title>
+                            {{ loading ? '...' : file.description }}
+                        </v-list-item-title>
+                        <v-list-item-subtitle>
+                            Description
+                        </v-list-item-subtitle>
+
+                        <template v-slot:append>
+                            <v-list-item-action>
+                                <v-btn
+                                    icon="mdi-pencil"
+                                    variant="tonal"
+                                    color="primary"
+                                    size="small"
+                                >
+                                </v-btn>
+                            </v-list-item-action>
+                        </template>
+                    </v-list-item>
+
+                    <v-divider inset></v-divider>
+
+                    <v-list-item>
+                        <template v-slot:prepend>
+                            <v-icon color="primary" icon="mdi-license"></v-icon>
+                        </template>
+                        <v-list-item-title>
+                            {{ loading ? '...' : file.license.label }}
+                        </v-list-item-title>
+                        <v-list-item-subtitle>License</v-list-item-subtitle>
 
                         <!--						<v-list-item-action>
   <v-btn icon>
@@ -127,13 +84,68 @@
   </v-btn>
 </v-list-item-action>-->
                     </v-list-item>
+
+                    <v-divider inset></v-divider>
+
+                    <v-list-item>
+                        <template v-slot:prepend>
+                            <v-icon color="primary" icon="mdi-tag"></v-icon>
+                        </template>
+
+                        <v-list-item-title v-if="!loading">
+                            <v-chip
+                                class="mr-2"
+                                v-for="tag in file.tags"
+                                :key="tag.id"
+                                size="small"
+                            >
+                                {{ tag.label }}
+                            </v-chip>
+                        </v-list-item-title>
+                        <v-list-item-title v-else>...</v-list-item-title>
+                        <v-list-item-subtitle>Tags</v-list-item-subtitle>
+
+                        <template v-slot:append>
+                            <v-list-item-action>
+                                <v-btn
+                                    icon="mdi-pencil"
+                                    variant="tonal"
+                                    color="primary"
+                                    size="small"
+                                >
+                                </v-btn>
+                            </v-list-item-action>
+                        </template>
+                    </v-list-item>
                     <v-divider inset></v-divider>
                     <v-list-item>
-                        <v-list-item-icon>
-                            <v-icon color="primary">
-                                mdi-human-male-female-child
-                            </v-icon>
-                        </v-list-item-icon>
+                        <template v-slot:prepend>
+                            <v-icon
+                                color="primary"
+                                icon="mdi-calendar"
+                            ></v-icon>
+                        </template>
+
+                        <v-list-item-title v-if="!loading">
+                            {{
+                                new Date(file.uploaded_at).toLocaleString(
+                                    'en-US'
+                                )
+                            }}
+                        </v-list-item-title>
+                        <v-list-item-title v-else>...</v-list-item-title>
+                        <v-list-item-subtitle>
+                            Uploaded on
+                        </v-list-item-subtitle>
+                    </v-list-item>
+                    <v-divider inset></v-divider>
+                    <v-list-item>
+                        <template v-slot:prepend>
+                            <v-icon
+                                color="primary"
+                                icon="mdi-human-male-female-child"
+                            ></v-icon>
+                        </template>
 
                         <v-list-item-content>
                             <v-list-item-title>
@@ -141,16 +153,10 @@
                                     loading ? '...' : file.version
                                 }})
                             </v-list-item-title>
-                            <v-list-item-subtitle
-                                >Family and version
+                            <v-list-item-subtitle>
+                                Family and version
                             </v-list-item-subtitle>
                         </v-list-item-content>
-
-                        <!--						<v-list-item-action>
-  <v-btn icon>
-    <v-icon>mdi-pencil</v-icon>
-  </v-btn>
-</v-list-item-action>-->
                     </v-list-item>
                 </v-list>
                 <div
@@ -161,19 +167,19 @@
                         <div class="d-inline-block mr-2">
                             <v-btn
                                 color="primary"
-                                outlined
+                                variant="tonal"
+                                prepend-icon="mdi-eye"
                                 :to="'/feature-model/' + file.id"
                             >
-                                <v-icon dark left>mdi-eye</v-icon>
                                 View Model
                             </v-btn>
                         </div>
                         <div class="d-inline-block">
                             <v-btn
-                                outlined
+                                variant="tonal"
                                 color="primary"
                                 @click="
-                                    $router.push({
+                                    router.push({
                                         name: 'FamilyDetail',
                                         params: {
                                             id: file.family.id,
@@ -181,20 +187,19 @@
                                         },
                                     })
                                 "
+                                prepend-icon="mdi-human-male-female-child"
                             >
-                                <v-icon dark left>
-                                    mdi-human-male-female-child
-                                </v-icon>
                                 See Family
                             </v-btn>
                         </div>
                     </div>
                     <div class="d-inline-block">
                         <v-btn
-                            outlined
+                            variant="tonal"
                             color="error"
                             :disabled="file.owner === false"
                             @click="deleteItem(item)"
+                            prepend-icon="mdi-delete"
                         >
                             Delete Model
                         </v-btn>
@@ -211,28 +216,42 @@
                                 v-for="(item, i) in artifacts"
                                 :key="i"
                             >
-                                <v-list-item-avatar>
-                                    <v-icon> mdi-file-document-outline</v-icon>
-                                </v-list-item-avatar>
-                                <v-list-item-content>
-                                    <v-list-item-title>
-                                        {{ item.title }}
-                                    </v-list-item-title>
-                                    <v-list-item-subtitle>
-                                        {{ item.subtitle }}
-                                    </v-list-item-subtitle>
-                                </v-list-item-content>
-                                <v-list-item-action style="flex-direction: row">
-                                    <v-btn icon>
-                                        <v-icon> mdi-download</v-icon>
-                                    </v-btn>
-                                    <v-btn
-                                        icon
-                                        @click.stop="showArtifactDialog(item)"
+                                <template v-slot:prepend>
+                                    <v-icon
+                                        color="primary"
+                                        icon="mdi-file-document-outline"
+                                    ></v-icon>
+                                </template>
+                                <v-list-item-title>
+                                    {{ item.title }}
+                                </v-list-item-title>
+                                <v-list-item-subtitle>
+                                    {{ item.subtitle }}
+                                </v-list-item-subtitle>
+                                <template v-slot:append>
+                                    <v-list-item-action
+                                        style="flex-direction: row"
                                     >
-                                        <v-icon> mdi-eye</v-icon>
-                                    </v-btn>
-                                </v-list-item-action>
+                                        <v-btn
+                                            icon="mdi-download"
+                                            variant="tonal"
+                                            color="success"
+                                            size="small"
+                                            class="mr-2"
+                                        >
+                                        </v-btn>
+                                        <v-btn
+                                            icon="mdi-eye"
+                                            variant="tonal"
+                                            color="primary"
+                                            size="small"
+                                            @click.stop="
+                                                showArtifactDialog(item)
+                                            "
+                                        >
+                                        </v-btn>
+                                    </v-list-item-action>
+                                </template>
                             </v-list-item>
                         </v-list>
                     </div>
@@ -247,14 +266,13 @@
                                 :style="`width: ${getStati.success.percentage}%!important`"
                                 class="d-inline-block"
                             >
-                                <v-tooltip bottom>
-                                    <template v-slot:activator="{ on, attrs }">
+                                <v-tooltip location="bottom">
+                                    <template v-slot:activator="{ props }">
                                         <v-progress-linear
                                             height="15"
-                                            value="100"
-                                            color="green"
-                                            v-bind="attrs"
-                                            v-on="on"
+                                            model-value="100"
+                                            color="success"
+                                            v-bind="props"
                                         />
                                     </template>
                                     <span>
@@ -268,14 +286,13 @@
                                 :style="`width: ${getStati.error.percentage}%!important`"
                                 class="d-inline-block"
                             >
-                                <v-tooltip bottom>
-                                    <template v-slot:activator="{ on, attrs }">
+                                <v-tooltip location="bottom">
+                                    <template v-slot:activator="{ props }">
                                         <v-progress-linear
                                             height="15"
-                                            value="100"
+                                            model-value="100"
                                             color="error"
-                                            v-bind="attrs"
-                                            v-on="on"
+                                            v-bind="props"
                                         />
                                     </template>
                                     <span>
@@ -289,14 +306,13 @@
                                 :style="`width: ${getStati.progress.percentage}%!important`"
                                 class="d-inline-block"
                             >
-                                <v-tooltip bottom>
-                                    <template v-slot:activator="{ on, attrs }">
+                                <v-tooltip location="bottom">
+                                    <template v-slot:activator="{ props }">
                                         <v-progress-linear
                                             height="15"
-                                            value="100"
+                                            model-value="100"
                                             color="primary"
-                                            v-bind="attrs"
-                                            v-on="on"
+                                            v-bind="props"
                                         />
                                     </template>
                                     <span>
@@ -313,10 +329,14 @@
                         :items="itemsAnalysis"
                         :loading="loading"
                         :search="searchAnalysis"
+                        items-per-page="5"
                         class="elevation-1"
                     >
                         <template v-slot:top>
-                            <v-toolbar flat>
+                            <v-toolbar
+                                flat
+                                style="background-color: transparent"
+                            >
                                 <v-toolbar-title class="hidden-sm-and-down"
                                     >Analyses
                                 </v-toolbar-title>
@@ -327,25 +347,29 @@
                                 ></v-divider>
                                 <v-spacer class="hidden-sm-and-down"></v-spacer>
                                 <v-text-field
+                                    density="comfortable"
                                     v-model="searchAnalysis"
-                                    append-icon="mdi-magnify"
+                                    append-inner-icon="mdi-magnify"
+                                    variant="filled"
+                                    clear-icon="mdi-download"
                                     hide-details
                                     label="Search"
                                     single-line
+                                    class="mr-4"
                                 >
                                 </v-text-field>
                             </v-toolbar>
                         </template>
                         <template v-slot:item.status="{ item }">
                             <v-progress-circular
-                                v-if="item.status === 0"
+                                v-if="item.raw.status === 0"
                                 size="24"
                                 width="3"
                                 indeterminate
                                 color="primary"
                             ></v-progress-circular>
                             <v-icon
-                                v-else-if="item.status === 1"
+                                v-else-if="item.raw.status === 1"
                                 color="success"
                             >
                                 mdi-check
@@ -387,36 +411,96 @@
             fullscreen
             transition="dialog-bottom-transition"
         >
-            <v-toolbar dark>
-                <v-icon class="mr-2">mdi-file-compare</v-icon>
-                <v-toolbar-title
-                    >View and compare Feature Model artifacts:
-                    <span class="font-weight-bold">{{
-                        selectedArtifact.title
-                    }}</span></v-toolbar-title
-                >
+            <v-toolbar dark color="primary">
+                <!--                <v-icon icon="mdi-file-compare" class="mx-2"></v-icon>-->
+                <v-toolbar-title>
+                    View and compare Feature Model artifacts:
+                    <span class="font-weight-bold">
+                        {{ selectedArtifact.title }}
+                    </span>
+                </v-toolbar-title>
                 <v-spacer></v-spacer>
                 <v-toolbar-items>
-                    <v-btn icon dark @click="dialogArtifact = false">
-                        <v-icon>mdi-close</v-icon>
+                    <v-btn
+                        icon="mdi-close"
+                        dark
+                        @click="dialogArtifact = false"
+                    >
                     </v-btn>
                 </v-toolbar-items>
             </v-toolbar>
             <v-card>
                 <v-card-text>
+                    <v-row>
+                        <v-col cols="12" class="pb-0">
+                            <div class="text-subtitle-2">Toggle Headers</div>
+                        </v-col>
+                        <v-col cols="12" class="d-flex">
+                            <v-btn-toggle
+                                v-model="selectedCols"
+                                multiple
+                                density="compact"
+                                rounded="xl"
+                            >
+                                <v-btn
+                                    v-for="(
+                                        item, index
+                                    ) in headerCsvArtifactFull"
+                                    :key="index"
+                                    size="small"
+                                    variant="outlined"
+                                    :value="item.key"
+                                    :prepend-icon="
+                                        selectedCols.includes(item.key)
+                                            ? 'mdi-check'
+                                            : null
+                                    "
+                                >
+                                    {{ item.title }}
+                                </v-btn>
+                            </v-btn-toggle>
+                            <v-spacer></v-spacer>
+                            <v-btn
+                                :disabled="selectedCols.length === 0"
+                                variant="tonal"
+                                value="collapse"
+                                rounded="xl"
+                                @click="selectedCols = []"
+                            >
+                                Collapse all
+                            </v-btn>
+                            <v-btn
+                                :disabled="
+                                    selectedCols.length ===
+                                    headerCsvArtifactFull.length
+                                "
+                                variant="tonal"
+                                value="collapse"
+                                rounded="xl"
+                                class="ml-2"
+                                @click="
+                                    selectedCols = headerCsvArtifactFull.map(
+                                        (el) => el.key
+                                    )
+                                "
+                            >
+                                Expand all
+                            </v-btn>
+                        </v-col>
+                    </v-row>
+                    <v-divider class="mt-4"></v-divider>
                     <v-row class="ma-1">
                         <v-col
                             cols="12"
-                            :md="isRightFmSelected ? 6 : 8"
-                            :lg="isRightFmSelected ? 6 : 9"
+                            :md="isRightFmSelected ? 6 : 12"
+                            :lg="isRightFmSelected ? 6 : 12"
                             class="pa-2"
                         >
                             <h6 class="text-h6">
                                 Feature Model: {{ file.label }}
                             </h6>
-
                             <v-data-table
-                                v-if="selectedArtifact.title === 'CSV'"
+                                v-if="selectedArtifact.value.title === 'CSV'"
                                 :headers="headerCsvArtifact"
                                 :items="itemsCsvArtifact"
                                 :items-per-page="10"
@@ -433,12 +517,25 @@
                                 >
                                 </textarea>
                             </div>
-                            <v-btn color="success">
-                                <v-icon left>mdi-download</v-icon>
-                                Download Artifact
-                            </v-btn>
+                            <div
+                                class="d-flex justify-space-between"
+                                style="width: 100%"
+                            >
+                                <v-btn
+                                    color="success"
+                                    prepend-icon="mdi-download"
+                                >
+                                    Download Artifact
+                                </v-btn>
+                                <v-btn
+                                    color="primary"
+                                    prepend-icon="mdi-compare-horizontal"
+                                >
+                                    Compare
+                                </v-btn>
+                            </div>
                         </v-col>
-                        <v-col
+                        <!--                        <v-col
                             v-if="!isRightFmSelected"
                             cols="12"
                             md="4"
@@ -512,9 +609,9 @@
                                     </v-list-item-group>
                                 </v-list>
                             </div>
-                        </v-col>
+                        </v-col>-->
                         <v-col
-                            v-else
+                            v-if="isRightFmSelected"
                             cols="12"
                             md="6"
                             lg="6"
@@ -563,499 +660,504 @@
         ></tutorial-mode>
         <v-btn
             id="tutorial-mode"
-            fab
-            fixed
-            right
-            bottom
+            position="fixed"
             color="primary"
             @click="showTutorial = true"
+            icon="mdi-school"
+            style="bottom: 70px; right: 20px"
         >
-            <v-icon> mdi-school</v-icon>
         </v-btn>
     </div>
 </template>
 
-<script>
-import Vue from 'vue';
+<script setup>
+import { computed, onMounted, reactive, ref, watch } from 'vue';
 import api from '@/services/api.service';
-import TutorialMode from '@/components/TutorialMode';
+import { useFileStore } from '@/store/file';
+import { useRouter, useRoute } from 'vue-router';
 
-const API_URL = process.env.VUE_APP_DOMAIN;
+const router = useRouter();
+const route = useRoute();
+const fileStore = useFileStore();
 
-export default Vue.extend({
-    name: 'FileDetail',
+const API_URL = import.meta.env.VITE_APP_DOMAIN;
 
-    components: {
-        TutorialMode,
+let file = reactive({});
+const loading = ref(true);
+const dialogDelete = ref(false);
+const dialogArtifact = ref(false);
+const shouldCompare = ref(false);
+const loadingComparableFM = ref(false);
+const selectedRightFM = ref(-1);
+const selectedArtifact = {};
+const rightFmIsSelected = ref(false);
+const removeLoading = ref(false);
+const searchAnalysis = ref('');
+const headersAnalysis = [
+    /*{
+        title: 'ID',
+        align: 'start',
+        sortable: false,
+        key: 'id',
+    },*/
+    { title: 'Name', key: 'name' },
+    { title: 'Query', key: 'query' },
+    { title: 'Status', key: 'status' },
+];
+const itemsAnalysis = [
+    {
+        id: 1,
+        name: 'first analysis',
+        query: 'count nodes',
+        status: 0,
     },
-
-    props: {},
-
-    data: () => ({
-        file: {},
-        loading: true,
-        dialogDelete: false,
-        dialogArtifact: false,
-        shouldCompare: false,
-        loadingComparableFM: false,
-        selectedRightFM: -1,
-        selectedArtifact: {},
-        rightFmIsSelected: false,
-        removeLoading: false,
-        searchAnalysis: '',
-        headersAnalysis: [
-            {
-                text: 'ID',
-                align: 'start',
-                sortable: false,
-                value: 'id',
-            },
-            { text: 'Name', value: 'name' },
-            { text: 'Query', value: 'query' },
-            { text: 'Status', value: 'status' },
-        ],
-        itemsAnalysis: [
-            {
-                id: 1,
-                name: 'first analysis',
-                query: 'count nodes',
-                status: 0,
-            },
-            {
-                id: 2,
-                name: 'complex analysis',
-                query: 'calculate purpose of life --force',
-                status: 1,
-            },
-            {
-                id: 42,
-                name: 'another analysis',
-                query: 'foo bar',
-                status: 0,
-            },
-        ],
-        showTutorial: false,
-        tutorialSteps: [
-            {
-                title: 'Welcome to the tutorial!',
-                description:
-                    'You can restart the tutorial anytime by clicking on this button.',
-                elementCssSelector: '#tutorial-mode',
-            },
-            {
-                title: 'Feature model details',
-                description:
-                    'Here you can see details and more information about the feature model. You can also view the model and the family. If you are the owner of the model, you can also edit aspects like name or description.',
-                elementCssSelector: '#feature-model-details',
-            },
-            {
-                title: 'Feature model actions',
-                description:
-                    'With those action buttons, you are able to view the model or the family, or - if you are the owner of the model - delete it.',
-                elementCssSelector: '#feature-model-actions',
-            },
-            {
-                title: 'The Analyses and progress',
-                description:
-                    "After uploading a feature model, some predefined analyses will run on them automatically. In this table you'll see those analyses as well as the progress (done, in progress, failed).",
-                elementCssSelector: '#feature-model-analysis-progress',
-            },
-            {
-                title: 'Feature model artifacts',
-                description:
-                    "In this section you'll find artifacts of the feature model. Those artifacts - which are basically files - are automatically generated after the analyses are done. You can view them here.",
-                elementCssSelector: '#feature-model-artifacts',
-            },
-        ],
-        artifacts: [
-            {
-                title: 'CSV',
-                subtitle: 'Displaying CSV of feature model',
-            },
-            {
-                title: 'XML',
-                subtitle: 'Displaying XML of feature model',
-            },
-            {
-                title: 'Complex Document',
-                subtitle: 'Generated from analysis: complex analysis',
-            },
-        ],
-        headerCsvArtifact: [
-            { text: 'Input File', value: 'input_file' },
-            { text: 'Input Hash', value: 'input_hash' },
-            { text: 'SVO', value: 'svo' },
-            { text: 'DVO', value: 'dvo' },
-            { text: 'DVO Time', value: 'dvo_time' },
-            { text: 'BDD Compiler', value: 'bdd_compiler' },
-            { text: 'BDD Bootstrap', value: 'bdd_bootstrap' },
-            { text: 'BDD Compile', value: 'bdd_compile' },
-            { text: 'BDD Timeout', value: 'bdd_timeout' },
-            { text: 'BDD Size', value: 'bdd_size' },
-        ],
-        itemsCsvArtifact: [
-            {
-                input_file: 'busybox.dimacs',
-                input_hash: '287b501faf4c816afd0fe517c85ab7ed',
-                svo: 'force',
-                dvo: 'SIFTC',
-                dvo_time: '',
-                bdd_compiler: 'cudd',
-                bdd_bootstrap: 0.006,
-                bdd_compile: 44.813,
-                bdd_timeout: false,
-                bdd_size: '',
-            },
-            {
-                input_file: 'busybox.dimacs',
-                input_hash: '287b501faf4c816afd0fe517c85ab7ed',
-                svo: 'force',
-                dvo: '',
-                dvo_time: '',
-                bdd_compiler: '',
-                bdd_bootstrap: null,
-                bdd_compile: null,
-                bdd_timeout: null,
-                bdd_size: '',
-            },
-            {
-                input_file: 'busybox.dimacs',
-                input_hash: '287b501faf4c816afd0fe517c85ab7ed',
-                svo: 'force',
-                dvo: 'SIFTC',
-                dvo_time: '',
-                bdd_compiler: 'cudd',
-                bdd_bootstrap: 0.008,
-                bdd_compile: 45.037,
-                bdd_timeout: false,
-                bdd_size: '',
-            },
-            {
-                input_file: 'busybox.dimacs',
-                input_hash: '287b501faf4c816afd0fe517c85ab7ed',
-                svo: 'force',
-                dvo: '',
-                dvo_time: '',
-                bdd_compiler: '',
-                bdd_bootstrap: null,
-                bdd_compile: null,
-                bdd_timeout: null,
-                bdd_size: '',
-            },
-            {
-                input_file: 'busybox.dimacs',
-                input_hash: '287b501faf4c816afd0fe517c85ab7ed',
-                svo: 'force',
-                dvo: 'SIFTC',
-                dvo_time: '',
-                bdd_compiler: 'cudd',
-                bdd_bootstrap: 0.01,
-                bdd_compile: 32.266,
-                bdd_timeout: false,
-                bdd_size: '',
-            },
-            {
-                input_file: 'busybox.dimacs',
-                input_hash: '287b501faf4c816afd0fe517c85ab7ed',
-                svo: 'force',
-                dvo: 'SIFTC',
-                dvo_time: '',
-                bdd_compiler: 'cudd',
-                bdd_bootstrap: 0.006,
-                bdd_compile: 31.951,
-                bdd_timeout: false,
-                bdd_size: '',
-            },
-            {
-                input_file: 'busybox.dimacs',
-                input_hash: '287b501faf4c816afd0fe517c85ab7ed',
-                svo: 'force',
-                dvo: '',
-                dvo_time: '',
-                bdd_compiler: '',
-                bdd_bootstrap: null,
-                bdd_compile: null,
-                bdd_timeout: null,
-                bdd_size: '',
-            },
-            {
-                input_file: 'busybox.dimacs',
-                input_hash: '287b501faf4c816afd0fe517c85ab7ed',
-                svo: 'force',
-                dvo: 'SIFTC',
-                dvo_time: '',
-                bdd_compiler: 'cudd',
-                bdd_bootstrap: 0.006,
-                bdd_compile: 37.242,
-                bdd_timeout: false,
-                bdd_size: '',
-            },
-            {
-                input_file: 'busybox.dimacs',
-                input_hash: '287b501faf4c816afd0fe517c85ab7ed',
-                svo: 'force',
-                dvo: '',
-                dvo_time: '',
-                bdd_compiler: '',
-                bdd_bootstrap: null,
-                bdd_compile: null,
-                bdd_timeout: null,
-                bdd_size: '',
-            },
-            {
-                input_file: 'busybox.dimacs',
-                input_hash: '287b501faf4c816afd0fe517c85ab7ed',
-                svo: 'force',
-                dvo: '',
-                dvo_time: '',
-                bdd_compiler: '',
-                bdd_bootstrap: null,
-                bdd_compile: null,
-                bdd_timeout: null,
-                bdd_size: '',
-            },
-            {
-                input_file: 'busybox.dimacs',
-                input_hash: '287b501faf4c816afd0fe517c85ab7ed',
-                svo: 'force-best',
-                dvo: 'SIFTC',
-                dvo_time: '',
-                bdd_compiler: 'cudd',
-                bdd_bootstrap: 0.006,
-                bdd_compile: 36.179,
-                bdd_timeout: false,
-                bdd_size: '',
-            },
-            {
-                input_file: 'busybox.dimacs',
-                input_hash: '287b501faf4c816afd0fe517c85ab7ed',
-                svo: 'force-best',
-                dvo: 'SIFTC',
-                dvo_time: '',
-                bdd_compiler: 'cudd',
-                bdd_bootstrap: 0.01,
-                bdd_compile: 34.675,
-                bdd_timeout: false,
-                bdd_size: '',
-            },
-            {
-                input_file: 'busybox.dimacs',
-                input_hash: '287b501faf4c816afd0fe517c85ab7ed',
-                svo: 'force-best',
-                dvo: 'SIFTC',
-                dvo_time: '',
-                bdd_compiler: 'cudd',
-                bdd_bootstrap: 0.009,
-                bdd_compile: 46.592,
-                bdd_timeout: false,
-                bdd_size: '',
-            },
-            {
-                input_file: 'busybox.dimacs',
-                input_hash: '287b501faf4c816afd0fe517c85ab7ed',
-                svo: 'force-best',
-                dvo: '',
-                dvo_time: '',
-                bdd_compiler: '',
-                bdd_bootstrap: null,
-                bdd_compile: null,
-                bdd_timeout: null,
-                bdd_size: '',
-            },
-            {
-                input_file: 'busybox.dimacs',
-                input_hash: '287b501faf4c816afd0fe517c85ab7ed',
-                svo: 'force-best',
-                dvo: 'SIFTC',
-                dvo_time: '',
-                bdd_compiler: 'cudd',
-                bdd_bootstrap: 0.007,
-                bdd_compile: 40.298,
-                bdd_timeout: false,
-                bdd_size: '',
-            },
-            {
-                input_file: 'busybox.dimacs',
-                input_hash: '287b501faf4c816afd0fe517c85ab7ed',
-                svo: 'force-best',
-                dvo: 'SIFTC',
-                dvo_time: '',
-                bdd_compiler: 'cudd',
-                bdd_bootstrap: 0.005,
-                bdd_compile: 44.059,
-                bdd_timeout: false,
-                bdd_size: '',
-            },
-            {
-                input_file: 'busybox.dimacs',
-                input_hash: '287b501faf4c816afd0fe517c85ab7ed',
-                svo: 'force-best',
-                dvo: 'SIFTC',
-                dvo_time: '',
-                bdd_compiler: 'cudd',
-                bdd_bootstrap: 0.006,
-                bdd_compile: 36.9,
-                bdd_timeout: false,
-                bdd_size: '',
-            },
-            {
-                input_file: 'busybox.dimacs',
-                input_hash: '287b501faf4c816afd0fe517c85ab7ed',
-                svo: 'force-best',
-                dvo: 'SIFTC',
-                dvo_time: '',
-                bdd_compiler: 'cudd',
-                bdd_bootstrap: 0.006,
-                bdd_compile: 41.094,
-                bdd_timeout: false,
-                bdd_size: '',
-            },
-            {
-                input_file: 'busybox.dimacs',
-                input_hash: '287b501faf4c816afd0fe517c85ab7ed',
-                svo: 'force-best',
-                dvo: 'SIFTC',
-                dvo_time: '',
-                bdd_compiler: 'cudd',
-                bdd_bootstrap: 0.008,
-                bdd_compile: 35.726,
-                bdd_timeout: false,
-                bdd_size: '',
-            },
-            {
-                input_file: 'busybox.dimacs',
-                input_hash: '287b501faf4c816afd0fe517c85ab7ed',
-                svo: 'force-best',
-                dvo: 'SIFTC',
-                dvo_time: '',
-                bdd_compiler: 'cudd',
-                bdd_bootstrap: 0.01,
-                bdd_compile: 27.533,
-                bdd_timeout: false,
-                bdd_size: '',
-            },
-            {
-                input_file: 'busybox.dimacs',
-                input_hash: '287b501faf4c816afd0fe517c85ab7ed',
-                svo: 'force-avg',
-                dvo: 'SIFTC',
-                dvo_time: '',
-                bdd_compiler: 'cudd',
-                bdd_bootstrap: 0.01,
-                bdd_compile: 32.349,
-                bdd_timeout: false,
-                bdd_size: '',
-            },
-            {
-                input_file: 'busybox.dimacs',
-                input_hash: '287b501faf4c816afd0fe517c85ab7ed',
-                svo: 'force-avg',
-                dvo: 'SIFTC',
-                dvo_time: '',
-                bdd_compiler: 'cudd',
-                bdd_bootstrap: 0.01,
-                bdd_compile: 41.088,
-                bdd_timeout: false,
-                bdd_size: '',
-            },
-            {
-                input_file: 'busybox.dimacs',
-                input_hash: '287b501faf4c816afd0fe517c85ab7ed',
-                svo: 'force-avg',
-                dvo: 'SIFTC',
-                dvo_time: '',
-                bdd_compiler: 'cudd',
-                bdd_bootstrap: 0.005,
-                bdd_compile: 34.342,
-                bdd_timeout: false,
-                bdd_size: '',
-            },
-            {
-                input_file: 'busybox.dimacs',
-                input_hash: '287b501faf4c816afd0fe517c85ab7ed',
-                svo: 'force-avg',
-                dvo: '',
-                dvo_time: '',
-                bdd_compiler: '',
-                bdd_bootstrap: null,
-                bdd_compile: null,
-                bdd_timeout: null,
-                bdd_size: '',
-            },
-            {
-                input_file: 'busybox.dimacs',
-                input_hash: '287b501faf4c816afd0fe517c85ab7ed',
-                svo: 'force-avg',
-                dvo: 'SIFTC',
-                dvo_time: '',
-                bdd_compiler: 'cudd',
-                bdd_bootstrap: 0.01,
-                bdd_compile: 30.061,
-                bdd_timeout: false,
-                bdd_size: '',
-            },
-            {
-                input_file: 'busybox.dimacs',
-                input_hash: '287b501faf4c816afd0fe517c85ab7ed',
-                svo: 'force-avg',
-                dvo: 'SIFTC',
-                dvo_time: '',
-                bdd_compiler: 'cudd',
-                bdd_bootstrap: 0.009,
-                bdd_compile: 35.78,
-                bdd_timeout: false,
-                bdd_size: '',
-            },
-            {
-                input_file: 'busybox.dimacs',
-                input_hash: '287b501faf4c816afd0fe517c85ab7ed',
-                svo: 'force-avg',
-                dvo: 'SIFTC',
-                dvo_time: '',
-                bdd_compiler: 'cudd',
-                bdd_bootstrap: 0.011,
-                bdd_compile: 36.598,
-                bdd_timeout: false,
-                bdd_size: '',
-            },
-            {
-                input_file: 'busybox.dimacs',
-                input_hash: '287b501faf4c816afd0fe517c85ab7ed',
-                svo: 'force-avg',
-                dvo: 'SIFTC',
-                dvo_time: '',
-                bdd_compiler: 'cudd',
-                bdd_bootstrap: 0.009,
-                bdd_compile: 36.843,
-                bdd_timeout: false,
-                bdd_size: '',
-            },
-            {
-                input_file: 'busybox.dimacs',
-                input_hash: '287b501faf4c816afd0fe517c85ab7ed',
-                svo: 'force-avg',
-                dvo: 'SIFTC',
-                dvo_time: '',
-                bdd_compiler: 'cudd',
-                bdd_bootstrap: 0.01,
-                bdd_compile: 31.673,
-                bdd_timeout: false,
-                bdd_size: '',
-            },
-            {
-                input_file: 'busybox.dimacs',
-                input_hash: '287b501faf4c816afd0fe517c85ab7ed',
-                svo: 'force-avg',
-                dvo: '',
-                dvo_time: '',
-                bdd_compiler: '',
-                bdd_bootstrap: null,
-                bdd_compile: null,
-                bdd_timeout: null,
-                bdd_size: '',
-            },
-        ],
-        xmlFile: `
+    {
+        id: 2,
+        name: 'complex analysis',
+        query: 'calculate purpose of life --force',
+        status: 1,
+    },
+    {
+        id: 42,
+        name: 'another analysis',
+        query: 'foo bar',
+        status: 0,
+    },
+];
+const showTutorial = ref(false);
+const tutorialSteps = [
+    {
+        title: 'Welcome to the tutorial!',
+        description:
+            'You can restart the tutorial anytime by clicking on this button.',
+        elementCssSelector: '#tutorial-mode',
+    },
+    {
+        title: 'Feature model details',
+        description:
+            'Here you can see details and more information about the feature model. You can also view the model and the family. If you are the owner of the model, you can also edit aspects like name or description.',
+        elementCssSelector: '#feature-model-details',
+    },
+    {
+        title: 'Feature model actions',
+        description:
+            'With those action buttons, you are able to view the model or the family, or - if you are the owner of the model - delete it.',
+        elementCssSelector: '#feature-model-actions',
+    },
+    {
+        title: 'The Analyses and progress',
+        description:
+            "After uploading a feature model, some predefined analyses will run on them automatically. In this table you'll see those analyses as well as the progress (done, in progress, failed).",
+        elementCssSelector: '#feature-model-analysis-progress',
+    },
+    {
+        title: 'Feature model artifacts',
+        description:
+            "In this section you'll find artifacts of the feature model. Those artifacts - which are basically files - are automatically generated after the analyses are done. You can view them here.",
+        elementCssSelector: '#feature-model-artifacts',
+    },
+];
+const artifacts = [
+    {
+        title: 'CSV',
+        subtitle: 'Displaying CSV of feature model',
+    },
+    {
+        title: 'XML',
+        subtitle: 'Displaying XML of feature model',
+    },
+    {
+        title: 'Complex Document',
+        subtitle: 'Generated from analysis: complex analysis',
+    },
+];
+const headerCsvArtifactFull = [
+    { title: 'Input File', key: 'input_file' },
+    { title: 'Input Hash', key: 'input_hash' },
+    { title: 'SVO', key: 'svo' },
+    { title: 'DVO', key: 'dvo' },
+    { title: 'DVO Time', key: 'dvo_time' },
+    { title: 'BDD Compiler', key: 'bdd_compiler' },
+    { title: 'BDD Bootstrap', key: 'bdd_bootstrap' },
+    { title: 'BDD Compile', key: 'bdd_compile' },
+    { title: 'BDD Timeout', key: 'bdd_timeout' },
+    { title: 'BDD Size', key: 'bdd_size' },
+];
+const headerCsvArtifact = ref([
+    { title: 'Input File', key: 'input_file' },
+    { title: 'Input Hash', key: 'input_hash' },
+    { title: 'SVO', key: 'svo' },
+    { title: 'DVO', key: 'dvo' },
+    { title: 'DVO Time', key: 'dvo_time' },
+    { title: 'BDD Compiler', key: 'bdd_compiler' },
+    { title: 'BDD Bootstrap', key: 'bdd_bootstrap' },
+    { title: 'BDD Compile', key: 'bdd_compile' },
+    { title: 'BDD Timeout', key: 'bdd_timeout' },
+    { title: 'BDD Size', key: 'bdd_size' },
+]);
+const itemsCsvArtifact = [
+    {
+        input_file: 'busybox.dimacs',
+        input_hash: '287b501faf4c816afd0fe517c85ab7ed',
+        svo: 'force',
+        dvo: 'SIFTC',
+        dvo_time: '',
+        bdd_compiler: 'cudd',
+        bdd_bootstrap: 0.006,
+        bdd_compile: 44.813,
+        bdd_timeout: false,
+        bdd_size: '',
+    },
+    {
+        input_file: 'busybox.dimacs',
+        input_hash: '287b501faf4c816afd0fe517c85ab7ed',
+        svo: 'force',
+        dvo: '',
+        dvo_time: '',
+        bdd_compiler: '',
+        bdd_bootstrap: null,
+        bdd_compile: null,
+        bdd_timeout: null,
+        bdd_size: '',
+    },
+    {
+        input_file: 'busybox.dimacs',
+        input_hash: '287b501faf4c816afd0fe517c85ab7ed',
+        svo: 'force',
+        dvo: 'SIFTC',
+        dvo_time: '',
+        bdd_compiler: 'cudd',
+        bdd_bootstrap: 0.008,
+        bdd_compile: 45.037,
+        bdd_timeout: false,
+        bdd_size: '',
+    },
+    {
+        input_file: 'busybox.dimacs',
+        input_hash: '287b501faf4c816afd0fe517c85ab7ed',
+        svo: 'force',
+        dvo: '',
+        dvo_time: '',
+        bdd_compiler: '',
+        bdd_bootstrap: null,
+        bdd_compile: null,
+        bdd_timeout: null,
+        bdd_size: '',
+    },
+    {
+        input_file: 'busybox.dimacs',
+        input_hash: '287b501faf4c816afd0fe517c85ab7ed',
+        svo: 'force',
+        dvo: 'SIFTC',
+        dvo_time: '',
+        bdd_compiler: 'cudd',
+        bdd_bootstrap: 0.01,
+        bdd_compile: 32.266,
+        bdd_timeout: false,
+        bdd_size: '',
+    },
+    {
+        input_file: 'busybox.dimacs',
+        input_hash: '287b501faf4c816afd0fe517c85ab7ed',
+        svo: 'force',
+        dvo: 'SIFTC',
+        dvo_time: '',
+        bdd_compiler: 'cudd',
+        bdd_bootstrap: 0.006,
+        bdd_compile: 31.951,
+        bdd_timeout: false,
+        bdd_size: '',
+    },
+    {
+        input_file: 'busybox.dimacs',
+        input_hash: '287b501faf4c816afd0fe517c85ab7ed',
+        svo: 'force',
+        dvo: '',
+        dvo_time: '',
+        bdd_compiler: '',
+        bdd_bootstrap: null,
+        bdd_compile: null,
+        bdd_timeout: null,
+        bdd_size: '',
+    },
+    {
+        input_file: 'busybox.dimacs',
+        input_hash: '287b501faf4c816afd0fe517c85ab7ed',
+        svo: 'force',
+        dvo: 'SIFTC',
+        dvo_time: '',
+        bdd_compiler: 'cudd',
+        bdd_bootstrap: 0.006,
+        bdd_compile: 37.242,
+        bdd_timeout: false,
+        bdd_size: '',
+    },
+    {
+        input_file: 'busybox.dimacs',
+        input_hash: '287b501faf4c816afd0fe517c85ab7ed',
+        svo: 'force',
+        dvo: '',
+        dvo_time: '',
+        bdd_compiler: '',
+        bdd_bootstrap: null,
+        bdd_compile: null,
+        bdd_timeout: null,
+        bdd_size: '',
+    },
+    {
+        input_file: 'busybox.dimacs',
+        input_hash: '287b501faf4c816afd0fe517c85ab7ed',
+        svo: 'force',
+        dvo: '',
+        dvo_time: '',
+        bdd_compiler: '',
+        bdd_bootstrap: null,
+        bdd_compile: null,
+        bdd_timeout: null,
+        bdd_size: '',
+    },
+    {
+        input_file: 'busybox.dimacs',
+        input_hash: '287b501faf4c816afd0fe517c85ab7ed',
+        svo: 'force-best',
+        dvo: 'SIFTC',
+        dvo_time: '',
+        bdd_compiler: 'cudd',
+        bdd_bootstrap: 0.006,
+        bdd_compile: 36.179,
+        bdd_timeout: false,
+        bdd_size: '',
+    },
+    {
+        input_file: 'busybox.dimacs',
+        input_hash: '287b501faf4c816afd0fe517c85ab7ed',
+        svo: 'force-best',
+        dvo: 'SIFTC',
+        dvo_time: '',
+        bdd_compiler: 'cudd',
+        bdd_bootstrap: 0.01,
+        bdd_compile: 34.675,
+        bdd_timeout: false,
+        bdd_size: '',
+    },
+    {
+        input_file: 'busybox.dimacs',
+        input_hash: '287b501faf4c816afd0fe517c85ab7ed',
+        svo: 'force-best',
+        dvo: 'SIFTC',
+        dvo_time: '',
+        bdd_compiler: 'cudd',
+        bdd_bootstrap: 0.009,
+        bdd_compile: 46.592,
+        bdd_timeout: false,
+        bdd_size: '',
+    },
+    {
+        input_file: 'busybox.dimacs',
+        input_hash: '287b501faf4c816afd0fe517c85ab7ed',
+        svo: 'force-best',
+        dvo: '',
+        dvo_time: '',
+        bdd_compiler: '',
+        bdd_bootstrap: null,
+        bdd_compile: null,
+        bdd_timeout: null,
+        bdd_size: '',
+    },
+    {
+        input_file: 'busybox.dimacs',
+        input_hash: '287b501faf4c816afd0fe517c85ab7ed',
+        svo: 'force-best',
+        dvo: 'SIFTC',
+        dvo_time: '',
+        bdd_compiler: 'cudd',
+        bdd_bootstrap: 0.007,
+        bdd_compile: 40.298,
+        bdd_timeout: false,
+        bdd_size: '',
+    },
+    {
+        input_file: 'busybox.dimacs',
+        input_hash: '287b501faf4c816afd0fe517c85ab7ed',
+        svo: 'force-best',
+        dvo: 'SIFTC',
+        dvo_time: '',
+        bdd_compiler: 'cudd',
+        bdd_bootstrap: 0.005,
+        bdd_compile: 44.059,
+        bdd_timeout: false,
+        bdd_size: '',
+    },
+    {
+        input_file: 'busybox.dimacs',
+        input_hash: '287b501faf4c816afd0fe517c85ab7ed',
+        svo: 'force-best',
+        dvo: 'SIFTC',
+        dvo_time: '',
+        bdd_compiler: 'cudd',
+        bdd_bootstrap: 0.006,
+        bdd_compile: 36.9,
+        bdd_timeout: false,
+        bdd_size: '',
+    },
+    {
+        input_file: 'busybox.dimacs',
+        input_hash: '287b501faf4c816afd0fe517c85ab7ed',
+        svo: 'force-best',
+        dvo: 'SIFTC',
+        dvo_time: '',
+        bdd_compiler: 'cudd',
+        bdd_bootstrap: 0.006,
+        bdd_compile: 41.094,
+        bdd_timeout: false,
+        bdd_size: '',
+    },
+    {
+        input_file: 'busybox.dimacs',
+        input_hash: '287b501faf4c816afd0fe517c85ab7ed',
+        svo: 'force-best',
+        dvo: 'SIFTC',
+        dvo_time: '',
+        bdd_compiler: 'cudd',
+        bdd_bootstrap: 0.008,
+        bdd_compile: 35.726,
+        bdd_timeout: false,
+        bdd_size: '',
+    },
+    {
+        input_file: 'busybox.dimacs',
+        input_hash: '287b501faf4c816afd0fe517c85ab7ed',
+        svo: 'force-best',
+        dvo: 'SIFTC',
+        dvo_time: '',
+        bdd_compiler: 'cudd',
+        bdd_bootstrap: 0.01,
+        bdd_compile: 27.533,
+        bdd_timeout: false,
+        bdd_size: '',
+    },
+    {
+        input_file: 'busybox.dimacs',
+        input_hash: '287b501faf4c816afd0fe517c85ab7ed',
+        svo: 'force-avg',
+        dvo: 'SIFTC',
+        dvo_time: '',
+        bdd_compiler: 'cudd',
+        bdd_bootstrap: 0.01,
+        bdd_compile: 32.349,
+        bdd_timeout: false,
+        bdd_size: '',
+    },
+    {
+        input_file: 'busybox.dimacs',
+        input_hash: '287b501faf4c816afd0fe517c85ab7ed',
+        svo: 'force-avg',
+        dvo: 'SIFTC',
+        dvo_time: '',
+        bdd_compiler: 'cudd',
+        bdd_bootstrap: 0.01,
+        bdd_compile: 41.088,
+        bdd_timeout: false,
+        bdd_size: '',
+    },
+    {
+        input_file: 'busybox.dimacs',
+        input_hash: '287b501faf4c816afd0fe517c85ab7ed',
+        svo: 'force-avg',
+        dvo: 'SIFTC',
+        dvo_time: '',
+        bdd_compiler: 'cudd',
+        bdd_bootstrap: 0.005,
+        bdd_compile: 34.342,
+        bdd_timeout: false,
+        bdd_size: '',
+    },
+    {
+        input_file: 'busybox.dimacs',
+        input_hash: '287b501faf4c816afd0fe517c85ab7ed',
+        svo: 'force-avg',
+        dvo: '',
+        dvo_time: '',
+        bdd_compiler: '',
+        bdd_bootstrap: null,
+        bdd_compile: null,
+        bdd_timeout: null,
+        bdd_size: '',
+    },
+    {
+        input_file: 'busybox.dimacs',
+        input_hash: '287b501faf4c816afd0fe517c85ab7ed',
+        svo: 'force-avg',
+        dvo: 'SIFTC',
+        dvo_time: '',
+        bdd_compiler: 'cudd',
+        bdd_bootstrap: 0.01,
+        bdd_compile: 30.061,
+        bdd_timeout: false,
+        bdd_size: '',
+    },
+    {
+        input_file: 'busybox.dimacs',
+        input_hash: '287b501faf4c816afd0fe517c85ab7ed',
+        svo: 'force-avg',
+        dvo: 'SIFTC',
+        dvo_time: '',
+        bdd_compiler: 'cudd',
+        bdd_bootstrap: 0.009,
+        bdd_compile: 35.78,
+        bdd_timeout: false,
+        bdd_size: '',
+    },
+    {
+        input_file: 'busybox.dimacs',
+        input_hash: '287b501faf4c816afd0fe517c85ab7ed',
+        svo: 'force-avg',
+        dvo: 'SIFTC',
+        dvo_time: '',
+        bdd_compiler: 'cudd',
+        bdd_bootstrap: 0.011,
+        bdd_compile: 36.598,
+        bdd_timeout: false,
+        bdd_size: '',
+    },
+    {
+        input_file: 'busybox.dimacs',
+        input_hash: '287b501faf4c816afd0fe517c85ab7ed',
+        svo: 'force-avg',
+        dvo: 'SIFTC',
+        dvo_time: '',
+        bdd_compiler: 'cudd',
+        bdd_bootstrap: 0.009,
+        bdd_compile: 36.843,
+        bdd_timeout: false,
+        bdd_size: '',
+    },
+    {
+        input_file: 'busybox.dimacs',
+        input_hash: '287b501faf4c816afd0fe517c85ab7ed',
+        svo: 'force-avg',
+        dvo: 'SIFTC',
+        dvo_time: '',
+        bdd_compiler: 'cudd',
+        bdd_bootstrap: 0.01,
+        bdd_compile: 31.673,
+        bdd_timeout: false,
+        bdd_size: '',
+    },
+    {
+        input_file: 'busybox.dimacs',
+        input_hash: '287b501faf4c816afd0fe517c85ab7ed',
+        svo: 'force-avg',
+        dvo: '',
+        dvo_time: '',
+        bdd_compiler: '',
+        bdd_bootstrap: null,
+        bdd_compile: null,
+        bdd_timeout: null,
+        bdd_size: '',
+    },
+];
+const xmlFile = `
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <feature_model name="FeatureIDE model">
     <feature_tree>
@@ -3083,114 +3185,118 @@ C1164:~FEATURE_SH_NOFORK  or  FEATURE_PREFER_APPLETS
 </constraints>
 </feature_model>
 
-    `,
-    }),
+    `;
 
-    async mounted() {
-        this.loading = true;
-        await this.getFile();
-        this.loading = false;
-        //await this.fetchFeatureModelOfFamily(this.family.id)
-    },
+const selectedCols = ref([
+    'input_file',
+    'input_hash',
+    'svo',
+    'dvo',
+    'dvo_time',
+    'bdd_compiler',
+    'bdd_bootstrap',
+    'bdd_compile',
+    'bdd_timeout',
+    'bdd_size',
+]);
 
-    watch: {
+watch(
+    () => selectedCols.value,
+    (newValue) => {
+        console.log('moin');
+        /*console.log(
+            headerCsvArtifactFull.filter(
+                (el) => newValue.indexOf(el.key) !== -1
+            )
+        );*/
+        headerCsvArtifact.value = headerCsvArtifactFull.filter(
+            (el) => newValue.indexOf(el.key) !== -1
+        );
+    }
+);
+
+onMounted(async () => {
+    loading.value = true;
+    await getFile();
+    console.log('file', file);
+    loading.value = false;
+    showTutorial.value = !localStorage.fileDetailTutorialCompleted;
+    //await this.fetchFeatureModelOfFamily(this.family.id)
+});
+
+/*watch: {
         selectedRightFM: function (newValue) {
             console.log(newValue);
         },
-    },
+    },*/
+const isRightFmSelected = computed(() => {
+    return selectedRightFM.value !== -1;
+});
+const getMyFM = computed(() => {
+    return fileStore.myConfirmedFeatureModels;
+});
+const getStati = computed(() => {
+    return {
+        success: {
+            percentage:
+                (itemsAnalysis.filter((obj) => obj.status === 1).length /
+                    itemsAnalysis.length) *
+                100,
+            absolute: itemsAnalysis.filter((obj) => obj.status === 1).length,
+        },
+        error: {
+            percentage:
+                (itemsAnalysis.filter((obj) => obj.status === -1).length /
+                    itemsAnalysis.length) *
+                100,
+            absolute: itemsAnalysis.filter((obj) => obj.status === -1).length,
+        },
+        progress: {
+            percentage:
+                (itemsAnalysis.filter((obj) => obj.status === 0).length /
+                    itemsAnalysis.length) *
+                100,
+            absolute: itemsAnalysis.filter((obj) => obj.status === 0).length,
+        },
+        amount: itemsAnalysis.length,
+    };
+});
 
-    created() {
-        this.showTutorial = !localStorage.fileDetailTutorialCompleted;
-    },
-
-    computed: {
-        isRightFmSelected() {
-            return this.selectedRightFM !== -1;
-        },
-        getMyFM() {
-            return this.$store.state.featureModels.filter((item) => item.owner);
-        },
-        getStati() {
-            /*function compute(amount) {
-          return (
-              (this.itemsAnalysis.filter((obj) => obj.status === amount)
-                  .length /
-                  this.itemsAnalysis.length) *
-              100
-          );
-      }*/
-            return {
-                success: {
-                    percentage:
-                        (this.itemsAnalysis.filter((obj) => obj.status === 1)
-                            .length /
-                            this.itemsAnalysis.length) *
-                        100,
-                    absolute: this.itemsAnalysis.filter(
-                        (obj) => obj.status === 1
-                    ).length,
-                },
-                error: {
-                    percentage:
-                        (this.itemsAnalysis.filter((obj) => obj.status === -1)
-                            .length /
-                            this.itemsAnalysis.length) *
-                        100,
-                    absolute: this.itemsAnalysis.filter(
-                        (obj) => obj.status === -1
-                    ).length,
-                },
-                progress: {
-                    percentage:
-                        (this.itemsAnalysis.filter((obj) => obj.status === 0)
-                            .length /
-                            this.itemsAnalysis.length) *
-                        100,
-                    absolute: this.itemsAnalysis.filter(
-                        (obj) => obj.status === 0
-                    ).length,
-                },
-                amount: this.itemsAnalysis.length,
-            };
-        },
-    },
-
-    methods: {
-        async getFile() {
-            const id = this.$route.params.id;
-            await api
-                .get(`${API_URL}files/uploaded/confirmed/${id}/`)
-                .then((response) => {
-                    this.file = response.data;
-                })
-                .catch((error) => {
-                    console.log(error);
-                });
-        },
-        deleteItem() {
-            this.dialogDelete = true;
-        },
-        closeDelete() {
-            this.dialogDelete = false;
-        },
-        async deleteItemConfirm() {
-            this.removeLoading = true;
-            await this.$store.dispatch('deleteFeatureModel', this.file.id);
-            await this.$store.dispatch('fetchFiles');
-            this.removeLoading = false;
-            await this.$router.push('/');
-        },
-        showArtifactDialog(item) {
-            this.selectedArtifact = item;
-            this.dialogArtifact = true;
-        },
-        async compare() {
-            this.shouldCompare = true;
-            this.loadingComparableFM = true;
-            await this.$store.dispatch('fetchFeatureModels');
-            this.loadingComparableFM = false;
-        },
-        /*async fetchFeatureModelOfFamily(value) {
+async function getFile() {
+    const id = route.params.id;
+    await api
+        .get(`${API_URL}files/uploaded/confirmed/${id}/`)
+        .then((response) => {
+            file = response.data;
+        })
+        .catch((error) => {
+            console.log('getfile', error);
+        });
+}
+function deleteItem() {
+    this.dialogDelete = true;
+}
+function closeDelete() {
+    this.dialogDelete = false;
+}
+async function deleteItemConfirm() {
+    removeLoading.value = true;
+    await fileStore.deleteFeatureModel(file.value.id);
+    await fileStore.fetchConfirmedFeatureModels;
+    removeLoading.value = false;
+    await router.push('/');
+}
+function showArtifactDialog(item) {
+    selectedArtifact.value = item;
+    dialogArtifact.value = true;
+}
+async function compare() {
+    shouldCompare.value = true;
+    loadingComparableFM.value = true;
+    fileStore.fetchConfirmedFeatureModels();
+    loadingComparableFM.value = false;
+}
+/*async fetchFeatureModelOfFamily(value) {
   await api
     .get(`${API_URL}files/uploaded/confirmed/?family=${value}`)
     .then((response) => {
@@ -3198,8 +3304,6 @@ C1164:~FEATURE_SH_NOFORK  or  FEATURE_PREFER_APPLETS
       this.loadingTable = false
     })
 },*/
-    },
-});
 </script>
 
 <style>
