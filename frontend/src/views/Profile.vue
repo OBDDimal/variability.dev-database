@@ -99,6 +99,7 @@
                             <div class="timeline-div">
                                 <v-timeline align-top class="ma-3" dense>
                                     <v-timeline-item
+                                        data-cy="profile-timeline-item"
                                         v-for="elem in preparedElems"
                                         :key="elem.uploaded_at"
                                         :icon="
