@@ -17,7 +17,7 @@
                 </v-list-item>
 
                 <v-list-item @click="$emit('new-empty-model')">
-                    <v-list-item-icon>
+                    <v-list-item-icon class="empty-model-icon">
                         <v-icon>mdi-file-document-plus-outline</v-icon>
                     </v-list-item-icon>
 
@@ -143,6 +143,7 @@
                 >
                     <v-list-item-icon>
                         <v-icon :disabled="!isRedoAvailable || !editRights"
+                            data-cy="feature-model-toolbar-redo"
                             >mdi-redo
                         </v-icon>
                     </v-list-item-icon>
@@ -156,7 +157,7 @@
                     <template v-slot:activator="{ on, attrs }">
                         <v-list-item v-bind="attrs" v-on="on">
                             <v-list-item-icon>
-                                <v-icon>mdi-palette</v-icon>
+                                <v-icon data-cy="feature-model-toolbar-coloring">mdi-palette</v-icon>
                             </v-list-item-icon>
 
                             <v-list-item-content>
@@ -187,7 +188,7 @@
                     <template v-slot:activator="{ on, attrs }">
                         <v-list-item v-bind="attrs" v-on="on">
                             <v-list-item-icon>
-                                <v-icon>mdi-eye</v-icon>
+                                <v-icon data-cy="feature-model-toolbar-view">mdi-eye</v-icon>
                             </v-list-item-icon>
 
                             <v-list-item-content>
@@ -246,6 +247,7 @@
                             <template v-slot:default="{ active }">
                                 <v-list-item-action>
                                     <v-checkbox
+                                        data-cy="short-name-checkbox"
                                         v-model="isShortName"
                                         :input-value="active"
                                         color="primary"
@@ -262,6 +264,7 @@
                         <v-subheader>Space parent -> child</v-subheader>
                         <v-list-item>
                             <v-slider
+                                data-cy="parent-child-space-slider"
                                 v-model="spaceBetweenParentChild"
                                 hide-details
                                 max="300"
@@ -272,6 +275,7 @@
                         <v-subheader>Space between siblings</v-subheader>
                         <v-list-item>
                             <v-slider
+                                data-cy="sibling-space-slider"
                                 v-model="spaceBetweenSiblings"
                                 hide-details
                                 max="300"
@@ -284,7 +288,7 @@
 
                 <v-list-item @click="$emit('export')">
                     <v-list-item-icon>
-                        <v-icon>mdi-export-variant</v-icon>
+                        <v-icon data-cy="feature-model-toolbar-export">mdi-export-variant</v-icon>
                     </v-list-item-icon>
 
                     <v-list-item-content>
@@ -297,7 +301,7 @@
                     @click="$emit('show-collaboration-dialog')"
                 >
                     <v-list-item-icon id="feature-model-toolbar-collaboration">
-                        <v-icon :disabled="collaborationStatus"
+                        <v-icon data-cy="feature-model-toolbar-collaboration" :disabled="collaborationStatus"
                             >mdi-account-multiple
                         </v-icon>
                     </v-list-item-icon>
@@ -309,7 +313,7 @@
 
                 <v-list-item @click="$emit('show-tutorial')" id="tutorial-mode">
                     <v-list-item-icon>
-                        <v-icon>mdi-school</v-icon>
+                        <v-icon data-cy="feature-model-toolbar-tutorial">mdi-school</v-icon>
                     </v-list-item-icon>
 
                     <v-list-item-content>
@@ -323,7 +327,7 @@
                             <v-list-item-icon
                                 id="feature-model-toolbar-other-settings"
                             >
-                                <v-icon>mdi-dots-vertical</v-icon>
+                                <v-icon data-cy="feature-model-toolbar-settings">mdi-dots-vertical</v-icon>
                             </v-list-item-icon>
 
                             <v-list-item-content>
@@ -336,6 +340,7 @@
 
                         <v-list-item>
                             <v-text-field
+                                data-cy="feature-model-toolbar-adjust-levels"
                                 v-model="levels"
                                 class="mt-0 pt-0"
                                 min="0"
@@ -349,6 +354,7 @@
 
                         <v-list-item>
                             <v-text-field
+                                data-cy="feature-model-toolbar-adjust-max-children"
                                 v-model="maxChildren"
                                 class="mt-0 pt-0"
                                 min="0"
@@ -361,12 +367,14 @@
 
                         <v-list-item>
                             <v-checkbox
+                                data-cy="feature-model-toolbar-semantic-editing-checkbox"
                                 v-model="semanticEditing"
                                 label="Semantic editing"
                             ></v-checkbox>
                         </v-list-item>
                         <v-list-item>
                             <v-checkbox
+                                data-cy="feature-model-toolbar-quick-edit-checkbox"
                                 v-model="quickEdit"
                                 label="Quick edit"
                             ></v-checkbox>

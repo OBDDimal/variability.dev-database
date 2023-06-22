@@ -12,6 +12,7 @@
                 <v-form @submit.prevent="save">
                     <v-card-text>
                         <v-combobox
+                            data-cy="add-constraint-select-node-input"
                             ref="allNodes"
                             v-model="selectedFeatureNode"
                             :items="allNodes"
@@ -25,6 +26,7 @@
                         <v-row justify="space-between">
                             <v-col cols="6" sm="auto">
                                 <v-btn
+                                    data-cy="add-constraint-and-button"
                                     outlined
                                     @click="appendText('AND', true, true)"
                                 >and
@@ -33,6 +35,7 @@
                             </v-col>
                             <v-col cols="6" sm="auto">
                                 <v-btn
+                                    data-cy="add-constraint-or-button"
                                     outlined
                                     @click="appendText('OR', true, true)"
                                 >or
@@ -41,6 +44,7 @@
                             </v-col>
                             <v-col cols="6" sm="auto">
                                 <v-btn
+                                    data-cy="add-constraint-implies-button"
                                     outlined
                                     @click="appendText('IMPLIES', true, true)"
                                 >implies
@@ -49,6 +53,7 @@
                             </v-col>
                             <v-col cols="6" sm="auto">
                                 <v-btn
+                                    data-cy="add-constraint-not-button"
                                     outlined
                                     @click="appendText('NOT', true, true)"
                                 >not
@@ -57,6 +62,7 @@
                             </v-col>
                             <v-col cols="6" sm="auto">
                                 <v-btn
+                                    data-cy="add-constraint-open-bracket-button"
                                     outlined
                                     @click="appendText('(', true, false)"
                                 >(
@@ -65,6 +71,7 @@
                             </v-col>
                             <v-col cols="6" sm="auto">
                                 <v-btn
+                                    data-cy="add-constraint-close-bracket-button"
                                     outlined
                                     @click="appendText(')', false, true)"
                                 >)
@@ -77,6 +84,7 @@
                             <v-col class="pt-0" cols="12">
                                 <template>
                                     <v-text-field
+                                        data-cy="constraint-text"
                                         ref="inputField"
                                         v-model="constraintText"
                                         :rules="[
@@ -101,11 +109,16 @@
 
                     <v-card-actions>
                         <v-spacer></v-spacer>
-                        <v-btn color="secondary" text @click="discard"
+                        <v-btn
+                            data-cy="add-constraint-discard-button"
+                            color="secondary"
+                            text
+                            @click="discard"
                         >Discard
                         </v-btn
                         >
                         <v-btn
+                            data-cy="add-constraint-add-button"
                             :disabled="!isValid"
                             color="primary"
                             text

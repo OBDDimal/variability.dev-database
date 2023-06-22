@@ -12,6 +12,7 @@
     >
         <v-list>
             <v-list-item
+                data-cy="context-menu-collapse"
                 :disabled="d3Node && !d3Node.children && !d3Node.collapsedChildren"
                 @click="$emit('collapse', d3Node)"
             >
@@ -25,12 +26,13 @@
 
             <v-divider></v-divider>
 
-            <v-list-group no-action prepend-icon="mdi-eye-off">
+            <v-list-group data-cy="context-menu-hide-nodes" no-action prepend-icon="mdi-eye-off">
                 <template v-slot:activator>
                     <v-list-item-title>Hide Nodes</v-list-item-title>
                 </template>
 
                 <v-list-item
+                    data-cy="context-menu-hide-left-siblings"
                     :disabled="
             !(
               d3Node &&
@@ -48,6 +50,7 @@
                 </v-list-item>
 
                 <v-list-item
+                    data-cy="context-menu-hide-right-siblings"
                     :disabled="
             !(
               d3Node &&
@@ -66,6 +69,7 @@
                 </v-list-item>
 
                 <v-list-item
+                    data-cy="context-menu-hide-current-node"
                     :disabled="d3Node && d3Node.data && d3Node.data.isRoot"
                     @click="$emit('hideCurrentNode', d3Node)"
                 >
@@ -74,7 +78,7 @@
                     </v-list-item-content>
                 </v-list-item>
 
-                <v-list-item @click="$emit('hideAllOtherNodes', d3Node)">
+                <v-list-item data-cy="context-menu-hide-all-other-nodes" @click="$emit('hideAllOtherNodes', d3Node)">
                     <v-list-item-content>
                         <v-list-item-title>
                             Hide all other nodes on every level
@@ -83,6 +87,7 @@
                 </v-list-item>
 
                 <v-list-item
+                    data-cy="context-menu-hide-all-other-siblings"
                     :disabled="d3Node && d3Node.data && d3Node.data.isRoot"
                     @click="$emit('hideAllNodesOnThisLevel', d3Node)"
                 >
@@ -96,14 +101,14 @@
 
             <v-divider></v-divider>
 
-            <v-list-item :disabled="!(d3Node && d3Node.data.constraints && d3Node.data.constraints.length)"
+            <v-list-item data-cy="context-menu-highlight-constraints" :disabled="!(d3Node && d3Node.data.constraints && d3Node.data.constraints.length)"
                          @click="$emit('highlightConstraints', d3Node)">
                 <v-list-item-content>
                     <v-list-item-title>Highlight constraints</v-list-item-title>
                 </v-list-item-content>
             </v-list-item>
 
-            <v-list-item :disabled="!(d3Node && d3Node.data.constraints && d3Node.data.constraints.length)"
+            <v-list-item data-cy="context-menu-reset-highlight-constraints" :disabled="!(d3Node && d3Node.data.constraints && d3Node.data.constraints.length)"
                          @click="$emit('resetHighlightConstraints', d3Node)">
                 <v-list-item-content>
                     <v-list-item-title>Reset highlight constraints</v-list-item-title>
@@ -112,7 +117,7 @@
 
             <v-divider v-if="editRights"></v-divider>
 
-            <v-list-item v-if="editRights" @click="$emit('edit', d3Node)">
+            <v-list-item data-cy="context-menu-edit" v-if="editRights" @click="$emit('edit', d3Node)">
                 <v-list-item-icon>
                     <v-icon>mdi-pencil</v-icon>
                 </v-list-item-icon>
@@ -121,18 +126,18 @@
                 </v-list-item-content>
             </v-list-item>
 
-            <v-list-group v-if="editRights" no-action prepend-icon="mdi-plus">
+            <v-list-group data-cy="context-menu-add" v-if="editRights" no-action prepend-icon="mdi-plus">
                 <template v-slot:activator>
                     <v-list-item-title>Add</v-list-item-title>
                 </template>
 
-                <v-list-item @click="$emit('addAsChild', d3Node)">
+                <v-list-item data-cy="context-menu-add-as-child" @click="$emit('addAsChild', d3Node)">
                     <v-list-item-content>
                         <v-list-item-title>Add as child</v-list-item-title>
                     </v-list-item-content>
                 </v-list-item>
 
-                <v-list-item :disabled="(d3Node && d3Node.data.isRoot)"
+                <v-list-item data-cy="context-menu-add-as-sibling" :disabled="(d3Node && d3Node.data.isRoot)"
                              @click="$emit('addAsSibling', d3Node)">
                     <v-list-item-content>
                         <v-list-item-title>Add as sibling</v-list-item-title>
