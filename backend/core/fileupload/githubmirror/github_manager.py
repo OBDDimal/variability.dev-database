@@ -14,7 +14,7 @@ init_repo_name = 'wurstbroteater/djangoProject'
 init_branch = 'main'
 token = os.getenv('GITHUB_TOKEN')
 
-g = Github(login_or_token=token)
+g = Github(login_or_token = token)
 
 
 def mirror_to_github(file):
