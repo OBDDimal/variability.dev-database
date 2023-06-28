@@ -151,7 +151,7 @@ import { useAppStore } from '@/store/app';
 const appStore = useAppStore();
 const fileStore = useFileStore();
 const router = useRouter();
-const API_URL = import.meta.env.VUE_APP_DOMAIN;
+const API_URL = import.meta.env.VITE_APP_DOMAIN;
 const { families } = storeToRefs(useFileStore());
 
 const search = '';
