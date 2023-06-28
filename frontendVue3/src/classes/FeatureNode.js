@@ -21,7 +21,12 @@ export class FeatureNode {
     }
     setDisplayName(newName ){
         ///Sets the Displayname of the Featurenode
-        this.displayName= newName.slice(0, CONSTANTS.DISPLAY_NAME_LENGTH) + '...';
+        if(newName.length<= CONSTANTS.DISPLAY_NAME_LENGTH){
+            this.displayName= newName;
+        }else{
+            this.displayName= newName.slice(0, CONSTANTS.DISPLAY_NAME_RAW) + CONSTANTS.POINTS;
+        }
+       
     }
     color() {
         if (this.markedAsEdited) {
