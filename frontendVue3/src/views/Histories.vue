@@ -192,7 +192,7 @@ const formTitle = computed(() => {
 });
 
 function editItem(item) {
-    editedIndex.value = item.id;
+    editedIndex.value = item.index+1;
     editedItem = Object.assign({}, item.raw);
     editedItem.label = item.raw.label;
     console.log(editedItem.label);
@@ -212,7 +212,7 @@ function close() {
 
 function addFamily() {
     addLoading.value = true;
-    api.post(`${API_URL}families/`, this.editedItem)
+    api.post(`${API_URL}families/`, editedItem)
         .then(() => {
             appStore.updateSnackbar(
                 'Family added successfully!',
@@ -236,7 +236,7 @@ function addFamily() {
 
 function updateFamily() {
     addLoading.value = true;
-    api.put(`${API_URL}families/${this.editedIndex}/`, this.editedItem)
+    api.put(`${API_URL}families/${editedIndex.value}/`, editedItem)
         .then(() => {
             appStore.updateSnackbar(
                 'Family updated successfully!',
