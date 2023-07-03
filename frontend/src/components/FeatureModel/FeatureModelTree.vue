@@ -103,6 +103,7 @@
             @close="d3Data.contextMenu.selectedD3Node = undefined"
             @collapse="collapse"
             @edit="(d3Node) => openEditDialog(d3Node)"
+            @remove="(d3Node) => openRemoveDialog(d3Node)"
             @hideAllNodesOnThisLevel="
 				(d3Node) => hideAllNodesOnThisLevel(d3Node)
 			"
@@ -124,6 +125,14 @@
         >
         </feature-model-tree-edit-dialog>
 
+        <feature-model-tree-remove-dialog
+            :node="editNode"
+            :show="showRemoveDialog"
+            @close="showRemoveDialog = false"
+            @remove="(data) => remove(data)"
+        >
+        </feature-model-tree-remove-dialog>
+
         <feature-model-tree-add-dialog
             :parent="
 				d3Data.d3ParentOfAddNode
@@ -142,6 +151,7 @@ import Vue from 'vue'
 import FeatureModelTreeToolbar from './FeatureModelTreeToolbar.vue'
 import FeatureModelTreeContextMenu from './FeatureModelTreeContextMenu.vue'
 import FeatureModelTreeEditDialog from './FeatureModelTreeEditDialog.vue'
+import FeatureModelTreeRemoveDialog from './FeatureModelTreeRemoveDialog.vue'
 import FeatureModelTreeAddDialog from '@/components/FeatureModel/FeatureModelTreeAddDialog'
 
 // Import feature-model-services
@@ -163,6 +173,7 @@ export default Vue.extend({
         FeatureModelTreeContextMenu,
         FeatureModelTreeEditDialog,
         FeatureModelTreeAddDialog,
+        FeatureModelTreeRemoveDialog,
     },
 
     props: {
@@ -214,6 +225,7 @@ export default Vue.extend({
         },
         showAddDialog: false,
         showEditDialog: false,
+        showRemoveDialog: false,
         editNode: undefined,
         search: {
             showSearch: false,
@@ -336,6 +348,14 @@ export default Vue.extend({
             update.updateSvg(this.d3Data)
         },
 
+        remove(newData) {
+            this.showRemoveDialog = false
+
+            const editCommand = new EditCommand(this.editNode, newData)
+            this.commandManager.execute(editCommand)
+            update.updateSvg(this.d3Data)
+        },
+
         changeShortName(isShortName) {
             this.d3Data.isShortenedName = isShortName
             update.updateSvg(this.d3Data)
@@ -378,6 +398,12 @@ export default Vue.extend({
             this.closeContextMenu()
             this.editNode = d3Node.data
             this.showEditDialog = true
+        },
+
+        openRemoveDialog(d3Node) {
+            this.closeContextMenu()
+            this.editNode = d3Node.data
+            this.showRemoveDialog = true
         },
 
         undo() {
