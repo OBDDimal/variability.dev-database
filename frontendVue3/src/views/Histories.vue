@@ -59,7 +59,7 @@
                                                     single-line
                                                     hide-details
                                                     density="comfortable"
-                                                    v-model="editedItem.label"
+                                                    v-model="labelValue"
                                                     label="Label"
                                                 ></v-text-field>
                                             </v-col>
@@ -70,7 +70,7 @@
                                                     hide-details
                                                     density="comfortable"
                                                     v-model="
-                                                        editedItem.description
+                                                        descriptionValue
                                                     "
                                                     label="Description"
                                                 ></v-text-field>
@@ -184,6 +184,9 @@ const defaultItem = {
     description: '',
     owner: false,
 };
+// Neue lokale Variablen für v-model
+let labelValue = ref("");
+let descriptionValue = ref("");
 const loading = ref(false);
 const addLoading = ref(false);
 
@@ -194,11 +197,17 @@ const formTitle = computed(() => {
 function editItem(item) {
     editedIndex.value = item.index+1;
     editedItem = Object.assign({}, item.raw);
-    editedItem.label = item.raw.label;
-    console.log(editedItem.label);
+    labelValue.value = editedItem.label;
+    descriptionValue.value = editedItem.description;
     dialog.value = true;
 }
+watch(labelValue, (value) => {
+    editedItem.label = value;
+});
 
+watch(descriptionValue, (value) => {
+    editedItem.description = value;
+});
 watch(dialog, (value) => {
     if (!value) {
         editedIndex.value = -1;
@@ -208,6 +217,8 @@ watch(dialog, (value) => {
 function close() {
     dialog.value = false;
     editedIndex.value = -1;
+    labelValue.value = '';
+    descriptionValue.value='';
 }
 
 function addFamily() {
