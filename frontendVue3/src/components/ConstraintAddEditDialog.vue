@@ -1,6 +1,6 @@
 <template>
     <div class="text-center">
-        <v-dialog v-model="showDialog" persistent width="80%">
+        <v-dialog v-model="showDialog" persistent width="80%" >
             <v-card>
                 <v-card-title class="text-h5">
                     {{ mode }} Constraint
@@ -16,9 +16,6 @@
                             :items="allNodes"
                             item-title="name"
                             label="Select FeatureNode"
-                            @change="
-                                appendFeatureNode(selectedFeatureNode.name)
-                            "
                         ></v-combobox>
 
                         <v-row justify="space-between">
@@ -78,11 +75,10 @@
                                                 checkParse(value) ||
                                                 this.errorText,
                                         ]"
-                                        clearable
-                                        hide-details
                                         label="Constraint"
                                     ></v-text-field>
-                                    <label v-if="!isValid">
+                                    <!-- <label v-if="!isValid"> -->
+                                    <label>    
                                         {{ errorText }}
                                     </label>
                                 </template>
@@ -138,6 +134,12 @@ export default {
                 ? this.constraint.toStringForEdit()
                 : '';
         },
+        selectedFeatureNode (newSelected, oldSelected){   
+            if (newSelected !== oldSelected){
+                    ///console.log("Changing selectedFeatureNodeValue from: " + oldSelected.name+ " to: "+newSelected.name)
+                    this.appendFeatureNode(newSelected.name);
+            }
+        }
     },
 
     computed: {
@@ -147,7 +149,6 @@ export default {
             },
         },
     },
-
     methods: {
         discard() {
             this.constraintText = '';
@@ -193,13 +194,12 @@ export default {
             if (!text) return;
             this.$refs.allNodes.internalSearch = '';
             this.$refs.allNodes.internalSearch = '';
-            console.error("Reached!");
             if (!this.constraintText) {
                 this.constraintText = '';
             }
 
             // Add space if there do not exist one.
-            const pos = this.$refs.inputField.$refs.input.selectionStart;
+            const pos =  this.$refs.inputField.selectionStart;
             let textToInsert = '';
             if (
                 addSpaceBefore &&
@@ -223,6 +223,7 @@ export default {
                 this.constraintText.slice(0, pos) +
                 textToInsert +
                 this.constraintText.slice(pos);
+            console.log("New constraintstext: "+ this.constraintText);
         },
     },
 };
