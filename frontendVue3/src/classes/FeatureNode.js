@@ -6,7 +6,7 @@ export class FeatureNode {
     constructor(parent, name, groupType, mandatory, abstract) {
         this.parent = parent;
         this.name = name;
-        this.displayName = name.slice(0, CONSTANTS.DISPLAY_NAME_LENGTH) + '...';
+        this.setDisplayName(name);
         this.children = [];
         this.groupType = groupType;
         this.isRoot = parent === null;
@@ -19,7 +19,15 @@ export class FeatureNode {
         this.d3Node = null;
         this.markedAsEdited = false;
     }
-
+    setDisplayName(newName ){
+        ///Sets the Displayname of the Featurenode
+        if(newName.length<= CONSTANTS.DISPLAY_NAME_LENGTH){
+            this.displayName= newName;
+        }else{
+            this.displayName= newName.slice(0, CONSTANTS.DISPLAY_NAME_RAW) + CONSTANTS.POINTS;
+        }
+       
+    }
     color() {
         if (this.markedAsEdited) {
             return CONSTANTS.NODE_EDITED_COLOR;

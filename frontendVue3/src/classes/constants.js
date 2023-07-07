@@ -49,6 +49,8 @@ export const NODE_EDITED_COLOR = "rgb(197,196,120)";
 export const NODE_ABSTRACT_COLOR = "#ebebff";
 
 export const DISPLAY_NAME_LENGTH = 8;
+export const DISPLAY_NAME_RAW= 5;
+export const POINTS = '...';
 export const operators = {
     imp: "⇒",
     conj: "∧",
