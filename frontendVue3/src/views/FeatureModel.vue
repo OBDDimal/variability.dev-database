@@ -21,6 +21,49 @@
             @show-tutorial="showTutorial = true"
         >
         </feature-model-tree>
+        <v-btn
+            id="feature-model-information"
+            position="absolute"
+            location="right bottom"
+            theme="dark"
+            elevation="2"
+            icon
+            :x-large="$vuetify.display.mdAndUp"
+            style="background-color: rgb(var(--v-theme-primary))"
+            @click="openInformation = !openInformation"
+            class="mr-15"
+        >
+            <v-icon>mdi-information</v-icon>
+        </v-btn>
+
+        <v-btn
+            data-cy="feature-model-constraints-button"
+            id="feature-model-constraints"
+            position="absolute"
+            location="right bottom"
+            theme="dark"
+            elevation="2"
+            icon
+            :x-large="$vuetify.display.mdAndUp"
+            style="background-color:  rgb(var(--v-theme-primary))"
+            @click="openConstraints = true"
+        >
+            <v-icon>mdi-format-list-checks</v-icon>
+        </v-btn>
+
+        <constraints
+            v-if="data.constraints"
+            ref="constraints"
+            :is-open="openConstraints"
+            @close="openConstraints = false"
+            :command-manager="constraintCommandManager"
+            :constraints="data.constraints"
+            :editRights="editRights"
+            :rootNode="data.rootNode"
+            @update-feature-model="updateFeatureModel"
+        ></constraints>
+
+
     </div>
 </template>
 
