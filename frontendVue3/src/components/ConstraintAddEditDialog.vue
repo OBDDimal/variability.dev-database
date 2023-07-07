@@ -14,7 +14,7 @@
                             ref="allNodes"
                             v-model="selectedFeatureNode"
                             :items="allNodes"
-                            item-text="name"
+                            item-title="name"
                             label="Select FeatureNode"
                             @change="
                                 appendFeatureNode(selectedFeatureNode.name)
@@ -24,42 +24,42 @@
                         <v-row justify="space-between">
                             <v-col cols="6" sm="auto">
                                 <v-btn
-                                    outlined
+                                    variant="outlined"
                                     @click="appendText('AND', true, true)"
                                     >and
                                 </v-btn>
                             </v-col>
                             <v-col cols="6" sm="auto">
                                 <v-btn
-                                    outlined
+                                    variant="outlined"
                                     @click="appendText('OR', true, true)"
                                     >or
                                 </v-btn>
                             </v-col>
                             <v-col cols="6" sm="auto">
                                 <v-btn
-                                    outlined
+                                    variant="outlined"
                                     @click="appendText('IMPLIES', true, true)"
                                     >implies
                                 </v-btn>
                             </v-col>
                             <v-col cols="6" sm="auto">
                                 <v-btn
-                                    outlined
+                                    variant="outlined"
                                     @click="appendText('NOT', true, true)"
                                     >not
                                 </v-btn>
                             </v-col>
                             <v-col cols="6" sm="auto">
                                 <v-btn
-                                    outlined
+                                    variant="outlined"
                                     @click="appendText('(', true, false)"
                                     >(
                                 </v-btn>
                             </v-col>
                             <v-col cols="6" sm="auto">
                                 <v-btn
-                                    outlined
+                                    variant="outlined"
                                     @click="appendText(')', false, true)"
                                     >)
                                 </v-btn>
@@ -94,13 +94,13 @@
 
                     <v-card-actions>
                         <v-spacer></v-spacer>
-                        <v-btn color="secondary" text @click="discard"
+                        <v-btn color="secondary" variant="text" @click="discard"
                             >Discard
                         </v-btn>
                         <v-btn
                             :disabled="!isValid"
                             color="primary"
-                            text
+                            variant="text"
                             type="submit"
                             >{{ mode }}
                         </v-btn>
@@ -127,7 +127,7 @@ export default {
 
     props: {
         show: Boolean,
-        allNodes: [FeatureNode],
+        allNodes: undefined,
         constraint: undefined,
         mode: undefined,
     },
@@ -193,7 +193,7 @@ export default {
             if (!text) return;
             this.$refs.allNodes.internalSearch = '';
             this.$refs.allNodes.internalSearch = '';
-
+            console.error("Reached!");
             if (!this.constraintText) {
                 this.constraintText = '';
             }
