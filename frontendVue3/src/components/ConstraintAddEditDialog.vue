@@ -65,7 +65,6 @@
 
                         <v-row class="my-2">
                             <v-col class="pt-0" cols="12">
-                                <template>
                                     <v-text-field
                                         ref="inputField"
                                         v-model="constraintText"
@@ -77,11 +76,9 @@
                                         ]"
                                         label="Constraint"
                                     ></v-text-field>
-                                    <!-- <label v-if="!isValid"> -->
-                                    <label>    
+                                    <label v-if="!isValid"> 
                                         {{ errorText }}
                                     </label>
-                                </template>
                             </v-col>
                         </v-row>
                     </v-card-text>
