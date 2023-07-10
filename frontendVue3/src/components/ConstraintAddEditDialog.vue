@@ -16,6 +16,7 @@
                             :items="allNodes"
                             item-title="name"
                             label="Select FeatureNode"
+                            @update:modelValue="appendFeatureNode(selectedFeatureNode)"
                         ></v-combobox>
 
                         <v-row justify="space-between">
@@ -113,7 +114,7 @@ export default {
 
     data: () => ({
         constraintText: '',
-        selectedFeatureNode: '',
+        selectedFeatureNode: undefined,
         isValid: false,
         errorText: '',
     }),
@@ -130,12 +131,6 @@ export default {
             this.constraintText = this.constraint
                 ? this.constraint.toStringForEdit()
                 : '';
-        },
-        selectedFeatureNode (newSelected, oldSelected){   
-            if (newSelected !== oldSelected){
-                    ///console.log("Changing selectedFeatureNodeValue from: " + oldSelected.name+ " to: "+newSelected.name)
-                    this.appendFeatureNode(newSelected.name);
-            }
         }
     },
 
@@ -178,9 +173,9 @@ export default {
             }
         },
 
-        appendFeatureNode(featureNodeName) {
-            if (!featureNodeName) return;
-            let name = featureNodeName;
+        appendFeatureNode(featureNode) {
+            if (!featureNode) return;
+            let name = featureNode.name;
             if (name.split(' ').length > 1) {
                 name = `"${name}"`;
             }
@@ -221,6 +216,7 @@ export default {
                 textToInsert +
                 this.constraintText.slice(pos);
             console.log("New constraintstext: "+ this.constraintText);
+            this.selectedFeatureNode=undefined;
         },
     },
 };
