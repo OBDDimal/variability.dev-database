@@ -275,28 +275,24 @@ export default Vue.extend({
             this.reloadKey++;
         },
 
-        slice(node) {
+        async slice(node) {
             this.xml = jsonToXML(this.data);
 
             const content = new TextEncoder().encode(this.xml);
-            axios.post("http://localhost:10000/slice", {
+            let response = await axios.post("http://localhost:10000/slice", {
                 name: "hello.xml",
                 selection: [node.name],
                 content: Array.from(content)
-            }).then(function (response) {
-                console.log(response)
-                let status = response.status;
-                let responseBody = response.data;
-                while (status !== 200){
-                    axios.request(response.data.location).then(
-                        function (response2) {
-                            status = response2.status;
-                            responseBody = response2.data;
-                        }
-                    )
-                }
-                console.log(responseBody.body.content);
-            })
+            });
+            const newLocation = response.headers.location
+            console.log(response)
+            response = await axios.request("http://localhost:10000/" + newLocation);
+            console.log(response)
+            response = await axios.request("http://localhost:10000/" + newLocation);
+            console.log(response)
+            response = await axios.request("http://localhost:10000/" + newLocation);
+            console.log(response)
+
         },
 
         newEmptyModel() {
