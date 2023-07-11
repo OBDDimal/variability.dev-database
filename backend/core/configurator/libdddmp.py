@@ -839,9 +839,20 @@ class BDD(BDD_CE):
         var_indices = self.create_var_indices()
 
         c_root = tuple([root for root in selected_roots])
+
+        # Determine whether the min_var is the first variable in self.order
+        _, _, root_var = self.determine_high_low_min_var(c_root, config, var_indices)
+        initial_count = 1
+        for o in self.order:
+            if root_var == o:
+                break
+            if o not in config and -o not in config:
+                initial_count *= 2
+                selected_and_deselected.add(o)
+
         c_node = c_root
         ones = tuple([1 for _ in selected_roots])  # Terminal node 1
-        cache = {ones: (True, 1, 0)}
+        cache = {ones: (True, initial_count, 0)}
         while True:
             high, low, min_var = self.determine_high_low_min_var(c_node, config, var_indices)
 
@@ -1034,6 +1045,19 @@ class BDD(BDD_CE):
 
                 if count != 0:
                     cache[node_id] = count
+
+        for root_id in roots:
+            if cache.get(root_id) is not None:
+                _, var, _, _ = self.nodes[root_id]
+                for o in self.order:
+                    if o == var:
+                        break
+
+                    if o not in config and -o not in config:
+                        selected_and_deselected.add(o)
+                        cache[root_id] *= 2
+
+
 
         deselected_config = [-x for x in config if x < 0]
         selected_config = [x for x in config if x > 0]
