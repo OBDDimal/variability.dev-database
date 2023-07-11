@@ -145,6 +145,8 @@ import TutorialMode from '@/components/TutorialMode';
 import {NewEmptyModelCommand} from '@/classes/Commands/FeatureModel/NewEmptyModelCommand';
 import FeatureModelInformation from '@/components/FeatureModel/FeatureModelInformation';
 import axios from "axios";
+import {SliceCommand} from "@/classes/Commands/FeatureModel/SliceCommand";
+import {FeatureNode} from "@/classes/FeatureNode";
 
 export default Vue.extend({
     name: 'FeatureModel',
@@ -284,15 +286,33 @@ export default Vue.extend({
                 selection: [node.name],
                 content: Array.from(content)
             });
-            const newLocation = response.headers.location
-            console.log(response)
-            response = await axios.request("http://localhost:10000/" + newLocation);
-            console.log(response)
-            response = await axios.request("http://localhost:10000/" + newLocation);
-            console.log(response)
-            response = await axios.request("http://localhost:10000/" + newLocation);
-            console.log(response)
-
+            const newLocation = response.headers.location;
+            console.log(response);
+            while (response.status !== 200) {
+                response = await axios.request("http://localhost:10000/" + newLocation);
+                console.log(response);
+                await new Promise(r => setTimeout(r, 100));
+            }
+            let contentAsString = new TextDecoder().decode(Uint8Array.from(response.data.content));
+            console.log(contentAsString)
+            const xml = beautify(contentAsString);
+            let newData = {
+                featureMap: [],
+                constraints: [],
+                properties: [],
+                calculations: undefined,
+                comments: [],
+                featureOrder: undefined,
+                rootNode: new FeatureNode(null, 'Root', 'and', false, false),
+            };
+            xmlTranspiler.xmlToJson(xml, newData);
+            this.xml = xml;
+            const command = new SliceCommand(
+                this,
+                newData
+            );
+            this.featureModelCommandManager.execute(command);
+            this.updateFeatureModel();
         },
 
         newEmptyModel() {
