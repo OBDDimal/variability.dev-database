@@ -76,6 +76,8 @@
                                                 this.errorText,
                                         ]"
                                         label="Constraint"
+                                        clearable
+                                        hide-details
                                     ></v-text-field>
                                     <label v-if="!isValid"> 
                                         {{ errorText }}
