@@ -72,25 +72,25 @@
 
             <template v-slot:item.formula="{ item }">
                 <v-chip
-                    v-model="item.checked"
-                    :color="item.constraint.color"
-                    :style="`color: ${computeColor(item.constraint.color)}`"
-                    @click="highlightConstraint(item)"
+                    v-model="item.columns.checked"
+                    :color="item.columns.color"
+                    :style="`color: ${computeColor(item.columns.color)}`"
+                    @click="highlightConstraint(item.columns)"
                 >
-                    {{ item.formula }}
+                    {{ item.columns.formula }}
                 </v-chip>
             </template>
 
             <template v-slot:item.actions="{ item }">
                 <v-icon
                     class="mr-6"
-                    @click="openAddEditDialog('Edit', item.constraint)"
+                    @click="openAddEditDialog('Edit', item.columns.constraint)"
                     :disabled="!editRights"
                 >
                     mdi-pencil
                 </v-icon>
                 <v-icon
-                    @click="deleteConstraint(item.constraint)"
+                    @click="deleteConstraint(item.columns.constraint)"
                     :disabled="!editRights"
                 >
                     mdi-delete
@@ -124,9 +124,9 @@ export default {
 
     data: () => ({
         headers: [
-            { text: 'Constraint', value: 'formula', width: '50%' },
-            { text: 'Actions', value: 'actions', width: '50%' },
-        ],
+            { text: 'Constraint', key: 'formula', width: '50%' },
+            { text: 'Actions', key: 'actions', width: '50%' },
+        ], 
         search: '',
         showAddEditDialog: false,
         modeAddEdit: undefined,
@@ -152,6 +152,7 @@ export default {
 
     methods: {
         highlightConstraint(constraintRow) {
+            console.log(constraintRow);
             constraintRow.checked = !constraintRow.checked;
             constraintRow.constraint.toggleHighlighted();
             constraintRow.constraint
