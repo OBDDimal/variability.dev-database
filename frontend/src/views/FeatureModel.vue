@@ -281,18 +281,12 @@ export default Vue.extend({
             this.xml = jsonToXML(this.data);
 
             const content = new TextEncoder().encode(this.xml);
-            let response = await axios.post("http://localhost:10000/slice", {
+            let response = await axios.post(`${process.env.VUE_APP_DOMAIN_FEATUREIDESERVICE}slice`, {
                 name: "hello.xml",
                 selection: [node.name],
                 content: Array.from(content)
             });
-            const newLocation = response.headers.location;
             console.log(response);
-            while (response.status !== 200) {
-                response = await axios.request("http://localhost:10000/" + newLocation);
-                console.log(response);
-                await new Promise(r => setTimeout(r, 100));
-            }
             let contentAsString = new TextDecoder().decode(Uint8Array.from(response.data.content));
             console.log(contentAsString)
             const xml = beautify(contentAsString);
