@@ -105,6 +105,7 @@
             @close="d3Data.contextMenu.selectedD3Node = undefined"
             @collapse="collapse"
             @edit="(d3Node) => openEditDialog(d3Node)"
+            @remove="(d3Node) => openRemoveDialog(d3Node)"
             @hideAllNodesOnThisLevel="
                 (d3Node) => hideAllNodesOnThisLevel(d3Node)
             "
@@ -126,6 +127,14 @@
         >
         </feature-model-tree-edit-dialog>
 
+      <feature-model-tree-remove-dialog
+        :node="editNode"
+        :show="showRemoveDialog"
+        @close="showRemoveDialog = false"
+        @remove="remove"
+      >
+      </feature-model-tree-remove-dialog>
+
         <feature-model-tree-add-dialog
             :parent="
                 d3Data.d3ParentOfAddNode
@@ -142,8 +151,9 @@
 <script>
 import FeatureModelTreeToolbar from './FeatureModelTreeToolbar.vue';
 import FeatureModelTreeContextMenu from './FeatureModelTreeContextMenu.vue';
-import FeatureModelTreeEditDialog from './FeatureModelTreeEditDialog.vue';
+import FeatureModelTreeEditDialog from '@/components/FeatureModel/FeatureModelTreeEditDialog.vue';
 import FeatureModelTreeAddDialog from '@/components/FeatureModel/FeatureModelTreeAddDialog';
+import FeatureModelTreeRemoveDialog from '@/components/FeatureModel/FeatureModelTreeRemoveDialog.vue';
 // Import feature-model-services
 import * as dragAndDrop from '@/services/FeatureModel/dragAndDrop.service.js';
 import * as update from '@/services/FeatureModel/update.service.js';
@@ -153,8 +163,10 @@ import * as search from '@/services/FeatureModel/search.service.js';
 import { CommandManager } from '@/classes/Commands/CommandManager';
 import { AddCommand } from '@/classes/Commands/FeatureModel/AddCommand';
 import { EditCommand } from '@/classes/Commands/FeatureModel/EditCommand';
+import { RemoveCommand } from '@/classes/Commands/FeatureModel/RemoveCommand';
 import * as update_service from '@/services/FeatureModel/update.service';
 import { useDisplay } from 'vuetify';
+
 
 export default {
     name: 'FeatureModelTree',
@@ -164,6 +176,7 @@ export default {
         FeatureModelTreeContextMenu,
         FeatureModelTreeEditDialog,
         FeatureModelTreeAddDialog,
+        FeatureModelTreeRemoveDialog,
     },
 
     props: {
@@ -215,6 +228,7 @@ export default {
         },
         showAddDialog: false,
         showEditDialog: false,
+        showRemoveDialog: false,
         editNode: undefined,
         search: {
             showSearch: false,
@@ -341,6 +355,18 @@ export default {
             update.updateSvg(this.d3Data);
         },
 
+        remove() {
+          this.showRemoveDialog = false
+
+          if (this.editNode.isLeaf() && this.editNode.parent.children.length === 1 && this.editNode.constraints.length === 0) {
+            const removeCommand = new RemoveCommand(this.editNode, this.d3Data.d3AddNodeIndex)
+            this.commandManager.execute(removeCommand)
+            update.updateSvg(this.d3Data)
+          } else {
+            this.$emit('slice', this.editNode)
+          }
+        },
+
         changeShortName(isShortName) {
             this.d3Data.isShortenedName = isShortName;
             update.updateSvg(this.d3Data);
@@ -383,6 +409,12 @@ export default {
             this.closeContextMenu();
             this.editNode = d3Node.data;
             this.showEditDialog = true;
+        },
+
+        openRemoveDialog(d3Node) {
+          this.closeContextMenu()
+          this.editNode = d3Node.data
+          this.showRemoveDialog = true
         },
 
         undo() {

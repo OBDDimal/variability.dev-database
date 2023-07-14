@@ -352,7 +352,7 @@ export default Vue.extend({
     remove() {
       this.showRemoveDialog = false
 
-      if (this.editNode.isLeaf() && this.editNode.parent.children().size() === 1 && this.editNode.constraints.length === 0) {
+      if (this.editNode.isLeaf() && this.editNode.parent.children.length === 1 && this.editNode.constraints.length === 0) {
         const removeCommand = new RemoveCommand(this.editNode, this.d3Data.d3AddNodeIndex)
         this.commandManager.execute(removeCommand)
         update.updateSvg(this.d3Data)

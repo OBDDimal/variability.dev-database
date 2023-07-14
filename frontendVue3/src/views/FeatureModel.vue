@@ -12,6 +12,7 @@
             @exportToXML="exportToXML"
             @reset="reset"
             @save="save"
+            @slice="node => slice(node)"
             @update-constraints="updateConstraints"
             @show-collaboration-dialog="
                 showStartCollaborationSessionDialog = true
@@ -40,9 +41,12 @@ import CollaborationContinueEditingDialog from '@/components/CollaborationContin
 import { EXAMPLE_FEATURE_MODEL_XML } from '@/classes/constants';
 import TutorialMode from '@/components/TutorialMode';
 import { NewEmptyModelCommand } from '@/classes/Commands/FeatureModel/NewEmptyModelCommand';
+import { SliceCommand } from "@/classes/Commands/FeatureModel/SliceCommand";
+import { FeatureNode } from "@/classes/FeatureNode";
 import FeatureModelInformation from '@/components/FeatureModel/FeatureModelInformation';
 import { useAppStore } from '@/store/app';
 import { useRouter } from 'vue-router';
+import axios from "axios";
 
 const router = useRouter();
 const appStore = useAppStore();
@@ -176,6 +180,38 @@ export default {
             // TODO: Transpile the xml file new and restart viewer.
             this.initData();
             this.reloadKey++;
+        },
+
+        async slice(node) {
+            this.xml = jsonToXML(this.data);
+
+            const content = new TextEncoder().encode(this.xml);
+            let response = await axios.post(`${import.meta.env.VITE_APP_DOMAIN_FEATUREIDESERVICE}slice`, {
+                name: "hello.xml",
+                selection: [node.name],
+                content: Array.from(content)
+            });
+            console.log(response);
+            let contentAsString = new TextDecoder().decode(Uint8Array.from(response.data.content));
+            console.log(contentAsString)
+            const xml = beautify(contentAsString);
+            let newData = {
+                featureMap: [],
+                constraints: [],
+                properties: [],
+                calculations: undefined,
+                comments: [],
+                featureOrder: undefined,
+                rootNode: new FeatureNode(null, 'Root', 'and', false, false),
+            };
+            xmlTranspiler.xmlToJson(xml, newData);
+            this.xml = xml;
+            const command = new SliceCommand(
+                this,
+                newData
+            );
+            this.featureModelCommandManager.execute(command);
+            this.updateFeatureModel();
         },
 
         newEmptyModel() {

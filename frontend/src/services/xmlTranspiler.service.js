@@ -25,7 +25,7 @@ export function xmlToJson(currentModel, data) {
     data.calculations = getCalculations(calculationsSection);
 
     data.rootNode = getChildrenOfFeature(struct, null, data)[0];
-    data.constraints = readConstraints(constraintsContainer,data);
+    data.constraints = readConstraints(constraintsContainer, data);
     data.properties = getProperties(propertiesSection);
     data.comments = getComments(commentsSection);
     data.featureOrder = getFeatureOrder(featureOrderSection);
