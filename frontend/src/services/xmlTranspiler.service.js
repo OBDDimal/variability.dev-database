@@ -46,6 +46,9 @@ function getChildrenOfFeature(struct, parent, data) {
                 child.getAttribute('mandatory') === 'true',
                 child.getAttribute('abstract') === 'true'
             );
+            if(child.tagName === 'feature'){
+              toAppend.setGroupType('and')
+            }
             toAppend.children = getChildrenOfFeature(child, toAppend, data);
 
             data.featureMap[toAppend.name] = toAppend;
