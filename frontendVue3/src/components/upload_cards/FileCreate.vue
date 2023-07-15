@@ -31,7 +31,8 @@
                 <v-window-item value="multiple"> 
                     <multiple @close="$emit('close')"></multiple>
                  </v-window-item>
-                <v-window-item value="zip"> Zip </v-window-item>
+                <v-window-item value="zip">
+                  <zip @close="$emit('close')" ></zip></v-window-item>
             </v-window>
             <!--            <v-tabs-items v-model="tab" class="pt-4">
 &lt;!&ndash;                <v-tab-item> </v-tab-item>&ndash;&gt;
@@ -425,6 +426,7 @@ import api from '@/services/api.service';
 import { onMounted, ref, watch } from 'vue';
 import Single from '@/components/upload_cards/file_create/Single.vue';
 import Multiple from '@/components/upload_cards/file_create/Multiple.vue';
+import Zip from '@/components/upload_cards/file_create/Zip.vue'
 import { useAppStore } from '@/store/app';
 import { storeToRefs } from 'pinia';
 import { useFileStore } from '@/store/file';
