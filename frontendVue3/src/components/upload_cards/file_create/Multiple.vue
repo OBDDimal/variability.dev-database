@@ -25,7 +25,8 @@
                 show-size
                 >
   
-</v-file-input></v-col>
+                </v-file-input>
+            </v-col>
             <v-col class="py-0" cols="12" md="6">
               <v-select
               v-model="formData.license"
@@ -41,6 +42,7 @@
               >
               </v-select>
             </v-col>
+            <!--
             <v-col class="py-0" cols="12" md="6">
               <v-combobox
               v-model="formData.family"
@@ -68,7 +70,9 @@
                 label="New Family Description"
               ></v-text-field>
             </v-col>
+            -->
           </v-row>
+          
           <v-row>
             <v-col class="py-0" cols="12">
                 <v-combobox
@@ -169,8 +173,8 @@ let formData = reactive({
   description: '',
   files: [],
   license: null,
-  family: null,
-  version: '',
+  family: '1',
+  version: '1.0.0',
   tags: [],
   legalShare: false,
   userData: false,
@@ -197,7 +201,6 @@ let numberOfModelsInFamily = ref(0);
 
 let versionRules = [(v) => !!v || 'Version is required'];
 
-let gottenTags = ref([]);
 let newTag = { label: '', description: '', is_public: false };
 
 let addTagMenu = ref(false);
