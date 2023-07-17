@@ -20,8 +20,8 @@ export class EditCommand extends FeatureNodeCommand {
             this.node.parent.uncollapse();
             this.node.parent.unhideChildren();
         }
-
         this.node.name = this.newData.name;
+        this.node.setDisplayName(this.newData.name);
         this.node.groupType = this.newData.groupType;
         this.node.isMandatory = this.newData.mandatory;
         this.node.isAbstract = this.newData.abstract;
@@ -34,6 +34,7 @@ export class EditCommand extends FeatureNodeCommand {
         }
 
         this.node.name = this.oldData.name;
+        this.node.setDisplayName(this.oldData.name);
         this.node.groupType = this.oldData.groupType;
         this.node.isMandatory = this.oldData.mandatory;
         this.node.isAbstract = this.oldData.abstract;
