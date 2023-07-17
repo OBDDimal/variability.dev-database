@@ -1,5 +1,5 @@
 <template>
-    <v-dialog
+    <v-bottom-sheet
         v-model="isOpenDialog"
         hide-overlay
         @click:outside="$emit('close')"
@@ -97,7 +97,7 @@
                 </v-icon>
             </template>
         </v-data-table>
-    </v-dialog>
+    </v-bottom-sheet>
 </template>
 
 <script>
