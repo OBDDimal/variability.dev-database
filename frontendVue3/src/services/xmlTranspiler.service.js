@@ -5,6 +5,7 @@ import { Disjunction } from '@/classes/Constraint/Disjunction';
 import { Conjunction } from '@/classes/Constraint/Conjunction';
 import { Implication } from '@/classes/Constraint/Implication';
 import { Negation } from '@/classes/Constraint/Negation';
+import { SoloDisjunction } from '@/classes/Constraint/SoloDisjunction';
 
 export function xmlToJson(currentModel, data) {
     /*const start = performance.now();*/
@@ -96,14 +97,7 @@ function readConstraintItem(item, data) {
                     return new Negation(childItems[0]);
             }
         } else {
-            switch (item.tagName) {
-                case 'disj':
-                    return new Disjunction(childItems[0], childItems[0]);
-                case 'conj':
-                    return new Conjunction(childItems[0], childItems[0]);
-                case 'imp':
-                    return new Implication(childItems[0], childItems[0]);
-            }
+            return new SoloDisjunction(childItems[0]);
         }
     }
 }
