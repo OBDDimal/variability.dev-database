@@ -115,6 +115,29 @@ export const useFileStore = defineStore('file', {
                     );
                 });
         },
+        async uploadZipFeatureModel(data) {
+            const appStore = useAppStore();
+            await api
+                .post(`${API_URL}zip-upload/`, data, {
+                    headers: { 'Content-Type': 'multipart/form-data' },
+                })
+                .then(() => {
+                    appStore.updateSnackbar(
+                        'Upload successfully! Check your mails',
+                        'success',
+                        5000,
+                        true
+                    );
+                })
+                .catch((error) => {
+                    appStore.updateSnackbar(
+                        'Error! ' + error.message,
+                        'error',
+                        5000,
+                        true
+                    );
+                });
+        },
         async uploadTag(payload) {
             // payload = { label, description, is_public }
             const appStore = useAppStore();

@@ -9,7 +9,7 @@
             each individual Feature Model. <br />
         </div>
         <v-form
-            ref="zipform"
+            ref="valid_zip"
             v-model="valid_zip"
             lazy-validation
         >
@@ -17,7 +17,7 @@
                 <v-col class="py-0" cols="12" md="6">
                     <v-text-field
                         data-cy="file-create-zip-label-textfield"
-                        v-model="label_zip"
+                        v-model="formData.label"
                         :rules="labelRules"
                         accept=".zip"
                         dense
@@ -33,7 +33,7 @@
                 <v-col class="py-0" cols="12">
                     <v-textarea
                         data-cy="file-create-zip-description-textfield"
-                        v-model="description_zip"
+                        v-model="formData.description"
                         :rules="descriptionRules"
                         counter="250"
                         dense
@@ -50,7 +50,7 @@
                 <v-col class="py-0" cols="12" md="6">
                     <v-file-input
                         data-cy="file-create-zip-file-input"
-                        v-model="file_zip"
+                        v-model="formData.files"
                         :rules="fileRules"
                         accept=".zip"
                         dense
@@ -66,9 +66,11 @@
                 <v-col class="py-0" cols="12" md="6">
                     <v-select
                         data-cy="file-create-zip-license-select"
-                        v-model="license_zip"
-                        :items="getLicenses"
+                        v-model="formData.license"
+                        :items="licenses"
                         :rules="licenseRules"
+                        item-title="label"
+                        item-value="id"
                         dense
                         variant="outlined"
                         density="comfortable"
@@ -79,24 +81,29 @@
                     >
                     </v-select>
                 </v-col>
+                
                 <v-col class="py-0" cols="12" md="6">
-                    <!-- Change back to v-combobox when new family upload is working properly -->
-                    <v-text-field
-                        data-cy="file-create-zip-family-label-textfield"
-                        v-model="family_zip"
+                    <v-autocomplete
+                        v-model="formData.family"
+                        :items="fileStore.myOwnFamilies"
+                        item-title="label"
+                        item-value="id"
                         :required="true"
-                        dense
+                        :rules="familyRules"
                         variant="outlined"
                         density="comfortable"
-                        hint="Create new family"
-                        label="New Family"
-                        outlined
-                    ></v-text-field>
+                        hint="Add to or create new family"
+                        label="Family"
+                        append-icon="mdi-plus"
+                        @click:append="addFamilyMenu = !addFamilyMenu"
+                        @change="familyChange"
+                    ></v-autocomplete>
                 </v-col>
+                <!--
                 <v-col class="py-0" cols="12" md="6">
                     <v-text-field
                         data-cy="file-create-zip-family-description-textfield"
-                        v-model="newFamilyDescription_zip"
+                        v-model="formData."
                         dense
                         variant="outlined"
                         density="comfortable"
@@ -105,33 +112,32 @@
                         outlined
                     ></v-text-field>
                 </v-col>
+                -->
             </v-row>
+            
             <v-row>
                 <v-col class="py-0" cols="12">
                     <!-- Change back to v-combobox once sequential axios requests are implemented -->
                     <v-autocomplete
-                        v-model="tags_zip"
-                        :items="getTags"
-                        append-outer-icon="mdi-plus"
+                        v-model="formData.tags"
+                        :items="myOwnTags"
+                        append-icon="mdi-plus"
+                        item-value="id"
+                        item-title="label"
                         chips
-                        dense
                         variant="outlined"
                         density="comfortable"
                         hide-details
                         hint="Choose or create tags for your feature model"
                         label="Tags"
                         multiple
-                        outlined
-                        small-chips
-                        @click:append-outer="
-                            editTagMenu = !editTagMenu
-                        "
+                        @click:append="addTagMenu = !addTagMenu"
                     ></v-autocomplete>
                 </v-col>
                 <v-col class="pb-0" cols="12">
                     <v-checkbox
                         data-cy="file-create-zip-legal-share-checkbox"
-                        v-model="legalShare_zip"
+                        v-model="formData.legalShare"
                         class="mt-0"
                         hide-details
                         label="I am legally allowed to share this model"
@@ -143,7 +149,7 @@
                 <v-col class="py-0" cols="12">
                     <v-checkbox
                         data-cy="file-create-zip-user-data-checkbox"
-                        v-model="userData_zip"
+                        v-model="formData.userData"
                         class="mt-0"
                         hide-details
                         label="My email and a date will always be tied to the file upload (even after account deletion)"
@@ -155,7 +161,7 @@
                 <v-col class="py-0" cols="12">
                     <v-checkbox
                         data-cy="file-create-zip-open-source-checkbox"
-                        v-model="openSource_zip"
+                        v-model="formData.openSource"
                         class="mt-0"
                         hide-details
                         label="All information will be published according to your chosen license"
@@ -165,24 +171,19 @@
                     </v-checkbox>
                 </v-col>
                 <v-col class="pb-0" cols="12">
-                    <div class="d-flex align-center">
-                        <v-spacer></v-spacer>
-                        <span
-                            v-if="uploadStatus !== ''"
-                            class="text-subtitle-1"
-                            >{{ uploadStatus }}</span
-                        >
-                        <action-buttons
-                        :data="formData"
-                  :valid="valid_bulk"
+                <action-buttons
+                    :data="formData"
+                  :valid="valid_zip"
                   @close="$emit('close')"
                   @submit-click="showDetails = true"
                 ></action-buttons>
-                    </div>
                 </v-col>
             </v-row>
         </v-form>
     </v-container>
+    <v-dialog v-model="addTagMenu" max-width="350">
+        <tag-create @close="addTagMenu = false"></tag-create>
+    </v-dialog>
 </template>
 <script setup>
 import { computed, onMounted, reactive, ref, watch } from 'vue';
@@ -196,18 +197,65 @@ const fileStore = useFileStore();
 
 const emit = defineEmits(['close']);
 
-const valid_bulk = ref(null);
+const valid_zip = ref(null);
 
 let formData = reactive({
   label: '',
   description: '',
   files: null,
   license: null,
-  family: '1',
+  family: '11',
   version: '1.0.0',
   tags: [],
   legalShare: false,
   userData: false,
   openSource: false,
 });
+
+const showDetails = ref(false);
+
+let labelRules = [(v) => !!v || 'Label is required'];
+
+let descriptionRules = [
+    (v) => !!v || 'Description is required',
+    (v) => v.length <= 250 || 'Max 250 characters please',
+];
+
+let fileRules = [(v) => !!v || 'File is required'];
+
+let { licenses, tags, myOwnTags } = storeToRefs(fileStore);
+let licenseRules = [(v) => !!v || 'License is required'];
+
+let familyRules = [(v) => !!v || 'Family is required'];
+
+let checkboxRules = [(v) => !!v || 'Checkbox must be checked'];
+
+let gottenFamilies = ref([]);
+let gottenFiles = ref([]);
+
+let allVersions = ref([]);
+let latestFeatureModelVersion = ref(null);
+let numberOfModelsInFamily = ref(0);
+
+let versionRules = [(v) => !!v || 'Version is required'];
+
+let gottenTags = ref([]);
+let newTag = { label: '', description: '', is_public: false };
+
+let addTagMenu = ref(false);
+let addFamilyMenu = ref(false);
+
+watch(
+    () => formData.family,
+    (value) => {
+        console.log(getFeatureModelOfFamily(value));
+    }
+);
+
+async function getFeatureModelOfFamily(id) {
+    const res = await fileStore.fetchFeatureModelOfFamily(id);
+    console.log(res.length);
+    return res;
+}
 </script>
+
