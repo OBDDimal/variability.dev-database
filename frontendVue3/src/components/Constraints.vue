@@ -72,25 +72,25 @@
 
             <template v-slot:item.formula="{ item }">
                 <v-chip
-                    v-model="item.columns.checked"
-                    :color="item.columns.color"
-                    :style="`color: ${computeColor(item.columns.color)}`"
-                    @click="highlightConstraint(item.columns)"
+                    v-model="item.raw.checked"
+                    :color="item.raw.color"
+                    :style="`color: ${computeColor(item.raw.color)}`"
+                    @click="highlightConstraint(item.raw)"
                 >
-                    {{ item.columns.formula }}
+                    {{ item.raw.formula }}
                 </v-chip>
             </template>
 
             <template v-slot:item.actions="{ item }">
                 <v-icon
                     class="mr-6"
-                    @click="openAddEditDialog('Edit', item.columns.constraint)"
+                    @click="openAddEditDialog('Edit', item.raw.constraint)"
                     :disabled="!editRights"
                 >
                     mdi-pencil
                 </v-icon>
                 <v-icon
-                    @click="deleteConstraint(item.columns.constraint)"
+                    @click="deleteConstraint(item.raw.constraint)"
                     :disabled="!editRights"
                 >
                     mdi-delete
@@ -116,7 +116,7 @@ export default {
 
     props: {
         commandManager: CommandManager,
-        constraints: undefined,
+        constraints: Array,
         rootNode: undefined,
         editRights: undefined,
         isOpen: Boolean,
@@ -124,8 +124,8 @@ export default {
 
     data: () => ({
         headers: [
-            { text: 'Constraint', key: 'formula', width: '50%' },
-            { text: 'Actions', key: 'actions', width: '50%' },
+            { title: 'Constraint', key: 'formula', width: '50%' },
+            { title: 'Actions', key: 'actions', width: '50%' },
         ], 
         search: '',
         showAddEditDialog: false,
@@ -152,7 +152,6 @@ export default {
 
     methods: {
         highlightConstraint(constraintRow) {
-            console.log(constraintRow);
             constraintRow.checked = !constraintRow.checked;
             constraintRow.constraint.toggleHighlighted();
             constraintRow.constraint
