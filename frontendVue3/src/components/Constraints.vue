@@ -70,14 +70,13 @@
                 </div>
             </template>
 
-            <template v-slot:item.formula="{ item }">
+            <template v-slot:item.formula="{ item }">          
                 <v-chip
-                    v-model="item.raw.checked"
                     :color="item.raw.color"
                     :style="`color: ${computeColor(item.raw.color)}`"
                     @click="highlightConstraint(item.raw)"
                 >
-                    {{ item.raw.formula }}
+                {{ item.raw.formula }}
                 </v-chip>
             </template>
 
@@ -145,14 +144,12 @@ export default {
             return this.constraints.map((e) => ({
                 constraint: e,
                 formula: e.toString(),
-                checked: false,
             }));
         },
     },
 
     methods: {
         highlightConstraint(constraintRow) {
-            constraintRow.checked = !constraintRow.checked;
             constraintRow.constraint.toggleHighlighted();
             constraintRow.constraint
                 .getFeatureNodes()
