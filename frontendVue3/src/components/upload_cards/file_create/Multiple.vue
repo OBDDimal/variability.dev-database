@@ -7,7 +7,7 @@
           <b>Version: </b> Version will be incremented automatically. <br />
           <b>Tags: </b> The chosen tags will be applied to each individual Feature Model. <br />
         </div>
-        <v-form ref="valid_bulk" v-model="valid_bulk" lazy-validation>
+        <v-form ref="form" lazy-validation  @submit.prevent>
           <v-row>
             <v-col class="py-0" cols="12" md="6">
                 <v-file-input
@@ -23,9 +23,7 @@
                 label="File Upload"
                 required
                 show-size
-                >
-  
-                </v-file-input>
+                ></v-file-input>
             </v-col>
             <v-col class="py-0" cols="12" md="6">
               <v-select
@@ -42,6 +40,24 @@
               >
               </v-select>
             </v-col>
+            <v-col class="py-1" cols="12" md="6">
+                    <!-- Change back to v-combobox when new family upload is working properly -->
+                    <v-autocomplete
+                        v-model="formData.family"
+                        :items="fileStore.myOwnFamilies"
+                        item-title="label"
+                        item-value="id"
+                        :required="true"
+                        :rules="familyRules"
+                        variant="outlined"
+                        density="comfortable"
+                        hint="Add to or create new family"
+                        label="Family"
+                        append-icon="mdi-plus"
+                        @click:append="addFamilyMenu = !addFamilyMenu"
+                        @change="familyChange"
+                    ></v-autocomplete>
+                </v-col>
             <!--
             <v-col class="py-0" cols="12" md="6">
               <v-combobox
@@ -77,7 +93,7 @@
             <v-col class="py-0" cols="12">
                 <v-combobox
                         v-model="formData.tags"
-                        :items="myOwnTags"
+                        :items="fileStore.myOwnTags"
                         append-icon="mdi-plus"
                         item-value="id"
                         item-title="label"
@@ -131,16 +147,17 @@
               </v-checkbox>
             </v-col>
             <v-col class="pb-0" cols="12">
-              <div class="d-flex align-center">
+              <!--<div class="d-flex align-center">
                 <v-spacer></v-spacer>
                 <span v-if="uploadStatus !== ''" class="text-subtitle-1">{{ uploadStatus }}</span>
-                <action-buttons
+                
+              </div>-->
+              <action-buttons
                   :data="formData"
-                  :valid="valid_bulk"
+                  :valid="form"
                   @close="$emit('close')"
                   @submit-click="showDetails = true"
                 ></action-buttons>
-              </div>
             </v-col>
           </v-row>
         </v-form>
@@ -166,15 +183,15 @@ const fileStore = useFileStore();
 
 const emit = defineEmits(['close']);
 
-const valid_bulk = ref(null);
+const form = ref(null);
 
 let formData = reactive({
   label: '',
   description: '',
-  files: [],
+  files: null,
   license: null,
-  family: '1',
-  version: '1.0.0',
+  family: null,
+  version: '',
   tags: [],
   legalShare: false,
   userData: false,
@@ -205,14 +222,17 @@ let newTag = { label: '', description: '', is_public: false };
 
 let addTagMenu = ref(false);
 let addFamilyMenu = ref(false);
+let fileNames = ref([]);
 
 watch(() => formData.family, (value) => {
   console.log(getFeatureModelOfFamily(value));
-});
+}
+);
+
 
 async function getFeatureModelOfFamily(id) {
   const res = await fileStore.fetchFeatureModelOfFamily(id);
-  console.log(res.length);
+  console.log(res);
   return res;
 }
 

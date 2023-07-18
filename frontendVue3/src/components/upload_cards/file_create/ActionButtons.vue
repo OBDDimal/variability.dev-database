@@ -114,12 +114,11 @@ async function uploadBulk() {
   const data = new FormData();
   let file_data = [];
   loading.value = true;
-  majorversion = 1;
-  
-  
+  let majorversion = 1;
   for (let i = 0; i < props.data.files.length; i++) {
     const file = props.data.files[i];
-    let version = `${majorversion}.0.0`;
+    console.log(props.data.files[i].name)
+    let version = majorversion.toString() + '.0.0';
     let file_object = {};
     const options = {
                         weekday: 'long',
@@ -135,11 +134,13 @@ async function uploadBulk() {
     file_object['license'] = props.data.license;
     file_object['version'] = version;
     file_object['family'] = props.data.family;
-    file_object['tags'] = props.data.tags;
+    file_object['tags'] = props.data.tags.map((x) =>
+                        parseInt(x.id)
+                    );
     file_object['file'] = i.toString();
     file_data.push(file_object);
 
-    data.append(i.toString(), file[0]);
+    data.append(i.toString(), file);
     majorversion++;
   }
 

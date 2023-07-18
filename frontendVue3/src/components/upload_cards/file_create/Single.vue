@@ -30,7 +30,7 @@
                 </v-col>
                 <v-col class="py-1" cols="12" md="6">
                     <v-file-input
-                        v-model="formData.file"
+                        v-model="formData.files"
                         :rules="fileRules"
                         accept=".xml"
                         small-chips
@@ -219,7 +219,7 @@ const form = ref(null);
 let formData = reactive({
     label: '',
     description: '',
-    file: null,
+    files: null,
     license: null,
     family: null,
     version: '',
