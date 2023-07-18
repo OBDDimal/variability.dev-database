@@ -6,6 +6,7 @@
                 ref="featureModelTree"
                 :collaborationStatus="collaborationStatus"
                 :command-manager="featureModelCommandManager"
+                :is-service-available="isServiceAvailable"
                 :constraints="data.constraints"
                 :editRights="editRights"
                 :rootNode="data.rootNode"
@@ -176,6 +177,7 @@ export default Vue.extend({
             featureOrder: undefined,
             rootNode: undefined,
         },
+        isServiceAvailable: false,
         xml: undefined,
         reloadKey: 0,
         collaborationReloadKey: 10000,
@@ -232,6 +234,7 @@ export default Vue.extend({
                 alert('Wrong key!');
             }
         }
+        this.checkService()
 
         // Start tutorial mode if it has not been completed before
         this.showTutorial = !localStorage.featureModelTutorialCompleted;
@@ -307,6 +310,19 @@ export default Vue.extend({
             );
             this.featureModelCommandManager.execute(command);
             this.updateFeatureModel();
+        },
+
+        async checkService() {
+            while (true) {
+                let response = await axios.get(`${process.env.VUE_APP_DOMAIN_FEATUREIDESERVICE}`);
+                if (response.status === 200) {
+                    this.isServiceAvailable = true;
+                } else {
+                    this.isServiceAvailable = false;
+                }
+                await new Promise(res => setTimeout(res,5000))
+            }
+
         },
 
         newEmptyModel() {

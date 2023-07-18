@@ -381,6 +381,16 @@
                         </v-list-item>
                     </v-list>
                 </v-menu>
+
+                <v-list-item >
+                    <v-list-item-icon>
+                        <v-icon>{{isServiceAvailable ? 'mdi-wifi' : 'mdi-wifi-off'}}</v-icon>
+                    </v-list-item-icon>
+
+                    <v-list-item-content>
+                        <v-list-item-title>FeatureIDEService Status</v-list-item-title>
+                    </v-list-item-content>
+                </v-list-item>
             </v-list>
         </v-navigation-drawer>
     </div>
@@ -398,6 +408,7 @@ export default Vue.extend({
         isUndoAvailable: Boolean,
         isRedoAvailable: Boolean,
         isSaveAvailable: Boolean,
+        isServiceAvailable: Boolean,
         direction: String,
         editRights: undefined,
         collaborationStatus: undefined,
