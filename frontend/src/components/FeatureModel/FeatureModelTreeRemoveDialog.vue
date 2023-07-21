@@ -46,7 +46,6 @@ export default Vue.extend({
   }),
 
   props: {
-    model: Object,
     node: Object,
     show: Boolean,
   },

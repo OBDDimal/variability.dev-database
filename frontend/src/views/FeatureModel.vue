@@ -6,10 +6,13 @@
                 ref="featureModelTree"
                 :collaborationStatus="collaborationStatus"
                 :command-manager="featureModelCommandManager"
-                :is-service-available="isServiceAvailable"
                 :constraints="data.constraints"
+                :is-service-available="isServiceAvailable"
                 :editRights="editRights"
                 :rootNode="data.rootNode"
+                :loadingData="loadingData"
+                :error="error"
+                :error-message="errorMessage"
                 @exportToXML="exportToXML"
                 @reset="reset"
                 @save="save"
@@ -21,6 +24,8 @@
                 @show-claim-dialog="showClaimDialog"
                 @new-empty-model="newEmptyModel"
                 @show-tutorial="showTutorial = true"
+                @error-closed="errorClosed"
+                @error-new="message => errorNew(message)"
         >
         </feature-model-tree>
 
@@ -177,6 +182,9 @@ export default Vue.extend({
             featureOrder: undefined,
             rootNode: undefined,
         },
+        loadingData: false,
+        error: false,
+        errorMessage: "",
         isServiceAvailable: false,
         xml: undefined,
         reloadKey: 0,
@@ -281,46 +289,51 @@ export default Vue.extend({
         },
 
         async slice(node) {
-            this.xml = jsonToXML(this.data);
+            this.loadingData = true;
+            console.log(this.loadingData)
+            await this.checkService()
+            if (this.isServiceAvailable) {
 
-            const content = new TextEncoder().encode(this.xml);
-            let response = await axios.post(`${process.env.VUE_APP_DOMAIN_FEATUREIDESERVICE}slice`, {
-                name: "hello.xml",
-                selection: [node.name],
-                content: Array.from(content)
-            });
-            console.log(response);
-            let contentAsString = new TextDecoder().decode(Uint8Array.from(response.data.content));
-            console.log(contentAsString)
-            const xml = beautify(contentAsString);
-            let newData = {
-                featureMap: [],
-                constraints: [],
-                properties: [],
-                calculations: undefined,
-                comments: [],
-                featureOrder: undefined,
-                rootNode: new FeatureNode(null, 'Root', 'and', false, false),
-            };
-            xmlTranspiler.xmlToJson(xml, newData);
-            this.xml = xml;
-            const command = new SliceCommand(
-                this,
-                newData
-            );
-            this.featureModelCommandManager.execute(command);
-            this.updateFeatureModel();
+                this.xml = jsonToXML(this.data);
+                const content = new TextEncoder().encode(this.xml);
+                let response = await axios.post(`${process.env.VUE_APP_DOMAIN_FEATUREIDESERVICE}slice`, {
+                    name: "hello.xml",
+                    selection: [node.name],
+                    content: Array.from(content)
+                });
+                console.log(response);
+                let contentAsString = new TextDecoder().decode(Uint8Array.from(response.data.content));
+                console.log(contentAsString)
+                const xml = beautify(contentAsString);
+                let newData = {
+                    featureMap: [],
+                    constraints: [],
+                    properties: [],
+                    calculations: undefined,
+                    comments: [],
+                    featureOrder: undefined,
+                    rootNode: new FeatureNode(null, 'Root', 'and', false, false),
+                };
+                xmlTranspiler.xmlToJson(xml, newData);
+                this.xml = xml;
+                const command = new SliceCommand(
+                    this,
+                    newData
+                );
+                this.featureModelCommandManager.execute(command);
+                this.updateFeatureModel();
+            } else {
+                this.errorNew("FeatureIDE Service is not available to slice the feature.")
+            }
+            this.loadingData = false;
         },
 
         async checkService() {
-            while (true) {
+            try {
                 let response = await axios.get(`${process.env.VUE_APP_DOMAIN_FEATUREIDESERVICE}`);
-                if (response.status === 200) {
-                    this.isServiceAvailable = true;
-                } else {
-                    this.isServiceAvailable = false;
-                }
-                await new Promise(res => setTimeout(res,5000))
+                this.isServiceAvailable = response.status === 200;
+            } catch (error) {
+                this.isServiceAvailable = false
             }
 
         },
@@ -384,6 +397,16 @@ export default Vue.extend({
             this.collaborationManager.closeCollaboration();
             this.collaborationManager.noConfirm = false;
             this.$router.push('/');
+        },
+
+        errorClosed() {
+            this.error = false;
+            this.errorMessage = '';
+        },
+
+        errorNew(message) {
+            this.error = true;
+            this.errorMessage = message;
         },
     },
 });

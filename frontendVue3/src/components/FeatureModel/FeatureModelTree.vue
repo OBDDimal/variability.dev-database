@@ -75,6 +75,7 @@
             :is-undo-available="
                 commandManager && commandManager.isUndoAvailable()
             "
+            :is-service-available="isServiceAvailable"
             @coloring="(coloringIndex) => coloring(coloringIndex)"
             @export="$emit('exportToXML')"
             @fitToView="fitToView"
@@ -127,6 +128,18 @@
         >
         </feature-model-tree-edit-dialog>
 
+      <feature-model-tree-loading-dialog
+                :show="loadingData"
+        >
+        </feature-model-tree-loading-dialog>
+
+        <feature-model-tree-error-dialog
+                :show="error"
+                :error-message="errorMessage"
+                @close="$emit('error-closed')"
+        >
+        </feature-model-tree-error-dialog>
+
       <feature-model-tree-remove-dialog
         :node="editNode"
         :show="showRemoveDialog"
@@ -154,6 +167,8 @@ import FeatureModelTreeContextMenu from './FeatureModelTreeContextMenu.vue';
 import FeatureModelTreeEditDialog from '@/components/FeatureModel/FeatureModelTreeEditDialog.vue';
 import FeatureModelTreeAddDialog from '@/components/FeatureModel/FeatureModelTreeAddDialog';
 import FeatureModelTreeRemoveDialog from '@/components/FeatureModel/FeatureModelTreeRemoveDialog.vue';
+import FeatureModelTreeLoadingDialog from '@/components/FeatureModel/FeatureModelTreeLoadingDialog.vue';
+import FeatureModelTreeErrorDialog from '@/components/FeatureModel/FeatureModelTreeErrorDialog.vue';
 // Import feature-model-services
 import * as dragAndDrop from '@/services/FeatureModel/dragAndDrop.service.js';
 import * as update from '@/services/FeatureModel/update.service.js';
@@ -172,6 +187,8 @@ export default {
     name: 'FeatureModelTree',
 
     components: {
+      FeatureModelTreeErrorDialog,
+      FeatureModelTreeLoadingDialog,
         FeatureModelTreeToolbar,
         FeatureModelTreeContextMenu,
         FeatureModelTreeEditDialog,
@@ -186,6 +203,10 @@ export default {
         constraints: undefined,
         editRights: undefined,
         collaborationStatus: undefined,
+        isServiceAvailable: Boolean,
+        loadingData: Boolean,
+        errorMessage: String,
+        error: Boolean,
     },
 
     data: () => ({
@@ -396,11 +417,13 @@ export default {
         },
 
         openAddAsChildDialog(d3Node) {
+            this.closeContextMenu();
             this.d3Data.d3ParentOfAddNode = d3Node;
             this.showAddDialog = true;
         },
 
         openAddAsSiblingDialog(d3Node) {
+            this.closeContextMenu();
             this.d3Data.d3ParentOfAddNode = d3Node.parent;
             this.showAddDialog = true;
         },

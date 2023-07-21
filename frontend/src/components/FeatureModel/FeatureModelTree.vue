@@ -72,8 +72,8 @@
                 :is-redo-available="commandManager && commandManager.isRedoAvailable()"
                 :is-save-available="(commandManager && commandManager.isUndoAvailable())
                 || (commandManager.collaborationManager.constraintCommandManager.isUndoAvailable())"
-                :is-service-available="isServiceAvailable"
                 :is-undo-available="commandManager && commandManager.isUndoAvailable()"
+                :is-service-available="isServiceAvailable"
                 @coloring="coloringIndex => coloring(coloringIndex)"
                 @export="$emit('exportToXML')"
                 @fitToView="fitToView"
@@ -134,6 +134,18 @@
         >
         </feature-model-tree-remove-dialog>
 
+        <feature-model-tree-loading-dialog
+                :show="loadingData"
+        >
+        </feature-model-tree-loading-dialog>
+
+        <feature-model-tree-error-dialog
+                :show="error"
+                :error-message="errorMessage"
+                @close="$emit('error-closed')"
+        >
+        </feature-model-tree-error-dialog>
+
         <feature-model-tree-add-dialog
                 :parent="
 				d3Data.d3ParentOfAddNode
@@ -154,6 +166,8 @@ import FeatureModelTreeContextMenu from './FeatureModelTreeContextMenu.vue'
 import FeatureModelTreeEditDialog from './FeatureModelTreeEditDialog.vue'
 import FeatureModelTreeRemoveDialog from './FeatureModelTreeRemoveDialog.vue'
 import FeatureModelTreeAddDialog from '@/components/FeatureModel/FeatureModelTreeAddDialog'
+import FeatureModelTreeLoadingDialog from "@/components/FeatureModel/FeatureModelTreeLoadingDialog.vue"
+import FeatureModelTreeErrorDialog from "@/components/FeatureModel/FeatureModelTreeErrorDialog.vue";
 
 // Import feature-model-services
 import * as dragAndDrop from '@/services/FeatureModel/dragAndDrop.service.js'
@@ -167,25 +181,31 @@ import {EditCommand} from '@/classes/Commands/FeatureModel/EditCommand'
 import * as update_service from '@/services/FeatureModel/update.service'
 import {RemoveCommand} from "@/classes/Commands/FeatureModel/RemoveCommand";
 
+
 export default Vue.extend({
     name: 'FeatureModelTree',
 
     components: {
+        FeatureModelTreeErrorDialog,
         FeatureModelTreeToolbar,
         FeatureModelTreeContextMenu,
         FeatureModelTreeEditDialog,
         FeatureModelTreeAddDialog,
         FeatureModelTreeRemoveDialog,
+        FeatureModelTreeLoadingDialog
     },
 
     props: {
         commandManager: CommandManager,
-        isServiceAvailable: Boolean,
         remoteCommands: undefined,
         rootNode: undefined,
         constraints: undefined,
         editRights: undefined,
         collaborationStatus: undefined,
+        isServiceAvailable: Boolean,
+        loadingData: Boolean,
+        errorMessage: String,
+        error: Boolean,
     },
 
     data: () => ({
