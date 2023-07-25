@@ -1,6 +1,6 @@
 <template>
     <div class="text-center">
-        <v-dialog v-model="showDialog" persistent width="80%">
+        <v-dialog v-model="showDialog" persistent width="80%" >
             <v-card>
                 <v-card-title class="text-h5">
                     {{ mode }} Constraint
@@ -14,52 +14,50 @@
                             ref="allNodes"
                             v-model="selectedFeatureNode"
                             :items="allNodes"
-                            item-text="name"
+                            item-title="name"
                             label="Select FeatureNode"
-                            @change="
-                                appendFeatureNode(selectedFeatureNode.name)
-                            "
+                            @update:modelValue="appendFeatureNode(selectedFeatureNode)"
                         ></v-combobox>
 
                         <v-row justify="space-between">
                             <v-col cols="6" sm="auto">
                                 <v-btn
-                                    outlined
+                                    variant="outlined"
                                     @click="appendText('AND', true, true)"
                                     >and
                                 </v-btn>
                             </v-col>
                             <v-col cols="6" sm="auto">
                                 <v-btn
-                                    outlined
+                                    variant="outlined"
                                     @click="appendText('OR', true, true)"
                                     >or
                                 </v-btn>
                             </v-col>
                             <v-col cols="6" sm="auto">
                                 <v-btn
-                                    outlined
+                                    variant="outlined"
                                     @click="appendText('IMPLIES', true, true)"
                                     >implies
                                 </v-btn>
                             </v-col>
                             <v-col cols="6" sm="auto">
                                 <v-btn
-                                    outlined
+                                    variant="outlined"
                                     @click="appendText('NOT', true, true)"
                                     >not
                                 </v-btn>
                             </v-col>
                             <v-col cols="6" sm="auto">
                                 <v-btn
-                                    outlined
+                                    variant="outlined"
                                     @click="appendText('(', true, false)"
                                     >(
                                 </v-btn>
                             </v-col>
                             <v-col cols="6" sm="auto">
                                 <v-btn
-                                    outlined
+                                    variant="outlined"
                                     @click="appendText(')', false, true)"
                                     >)
                                 </v-btn>
@@ -68,7 +66,6 @@
 
                         <v-row class="my-2">
                             <v-col class="pt-0" cols="12">
-                                <template>
                                     <v-text-field
                                         ref="inputField"
                                         v-model="constraintText"
@@ -78,14 +75,13 @@
                                                 checkParse(value) ||
                                                 this.errorText,
                                         ]"
+                                        label="Constraint"
                                         clearable
                                         hide-details
-                                        label="Constraint"
                                     ></v-text-field>
-                                    <label v-if="!isValid">
+                                    <label v-if="!isValid"> 
                                         {{ errorText }}
                                     </label>
-                                </template>
                             </v-col>
                         </v-row>
                     </v-card-text>
@@ -94,13 +90,13 @@
 
                     <v-card-actions>
                         <v-spacer></v-spacer>
-                        <v-btn color="secondary" text @click="discard"
+                        <v-btn color="secondary" variant="text" @click="discard"
                             >Discard
                         </v-btn>
                         <v-btn
                             :disabled="!isValid"
                             color="primary"
-                            text
+                            variant="text"
                             type="submit"
                             >{{ mode }}
                         </v-btn>
@@ -120,14 +116,14 @@ export default {
 
     data: () => ({
         constraintText: '',
-        selectedFeatureNode: '',
+        selectedFeatureNode: undefined,
         isValid: false,
         errorText: '',
     }),
 
     props: {
         show: Boolean,
-        allNodes: [FeatureNode],
+        allNodes: undefined,
         constraint: undefined,
         mode: undefined,
     },
@@ -137,7 +133,7 @@ export default {
             this.constraintText = this.constraint
                 ? this.constraint.toStringForEdit()
                 : '';
-        },
+        }
     },
 
     computed: {
@@ -147,7 +143,6 @@ export default {
             },
         },
     },
-
     methods: {
         discard() {
             this.constraintText = '';
@@ -180,9 +175,9 @@ export default {
             }
         },
 
-        appendFeatureNode(featureNodeName) {
-            if (!featureNodeName) return;
-            let name = featureNodeName;
+        appendFeatureNode(featureNode) {
+            if (!featureNode) return;
+            let name = featureNode.name;
             if (name.split(' ').length > 1) {
                 name = `"${name}"`;
             }
@@ -193,13 +188,12 @@ export default {
             if (!text) return;
             this.$refs.allNodes.internalSearch = '';
             this.$refs.allNodes.internalSearch = '';
-
             if (!this.constraintText) {
                 this.constraintText = '';
             }
 
             // Add space if there do not exist one.
-            const pos = this.$refs.inputField.$refs.input.selectionStart;
+            const pos =  this.$refs.inputField.selectionStart;
             let textToInsert = '';
             if (
                 addSpaceBefore &&
@@ -223,6 +217,8 @@ export default {
                 this.constraintText.slice(0, pos) +
                 textToInsert +
                 this.constraintText.slice(pos);
+            console.log("New constraintstext: "+ this.constraintText);
+            this.selectedFeatureNode=undefined;
         },
     },
 };
