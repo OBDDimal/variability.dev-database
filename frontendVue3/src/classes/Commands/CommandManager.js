@@ -112,9 +112,11 @@ export class CommandManager {
 
     fadeOut(d3Data, command) {
         // Rerender for edits and fade them out
-        setTimeout(() => {
-            command.unmarkChanges();
-            update.updateSvg(d3Data);
-        }, 5000);
+        if(this.d3Data){
+            setTimeout(() => {
+                command.unmarkChanges();
+                update.updateSvg(d3Data);
+            }, 5000);
+        }
     }
 }
