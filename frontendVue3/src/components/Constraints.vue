@@ -195,10 +195,12 @@ export default {
 
         undo() {
             this.commandManager.undo();
+            this.$emit('update-feature-model');
         },
 
         redo() {
             this.commandManager.redo();
+            this.$emit('update-feature-model');
         },
     },
 
