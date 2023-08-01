@@ -177,6 +177,9 @@ export default {
         },
 
         deleteConstraint(constraint) {
+            if(constraint.isHighlighted){ //reset highlight to free up color
+                constraint.toggleHighlighted();
+            }
             const command = new DeleteCommand(this.constraints, constraint);
             this.commandManager.execute(command);
             this.$emit('update-feature-model');
