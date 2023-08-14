@@ -1,23 +1,22 @@
 <template>
     <div
         :style="
-            $vuetify.breakpoint.smAndDown
+            smAndDown
                 ? 'position: absolute; top: 0; left: 5rem; width: inherit'
                 : ''
         "
     >
         <v-row
             class="mt-2"
-            :justify="$vuetify.breakpoint.smAndDown ? 'start' : 'center'"
+            :justify="smAndDown ? 'start' : 'center'"
             align="center"
         >
             <v-btn
-                v-if="$vuetify.breakpoint.mdAndDown"
+                v-if="mdAndDown"
                 @click="fab = !fab"
                 color="primary"
-                dark
+                theme="dark"
                 small
-                fab
                 class="mr-2"
             >
                 <v-icon v-if="fab"> mdi-close </v-icon>
@@ -25,22 +24,22 @@
             </v-btn>
             <v-slide-x-transition>
                 <v-toolbar
-                    v-show="fab || $vuetify.breakpoint.mdAndUp"
-                    :absolute="!$vuetify.breakpoint.smAndDown"
+                    v-show="fab || mdAndUp"
+                    :absolute="!smAndDown"
                     class="rounded-pill"
-                    :class="$vuetify.breakpoint.smAndDown ? '' : 'mt-2'"
+                    :class="smAndDown ? '' : 'mt-2'"
                     elevation="9"
                     height="auto"
                     style="border: 2px solid white"
                 >
                     <div
                         :style="
-                            $vuetify.breakpoint.smAndDown
+                            smAndDown
                                 ? 'max-width: 20vw'
                                 : 'max-width: 45vw'
                         "
                     >
-                        <v-chip-group disabled="true" mandatory>
+                        <v-chip-group disabled mandatory>
                             <v-chip
                                 :class="
                                     collaborationManager.isClient
@@ -104,11 +103,10 @@
                         "
                         bottom
                     >
-                        <template v-slot:activator="{ on, attrs }">
+                        <template v-slot:activator="{ props }">
                             <v-btn
                                 icon
-                                v-bind="attrs"
-                                v-on="on"
+                                v-bind="props"
                                 :disabled="claimButtonClickDisabled"
                                 @click="claimEditRights()"
                             >
@@ -119,11 +117,10 @@
                     </v-tooltip>
 
                     <v-tooltip v-if="collaborationManager.isHost" bottom>
-                        <template v-slot:activator="{ on, attrs }">
+                        <template v-slot:activator="{ props }">
                             <v-btn
                                 icon
-                                v-bind="attrs"
-                                v-on="on"
+                                v-bind="props"
                                 :color="
                                     collaborationManager.blockEditRequests
                                         ? 'primary'
@@ -138,12 +135,11 @@
                     </v-tooltip>
 
                     <v-tooltip v-if="collaborationManager.isHost" bottom>
-                        <template v-slot:activator="{ on, attrs }">
+                        <template v-slot:activator="{ props }">
                             <v-btn
                                 icon
-                                v-bind="attrs"
+                                v-bind="props"
                                 @click="showQrCode = true"
-                                v-on="on"
                             >
                                 <v-icon>mdi-qrcode</v-icon>
                             </v-btn>
@@ -152,12 +148,11 @@
                     </v-tooltip>
 
                     <v-tooltip v-if="collaborationManager.isHost" bottom>
-                        <template v-slot:activator="{ on, attrs }">
+                        <template v-slot:activator="{ props }">
                             <v-btn
                                 icon
-                                v-bind="attrs"
+                                v-bind="props"
                                 @click="copyLink"
-                                v-on="on"
                             >
                                 <v-icon>mdi-content-copy</v-icon>
                             </v-btn>
@@ -166,13 +161,12 @@
                     </v-tooltip>
 
                     <v-tooltip bottom>
-                        <template v-slot:activator="{ on, attrs }">
+                        <template v-slot:activator="{ props }">
                             <v-btn
                                 color="red"
                                 icon
-                                v-bind="attrs"
+                                v-bind="props"
                                 @click="showCloseDialog = true"
-                                v-on="on"
                             >
                                 <v-icon>mdi-close</v-icon>
                             </v-btn>
@@ -275,8 +269,17 @@
     </div>
 </template>
 
+<script setup>
+  import { useDisplay } from 'vuetify'
+
+  const { smAndDown, mdAndDown, mdAndUp } = useDisplay()
+</script>
+
 <script>
 import QrcodeVue from 'qrcode.vue';
+import { useAppStore } from '@/store/app';
+
+const appStore = useAppStore();
 
 export default {
     name: 'CollaborationToolbar',
@@ -299,17 +302,17 @@ export default {
 
     methods: {
         link() {
-            return `${process.env.VUE_APP_DOMAIN_FRONTEND}collaboration/${this.collaborationManager.collaborationKey}`;
+            return `${import.meta.env.VITE_APP_DOMAIN_FRONTEND}collaboration/${this.collaborationManager.collaborationKey}`;
         },
 
         copyLink() {
             navigator.clipboard.writeText(this.link());
-            this.$store.commit('updateSnackbar', {
-                message: 'Link copied',
-                variant: 'success',
-                timeout: 5000,
-                show: true,
-            });
+            appStore.updateSnackbar(
+                'Link copied',
+                'success',
+                5000,
+                true,
+            );
         },
 
         claimEditRights() {

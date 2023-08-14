@@ -63,6 +63,52 @@
             @update-feature-model="updateFeatureModel"
         ></constraints>
 
+        <collaboration-toolbar
+              v-if="collaborationStatus"
+              :key="collaborationReloadKey"
+              :collaboration-manager="collaborationManager"
+              :show-claim-dialog="showClaimDialog"
+        ></collaboration-toolbar>
+
+        <v-dialog
+            v-model="showStartCollaborationSessionDialog"
+            persistent
+            width="auto"
+        >
+            <v-card>
+                <v-card-title
+                    >Do you want to start a new collaboration
+                    session?</v-card-title
+                >
+                <v-card-actions>
+                    <v-spacer></v-spacer>
+                    <v-btn
+                        color="red"
+                        variant="text"
+                        @click="showStartCollaborationSessionDialog = false"
+                    >
+                        Cancel
+                    </v-btn>
+
+                    <v-btn color="primary" variant="text" @click="createCollaboration">
+                        Start
+                    </v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
+
+        <collaboration-name-dialog
+            v-if="collaborationKey"
+            @change-name="(name) => collaborationManager.sendName(name)"
+        ></collaboration-name-dialog>
+
+        <collaboration-continue-editing-dialog
+            :show="showContinueEditingDialog"
+            @close="closeFeatureModel"
+            @continue-editing="continueEditing"
+        >
+        </collaboration-continue-editing-dialog>
+
 
     </div>
 </template>
@@ -265,7 +311,7 @@ export default {
             this.showStartCollaborationSessionDialog = false;
             this.collaborationManager.createCollaboration();
             navigator.clipboard.writeText(
-                `${import.meta.env.VITE_APP_DOMAIN}collaboration/${
+                `${import.meta.env.VITE_APP_DOMAIN_FRONTEND}collaboration/${
                     this.collaborationManager.collaborationKey
                 }`
             );

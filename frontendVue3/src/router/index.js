@@ -41,6 +41,15 @@ const routes = [
         },
     },
     {
+        path: '/collaboration/:collaborationKey',
+        name: 'FeatureModel',
+        props: true,
+        component: () => import('@/views/FeatureModel.vue'),
+        meta: {
+            title: 'Collaboration Mode',
+        },
+    },
+    {
         path: '/feature-model/:id',
         name: 'FeatureModel',
         props: true,
