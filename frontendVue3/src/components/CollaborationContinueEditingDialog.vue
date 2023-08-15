@@ -6,8 +6,8 @@
             </v-card-title>
             <v-card-actions>
                 <v-spacer></v-spacer>
-                <v-btn text color="error" @click="$emit('close')">Close</v-btn>
-                <v-btn text color="primary" @click="$emit('continue-editing')"
+                <v-btn variant="text" color="error" @click="$emit('close')">Close</v-btn>
+                <v-btn variant="text" color="primary" @click="$emit('continue-editing')"
                     >Continue editing</v-btn
                 >
             </v-card-actions>

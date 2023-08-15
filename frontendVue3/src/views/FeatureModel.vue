@@ -319,13 +319,11 @@ export default {
 
         continueEditing() {
             this.showContinueEditingDialog = false;
-            this.collaborationManager.closeCollaboration();
             this.editRights = true;
         },
 
         closeFeatureModel() {
             this.showContinueEditingDialog = false;
-            this.collaborationManager.closeCollaboration();
             this.collaborationManager.noConfirm = false;
             router.push('/');
         },

@@ -2,8 +2,8 @@
     <div class='justify-center'
         :style="
             smAndDown
-                ? 'position: absolute; top: 8%; left: 5rem; width: inherit'
-                : 'position: absolute; top: 10%; width: inherit; left: 50%; transform: translate(-50%, -50%)'
+                ? 'position: absolute; top: 85px; left: 5rem; width: inherit; transform: translate(0%, -50%)'
+                : 'position: absolute; top: 85px; width: inherit; left: 50%; transform: translate(-50%, -50%)'
         "
     >
         <v-row
@@ -12,7 +12,7 @@
             align="center"
         >
             <v-btn
-                v-if="mdAndDown"
+                v-if="mdAndDown || !fab"
                 @click="fab = !fab"
                 color="primary"
                 theme="dark"
@@ -26,8 +26,7 @@
                 <v-toolbar
                     dense
                     v-show="fab"
-                    class="rounded-pill"
-                    :class="smAndDown ? '' : 'mt-2'"
+                    class="rounded-pill mt-2"
                     elevation="9"
                     height="auto"
                     style="border: 2px solid white; width: inherit"
@@ -194,7 +193,7 @@
         </v-dialog>
 
         <!-- Close/Leave dialog -->
-        <!--        <v-dialog v-model="showCloseDialog" width="auto">
+        <v-dialog v-model="showCloseDialog" width="auto">
             <v-card>
                 <v-card-title class="text-h5" v-if="collaborationManager.isHost"
                     >Do you really want to close the collaboration session?
@@ -205,29 +204,29 @@
                 >
                 <v-card-actions>
                     <v-spacer></v-spacer>
-                    <v-btn color="error" text @click="showCloseDialog = false"
+                    <v-btn color="error" variant="text" @click="showCloseDialog = false"
                         >Cancel</v-btn
                     >
                     <v-btn
                         v-if="collaborationManager.isHost"
                         color="primary"
-                        text
+                        variant="text"
                         @click="collaborationManager.closeCollaboration()"
                         >Close
                     </v-btn>
                     <v-btn
                         v-else
                         color="primary"
-                        text
+                        variant="text"
                         @click="collaborationManager.closeCollaboration()"
                         >Leave</v-btn
                     >
                 </v-card-actions>
             </v-card>
-        </v-dialog>-->
+        </v-dialog>
 
         <!-- Claim dialog that is only visible for host -->
-        <!--        <v-dialog v-model="showClaimDialog" persistent width="auto">
+        <v-dialog v-model="showClaimDialogWindow" persistent width="auto">
             <v-card>
                 <v-card-title
                     >"{{ collaborationManager.getClaimerName() }}" wants to
@@ -237,7 +236,7 @@
                     <v-spacer></v-spacer>
                     <v-btn
                         color="error"
-                        text
+                        variant="text"
                         @click="
                             collaborationManager.sendClaimEditRightsResponse(
                                 false
@@ -249,7 +248,7 @@
 
                     <v-btn
                         color="primary"
-                        text
+                        variant="text"
                         @click="
                             collaborationManager.sendClaimEditRightsResponse(
                                 true
@@ -260,14 +259,14 @@
                     </v-btn>
                 </v-card-actions>
             </v-card>
-        </v-dialog>-->
+        </v-dialog>
     </div>
 </template>
 
 <script setup>
   import { useDisplay } from 'vuetify'
 
-  const { smAndDown, mdAndDown, mdAndUp } = useDisplay()
+  const { smAndDown, mdAndDown } = useDisplay()
 </script>
 
 <script>
@@ -295,7 +294,18 @@ export default {
         fab: true,
     }),
 
+    computed: {
+      showClaimDialogWindow: {
+            get() {
+                return this.showClaimDialog;
+            },
+        },
+    },
+
     methods: {
+
+
+
         link() {
             return `${import.meta.env.VITE_APP_DOMAIN_FRONTEND}collaboration/${this.collaborationManager.collaborationKey}`;
         },
