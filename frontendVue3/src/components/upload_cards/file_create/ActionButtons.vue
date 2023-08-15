@@ -112,6 +112,7 @@ async function uploadSingle(){
 }
 async function uploadBulk() {
   const data = new FormData();
+  let uploaded_family_id = 0;
   let file_data = [];
   loading.value = true;
   let majorversion = 1;
@@ -133,7 +134,18 @@ async function uploadBulk() {
     file_object['description'] = `Added in bulk upload on ${date.toLocaleString('en-US', options)}`;
     file_object['license'] = props.data.license;
     file_object['version'] = version;
-    file_object['family'] = props.data.family;
+    if (i !== 0) {
+        file_object['family'] = uploaded_family_id;
+    } else {
+      const uploadedFamily = await fileStore.uploadFamily(
+        {
+        label: props.data.family,
+        description: props.data.familydescription
+        }
+      );
+      uploaded_family_id = uploadedFamily.id;
+      file_object['family'] = uploaded_family_id;
+    }
     file_object['tags'] = props.data.tags.map((x) =>
                         parseInt(x.id)
                     );
@@ -158,12 +170,19 @@ async function uploadZip() {
     loading.value = true;
     const data = new FormData();
     let file_data = [];
+    let uploaded_family_id = 0;
 
     let file_object = {};
     file_object['label'] = props.data.label;
     file_object['description'] = props.data.description;
     file_object['license'] = props.data.license;
-
+    /*const uploadedFamily = await fileStore.uploadFamily(
+        {
+        label: props.data.family,
+        description: props.data.newFamilyDescription_zip
+        }
+      );
+    uploaded_family_id = uploadedFamily.id;*/
     file_object['family'] = props.data.family;
     file_object['tags'] = props.data.tags;
 
@@ -178,12 +197,5 @@ async function uploadZip() {
     loading.value = false;
     close();
 }
-async function getFeatureModelOfFamily(id) {
-  const res = await fileStore.fetchFeatureModelOfFamily(id);
-  console.log(res);
-  return res;
-}
-function delay(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
+
 </script>

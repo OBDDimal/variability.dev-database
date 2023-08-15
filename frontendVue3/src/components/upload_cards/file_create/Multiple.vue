@@ -40,53 +40,30 @@
               >
               </v-select>
             </v-col>
-            <v-col class="py-1" cols="12" md="6">
-                    <!-- Change back to v-combobox when new family upload is working properly -->
-                    <v-autocomplete
-                        v-model="formData.family"
-                        :items="fileStore.myOwnFamilies"
-                        item-title="label"
-                        item-value="id"
-                        :required="true"
-                        :rules="familyRules"
-                        variant="outlined"
-                        density="comfortable"
-                        hint="Add to or create new family"
-                        label="Family"
-                        append-icon="mdi-plus"
-                        @click:append="addFamilyMenu = !addFamilyMenu"
-                        @change="familyChange"
-                    ></v-autocomplete>
-                </v-col>
-            <!--
             <v-col class="py-0" cols="12" md="6">
-              <v-combobox
+              <v-text-field
               v-model="formData.family"
-                        :items="fileStore.myOwnFamilies"
                         item-title="label"
-                        item-value="id"
                         :required="true"
                         :rules="familyRules"
                         variant="outlined"
                         density="comfortable"
-                        hint="Add to or create new family"
+                        hint="Create new family"
                         label="Family"
-                        append-icon="mdi-plus"
-                        @click:append="addFamilyMenu = !addFamilyMenu"
                         @change="familyChange"
-              ></v-combobox>
+              ></v-text-field>
             </v-col>
             <v-col class="py-0" cols="12" md="6">
               <v-text-field
                 data-cy="file-create-multiple-family-description-textfield"
-                v-model="formData.description"
+                v-model="formData.familydescription"
                 variant="outlined"
                 density="comfortable"
                 hint="Describe your new family"
                 label="New Family Description"
               ></v-text-field>
             </v-col>
-            -->
+            
           </v-row>
           
           <v-row>
@@ -190,7 +167,8 @@ let formData = reactive({
   description: '',
   files: null,
   license: null,
-  family: null,
+  family: '',
+  familydescription: '',
   version: '',
   tags: [],
   legalShare: false,
@@ -224,10 +202,6 @@ let addTagMenu = ref(false);
 let addFamilyMenu = ref(false);
 let fileNames = ref([]);
 
-watch(() => formData.family, (value) => {
-  console.log(getFeatureModelOfFamily(value));
-}
-);
 
 
 async function getFeatureModelOfFamily(id) {
