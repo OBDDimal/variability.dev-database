@@ -1,9 +1,9 @@
 <template>
-    <div
+    <div class='justify-center'
         :style="
             smAndDown
-                ? 'position: absolute; top: 0; left: 5rem; width: inherit'
-                : ''
+                ? 'position: absolute; top: 8%; left: 5rem; width: inherit'
+                : 'position: absolute; top: 10%; width: inherit; left: 50%; transform: translate(-50%, -50%)'
         "
     >
         <v-row
@@ -17,7 +17,7 @@
                 color="primary"
                 theme="dark"
                 small
-                class="mr-2"
+                class="mr-2 mt-2"
             >
                 <v-icon v-if="fab"> mdi-close </v-icon>
                 <v-icon v-else> mdi-account-multiple </v-icon>
@@ -25,8 +25,7 @@
             <v-slide-x-transition>
                 <v-toolbar
                     dense
-                    v-show="fab || mdAndUp"
-                    :absolute="!smAndDown"
+                    v-show="fab"
                     class="rounded-pill"
                     :class="smAndDown ? '' : 'mt-2'"
                     elevation="9"
