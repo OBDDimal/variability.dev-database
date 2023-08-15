@@ -24,13 +24,14 @@
             </v-btn>
             <v-slide-x-transition>
                 <v-toolbar
+                    dense
                     v-show="fab || mdAndUp"
                     :absolute="!smAndDown"
                     class="rounded-pill"
                     :class="smAndDown ? '' : 'mt-2'"
                     elevation="9"
                     height="auto"
-                    style="border: 2px solid white"
+                    style="border: 2px solid white; width: inherit"
                 >
                     <div
                         :style="
@@ -39,7 +40,7 @@
                                 : 'max-width: 45vw'
                         "
                     >
-                        <v-chip-group disabled mandatory>
+                        <v-chip-group :disabled="true" mandatory>
                             <v-chip
                                 :class="
                                     collaborationManager.isClient
@@ -105,12 +106,11 @@
                     >
                         <template v-slot:activator="{ props }">
                             <v-btn
-                                icon
+                                icon="mdi-account-edit"
                                 v-bind="props"
                                 :disabled="claimButtonClickDisabled"
                                 @click="claimEditRights()"
                             >
-                                <v-icon>mdi-account-edit</v-icon>
                             </v-btn>
                         </template>
                         <span>Claim edit rights</span>
@@ -119,7 +119,7 @@
                     <v-tooltip v-if="collaborationManager.isHost" bottom>
                         <template v-slot:activator="{ props }">
                             <v-btn
-                                icon
+                                icon="mdi-account-cancel"
                                 v-bind="props"
                                 :color="
                                     collaborationManager.blockEditRequests
@@ -128,7 +128,6 @@
                                 "
                                 @click="blockEditRequests"
                             >
-                                <v-icon>mdi-account-cancel</v-icon>
                             </v-btn>
                         </template>
                         <span>Block edit claims</span>
@@ -137,11 +136,10 @@
                     <v-tooltip v-if="collaborationManager.isHost" bottom>
                         <template v-slot:activator="{ props }">
                             <v-btn
-                                icon
+                                icon="mdi-qrcode"
                                 v-bind="props"
                                 @click="showQrCode = true"
                             >
-                                <v-icon>mdi-qrcode</v-icon>
                             </v-btn>
                         </template>
                         <span>Show qr code</span>
@@ -150,11 +148,10 @@
                     <v-tooltip v-if="collaborationManager.isHost" bottom>
                         <template v-slot:activator="{ props }">
                             <v-btn
-                                icon
+                                icon="mdi-content-copy"
                                 v-bind="props"
                                 @click="copyLink"
                             >
-                                <v-icon>mdi-content-copy</v-icon>
                             </v-btn>
                         </template>
                         <span>Copy invitation link</span>
@@ -164,11 +161,10 @@
                         <template v-slot:activator="{ props }">
                             <v-btn
                                 color="red"
-                                icon
+                                icon="mdi-close"
                                 v-bind="props"
                                 @click="showCloseDialog = true"
                             >
-                                <v-icon>mdi-close</v-icon>
                             </v-btn>
                         </template>
                         <span v-if="collaborationManager.isHost"
