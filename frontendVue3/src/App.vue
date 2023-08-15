@@ -2,7 +2,7 @@
     <v-app>
         <navbar></navbar>
         <v-main style="position: relative">
-            <router-view />
+            <router-view :key="$route.fullPath" />
             <v-snackbar
                 location="bottom"
                 v-model="snackbar.show"

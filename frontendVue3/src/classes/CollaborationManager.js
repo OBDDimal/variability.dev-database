@@ -265,7 +265,7 @@ export default class CollaborationManager {
             data: data,
         };
 
-        this.connections.filter(conn => conn !== excluded).forEach(conn => conn.send(toSend));
+        this.connections.filter(conn => conn.peer !== excluded.peer).forEach(conn => conn.send(toSend));
     }
 
     sendInitData(connection) {
