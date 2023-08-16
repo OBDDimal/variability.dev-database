@@ -12,9 +12,9 @@
             align="center"
         >
             <v-btn
-                v-if="mdAndDown || !fab"
+                v-if="smAndDown || !fab"
                 @click="fab = !fab"
-                color="primary"
+                style="background-color: rgb(var(--v-theme-primary))"
                 theme="dark"
                 small
                 class="mr-2 mt-2"
@@ -38,7 +38,7 @@
                                 : 'max-width: 45vw'
                         "
                     >
-                        <v-chip-group :disabled="true" mandatory>
+                        <v-chip-group :disabled="true" mandatory class="ml-2 flex-nowrap" :column="false">
                             <v-chip
                                 :class="
                                     collaborationManager.isClient

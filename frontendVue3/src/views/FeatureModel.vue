@@ -131,9 +131,7 @@ import TutorialMode from '@/components/TutorialMode';
 import { NewEmptyModelCommand } from '@/classes/Commands/FeatureModel/NewEmptyModelCommand';
 import FeatureModelInformation from '@/components/FeatureModel/FeatureModelInformation';
 import { useAppStore } from '@/store/app';
-import { useRouter } from 'vue-router';
 
-const router = useRouter();
 const appStore = useAppStore();
 
 export default {
@@ -325,7 +323,7 @@ export default {
         closeFeatureModel() {
             this.showContinueEditingDialog = false;
             this.collaborationManager.noConfirm = false;
-            router.push('/');
+            this.$router.push({ path: '/' });
         },
     },
 };
