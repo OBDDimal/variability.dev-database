@@ -18,44 +18,23 @@
             </v-btn>
         </div>
     </v-col>
-    <div v-if="uploadInfo">
-    <h3>Upload Information</h3>
-    <p>{{ uploadInfo.fileCount }} file(s) uploaded:</p>
-    <ul>
-      <li v-for="fileName in uploadInfo.fileNames" :key="fileName">{{ fileName }}</li>
-    </ul>
-    <p>License: {{ uploadInfo.license }}</p>
-  </div>
-  <div v-if="uploadError">
-    <h3>Error</h3>
-    <p>{{ uploadError }}</p>
-  </div>
+
 </template>
 
 <script setup>
 import { ref } from 'vue';
 import { useFileStore } from '@/store/file';
+import UploadSummary from './UploadSummary.vue'; // Passe den Pfad an
+
 import { timeDay } from 'd3';
 import { walkIdentifiers } from 'vue/compiler-sfc';
-
+import Zip from './Zip.vue';
+  let uploadSuccessful = ref(false);
     const uploadInfo = ref(null);
     const uploadError = ref(null);
-
-    function showUploadInfo(fileCount, fileNames, license) {
-      uploadInfo.value = {
-        fileCount: fileCount,
-        fileNames: fileNames,
-        license: license
-      };
-    }
-
-    function showUploadError(error) {
-      uploadError.value = error;
-    }
-
 const fileStore = useFileStore();
 
-const emit = defineEmits(['close', 'submitClick']);
+const emit = defineEmits(['close', 'submitClick', 'uploadSuccessfull']);
 
 const props = defineProps({
     data: {
@@ -105,10 +84,17 @@ async function uploadSingle(){
             data.append('0', props.data.files[0]);
             data.append('files', JSON.stringify(file_data));
             uploadStatus.value = 'Uploading file...';
-            await fileStore.uploadBulkFeatureModels(data);
+            uploadSuccessful = await fileStore.uploadBulkFeatureModels(data);
+            uploadInfo.value = {
+              format: "Single",
+              fileNames: props.data.label,
+              license: props.data.license
+            };
             uploadStatus.value = '';
             loading.value = false;
-            emit('close');
+            emit('uploadSuccessfull', uploadInfo.value);
+            console.log("Emit Upload")
+            //emit('close');
 }
 async function uploadBulk() {
   const data = new FormData();
@@ -116,6 +102,7 @@ async function uploadBulk() {
   let file_data = [];
   loading.value = true;
   let majorversion = 1;
+  let file_names = [];
   for (let i = 0; i < props.data.files.length; i++) {
     const file = props.data.files[i];
     console.log(props.data.files[i].name)
@@ -151,18 +138,25 @@ async function uploadBulk() {
                     );
     file_object['file'] = i.toString();
     file_data.push(file_object);
-
+    file_names[i] = file.name.replace('.xml', '')
     data.append(i.toString(), file);
     majorversion++;
+
   }
 
   data.append('files', JSON.stringify(file_data));
 
   uploadStatus.value = 'Uploading bulk files...';
-  await fileStore.uploadBulkFeatureModels(data);
+  uploadSuccessful = await fileStore.uploadBulkFeatureModels(data);
+  uploadInfo.value = {
+        format: "Bulk",
+        fileCount: props.data.files.length,
+        fileNames: file_names,
+        license: props.data.license
+      };
   uploadStatus.value = '';
   loading.value = false;
-  emit('close');
+  emit('uploadSuccessfull', uploadInfo.value)
 }
 
 async function uploadZip() {
@@ -191,11 +185,17 @@ async function uploadZip() {
     data.append('file', props.data.files[0]);
     console.log(props.data.files)
     uploadStatus.value = 'Uploading zip file. This may take a while...';
-    await fileStore.uploadZipFeatureModel(data);
-
+    uploadSuccessful = await fileStore.uploadZipFeatureModel(data);
+    uploadInfo.value = {
+        format: "Zip",
+        fileNames: props.data.label,
+        license: props.data.license
+      };
     uploadStatus.value = '';
     loading.value = false;
-    close();
+    emit('uploadSuccessfull', uploadInfo.value);
+    
+    
 }
 
 </script>

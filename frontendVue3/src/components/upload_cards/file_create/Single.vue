@@ -190,6 +190,7 @@
                     :valid="form"
                     @close="$emit('close')"
                     @submit-click="showDetails = true"
+                    @uploadSuccessfull="(uploadInfo) => $emit('uploadSuccessfull', uploadInfo)"
                 ></action-buttons>
             </v-row>
         </v-form>
@@ -212,7 +213,7 @@ import ActionButtons from '@/components/upload_cards/file_create/ActionButtons.v
 
 const fileStore = useFileStore();
 
-const emit = defineEmits(['close']);
+const emit = defineEmits(['close', 'uploadSuccessfull']);
 
 const form = ref(null);
 
