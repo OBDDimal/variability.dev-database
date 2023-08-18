@@ -47,6 +47,8 @@
                                 "
                                 color="primary"
                                 :disabled="collaborationManager.isClient"
+                                theme="dark"
+                                style="background-color: rgb(var(--v-theme-primary))"
                                 @click="
                                     collaborationManager.sendMemberData(
                                         collaborationManager.peer._id
@@ -74,6 +76,9 @@
                                 :color="
                                     member.name === 'Host' ? 'success' : 'none'
                                 "
+                                theme="dark"
+                                :style="collaborationManager.editorId ===
+                                        member.id ? 'background-color: rgb(var(--v-theme-success))' : ''"
                                 :disabled="collaborationManager.isClient"
                                 @click="
                                     collaborationManager.sendMemberData(
