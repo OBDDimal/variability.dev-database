@@ -184,6 +184,9 @@
     <v-dialog v-model="addTagMenu" max-width="350">
         <tag-create @close="addTagMenu = false"></tag-create>
     </v-dialog>
+    <v-dialog v-model="addFamilyMenu" max-width="350">
+        <family-create @close="addFamilyMenu = false"></family-create>
+    </v-dialog>
 </template>
 <script setup>
 import { computed, onMounted, reactive, ref, watch } from 'vue';
