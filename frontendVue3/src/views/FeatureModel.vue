@@ -9,9 +9,14 @@
             :constraints="data.constraints"
             :editRights="editRights"
             :rootNode="data.rootNode"
+            :is-service-available="isServiceAvailable"
+            :loadingData="loadingData"
+            :error="error"
+            :error-message="errorMessage"
             @exportToXML="exportToXML"
             @reset="reset"
             @save="save"
+            @slice="node => slice(node)"
             @update-constraints="updateConstraints"
             @show-collaboration-dialog="
                 showStartCollaborationSessionDialog = true
@@ -19,6 +24,8 @@
             @show-claim-dialog="showClaimDialog"
             @new-empty-model="newEmptyModel"
             @show-tutorial="showTutorial = true"
+            @error-closed="errorClosed"
+            @error-new="message => errorNew(message)"
         >
         </feature-model-tree>
         <v-btn
@@ -83,9 +90,12 @@ import CollaborationContinueEditingDialog from '@/components/CollaborationContin
 import { EXAMPLE_FEATURE_MODEL_XML } from '@/classes/constants';
 import TutorialMode from '@/components/TutorialMode';
 import { NewEmptyModelCommand } from '@/classes/Commands/FeatureModel/NewEmptyModelCommand';
+import { SliceCommand } from "@/classes/Commands/FeatureModel/SliceCommand";
+import { FeatureNode } from "@/classes/FeatureNode";
 import FeatureModelInformation from '@/components/FeatureModel/FeatureModelInformation';
 import { useAppStore } from '@/store/app';
 import { useRouter } from 'vue-router';
+import axios from "axios";
 
 const router = useRouter();
 const appStore = useAppStore();
@@ -119,6 +129,10 @@ export default {
                 featureOrder: undefined,
                 rootNode: undefined,
             },
+            loadingData: false,
+            error: false,
+            errorMessage: "",
+            isServiceAvailable: false,
             xml: undefined,
             reloadKey: 0,
             collaborationReloadKey: 10000,
@@ -176,6 +190,7 @@ export default {
                 alert('Wrong key!');
             }
         }
+        this.checkService()
 
         // Start tutorial mode if it has not been completed before
         this.showTutorial = !localStorage.featureModelTutorialCompleted;
@@ -219,6 +234,53 @@ export default {
             // TODO: Transpile the xml file new and restart viewer.
             this.initData();
             this.reloadKey++;
+        },
+
+        async slice(node) {
+            this.loadingData = true;
+            await this.checkService()
+            if (this.isServiceAvailable) {
+
+                this.xml = jsonToXML(this.data);
+                const content = new TextEncoder().encode(this.xml);
+                let response = await axios.post(`${import.meta.env.VITE_APP_DOMAIN_FEATUREIDESERVICE}slice`, {
+                    name: "hello.xml",
+                    selection: [node.name],
+                    content: Array.from(content)
+                });
+                let contentAsString = new TextDecoder().decode(Uint8Array.from(response.data.content));
+                const xml = beautify(contentAsString);
+                let newData = {
+                    featureMap: [],
+                    constraints: [],
+                    properties: [],
+                    calculations: undefined,
+                    comments: [],
+                    featureOrder: undefined,
+                    rootNode: new FeatureNode(null, 'Root', 'and', false, false),
+                };
+                xmlTranspiler.xmlToJson(xml, newData);
+                this.xml = xml;
+                const command = new SliceCommand(
+                    this,
+                    newData
+                );
+                this.featureModelCommandManager.execute(command);
+                this.updateFeatureModel();
+            } else {
+                this.loadingData = false;
+                this.errorNew("FeatureIDE Service is not available to slice the feature.");
+            }
+            this.loadingData = false;
+        },
+
+        async checkService() {
+            try {
+                let response = await axios.get(`${import.meta.env.VITE_APP_DOMAIN_FEATUREIDESERVICE}`);
+                this.isServiceAvailable = response.status === 200;
+            } catch (error) {
+                this.isServiceAvailable = false
+            }
         },
 
         newEmptyModel() {
@@ -282,6 +344,16 @@ export default {
             this.collaborationManager.closeCollaboration();
             this.collaborationManager.noConfirm = false;
             router.push('/');
+        },
+
+        errorClosed() {
+            this.error = false;
+            this.errorMessage = '';
+        },
+
+        errorNew(message) {
+            this.error = true;
+            this.errorMessage = message;
         },
     },
 };

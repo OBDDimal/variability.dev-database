@@ -314,6 +314,15 @@
                         </v-list-item>
                     </v-list>
                 </v-menu>
+                <v-list-item
+                    id="featureide-service-status"
+                >
+                  <template v-slot:prepend>
+                    <v-icon v-if=isServiceAvailable>mdi-wifi</v-icon>
+                    <v-icon v-if=!isServiceAvailable>mdi-wifi-off</v-icon>
+                  </template>
+                    <v-list-item-title>FeatureIDE Service Status</v-list-item-title>
+                </v-list-item>
             </v-list>
         </v-navigation-drawer>
     </div>
@@ -329,6 +338,7 @@ export default {
         isUndoAvailable: Boolean,
         isRedoAvailable: Boolean,
         isSaveAvailable: Boolean,
+        isServiceAvailable: Boolean,
         direction: String,
         editRights: undefined,
         collaborationStatus: undefined,

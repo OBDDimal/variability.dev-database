@@ -64,7 +64,7 @@ export const EXAMPLE_FEATURE_MODEL_XML = `
 <featureModel>
     <properties/>
         <struct>
-            <and name="Root">
+            <and name="Root" mandatory="true">
                 <feature mandatory="true" name="Feature A"/>
                 <feature mandatory="false" name="Feature B"/>
             </and>
