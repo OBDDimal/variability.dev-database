@@ -188,27 +188,10 @@ let familyRules = [(v) => !!v || 'Family is required'];
 
 let checkboxRules = [(v) => !!v || 'Checkbox must be checked'];
 
-let gottenFamilies = ref([]);
-let gottenFiles = ref([]);
-
-let allVersions = ref([]);
-let latestFeatureModelVersion = ref(null);
-let numberOfModelsInFamily = ref(0);
-
-let versionRules = [(v) => !!v || 'Version is required'];
-
 let newTag = { label: '', description: '', is_public: false };
 
 let addTagMenu = ref(false);
 let addFamilyMenu = ref(false);
-let fileNames = ref([]);
 
-
-
-async function getFeatureModelOfFamily(id) {
-  const res = await fileStore.fetchFeatureModelOfFamily(id);
-  console.log(res);
-  return res;
-}
 
 </script>

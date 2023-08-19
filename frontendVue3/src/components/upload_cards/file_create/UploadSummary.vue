@@ -39,9 +39,6 @@
   </template>
   
   <script setup>
-    import { ref } from 'vue';
-    import { useFileStore } from '@/store/file';
-    const fileStore = useFileStore();
     const props = defineProps({
         data: {
         type: Object,

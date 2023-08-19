@@ -227,34 +227,8 @@ let licenseRules = [(v) => !!v || 'License is required'];
 
 let familyRules = [(v) => !!v || 'Family is required'];
 
-let checkboxRules = [(v) => !!v || 'Checkbox must be checked'];
-
-let gottenFamilies = ref([]);
-let gottenFiles = ref([]);
-
-let allVersions = ref([]);
-let latestFeatureModelVersion = ref(null);
-let numberOfModelsInFamily = ref(0);
-
-let versionRules = [(v) => !!v || 'Version is required'];
-
-let gottenTags = ref([]);
-let newTag = { label: '', description: '', is_public: false };
-
 let addTagMenu = ref(false);
 let addFamilyMenu = ref(false);
 
-watch(
-    () => formData.family,
-    (value) => {
-        console.log(getFeatureModelOfFamily(value));
-    }
-);
-
-async function getFeatureModelOfFamily(id) {
-    const res = await fileStore.fetchFeatureModelOfFamily(id);
-    console.log(res.length);
-    return res;
-}
 </script>
 

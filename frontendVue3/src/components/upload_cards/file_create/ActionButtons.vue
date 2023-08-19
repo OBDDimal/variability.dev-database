@@ -24,14 +24,7 @@
 <script setup>
 import { ref } from 'vue';
 import { useFileStore } from '@/store/file';
-import UploadSummary from './UploadSummary.vue'; // Passe den Pfad an
-
-import { timeDay } from 'd3';
-import { walkIdentifiers } from 'vue/compiler-sfc';
-import Zip from './Zip.vue';
-  let uploadSuccessful = ref(false);
-    const uploadInfo = ref(null);
-    const uploadError = ref(null);
+const uploadInfo = ref(null);
 const fileStore = useFileStore();
 
 const emit = defineEmits(['close', 'submitClick', 'uploadSuccessfull']);
@@ -84,7 +77,7 @@ async function uploadSingle(){
             data.append('0', props.data.files[0]);
             data.append('files', JSON.stringify(file_data));
             uploadStatus.value = 'Uploading file...';
-            uploadSuccessful = await fileStore.uploadBulkFeatureModels(data);
+            await fileStore.uploadBulkFeatureModels(data);
             uploadInfo.value = {
               format: "Single",
               fileNames: props.data.label,
@@ -147,7 +140,7 @@ async function uploadBulk() {
   data.append('files', JSON.stringify(file_data));
 
   uploadStatus.value = 'Uploading bulk files...';
-  uploadSuccessful = await fileStore.uploadBulkFeatureModels(data);
+  await fileStore.uploadBulkFeatureModels(data);
   uploadInfo.value = {
         format: "Bulk",
         fileCount: props.data.files.length,
@@ -185,7 +178,7 @@ async function uploadZip() {
     data.append('file', props.data.files[0]);
     console.log(props.data.files)
     uploadStatus.value = 'Uploading zip file. This may take a while...';
-    uploadSuccessful = await fileStore.uploadZipFeatureModel(data);
+    await fileStore.uploadZipFeatureModel(data);
     uploadInfo.value = {
         format: "Zip",
         fileNames: props.data.label,
