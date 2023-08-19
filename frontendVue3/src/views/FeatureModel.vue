@@ -195,7 +195,6 @@ export default {
 
         async slice(node) {
             this.loadingData = true;
-            console.log(this.loadingData)
             await this.checkService()
             if (this.isServiceAvailable) {
 
@@ -206,9 +205,7 @@ export default {
                     selection: [node.name],
                     content: Array.from(content)
                 });
-                console.log(response);
                 let contentAsString = new TextDecoder().decode(Uint8Array.from(response.data.content));
-                console.log(contentAsString)
                 const xml = beautify(contentAsString);
                 let newData = {
                     featureMap: [],
