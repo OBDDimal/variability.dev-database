@@ -18,6 +18,7 @@
             @save="save"
             @slice="node => slice(node)"
             @update-constraints="updateConstraints"
+            @openConstraints="openConstraints = true"
             @show-collaboration-dialog="
                 showStartCollaborationSessionDialog = true
             "

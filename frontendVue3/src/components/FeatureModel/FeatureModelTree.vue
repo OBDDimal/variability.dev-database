@@ -83,6 +83,7 @@
             @redo="redo"
             @reset="$emit('reset')"
             @resetView="(levels, maxChildren) => resetView(levels, maxChildren)"
+            @openConstraints="$emit('openConstraints')"
             @save="$emit('save')"
             @semanticEditing="(value) => (d3Data.semanticEditing = value)"
             @shortName="changeShortName"

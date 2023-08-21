@@ -172,7 +172,7 @@
                         </v-list-item>
                         <v-list-item
                             class="clickable"
-                            @click="$store.commit('openConstraints', true)"
+                            @click="$emit('openConstraints')"
                         >
                             <v-list-item-title>
                                 Show Constraints
