@@ -5,6 +5,7 @@ import { Disjunction } from '@/classes/Constraint/Disjunction';
 import { Conjunction } from '@/classes/Constraint/Conjunction';
 import { Implication } from '@/classes/Constraint/Implication';
 import { Negation } from '@/classes/Constraint/Negation';
+import { SoloDisjunction } from '@/classes/Constraint/SoloDisjunction';
 
 export function xmlToJson(currentModel, data) {
     /*const start = performance.now();*/
@@ -25,10 +26,7 @@ export function xmlToJson(currentModel, data) {
     data.calculations = getCalculations(calculationsSection);
 
     data.rootNode = getChildrenOfFeature(struct, null, data)[0];
-    data.constraints = readConstraints(
-        [...constraintsContainer.childNodes],
-        data
-    );
+    data.constraints = readConstraints(constraintsContainer, data);
     data.properties = getProperties(propertiesSection);
     data.comments = getComments(commentsSection);
     data.featureOrder = getFeatureOrder(featureOrderSection);
@@ -49,6 +47,9 @@ function getChildrenOfFeature(struct, parent, data) {
                 child.getAttribute('mandatory') === 'true',
                 child.getAttribute('abstract') === 'true'
             );
+            if(child.tagName === 'feature'){
+              toAppend.setGroupType('and')
+            }
             toAppend.children = getChildrenOfFeature(child, toAppend, data);
 
             data.featureMap[toAppend.name] = toAppend;
@@ -60,7 +61,10 @@ function getChildrenOfFeature(struct, parent, data) {
 }
 
 function readConstraints(constraints, data) {
-    return constraints
+    if (!constraints) return [];
+
+    const childNodes = [...constraints.childNodes]
+    return childNodes
         .filter((rule) => rule.tagName)
         .map((rule) => {
             return [...rule.childNodes]
@@ -81,15 +85,19 @@ function readConstraintItem(item, data) {
             .filter((childItem) => childItem.tagName)
             .map((childItem) => readConstraintItem(childItem, data));
 
-        switch (item.tagName) {
-            case 'disj':
-                return new Disjunction(childItems[0], childItems[1]);
-            case 'conj':
-                return new Conjunction(childItems[0], childItems[1]);
-            case 'imp':
-                return new Implication(childItems[0], childItems[1]);
-            case 'not':
-                return new Negation(childItems[0]);
+        if (childItems.length > 1 || item.tagName === 'not') {
+            switch (item.tagName) {
+                case 'disj':
+                    return new Disjunction(childItems[0], childItems[1]);
+                case 'conj':
+                    return new Conjunction(childItems[0], childItems[1]);
+                case 'imp':
+                    return new Implication(childItems[0], childItems[1]);
+                case 'not':
+                    return new Negation(childItems[0]);
+            }
+        } else {
+            return new SoloDisjunction(childItems[0]);
         }
     }
 }

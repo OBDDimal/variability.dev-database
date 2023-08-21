@@ -82,6 +82,10 @@ export class FeatureNode {
         return this.children.length === 0;
     }
 
+    setGroupType(groupType) {
+        this.groupType = groupType;
+    }
+
     uncollapse(toRoot = true) {
         if (this.isCollapsed && !this.isLeaf()) {
             this.d3Node.children = this.d3Node.collapsedChildren;
