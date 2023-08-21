@@ -245,7 +245,6 @@ export default class CollaborationManager {
             action: action,
             data: data,
         };
-
         this.connections.forEach(conn => conn.send(toSend));
     }
 

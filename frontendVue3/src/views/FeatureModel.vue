@@ -284,33 +284,27 @@ export default {
             this.loadingData = true;
             await this.checkService()
             if (this.isServiceAvailable) {
-
-                this.xml = jsonToXML(this.data);
-                const content = new TextEncoder().encode(this.xml);
-                let response = await axios.post(`${import.meta.env.VITE_APP_DOMAIN_FEATUREIDESERVICE}slice`, {
-                    name: "hello.xml",
-                    selection: [node.name],
-                    content: Array.from(content)
-                });
-                let contentAsString = new TextDecoder().decode(Uint8Array.from(response.data.content));
-                const xml = beautify(contentAsString);
-                let newData = {
-                    featureMap: [],
-                    constraints: [],
-                    properties: [],
-                    calculations: undefined,
-                    comments: [],
-                    featureOrder: undefined,
-                    rootNode: new FeatureNode(null, 'Root', 'and', false, false),
-                };
-                xmlTranspiler.xmlToJson(xml, newData);
-                this.xml = xml;
-                const command = new SliceCommand(
-                    this,
-                    newData
-                );
-                this.featureModelCommandManager.execute(command);
-                this.updateFeatureModel();
+                try {
+                    this.xml = jsonToXML(this.data);
+                    const content = new TextEncoder().encode(this.xml);
+                    let response = await axios.post(`${import.meta.env.VITE_APP_DOMAIN_FEATUREIDESERVICE}slice`, {
+                        name: "hello.xml",
+                        selection: [node.name],
+                        content: Array.from(content)
+                    });
+                    let contentAsString = new TextDecoder().decode(Uint8Array.from(response.data.content));
+                    const xml = beautify(contentAsString);
+                    this.xml = xml;
+                    const command = new SliceCommand(
+                        this,
+                        xml
+                    );
+                    this.featureModelCommandManager.execute(command);
+                    this.updateFeatureModel();
+                } catch (e) {
+                  console.log(e);
+                  this.loadingData = false;
+                }
             } else {
                 this.loadingData = false;
                 this.errorNew("FeatureIDE Service is not available to slice the feature.");
