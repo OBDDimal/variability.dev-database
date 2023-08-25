@@ -173,11 +173,16 @@ export default {
             }
             this.closeAddEditDialog();
             this.commandManager.execute(command);
+            this.$emit('update-feature-model');
         },
 
         deleteConstraint(constraint) {
+            if(constraint.isHighlighted){ //reset highlight to free up color
+                constraint.toggleHighlighted();
+            }
             const command = new DeleteCommand(this.constraints, constraint);
             this.commandManager.execute(command);
+            this.$emit('update-feature-model');
         },
 
         openAddEditDialog(mode, constraint) {
@@ -193,10 +198,12 @@ export default {
 
         undo() {
             this.commandManager.undo();
+            this.$emit('update-feature-model');
         },
 
         redo() {
             this.commandManager.redo();
+            this.$emit('update-feature-model');
         },
     },
 

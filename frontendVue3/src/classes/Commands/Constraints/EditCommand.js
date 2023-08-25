@@ -9,11 +9,13 @@ export class EditCommand extends ConstraintCommand {
     }
 
     execute() {
+        this.constraint.rule.removeConstraint();  // Remove Constraints on  outdatet FeaturenodeConstraintItems
         this.constraint.rule = this.newConstraintItem;
         this.constraint.rule.setConstraint(this.constraint);
     }
 
     undo() {
+        this.constraint.rule.removeConstraint(); // Remove Constraints on  outdatet FeaturenodeConstraintItems
         this.constraint.rule = this.oldConstraintItem;
         this.constraint.rule.setConstraint(this.constraint);
     }
