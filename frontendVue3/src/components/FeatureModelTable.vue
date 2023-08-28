@@ -293,7 +293,6 @@ const dialog = ref(false);
 const createDialog = ref(false);
 const dialogDelete = ref(false);
 const dialogAnalysis = false;
-const editedIndex = ref(-1);
 const editedItem = ref(null);
 const defaultItem = ref(undefined);
 const checkLocalStorage = computed(() => {
@@ -303,7 +302,7 @@ const checkLocalStorage = computed(() => {
 async function deleteItemConfirm() {
     removeLoading.value = true;
     await fileStore.deleteFeatureModel(
-    editedItem.value.value
+    editedItem.value.id
     );
     await fileStore.fetchConfirmedFeatureModels();
     emit('onDelete');
@@ -311,21 +310,12 @@ async function deleteItemConfirm() {
 
     closeDelete();
 }
-function close() {
-    dialog.value = false;
-    /*this.$nextTick(() => {
-    this.editedItem = Object.assign({}, this.defaultItem);
-    this.editedIndex = -1;
-  });*/
-}
 function closeDelete() {
     dialogDelete.value = false;
     editedItem.value = { ...defaultItem };
-    editedIndex.value = -1;
 }
 function deleteItem(item) {
-    editedIndex.value = item.index;
-    editedItem.value = { ...item };
+    editedItem.value = { ...item.raw };
     dialogDelete.value = true;
 }
 function handleClick(value) {
