@@ -126,13 +126,18 @@
                         <v-list-item
                             v-for="(item, i) in itemsColoring"
                             :key="i"
-                            @click="selectedColoring(item)"
+                            @click="selectedColoring(i)"
                         >
                             <v-list-item-content>
                                 <v-list-item-title
                                     v-text="item"
                                 ></v-list-item-title>
                             </v-list-item-content>
+                        </v-list-item>
+                        <v-list-item
+                            v-if="isServiceAvailable"
+                            @click="selectedColoring(-1)"
+                        > Dead, Core and False Optional
                         </v-list-item>
                     </v-list>
                 </v-menu>

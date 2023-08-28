@@ -26,7 +26,7 @@ export class FeatureNode {
         }else{
             this.displayName= newName.slice(0, CONSTANTS.DISPLAY_NAME_RAW) + CONSTANTS.POINTS;
         }
-       
+
     }
     color() {
         if (this.markedAsEdited) {
@@ -84,6 +84,10 @@ export class FeatureNode {
 
     setGroupType(groupType) {
         this.groupType = groupType;
+    }
+
+    setColor(color) {
+        this.colorValue = color;
     }
 
     uncollapse(toRoot = true) {

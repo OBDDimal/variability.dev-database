@@ -48,6 +48,12 @@ export const NODE_COLOR = "rgb(204, 204, 255)";
 export const NODE_EDITED_COLOR = "rgb(197,196,120)";
 export const NODE_ABSTRACT_COLOR = "#ebebff";
 
+export const NODE_DEAD_COLOR = "rgb(255, 46, 46)";
+
+export const NODE_FALSEOP_COLOR = "rgb(255, 153, 51)";
+
+export const NODE_CORE_COLOR = "rgb(51, 51, 255)";
+
 export const DISPLAY_NAME_LENGTH = 8;
 export const DISPLAY_NAME_RAW= 5;
 export const POINTS = '...';

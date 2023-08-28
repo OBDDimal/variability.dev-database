@@ -3,6 +3,8 @@ import * as CONSTANTS from '@/classes/constants'
 
 export function colorNodes(allNodes, coloringIndex) {
 	switch (coloringIndex) {
+    case -1:
+      break
 		case 0:
 			coloring(allNodes, countNodes)
 			break
