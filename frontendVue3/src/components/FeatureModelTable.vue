@@ -156,6 +156,7 @@
                         variant="tonal"
                         size="small"
                         icon="mdi-play"
+                        @click="handleClick(item.raw)"
                     >
                     </v-btn>
                     <v-btn
@@ -174,7 +175,7 @@
                         variant="tonal"
                         icon="mdi-eye"
                         size="small"
-                        :to="'/feature-model/' + item.id"
+                        :to="'/feature-model/' + item.raw.id"
                     >
                     </v-btn>
                     <!-- <v-btn small rounded color="error" class="mr-2"> <v-icon>mdi-delete</v-icon></v-btn> -->
