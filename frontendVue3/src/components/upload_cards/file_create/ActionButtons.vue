@@ -178,7 +178,7 @@ async function uploadZip() {
     data.append('file', props.data.files[0]);
     console.log(props.data.files)
     uploadStatus.value = 'Uploading zip file. This may take a while...';
-    await fileStore.uploadZipFeatureModel(data);
+    await fileStore.uploadZipFeatureModels(data);
     uploadInfo.value = {
         format: "Zip",
         fileNames: props.data.label,
