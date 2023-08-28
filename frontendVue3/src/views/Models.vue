@@ -43,7 +43,7 @@
 
 <script setup>
 import FeatureModelTable from '@/components/FeatureModelTable.vue';
-import { onMounted } from 'vue';
+import { onMounted, ref } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useFileStore } from '@/store/file';
 import { useAppStore } from '@/store/app';
@@ -97,7 +97,7 @@ const tags = [];
 const check1 = false;
 const check2 = false;
 const check3 = false;
-const loading = true;
+const loading = ref(false);
 const info = '';
 const showTutorial = false;
 const tutorialSteps = [
