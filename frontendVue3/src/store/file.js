@@ -115,7 +115,7 @@ export const useFileStore = defineStore('file', {
                     );
                 });
         },
-        async uploadZipFeatureModel(data) {
+        async uploadZipFeatureModels(data) {
             const appStore = useAppStore();
             await api
                 .post(`${API_URL}zip-upload/`, data, {

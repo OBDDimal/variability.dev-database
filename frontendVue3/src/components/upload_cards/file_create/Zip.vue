@@ -176,6 +176,7 @@
                   :valid="valid_zip"
                   @close="$emit('close')"
                   @submit-click="showDetails = true"
+                  @uploadSuccessfull="(uploadInfo) => $emit('uploadSuccessfull', uploadInfo)"
                 ></action-buttons>
                 </v-col>
             </v-row>
