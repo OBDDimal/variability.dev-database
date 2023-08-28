@@ -231,9 +231,12 @@ import FileCreate from '@/components/upload_cards/FileCreate.vue';
 import { useAuthStore } from '@/store/auth';
 import { computed, ref } from 'vue';
 import { useRouter } from 'vue-router';
+import { useFileStore } from '@/store/file';
 
+const emit = defineEmits(['onDelete']);
 const router = useRouter();
 const authStore = useAuthStore();
+const fileStore = useFileStore();
 
 const props = defineProps({
     headline: {
@@ -283,47 +286,46 @@ const headers = [
         sortable: false,
     },
 ];
-const search = '';
-const removeLoading = false;
-const dialog = false;
+const search = ref('');
+const removeLoading = ref(false);
+const dialog = ref(false);
 const createDialog = ref(false);
-const dialogDelete = false;
+const dialogDelete = ref(false);
 const dialogAnalysis = false;
-
+const editedIndex = ref(-1);
+const editedItem = ref(null);
+const defaultItem = ref(undefined);
 const checkLocalStorage = computed(() => {
     return !!localStorage.featureModelData;
 });
 
 async function deleteItemConfirm() {
-    this.removeLoading = true;
-    /*await this.$store.dispatch(
-    'deleteFeatureModel',
-    this.editedItem.id
-  );
-  await this.$store.dispatch('fetchFiles');
-  this.$emit('onDelete');*/
-    this.removeLoading = false;
+    removeLoading.value = true;
+    await fileStore.deleteFeatureModel(
+    editedItem.value.value
+    );
+    await fileStore.fetchConfirmedFeatureModels();
+    emit('onDelete');
+    removeLoading.value = false;
 
-    this.closeDelete();
+    closeDelete();
 }
 function close() {
-    this.dialog = false;
+    dialog.value = false;
     /*this.$nextTick(() => {
     this.editedItem = Object.assign({}, this.defaultItem);
     this.editedIndex = -1;
   });*/
 }
 function closeDelete() {
-    this.dialogDelete = false;
-    /*this.$nextTick(() => {
-    this.editedItem = Object.assign({}, this.defaultItem);
-    this.editedIndex = -1;
-  });*/
+    dialogDelete.value = false;
+    editedItem.value = { ...defaultItem };
+    editedIndex.value = -1;
 }
 function deleteItem(item) {
-    this.editedIndex = this.items.indexOf(item);
-    this.editedItem = Object.assign({}, item);
-    this.dialogDelete = true;
+    editedIndex.value = item.index;
+    editedItem.value = { ...item };
+    dialogDelete.value = true;
 }
 function handleClick(value) {
     console.log(value);
