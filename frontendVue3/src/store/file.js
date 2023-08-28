@@ -26,7 +26,8 @@ export const useFileStore = defineStore('file', {
     },
     actions: {
         fetchConfirmedFeatureModels() {
-            api.get(`${API_URL}files/uploaded/confirmed/`).then((response) => {
+            //api.get(`${API_URL}files/uploaded/confirmed/`).then((response) => {
+            api.get(`${API_URL}files/`).then((response) => {
                 this.confirmedFeatureModels = response.data;
                 console.log(response.data[0]);
             });
