@@ -284,8 +284,7 @@ export default {
             await this.checkService()
             if (this.isServiceAvailable) {
                 try {
-                    this.xml = jsonToXML(this.data);
-                    const content = new TextEncoder().encode(this.xml);
+                    const content = new TextEncoder().encode(jsonToXML(this.data));
                     let response = await axios.post(`${import.meta.env.VITE_APP_DOMAIN_FEATUREIDESERVICE}slice`, {
                         name: "hello.xml",
                         selection: [node.name],
@@ -293,7 +292,6 @@ export default {
                     });
                     let contentAsString = new TextDecoder().decode(Uint8Array.from(response.data.content));
                     const xml = beautify(contentAsString);
-                    this.xml = xml;
                     const command = new SliceCommand(
                         this,
                         xml
