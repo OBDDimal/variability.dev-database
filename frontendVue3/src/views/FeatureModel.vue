@@ -202,7 +202,6 @@ export default {
         );
         this.featureModelCommandManager.commandEvent = this.commandEvent;
         this.constraintCommandManager.commandEvent = this.commandEvent;
-        console.log(this.id);
         if (this.id === 'local') {
             const xml = beautify(localStorage.featureModelData);
             xmlTranspiler.xmlToJson(xml, this.data);

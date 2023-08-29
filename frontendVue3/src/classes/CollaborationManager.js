@@ -178,6 +178,7 @@ export default class CollaborationManager {
             historyCommands: data.constraintHistoryCommands,
             futureCommands: data.constraintFutureCommands,
         };
+        this.constraintCommandManager.executeRemoteCommands(this.featureModel.data.rootNode, this.featureModel.data.constraints)
     }
 
     receiveClose() {
