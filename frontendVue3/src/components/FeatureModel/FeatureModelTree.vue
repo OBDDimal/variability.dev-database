@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div @click.middle="fitToView">
         <div class="float-right mt-2 mr-3" style="position: absolute; right: 0">
             <v-toolbar
                 floating
