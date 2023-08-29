@@ -95,7 +95,6 @@ export class CommandManager {
     }
 
     executeRemoteCommands(rootNode, constraints) {
-      console.log(this.remoteCommands)
         if (this.remoteCommands) {
             this.remoteCommands.historyCommands.forEach(commandData => {
                 const command = commandFactory.create(rootNode, constraints, commandData.type, commandData.data, this.collaborationManager.featureModel);
