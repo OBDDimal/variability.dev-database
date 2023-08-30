@@ -269,7 +269,12 @@ export default {
                 this.updateFeatureModel();
             } else {
                 this.loadingData = false;
-                this.errorNew("FeatureIDE Service is not available to slice the feature.");
+                appStore.updateSnackbar(
+              'Could not slice the Feature, because Service is down.',
+              'error',
+              3000,
+              true
+                )
             }
             this.loadingData = false;
         },

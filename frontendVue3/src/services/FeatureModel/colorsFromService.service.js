@@ -1,6 +1,7 @@
 import { jsonToXML } from '@/services/xmlTranspiler.service';
 import axios from 'axios';
 import { NODE_CORE_COLOR, NODE_DEAD_COLOR, NODE_FALSEOP_COLOR } from '@/classes/constants';
+import { useAppStore } from '@/store/app';
 
 export async function getColorsFromService(featureModel, d3Data) {
     try {
@@ -24,6 +25,11 @@ export async function getColorsFromService(featureModel, d3Data) {
         }
 
     } catch (e) {
-      console.log(e)
+        const appStore = useAppStore()
+        appStore.updateSnackbar(
+          'Could not detect any special cases, because Service is down.',
+          'error',
+          3000,
+          true)
     }
 }

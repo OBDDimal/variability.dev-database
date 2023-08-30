@@ -1,6 +1,7 @@
 import * as commandFactory from "@/classes/Commands/CommandFactory";
 import * as update from '@/services/FeatureModel/update.service.js';
 import { getColorsFromService } from '@/services/FeatureModel/colorsFromService.service';
+import { ReloadCommand } from '@/classes/Commands/ReloadCommand';
 
 export class CommandManager {
     constructor() {
@@ -11,6 +12,10 @@ export class CommandManager {
         this.remoteCommands = null;
         this.commandEvent = null;
         this.d3Data = null;
+    }
+
+    executeReload(){
+      this.fadeOut(this.d3Data, new ReloadCommand());
     }
 
     execute(command, initiator = true) {
@@ -33,8 +38,6 @@ export class CommandManager {
         this.futureCommands = [];
 
         this.commandEvent();
-
-        getColorsFromService(this.collaborationManager.featureModel.data, this.d3Data)
 
         this.fadeOut(this.d3Data, command);
     }
@@ -114,10 +117,27 @@ export class CommandManager {
     }
 
     fadeOut(d3Data, command) {
-        // Rerender for edits and fade them out
-        setTimeout(() => {
-            command.unmarkChanges();
-            update.updateSvg(d3Data);
-        }, 5000);
+        if(command instanceof ReloadCommand){
+            getColorsFromService(this.collaborationManager.featureModel.data, this.d3Data);
+            // Rerender for edits and fade them out
+            setTimeout(() => {
+                command.unmarkChanges();
+                update.updateSvg(d3Data);
+            }, 500);
+        } else if(this.type !== 'constraint') {
+            getColorsFromService(this.collaborationManager.featureModel.data, this.d3Data);
+            // Rerender for edits and fade them out
+            setTimeout(() => {
+                command.unmarkChanges();
+                update.updateSvg(d3Data);
+            }, 3000);
+        } else {
+            getColorsFromService(this.collaborationManager.featureModel.data, this.collaborationManager.featureModelCommandManager.d3Data);
+            // Rerender for edits and fade them out
+            setTimeout(() => {
+                command.unmarkChanges();
+                update.updateSvg(this.collaborationManager.featureModelCommandManager.d3Data);
+            }, 500);
+        }
     }
 }
