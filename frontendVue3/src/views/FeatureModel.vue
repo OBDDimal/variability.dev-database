@@ -22,7 +22,6 @@
                 showStartCollaborationSessionDialog = true
             "
             @show-claim-dialog="showClaimDialog"
-            @colors="getColors"
             @new-empty-model="newEmptyModel"
             @show-tutorial="showTutorial = true"
             @error-closed="errorClosed"
@@ -282,41 +281,6 @@ export default {
             } catch (error) {
                 this.isServiceAvailable = false
             }
-        },
-
-        async getColors() {
-            this.loadingData = true;
-            await this.checkService()
-            if (this.isServiceAvailable) {
-              try {
-                this.xml = jsonToXML(this.data);
-                const content = new TextEncoder().encode(this.xml);
-                let response = await axios.post(`${import.meta.env.VITE_APP_DOMAIN_FEATUREIDESERVICE}stats`, {
-                  name: this.id + ".xml",
-                  content: Array.from(content)
-                });
-                let deadFeatures = response.data.deadFeatures;
-                let falseOptionalFeatures = response.data.falseOptionalFeatures;
-                let coreFeatures = response.data.coreFeatures;
-
-                if (deadFeatures.length > 0) {
-                  this.$refs.featureModelTree.d3Data.root.descendants().find(node => deadFeatures.includes(node.data.name)).forEach(node => node.data.setColor(NODE_DEAD_COLOR));
-                }
-                if (falseOptionalFeatures.length > 0) {
-                  this.$refs.featureModelTree.d3Data.root.descendants().filter(node => falseOptionalFeatures.includes(node.data.name)).forEach(node => node.data.setColor(NODE_FALSEOP_COLOR));
-                }
-                if (coreFeatures.length > 0) {
-                  this.$refs.featureModelTree.d3Data.root.descendants().filter(node => coreFeatures.includes(node.data.name)).forEach(node => node.data.setColor(NODE_CORE_COLOR));
-                }
-                this.updateFeatureModel();
-              } catch (e) {
-                this.loadingData = false;
-              }
-            } else {
-                this.loadingData = false;
-                this.errorNew("FeatureIDE Service is not available to slice the feature.");
-            }
-            this.loadingData = false;
         },
 
         newEmptyModel() {

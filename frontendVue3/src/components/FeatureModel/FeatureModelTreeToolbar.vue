@@ -116,7 +116,7 @@
                     <v-list-item-title>Redo</v-list-item-title>
                 </v-list-item>
 
-                <v-menu offset-y :close-on-content-click="false">
+                <v-menu offset-y :close-on-content-click="false" v-model="isColorMenuOpened">
                     <template v-slot:activator="{ props }">
                         <v-list-item v-bind="props" prepend-icon="mdi-palette">
                             <v-list-item-title>Coloring</v-list-item-title>
@@ -133,11 +133,6 @@
                                     v-text="item"
                                 ></v-list-item-title>
                             </v-list-item-content>
-                        </v-list-item>
-                        <v-list-item
-                            v-if="isServiceAvailable"
-                            @click="selectedColoring(-1)"
-                        > Dead, Core and False Optional
                         </v-list-item>
                     </v-list>
                 </v-menu>
@@ -362,6 +357,7 @@ export default {
         drawer: true,
         discardChangesConfirmDialog: false,
         saveDialog: false,
+        isColorMenuOpened: false,
     }),
 
     watch: {
@@ -386,6 +382,11 @@ export default {
         quickEdit: function (newValue) {
             this.$emit('quickEdit', newValue);
         },
+        isColorMenuOpened: function(newValue) {
+          if(!newValue){
+            this.$emit('coloring', -1)
+          }
+        }
     },
 
     computed: {},

@@ -1,5 +1,6 @@
 import * as commandFactory from "@/classes/Commands/CommandFactory";
 import * as update from '@/services/FeatureModel/update.service.js';
+import { getColorsFromService } from '@/services/FeatureModel/colorsFromService.service';
 
 export class CommandManager {
     constructor() {
@@ -32,6 +33,8 @@ export class CommandManager {
         this.futureCommands = [];
 
         this.commandEvent();
+
+        getColorsFromService(this.collaborationManager.featureModel.data, this.d3Data)
 
         this.fadeOut(this.d3Data, command);
     }

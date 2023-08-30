@@ -283,11 +283,7 @@ export default {
 
         coloring(coloringIndex) {
           this.d3Data.coloringIndex = coloringIndex;
-            if(coloringIndex === -1){
-              this.$emit("colors")
-            } else {
-              update.updateSvg(this.d3Data);
-            }
+          update.updateSvg(this.d3Data);
         },
 
         onChangeFoundNodeIndex(index) {
