@@ -278,6 +278,7 @@ export default {
 
     methods: {
         resetView(levels, maxChildren) {
+            this.d3Data.direction ='v';
             view.reset(this.d3Data, levels, maxChildren);
         },
 
