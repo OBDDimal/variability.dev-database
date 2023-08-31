@@ -255,13 +255,12 @@ function updateChildrenCount(d3Data, featureNodeUpdate) {
     const childrenCountUpdate = childrenCountEnter.merge(childrenCount);
     childrenCountUpdate.attr('transform', (d3Node) => {
         if(d3Data.direction === 'v'){
-            const angle=0;
             const x = 0 ;
-            const y = CONSTANTS.RECT_HEIGHT + 10;
-            return `translate(${x}, ${y})rotate(${angle})`;
+            const y = CONSTANTS.RECT_HEIGHT + CONSTANTS.TRIANGLE_BORDER_OFFSET;
+            return `translate(${x}, ${y})`;
         }else{
-            const angle=270;
-            const x = d3Node.width+10;
+            const angle= CONSTANTS.TRIANGLE_HORIZONTAL_ROTATION;
+            const x = d3Node.width+CONSTANTS.TRIANGLE_BORDER_OFFSET;
             const y =   0;
             return `translate(${x}, ${y})rotate(${angle})`;
         }
