@@ -70,7 +70,7 @@
                 </div>
             </template>
 
-            <template v-slot:item.formula="{ item }">          
+            <template v-slot:item.formula="{ item }">
                 <v-chip
                     :color="item.raw.constraint.color"
                     @click="highlightConstraint(item.raw)"
@@ -80,19 +80,20 @@
             </template>
 
             <template v-slot:item.actions="{ item }">
-                <v-icon
-                    class="mr-6"
+                <v-btn
+                    icon="mdi-pencil"
+                    variant="text"
                     @click="openAddEditDialog('Edit', item.raw.constraint)"
                     :disabled="!editRights"
                 >
-                    mdi-pencil
-                </v-icon>
-                <v-icon
+                </v-btn>
+                <v-btn
+                    icon="mdi-delete"
+                    variant="text"
                     @click="deleteConstraint(item.raw.constraint)"
                     :disabled="!editRights"
                 >
-                    mdi-delete
-                </v-icon>
+                </v-btn>
             </template>
         </v-data-table>
     </v-bottom-sheet>
@@ -104,6 +105,10 @@ import { AddCommand } from '@/classes/Commands/Constraints/AddCommand';
 import { CommandManager } from '@/classes/Commands/CommandManager';
 import { EditCommand } from '@/classes/Commands/Constraints/EditCommand';
 import { DeleteCommand } from '@/classes/Commands/Constraints/DeleteCommand';
+import * as init from '@/services/FeatureModel/init.service';
+import * as dragAndDrop from '@/services/FeatureModel/dragAndDrop.service';
+import * as view from '@/services/FeatureModel/view.service';
+import * as update from '@/services/FeatureModel/update.service';
 
 export default {
     name: 'Constraints',
@@ -124,7 +129,7 @@ export default {
         headers: [
             { title: 'Constraint', key: 'formula', width: '50%' },
             { title: 'Actions', key: 'actions', width: '50%' },
-        ], 
+        ],
         search: '',
         showAddEditDialog: false,
         modeAddEdit: undefined,
@@ -132,7 +137,7 @@ export default {
         updateKey: 0,
     }),
 
-    computed: {
+  computed: {
         isOpenDialog: {
             get() {
                 return this.isOpen;
@@ -173,11 +178,16 @@ export default {
             }
             this.closeAddEditDialog();
             this.commandManager.execute(command);
+            this.$emit('update-feature-model');
         },
 
         deleteConstraint(constraint) {
+            if(constraint.isHighlighted){ //reset highlight to free up color
+                constraint.toggleHighlighted();
+            }
             const command = new DeleteCommand(this.constraints, constraint);
             this.commandManager.execute(command);
+            this.$emit('update-feature-model');
         },
 
         openAddEditDialog(mode, constraint) {
@@ -193,10 +203,12 @@ export default {
 
         undo() {
             this.commandManager.undo();
+            this.$emit('update-feature-model');
         },
 
         redo() {
             this.commandManager.redo();
+            this.$emit('update-feature-model');
         },
     },
 

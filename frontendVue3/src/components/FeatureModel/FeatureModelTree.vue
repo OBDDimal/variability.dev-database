@@ -260,7 +260,6 @@ export default {
         },
         smAndDown: useDisplay().smAndDown,
     }),
-
     mounted() {
         this.d3Data.featureModelTree = this;
 

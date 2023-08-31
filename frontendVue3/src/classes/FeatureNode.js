@@ -237,7 +237,7 @@ export class FeatureNode {
         rightSiblings.forEach(node => node.isHidden = false);
 
         const index = this.parent.d3Node.children.indexOf(this.d3Node);
-        const leftD3Siblings = this.parent.d3Node.children.slice(index + 1);
+        const leftD3Siblings = this.parent.d3Node.children.slice(0,index);
         const rightD3Siblings = rightSiblings.map(node => node.d3Node);
         this.parent.d3Node.children = [...leftD3Siblings, this.d3Node, ...rightD3Siblings];
     }

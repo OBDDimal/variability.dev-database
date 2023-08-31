@@ -6,6 +6,8 @@ import {EditCommand} from "@/classes/Commands/FeatureModel/EditCommand";
 import {SwapCommand} from "@/classes/Commands/FeatureModel/SwapCommand";
 import {parse} from "@/services/booleanExpressionParser.service";
 import {NewEmptyModelCommand} from "@/classes/Commands/FeatureModel/NewEmptyModelCommand";
+import { RemoveCommand } from '@/classes/Commands/FeatureModel/RemoveCommand';
+import { SliceCommand } from '@/classes/Commands/FeatureModel/SliceCommand';
 
 export function create(rootNode, allConstraints, type, data, featureModelComponent) {
     if (type === 'featureModel') {
@@ -21,6 +23,11 @@ export function create(rootNode, allConstraints, type, data, featureModelCompone
             return new SwapCommand(node, dstParent, data.dstIndex);
         } else if (data.commandType === 'new-empty-model') {
             return new NewEmptyModelCommand(featureModelComponent);
+        } else if (data.commandType === 'remove') {
+            const node = rootNode.descendants().find(node => node.name === data.nodeName);
+            return new RemoveCommand(node, data.dstIndex);
+        } else if (data.commandType === 'slice-model') {
+            return new SliceCommand(featureModelComponent, data.newXML);
         }
     } else {
         if (data.commandType === 'add') {

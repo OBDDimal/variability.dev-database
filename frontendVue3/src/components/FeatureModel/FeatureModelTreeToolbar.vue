@@ -128,11 +128,8 @@
                             :key="i"
                             @click="selectedColoring(i)"
                         >
-                            <v-list-item-content>
                                 <v-list-item-title
-                                    v-text="item"
-                                ></v-list-item-title>
-                            </v-list-item-content>
+                                >{{item}}</v-list-item-title>
                         </v-list-item>
                     </v-list>
                 </v-menu>

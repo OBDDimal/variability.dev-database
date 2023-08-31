@@ -70,6 +70,52 @@
             @update-feature-model="updateFeatureModel"
         ></constraints>
 
+        <collaboration-toolbar
+              v-if="collaborationStatus"
+              :key="collaborationReloadKey"
+              :collaboration-manager="collaborationManager"
+              :show-claim-dialog="showClaimDialog"
+        ></collaboration-toolbar>
+
+        <v-dialog
+            v-model="showStartCollaborationSessionDialog"
+            persistent
+            width="auto"
+        >
+            <v-card>
+                <v-card-title
+                    >Do you want to start a new collaboration
+                    session?</v-card-title
+                >
+                <v-card-actions>
+                    <v-spacer></v-spacer>
+                    <v-btn
+                        color="red"
+                        variant="text"
+                        @click="showStartCollaborationSessionDialog = false"
+                    >
+                        Cancel
+                    </v-btn>
+
+                    <v-btn color="primary" variant="text" @click="createCollaboration">
+                        Start
+                    </v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
+
+        <collaboration-name-dialog
+            v-if="collaborationKey"
+            @change-name="(name) => collaborationManager.sendName(name)"
+        ></collaboration-name-dialog>
+
+        <collaboration-continue-editing-dialog
+            :show="showContinueEditingDialog"
+            @close="closeFeatureModel"
+            @continue-editing="continueEditing"
+        >
+        </collaboration-continue-editing-dialog>
+
 
     </div>
 </template>
@@ -87,17 +133,14 @@ import { jsonToXML } from '@/services/xmlTranspiler.service';
 import CollaborationToolbar from '@/components/CollaborationToolbar';
 import CollaborationNameDialog from '@/components/CollaborationNameDialog';
 import CollaborationContinueEditingDialog from '@/components/CollaborationContinueEditingDialog';
-import { EXAMPLE_FEATURE_MODEL_XML, NODE_CORE_COLOR, NODE_DEAD_COLOR, NODE_FALSEOP_COLOR } from '@/classes/constants';
+import { EXAMPLE_FEATURE_MODEL_XML } from '@/classes/constants';
 import TutorialMode from '@/components/TutorialMode';
 import { NewEmptyModelCommand } from '@/classes/Commands/FeatureModel/NewEmptyModelCommand';
 import { SliceCommand } from "@/classes/Commands/FeatureModel/SliceCommand";
-import { FeatureNode } from "@/classes/FeatureNode";
 import FeatureModelInformation from '@/components/FeatureModel/FeatureModelInformation';
 import { useAppStore } from '@/store/app';
-import { useRouter } from 'vue-router';
 import axios from "axios";
 
-const router = useRouter();
 const appStore = useAppStore();
 
 export default {
@@ -158,7 +201,6 @@ export default {
         );
         this.featureModelCommandManager.commandEvent = this.commandEvent;
         this.constraintCommandManager.commandEvent = this.commandEvent;
-        console.log(this.id);
         if (this.id === 'local') {
             const xml = beautify(localStorage.featureModelData);
             xmlTranspiler.xmlToJson(xml, this.data);
@@ -240,33 +282,30 @@ export default {
             this.loadingData = true;
             await this.checkService()
             if (this.isServiceAvailable) {
-
-                this.xml = jsonToXML(this.data);
-                const content = new TextEncoder().encode(this.xml);
-                let response = await axios.post(`${import.meta.env.VITE_APP_DOMAIN_FEATUREIDESERVICE}slice`, {
-                    name: this.id + ".xml",
-                    selection: [node.name],
-                    content: Array.from(content)
-                });
-                let contentAsString = new TextDecoder().decode(Uint8Array.from(response.data.content));
-                const xml = beautify(contentAsString);
-                let newData = {
-                    featureMap: [],
-                    constraints: [],
-                    properties: [],
-                    calculations: undefined,
-                    comments: [],
-                    featureOrder: undefined,
-                    rootNode: new FeatureNode(null, 'Root', 'and', false, false),
-                };
-                xmlTranspiler.xmlToJson(xml, newData);
-                this.xml = xml;
-                const command = new SliceCommand(
-                    this,
-                    newData
-                );
-                this.featureModelCommandManager.execute(command);
-                this.updateFeatureModel();
+                try {
+                    const content = new TextEncoder().encode(jsonToXML(this.data));
+                    let response = await axios.post(`${import.meta.env.VITE_APP_DOMAIN_FEATUREIDESERVICE}slice`, {
+                        name: "hello.xml",
+                        selection: [node.name],
+                        content: Array.from(content)
+                    });
+                    let contentAsString = new TextDecoder().decode(Uint8Array.from(response.data.content));
+                    const xml = beautify(contentAsString);
+                    const command = new SliceCommand(
+                        this,
+                        xml
+                    );
+                    this.featureModelCommandManager.execute(command);
+                    this.updateFeatureModel();
+                } catch (e) {
+                  this.loadingData = false;
+                  appStore.updateSnackbar(
+                'Could not slice the Feature, because an unknown error occurred.',
+                'error',
+                3000,
+                true
+                  )
+                }
             } else {
                 this.loadingData = false;
                 appStore.updateSnackbar(
@@ -332,7 +371,7 @@ export default {
             this.showStartCollaborationSessionDialog = false;
             this.collaborationManager.createCollaboration();
             navigator.clipboard.writeText(
-                `${import.meta.env.VITE_APP_DOMAIN}collaboration/${
+                `${import.meta.env.VITE_APP_DOMAIN_FRONTEND}collaboration/${
                     this.collaborationManager.collaborationKey
                 }`
             );
@@ -340,15 +379,13 @@ export default {
 
         continueEditing() {
             this.showContinueEditingDialog = false;
-            this.collaborationManager.closeCollaboration();
             this.editRights = true;
         },
 
         closeFeatureModel() {
             this.showContinueEditingDialog = false;
-            this.collaborationManager.closeCollaboration();
             this.collaborationManager.noConfirm = false;
-            router.push('/');
+            this.$router.push({ path: '/' });
         },
 
         errorClosed() {

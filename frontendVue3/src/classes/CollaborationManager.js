@@ -4,6 +4,7 @@ import beautify from "xml-beautifier";
 import {xmlToJson} from "@/services/xmlTranspiler.service";
 import {Peer} from "peerjs";
 import {animals, colors, uniqueNamesGenerator} from 'unique-names-generator';
+import { useAppStore } from '@/store/app';
 
 export default class CollaborationManager {
     constructor(featureModelCommandManager, constraintCommandManager, featureModel) {
@@ -18,8 +19,8 @@ export default class CollaborationManager {
 
         this.connections = [];
         this.options = {
-            host: process.env.VUE_APP_DOMAIN_WEBSOCKET,
-            port: process.env.VUE_APP_DOMAIN_WEBSOCKET_PORT,
+            host: import.meta.env.VITE_APP_DOMAIN_WEBSOCKET,
+            port: import.meta.env.VITE_APP_DOMAIN_WEBSOCKET_PORT,
             path: "/myapp",
             pingInterval: 5000,
             debug: 0,
@@ -43,6 +44,7 @@ export default class CollaborationManager {
         // List of all clients inclusive host with { id, name }
         this.members = [];
         this.editorId = null;
+        this.appStore = useAppStore();
     }
 
     createCollaboration() {
@@ -176,6 +178,7 @@ export default class CollaborationManager {
             historyCommands: data.constraintHistoryCommands,
             futureCommands: data.constraintFutureCommands,
         };
+        this.constraintCommandManager.executeRemoteCommands(this.featureModel.data.rootNode, this.featureModel.data.constraints)
     }
 
     receiveClose() {
@@ -243,7 +246,6 @@ export default class CollaborationManager {
             action: action,
             data: data,
         };
-
         this.connections.forEach(conn => conn.send(toSend));
     }
 
@@ -263,7 +265,7 @@ export default class CollaborationManager {
             data: data,
         };
 
-        this.connections.filter(conn => conn !== excluded).forEach(conn => conn.send(toSend));
+        this.connections.filter(conn => conn.peer !== excluded.peer).forEach(conn => conn.send(toSend));
     }
 
     sendInitData(connection) {
@@ -329,12 +331,12 @@ export default class CollaborationManager {
     }
 
     showSnackbarMessage(message, variant = 'success') {
-        this.featureModel.$store.commit("updateSnackbar", {
-            message: message,
-            variant: variant,
-            timeout: 5000,
-            show: true,
-        });
+        this.appStore.updateSnackbar(
+          message,
+          variant,
+          5000,
+          true,
+        );
     }
 
     getClaimerName() {
