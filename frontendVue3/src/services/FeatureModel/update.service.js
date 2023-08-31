@@ -230,7 +230,7 @@ function updateChildrenCount(d3Data, featureNodeUpdate) {
             (d) => (d.data.isLeaf() || !d.data.isCollapsed ? [] : [d]),
             (d) => d.id
         );
-
+    
     const childrenCountEnter = childrenCount
         .enter()
         .append('g')
@@ -254,13 +254,18 @@ function updateChildrenCount(d3Data, featureNodeUpdate) {
 
     const childrenCountUpdate = childrenCountEnter.merge(childrenCount);
     childrenCountUpdate.attr('transform', (d3Node) => {
-        const x = d3Data.direction === 'v' ? 0 : d3Node.width + 10;
-        const y =
-            d3Data.direction === 'v'
-                ? CONSTANTS.RECT_HEIGHT + 10
-                : -CONSTANTS.RECT_HEIGHT / 8;
-        return `
-    translate(${x}, ${y})`;
+        if(d3Data.direction === 'v'){
+            const angle=0;
+            const x = 0 ;
+            const y = CONSTANTS.RECT_HEIGHT + 10;
+            return `translate(${x}, ${y})rotate(${angle})`;
+        }else{
+            const angle=270;
+            const x = d3Node.width+10;
+            const y =   0;
+            return `translate(${x}, ${y})rotate(${angle})`;
+        }
+        
     });
     childrenCountUpdate
         .selectAll('text.direct-children')
