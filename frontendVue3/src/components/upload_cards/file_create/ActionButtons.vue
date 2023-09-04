@@ -18,15 +18,16 @@
             </v-btn>
         </div>
     </v-col>
+
 </template>
 
 <script setup>
 import { ref } from 'vue';
 import { useFileStore } from '@/store/file';
-
+const uploadInfo = ref(null);
 const fileStore = useFileStore();
 
-const emit = defineEmits(['close', 'submitClick']);
+const emit = defineEmits(['close', 'submitClick', 'uploadSuccessfull']);
 
 const props = defineProps({
     data: {
@@ -42,47 +43,152 @@ let uploadStatus = ref('');
 let loading = ref(false);
 
 async function upload() {
-    const { valid } = await props.valid.validate();
-    if (valid) {
-        this.loading = true;
-        const data = new FormData();
-        let file_data = [];
-        let file_object = {};
-
-        file_object['label'] = props.data.label;
-        console.log('LABEL');
-        console.log(props.data.label);
-        file_object['description'] = props.data.description;
-        console.log('DESCRIPTION');
-        console.log(props.data.description);
-        file_object['license'] = props.data.license;
-        console.log('LICENSE');
-        console.log(props.data.license);
-        file_object['version'] = props.data.version;
-        console.log('VERSION');
-        console.log(props.data.version);
-
-        file_object['family'] = props.data.family;
-        console.log('FAMILY');
-        console.log(props.data.family);
-        file_object['tags'] = props.data.tags;
-        console.log('TAGS');
-        console.log(props.data.tags);
-        file_object['file'] = '0';
-        file_data.push(file_object);
-        console.log('FILES (in total finished):');
-        console.log(JSON.stringify(file_data));
-        data.append('files', JSON.stringify(file_data));
-        console.log(props.data.file);
-        data.append('0', props.data.file[0]);
-        uploadStatus.value = 'Uploading file...';
-        await fileStore.uploadBulkFeatureModels(data);
-        /*console.log('finished uploading file')*/
-        uploadStatus.value = '';
-        loading.value = false;
-        emit('close');
-    } else {
-        emit('submitClick');
+  const { valid } = await props.valid.validate();
+  if (valid) {
+    if (Array.isArray(props.data.files)) {
+      if (props.data.files.some(file => file.name.endsWith('.zip'))) {
+        console.log("Upload ZIP");
+        uploadZip();
+      }else if (props.data.files.length == 1) {
+      console.log("Single upload");
+      uploadSingle();
+      } else {
+        console.log("Bulk upload");
+        uploadBulk();
+    } 
     }
+  } else {
+    emit('submitClick');
+  }
 }
+async function uploadSingle(){
+            loading.value = true;
+            const data = new FormData();
+            let file_data = [];
+            let file_object = {};
+            file_object['label'] = props.data.label;
+            file_object['description'] = props.data.description;
+            file_object['license'] = props.data.license;
+            file_object['version'] = props.data.version;
+            file_object['family'] = props.data.family;
+            file_object['tags'] = props.data.tags;
+            file_object['file'] = '0';
+            file_data.push(file_object);
+            data.append('0', props.data.files[0]);
+            data.append('files', JSON.stringify(file_data));
+            uploadStatus.value = 'Uploading file...';
+            await fileStore.uploadBulkFeatureModels(data);
+            uploadInfo.value = {
+              format: "Single",
+              fileNames: props.data.label,
+              license: props.data.license
+            };
+            uploadStatus.value = '';
+            loading.value = false;
+            emit('uploadSuccessfull', uploadInfo.value);
+            console.log("Emit Upload")
+            //emit('close');
+}
+async function uploadBulk() {
+  const data = new FormData();
+  let uploaded_family_id = 0;
+  let file_data = [];
+  loading.value = true;
+  let majorversion = 1;
+  let file_names = [];
+  for (let i = 0; i < props.data.files.length; i++) {
+    const file = props.data.files[i];
+    console.log(props.data.files[i].name)
+    let version = majorversion.toString() + '.0.0';
+    let file_object = {};
+    const options = {
+                        weekday: 'long',
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric',
+                        hour: 'numeric',
+                        minute: 'numeric',
+                    };
+    let date = new Date();
+    file_object['label'] = file.name.replace('.xml', '');
+    file_object['description'] = `Added in bulk upload on ${date.toLocaleString('en-US', options)}`;
+    file_object['license'] = props.data.license;
+    file_object['version'] = version;
+    if (i !== 0) {
+        file_object['family'] = uploaded_family_id;
+    } else {
+      const uploadedFamily = await fileStore.uploadFamily(
+        {
+        label: props.data.family,
+        description: props.data.familydescription
+        }
+      );
+      uploaded_family_id = uploadedFamily.id;
+      file_object['family'] = uploaded_family_id;
+    }
+    file_object['tags'] = props.data.tags.map((x) =>
+                        parseInt(x.id)
+                    );
+    file_object['file'] = i.toString();
+    file_data.push(file_object);
+    file_names[i] = file.name.replace('.xml', '')
+    data.append(i.toString(), file);
+    majorversion++;
+
+  }
+
+  data.append('files', JSON.stringify(file_data));
+
+  uploadStatus.value = 'Uploading bulk files...';
+  await fileStore.uploadBulkFeatureModels(data);
+  uploadInfo.value = {
+        format: "Bulk",
+        fileCount: props.data.files.length,
+        fileNames: file_names,
+        license: props.data.license
+      };
+  uploadStatus.value = '';
+  loading.value = false;
+  emit('uploadSuccessfull', uploadInfo.value)
+}
+
+async function uploadZip() {
+    console.log("Zip Upload")
+    loading.value = true;
+    const data = new FormData();
+    let file_data = [];
+    let uploaded_family_id = 0;
+
+    let file_object = {};
+    file_object['label'] = props.data.label;
+    file_object['description'] = props.data.description;
+    file_object['license'] = props.data.license;
+    /*const uploadedFamily = await fileStore.uploadFamily(
+        {
+        label: props.data.family,
+        description: props.data.newFamilyDescription_zip
+        }
+      );
+    uploaded_family_id = uploadedFamily.id;*/
+    file_object['family'] = props.data.family;
+    file_object['tags'] = props.data.tags;
+
+    file_data.push(file_object);
+    data.append('files', JSON.stringify(file_object));
+    data.append('file', props.data.files[0]);
+    console.log(props.data.files)
+    uploadStatus.value = 'Uploading zip file. This may take a while...';
+    await fileStore.uploadZipFeatureModels(data);
+    uploadInfo.value = {
+        format: "Zip",
+        fileNames: props.data.label,
+        license: props.data.license
+      };
+    uploadStatus.value = '';
+    loading.value = false;
+    emit('uploadSuccessfull', uploadInfo.value);
+    
+    
+}
+
 </script>
