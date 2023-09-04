@@ -59,7 +59,7 @@
                                                     single-line
                                                     hide-details
                                                     density="comfortable"
-                                                    v-model="editedItem.label"
+                                                    v-model="labelValue"
                                                     label="Label"
                                                 ></v-text-field>
                                             </v-col>
@@ -70,7 +70,7 @@
                                                     hide-details
                                                     density="comfortable"
                                                     v-model="
-                                                        editedItem.description
+                                                        descriptionValue
                                                     "
                                                     label="Description"
                                                 ></v-text-field>
@@ -151,7 +151,7 @@ import { useAppStore } from '@/store/app';
 const appStore = useAppStore();
 const fileStore = useFileStore();
 const router = useRouter();
-const API_URL = import.meta.env.VUE_APP_DOMAIN;
+const API_URL = import.meta.env.VITE_APP_DOMAIN;
 const { families } = storeToRefs(useFileStore());
 
 const search = '';
@@ -184,6 +184,9 @@ const defaultItem = {
     description: '',
     owner: false,
 };
+// Neue lokale Variablen für v-model
+let labelValue = ref("");
+let descriptionValue = ref("");
 const loading = ref(false);
 const addLoading = ref(false);
 
@@ -192,13 +195,19 @@ const formTitle = computed(() => {
 });
 
 function editItem(item) {
-    editedIndex.value = item.id;
+    editedIndex.value = item.index+1;
     editedItem = Object.assign({}, item.raw);
-    editedItem.label = item.raw.label;
-    console.log(editedItem.label);
+    labelValue.value = editedItem.label;
+    descriptionValue.value = editedItem.description;
     dialog.value = true;
 }
+watch(labelValue, (value) => {
+    editedItem.label = value;
+});
 
+watch(descriptionValue, (value) => {
+    editedItem.description = value;
+});
 watch(dialog, (value) => {
     if (!value) {
         editedIndex.value = -1;
@@ -208,11 +217,13 @@ watch(dialog, (value) => {
 function close() {
     dialog.value = false;
     editedIndex.value = -1;
+    labelValue.value = '';
+    descriptionValue.value='';
 }
 
 function addFamily() {
     addLoading.value = true;
-    api.post(`${API_URL}families/`, this.editedItem)
+    api.post(`${API_URL}families/`, editedItem)
         .then(() => {
             appStore.updateSnackbar(
                 'Family added successfully!',
@@ -236,7 +247,7 @@ function addFamily() {
 
 function updateFamily() {
     addLoading.value = true;
-    api.put(`${API_URL}families/${this.editedIndex}/`, this.editedItem)
+    api.put(`${API_URL}families/${editedIndex.value}/`, editedItem)
         .then(() => {
             appStore.updateSnackbar(
                 'Family updated successfully!',
