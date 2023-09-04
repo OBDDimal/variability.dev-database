@@ -425,7 +425,6 @@ function updateLinks(d3Data, visibleD3Nodes) {
 
 function updateColoring(d3Data) {
     const allNodes = d3Data.root.data.descendants();
-    console.log(d3Data.coloringIndex);
     count.colorNodes(allNodes, d3Data.coloringIndex);
 }
 

@@ -7,9 +7,11 @@ export function colorNodes(allNodes, coloringIndex) {
 			resetColorNodes(allNodes)
 			break
 		case 1:
+      resetColorNodes(allNodes)
 			coloring(allNodes, countDirectChildren)
 			break
 		case 2:
+      resetColorNodes(allNodes)
 			coloring(allNodes, countTotalChildren)
 			break
 		default:
