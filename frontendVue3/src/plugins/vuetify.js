@@ -4,7 +4,7 @@ import { createVuetify } from 'vuetify';
 import { VDataTable } from 'vuetify/labs/VDataTable';
 import { VBottomSheet} from 'vuetify/labs/VBottomSheet';
 
-const variabilityLightTheme = {
+export const variabilityLightTheme = {
   dark: false,
   colors: {
     background: '#fcfcff',
@@ -15,11 +15,12 @@ const variabilityLightTheme = {
     error: '#ba1a1a',
     info: '#2196F3',
     success: '#4CAF50',
-    warning: '#FB8C00',
+    'on-success': '#1a1c1e',
+    warning: '#FB0000',
   },
 }
 
-const variabilityDarkTheme = {
+export const variabilityDarkTheme = {
   dark: true,
   colors: {
     background: '#1a1c1e',
@@ -29,6 +30,7 @@ const variabilityDarkTheme = {
     error: '#ffb4ab',
     info: '#2196F3',
     success: '#4CAF50',
+    'on-success': '#1a1c1e',
     warning: '#FB8C00',
   },
 }

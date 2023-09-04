@@ -87,7 +87,7 @@ function updateFeatureNodes(d3Data, visibleD3Nodes) {
     rectAndTextUpdate
         .select('rect')
         .classed('is-searched-feature', (d3Node) => d3Node.data.isSearched)
-        .attr('fill', (d3Node) => d3Node.data.color())
+        .attr('fill', (d3Node) => d3Node.data.color(d3Data.vuetify.theme.global.current.dark))
         .attr('x', (d3Node) =>
             d3Data.direction === 'v' ? -d3Node.width / 2 : 0
         )
@@ -104,9 +104,7 @@ function updateFeatureNodes(d3Data, visibleD3Nodes) {
         )
         .attr('x', d3Data.direction === 'v' ? 0 : (d3Node) => d3Node.width / 2)
         .classed('whiteText', (d3Node) => {
-            let color = d3Node.data.color();
-            const rgb = color.replace(/[^\d,]/g, '').split(',');
-            return rgb[0] * 0.299 + rgb[1] * 0.587 + rgb[2] * 0.114 <= 186;
+            return !d3Data.vuetify.theme.global.current.dark;
         })
         .text((d3Node) =>
             d3Data.isShortenedName ? d3Node.data.displayName : d3Node.data.name

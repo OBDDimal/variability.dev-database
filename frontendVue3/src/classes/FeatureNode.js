@@ -1,6 +1,7 @@
 import * as CONSTANTS from './constants';
 import * as d3 from "d3";
 import {PseudoNode} from "@/classes/PseudoNode";
+import { variabilityDarkTheme, variabilityLightTheme } from '@/plugins/vuetify';
 
 export class FeatureNode {
     constructor(parent, name, groupType, mandatory, abstract) {
@@ -12,7 +13,7 @@ export class FeatureNode {
         this.isRoot = parent === null;
         this.isMandatory = mandatory;
         this.isAbstract = abstract;
-        this.colorValue = CONSTANTS.NODE_COLOR;
+        this.colorValue = [variabilityLightTheme.colors.primary, variabilityDarkTheme.colors.primary];
         this.constraints = [];
         this.isCollapsed = false;
         this.isHidden = false;
@@ -26,15 +27,16 @@ export class FeatureNode {
         }else{
             this.displayName= newName.slice(0, CONSTANTS.DISPLAY_NAME_RAW) + CONSTANTS.POINTS;
         }
-       
+
     }
-    color() {
+    color(dark) {
+        console.log(dark)
         if (this.markedAsEdited) {
-            return CONSTANTS.NODE_EDITED_COLOR;
+            return dark ? variabilityDarkTheme.colors.warning : variabilityLightTheme.colors.warning;
         } else if (this.isAbstract) {
             return CONSTANTS.NODE_ABSTRACT_COLOR;
         } else {
-            return this.colorValue;
+            return dark ? this.colorValue[1] : this.colorValue[0];
         }
     }
 

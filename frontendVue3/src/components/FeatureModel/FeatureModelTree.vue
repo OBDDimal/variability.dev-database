@@ -246,6 +246,7 @@ export default {
             direction: 'v', // h = horizontally, v = vertically
             maxHorizontallyLevelWidth: [],
             featureModelTree: undefined,
+            vuetify: undefined,
         },
         showAddDialog: false,
         showEditDialog: false,
@@ -262,6 +263,7 @@ export default {
     }),
     mounted() {
         this.d3Data.featureModelTree = this;
+        this.d3Data.vuetify = this.$vuetify;
 
         init.initialize(this.d3Data, this.rootNode);
         dragAndDrop.init(this.d3Data, this.commandManager);
@@ -274,6 +276,12 @@ export default {
         );
         update.updateSvg(this.d3Data);
     },
+
+    watch: {
+      d3Data.vuetify.theme.global.current.dark: function (newValue) {
+
+      }
+    }
 
     methods: {
         resetView(levels, maxChildren) {

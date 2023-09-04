@@ -32,11 +32,10 @@
             id="feature-model-information"
             position="absolute"
             location="right bottom"
-            theme="dark"
             elevation="2"
             icon
             :x-large="$vuetify.display.mdAndUp"
-            style="background-color: rgb(var(--v-theme-primary))"
+            color="primary"
             @click="openInformation = !openInformation"
             class="mr-15"
         >
@@ -48,11 +47,10 @@
             id="feature-model-constraints"
             position="absolute"
             location="right bottom"
-            theme="dark"
             elevation="2"
             icon
             :x-large="$vuetify.display.mdAndUp"
-            style="background-color:  rgb(var(--v-theme-primary))"
+            color="primary"
             @click="openConstraints = true"
         >
             <v-icon>mdi-format-list-checks</v-icon>

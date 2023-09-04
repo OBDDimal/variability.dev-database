@@ -45,10 +45,8 @@
                                         ? 'collaboration-pill-disabled'
                                         : ''
                                 "
-                                color="primary"
                                 :disabled="collaborationManager.isClient"
-                                theme="dark"
-                                style="background-color: rgb(var(--v-theme-primary))"
+                                style="background-color: rgb(var(--v-theme-primary)); color: rgb(var(--v-theme-on-primary))"
                                 @click="
                                     collaborationManager.sendMemberData(
                                         collaborationManager.peer._id
@@ -73,12 +71,8 @@
                                         ? 'collaboration-pill-disabled'
                                         : ''
                                 "
-                                :color="
-                                    member.name === 'Host' ? 'success' : 'none'
-                                "
-                                theme="dark"
                                 :style="collaborationManager.editorId ===
-                                        member.id ? 'background-color: rgb(var(--v-theme-success))' : ''"
+                                        member.id ? 'background-color: rgb(var(--v-theme-success)); color: rgb(var(--v-theme-on-success))' : ''"
                                 :disabled="collaborationManager.isClient"
                                 @click="
                                     collaborationManager.sendMemberData(

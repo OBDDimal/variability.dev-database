@@ -13,7 +13,7 @@ export function colorNodes(allNodes, coloringIndex) {
 			coloring(allNodes, countTotalChildren)
 			break
 		default:
-			resetColorNodes(allNodes)
+			//resetColorNodes(allNodes)
 			break
 	}
 }
