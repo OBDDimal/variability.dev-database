@@ -322,6 +322,7 @@ export default {
         toggleDirection() {
             this.d3Data.direction = this.d3Data.direction === 'v' ? 'h' : 'v';
             update.updateSvg(this.d3Data);
+            view.zoomFit(this.d3Data);
         },
 
         hideCurrentNode(d3Node) {
