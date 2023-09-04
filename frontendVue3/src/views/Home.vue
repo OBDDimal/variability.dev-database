@@ -11,28 +11,28 @@
             :loading="loading"
             :addable="true"
         />
-        <!--    <tutorial-mode
-      :show="showTutorial"
-      @close="showTutorial = false"
-      :next-steps="tutorialSteps"
-      local-storage-identifier="homeTutorialCompleted"
-    ></tutorial-mode>-->
-        <!--        <v-btn
-            id="tutorial-mode"
-            fab
-            fixed
-            right
-            bottom
-            color="primary"
-            @click="showTutorial = true"
-        >
-            <v-icon> mdi-school </v-icon>
-        </v-btn>-->
+        <tutorial-mode
+        :show="showTutorial"
+        :next-steps="tutorialSteps"
+        local-storage-identifier="homeTutorialCompleted"
+        @close="showTutorial = false"
+        ></tutorial-mode>
+        <v-btn
+        id="tutorial-mode"
+        fab
+        fixed
+        right
+        bottom
+        color="primary"
+        @click="showTutorial = true">
+        <v-icon> mdi-school </v-icon>
+        </v-btn>
     </div>
 </template>
 
 <script setup>
 import FeatureModelTable from '@/components/FeatureModelTable.vue';
+import TutorialMode from '@/components/TutorialMode';
 import { onMounted } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useFileStore } from '@/store/file';

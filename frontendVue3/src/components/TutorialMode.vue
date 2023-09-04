@@ -1,5 +1,5 @@
 <template>
-    <v-dialog v-model="showDialog" persistent width="400">
+    <v-dialog v-model="showDialog" persistent width="400" @keydown.esc="$emit('close')">
         <div id="tutorial-dialog">
             <svg
                 v-if="!isMobile && isTop && isLeft"
@@ -112,7 +112,7 @@
 </template>
 
 <script setup>
-import { onMounted, ref, watch } from 'vue';
+import { onMounted, ref, computed, watch , defineEmits} from 'vue';
 
 const step = ref(undefined);
 const beforeSteps = ref([]);
@@ -120,7 +120,7 @@ const isTop = ref(false);
 const isLeft = ref(false);
 const isMobile = ref(false);
 const counter = ref(0);
-
+const emit = defineEmits(['close']);
 const props = defineProps({
     show: Boolean,
     nextSteps: {
@@ -213,7 +213,7 @@ onMounted(() => {
 });
 function startTutorial() {
     isMobile.value = 'ontouchstart' in window;
-    step.value = this.nextSteps[this.counter];
+    step.value = props.nextSteps[counter.value];
     counter.value++;
     if (!isMobile.value) {
         setBubblePosition();
@@ -222,14 +222,14 @@ function startTutorial() {
 
 function setBubblePosition() {
     const tutorialDialog = document.querySelector('#tutorial-dialog');
-    if (this.isMobile) {
+    if (isMobile) {
         tutorialDialog.style.position = 'block';
     } else {
         tutorialDialog.style.position = 'absolute';
     }
-    if (this.step.elementCssSelector) {
+    if (step.value.elementCssSelector) {
         const rect = document
-            .querySelector(this.step.elementCssSelector)
+            .querySelector(step.value.elementCssSelector)
             .getBoundingClientRect();
         const middleX = (rect.left - rect.right) / 2 + rect.right;
         const middleY = (rect.bottom - rect.top) / 2 + rect.top;
@@ -265,20 +265,19 @@ function setBubblePosition() {
 }
 
 function nextStep() {
-    if (this.nextSteps.length > this.counter) {
-        this.beforeSteps.unshift(this.step);
-        this.step = this.nextSteps[this.counter];
-        this.counter++;
-        if (!this.isMobile) {
-            this.setBubblePosition();
+    if (props.nextSteps.length > counter.value) {
+        beforeSteps.value.unshift(step.value);
+        step.value = props.nextSteps[counter.value];
+        counter.value++;
+        if (!isMobile.value) {
+            setBubblePosition();
         }
     } else {
-        this.exit();
+        exit();
     }
 }
 
 function exit() {
-    console.log('start');
     if (!isMobile.value) {
         const tutorialDialog = document.querySelector('#tutorial-dialog');
         tutorialDialog.style.left = '';
@@ -292,14 +291,11 @@ function exit() {
     isMobile.value = Boolean;
     counter.value = 0;
     localStorage[props.localStorageIdentifier] = true;
-    console.log('midd');
-    this.$emit('close');
-    console.log('end');
+    emit('close');
 }
 
 function beforeStep() {
     counter.value = counter - 1;
-    //this.nextSteps.unshift(this.step);
     step.value = beforeSteps.value.shift();
     if (!isMobile.value) {
         setBubblePosition();
@@ -315,13 +311,9 @@ function reset() {
     }
 }
 
-watch(show, (newValue, oldValue) => {
+watch(props.show, (newValue, oldValue) => {
     if (oldValue) {
-        /*this.nextSteps = [
-        ...this.beforeSteps.reverse(),
-        this.step,
-        ...this.nextSteps,
-    ];*/
+        console.log("Watcher fired");
         step.value = undefined;
         beforeSteps.value = [];
         isTop.value = false;
@@ -332,6 +324,15 @@ watch(show, (newValue, oldValue) => {
         // Reset position to 0 0 when restarting the tutorial again
         reset();
     }
+});
+// TODO Needed????
+const showDialog= computed(()=>{
+    return {
+            get() {
+                return props.show;
+            },
+            set() {},
+        }
 });
 </script>
 
