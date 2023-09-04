@@ -32,7 +32,7 @@
                     <v-file-input
                         v-model="formData.files"
                         :rules="fileRules"
-                        accept=".xml"
+                        accept=".xml, .zip"
                         small-chips
                         variant="outlined"
                         density="comfortable"
