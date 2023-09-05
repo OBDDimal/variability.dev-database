@@ -30,7 +30,6 @@ export class FeatureNode {
 
     }
     color(dark) {
-        console.log(dark)
         if (this.markedAsEdited) {
             return dark ? variabilityDarkTheme.colors.warning : variabilityLightTheme.colors.warning;
         } else if (this.isAbstract) {

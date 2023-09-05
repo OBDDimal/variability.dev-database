@@ -277,12 +277,6 @@ export default {
         update.updateSvg(this.d3Data);
     },
 
-    watch: {
-      d3Data.vuetify.theme.global.current.dark: function (newValue) {
-
-      }
-    }
-
     methods: {
         resetView(levels, maxChildren) {
             view.reset(this.d3Data, levels, maxChildren);
@@ -502,7 +496,14 @@ export default {
 
             this.updateSvg();
         },
-    },
+        '$vuetify.theme.global.current.dark':{
+            handler: function () {
+                this.updateSvg();
+            },
+        deep: true
+        }
+    }
+
 };
 </script>
 
