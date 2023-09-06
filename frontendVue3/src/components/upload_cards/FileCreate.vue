@@ -1,6 +1,6 @@
 <template>
     <v-card class="pa-2" max-width="1000">
-        <v-card-title v-if="showSummary">
+        <v-card-title v-if="showSummary" class="text-h5">
             Upload Summary
         </v-card-title>
         <v-card-title v-else>
@@ -37,13 +37,13 @@
                 <v-window-item value="single">
                     <single @close="$emit('close')" @uploadSuccessfull="(uploadInfo)=>handleUploadSuccess(uploadInfo)"></single>
                 </v-window-item>
-                <v-window-item value="multiple"> 
+                <v-window-item value="multiple">
                     <multiple @close="$emit('close')" @uploadSuccessfull="(uploadInfo)=>handleUploadSuccess(uploadInfo)"></multiple>
                  </v-window-item>
                 <v-window-item value="zip">
                   <zip @close="$emit('close')" @uploadSuccessfull="(uploadInfo)=>handleUploadSuccess(uploadInfo)"></zip></v-window-item>
             </v-window>
-            
+
         </v-card-text>
     </v-card>
 </template>
@@ -53,7 +53,7 @@ import { onMounted, ref, watch } from 'vue';
 import Single from '@/components/upload_cards/file_create/Single.vue';
 import Multiple from '@/components/upload_cards/file_create/Multiple.vue';
 import Zip from '@/components/upload_cards/file_create/Zip.vue'
-import UploadSummary from './file_create/UploadSummary.vue'; 
+import UploadSummary from './file_create/UploadSummary.vue';
 import { useAppStore } from '@/store/app';
 import { storeToRefs } from 'pinia';
 import { useFileStore } from '@/store/file';
