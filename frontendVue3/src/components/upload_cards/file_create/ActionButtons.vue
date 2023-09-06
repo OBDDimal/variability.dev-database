@@ -111,7 +111,6 @@ async function uploadSingle() {
       uploadStatus.value = '';
       loading.value = false;
       emit('uploadSuccessfull', uploadInfo.value);
-      console.log("Emit Upload")
     }).catch(() => {
       uploadStatus.value = '';
       loading.value = false;
