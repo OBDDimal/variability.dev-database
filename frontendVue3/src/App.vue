@@ -29,7 +29,7 @@
                 </template>
             </v-snackbar>
         </v-main>
-        <TheFooter v-if="route.name !== 'FeatureModel'"></TheFooter>
+        <TheFooter v-if="route.name !== 'FeatureModel' && $route.name !== 'Configurator'"></TheFooter>
     </v-app>
 </template>
 

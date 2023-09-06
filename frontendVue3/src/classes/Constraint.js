@@ -39,6 +39,10 @@ export class Constraint {
         return this.rule.toString();
     }
 
+    toList() {
+        return this.rule.toList();
+    }
+
     toStringForEdit() {
         return this.rule.toStringForEdit();
     }
@@ -49,5 +53,13 @@ export class Constraint {
 
     toStringXML() {
         return this.rule.toStringXML();
+    }
+
+    evaluate(tmp = false) {
+        return this.rule.evaluate(tmp);
+    }
+
+    quickFix(target) {
+        return this.rule.quickFix(target);
     }
 }
