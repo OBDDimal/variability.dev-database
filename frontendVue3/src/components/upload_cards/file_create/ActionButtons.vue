@@ -85,8 +85,9 @@ async function uploadSingle() {
   uploadStatus.value = 'Uploading file...';
   if (props.data.files.some(file => file.name.endsWith('.zip'))) {
     console.log("Upload ZIP");
-    return fileStore.uploadZipFeatureModels(data).then(() => {
-      uploadInfo.value = {
+    let success = await fileStore.uploadZipFeatureModels(data)
+      if (success){
+        uploadInfo.value = {
         format: "ZIP",
         fileNames: props.data.label,
         license: props.data.license
@@ -95,15 +96,14 @@ async function uploadSingle() {
       uploadStatus.value = '';
       loading.value = false;
       emit('uploadSuccessfull', uploadInfo.value);
-    })
-      .catch(() => {
-        uploadStatus.value = '';
-        loading.value = false;
-        emit('close');
-      })
+      }
+      else{
+        handleunsuccessfullupload();
+      }
   } else {
-    return fileStore.uploadBulkFeatureModels(data).then(() => {
-      uploadInfo.value = {
+     let success = await fileStore.uploadBulkFeatureModels(data)
+      if(success){
+        uploadInfo.value = {
         format: "Single",
         fileNames: props.data.label,
         license: props.data.license
@@ -111,14 +111,16 @@ async function uploadSingle() {
       uploadStatus.value = '';
       loading.value = false;
       emit('uploadSuccessfull', uploadInfo.value);
-    }).catch(() => {
-      uploadStatus.value = '';
+      }else{
+        handleunsuccessfullupload();
+      }
+
+  }
+}
+function handleunsuccessfullupload(){
+  uploadStatus.value = '';
       loading.value = false;
       emit('close');
-    })
-
-    //emit('close');
-  }
 }
 async function uploadBulk() {
   const data = new FormData();
@@ -171,16 +173,21 @@ async function uploadBulk() {
   data.append('files', JSON.stringify(file_data));
 
   uploadStatus.value = 'Uploading bulk files...';
-  await fileStore.uploadBulkFeatureModels(data);
-  uploadInfo.value = {
+  let success = await fileStore.uploadBulkFeatureModels(data);
+  if (success){
+    uploadInfo.value = {
         format: "Bulk",
         fileCount: props.data.files.length,
         fileNames: file_names,
         license: props.data.license
       };
-  uploadStatus.value = '';
-  loading.value = false;
-  emit('uploadSuccessfull', uploadInfo.value)
+    uploadStatus.value = '';
+    loading.value = false;
+    emit('uploadSuccessfull', uploadInfo.value)
+  }else{
+    handleunsuccessfullupload();
+  }
+
 }
 
 /*async function uploadZip() {
