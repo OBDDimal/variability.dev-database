@@ -89,7 +89,7 @@
                             <v-card>
                                 <v-card-title
                                     class="text-h5"
-                                    style="word-break: break-word"
+                                    style="white-space: normal;"
                                 >
                                     Are you sure you want to delete this feature
                                     model?
