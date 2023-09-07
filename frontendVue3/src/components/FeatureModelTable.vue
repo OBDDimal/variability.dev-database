@@ -31,7 +31,6 @@
                             density="comfortable"
                         >
                         </v-text-field>
-                        <v-tooltip location="top">
                             <template v-slot:activator="{ props }">
                                 <v-btn
                                     id="feature-model-upload"
