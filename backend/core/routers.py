@@ -61,9 +61,9 @@ urlpatterns = [
     path("api-auth/", include("rest_framework.urls")),
     path("user-info/", UserInfoApiView.as_view()),
     path('configurator/decision-propagation', DecisionPropagation.as_view()),
-    re_path("configurator/feature-models/(?P<name>[\w\d]+)/(?P<version_name>.*)", FeatureModels.as_view()),
-    re_path("configurator/mappings/(?P<name>[\w\d]+)", Mappings.as_view()),
-    re_path("configurator/feature-explanations/(?P<name>[\w\d]+)", Explanations.as_view()),
+    re_path(r"configurator/feature-models/(?P<name>[\w\d]+)/(?P<version_name>.*)", FeatureModels.as_view()),
+    re_path(r"configurator/mappings/(?P<name>[\w\d]+)", Mappings.as_view()),
+    re_path(r"configurator/feature-explanations/(?P<name>[\w\d]+)", Explanations.as_view()),
 ]
 urlpatterns += static(STATIC_URL, document_root=STATIC_ROOT)
 urlpatterns += static(MEDIA_URL, document_root=MEDIA_ROOT)
