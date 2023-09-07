@@ -231,14 +231,12 @@
 
 <script setup>
 import FileCreate from '@/components/upload_cards/FileCreate.vue';
-import { useAuthStore } from '@/store/auth';
 import { computed, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useFileStore } from '@/store/file';
 
 const emit = defineEmits(['onDelete']);
 const router = useRouter();
-const authStore = useAuthStore();
 const fileStore = useFileStore();
 
 const props = defineProps({
@@ -291,10 +289,8 @@ const headers = [
 ];
 const search = ref('');
 const removeLoading = ref(false);
-const dialog = ref(false);
 const createDialog = ref(false);
 const dialogDelete = ref(false);
-const dialogAnalysis = false;
 const editedItem = ref(null);
 const defaultItem = ref(undefined);
 const checkLocalStorage = computed(() => {
@@ -327,7 +323,6 @@ function handleClick(value) {
         params: { id: value.id, slug: value.slug },
     });
 }
-function setHovered() {}
 </script>
 
 <style>

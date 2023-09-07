@@ -54,52 +54,9 @@ const appStore = useAppStore();
 const { confirmedFeatureModels } = storeToRefs(useFileStore());
 const fileStore = useFileStore();
 
-const search = '';
-const dialog = false;
-const createDialog = false;
-const editedIndex = -1;
-const headers = [
-    {
-        text: 'ID',
-        align: 'start',
-        sortable: false,
-        value: 'id',
-    },
-    { text: 'Label', value: 'label' },
-    { text: 'Description', value: 'description' },
-    { text: 'License', value: 'license' },
-    { text: 'Tags', value: 'tags' },
-    { text: 'Uploaded on', value: 'uploaded' },
-    {
-        text: 'Actions',
-        align: 'center',
-        value: 'actions',
-        sortable: false,
-    },
-];
-const editedItem = {
-    label: '',
-    description: '',
-    license: 'CC-BY Mention',
-    tags: null,
-    uploaded: 'Today',
-};
-const defaultItem = {
-    label: '',
-    description: '',
-    license: 'CC-BY Mention',
-    tags: null,
-    uploaded: 'Today',
-};
-const licenses = [];
-const families = [];
-const tags = [];
-const check1 = false;
-const check2 = false;
-const check3 = false;
+
 const loading = ref(false);
-const info = '';
-const showTutorial = false;
+/*const showTutorial = false;
 const tutorialSteps = [
     {
         title: 'Welcome to the tutorial!',
@@ -137,7 +94,7 @@ const tutorialSteps = [
             'If there is a feature model in the local storage, you can view it by clicking this button.',
         elementCssSelector: '#feature-model-ls',
     },
-];
+];*/
 
 onMounted(() => {
     fileStore.fetchConfirmedFeatureModels();
