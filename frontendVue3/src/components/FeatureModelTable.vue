@@ -31,59 +31,62 @@
                             density="comfortable"
                         >
                         </v-text-field>
-                            <template v-slot:activator="{ props }">
-                                <v-btn
-                                    id="feature-model-upload"
-                                    v-if="addable"
-                                    class="mb-2 ml-4"
-                                    color="primary"
-                                    variant="tonal"
-                                    size="small"
-                                    icon="mdi-upload"
-                                    v-bind="props"
-                                    @click="createDialog = true"
-                                >
-                                </v-btn>
-                            </template>
-                            <span>Upload feature model</span>
-                        </v-tooltip>
-                        <v-tooltip top>
-                            <template v-slot:activator="{ on, attrs }">
-                                <v-btn
-                                    id="feature-model-create"
-                                    v-if="addable"
-                                    class="mb-2 ml-2"
-                                    color="success"
-                                    variant="tonal"
-                                    size="small"
-                                    icon="mdi-plus"
-                                    v-bind="attrs"
-                                    v-on="on"
-                                    to="/feature-model/new"
-                                >
-                                </v-btn>
-                            </template>
-                            <span>Create feature model</span>
-                        </v-tooltip>
-                        <v-tooltip top>
-                            <template v-slot:activator="{ on, attrs }">
-                                <v-btn
-                                    id="feature-model-ls"
-                                    v-if="addable"
-                                    :disabled="!checkLocalStorage"
-                                    class="mb-2 ml-2"
-                                    color="secondary"
-                                    variant="tonal"
-                                    size="small"
-                                    icon="mdi-server"
-                                    v-bind="attrs"
-                                    v-on="on"
-                                    to="/feature-model/local"
-                                >
-                                </v-btn>
-                            </template>
-                            <span>Upload from local storage</span>
-                        </v-tooltip>
+                      <v-tooltip location='top'>
+                        <template v-slot:activator='{ props }'>
+                          <v-btn
+                            id='feature-model-upload'
+                            v-if='addable'
+                            class='mb-2 ml-4'
+                            color='primary'
+                            variant='tonal'
+                            size='small'
+                            icon='mdi-upload'
+                            v-bind='props'
+                            @click='createDialog = true'
+                          >
+                          </v-btn>
+                        </template>
+                        <span>Upload feature model</span>
+                      </v-tooltip>
+
+                      <v-tooltip location='top'>
+                        <template v-slot:activator='{ props }'>
+                          <v-btn
+                            id='feature-model-create'
+                            v-if='addable'
+                            class='mb-2 ml-2'
+                            color='success'
+                            variant='tonal'
+                            size='small'
+                            icon='mdi-plus'
+                            v-bind='props'
+                            v-on='on'
+                            to='/feature-model/new'
+                          >
+                          </v-btn>
+                        </template>
+                        <span>Create feature model</span>
+                      </v-tooltip>
+
+                      <v-tooltip location='top'>
+                        <template v-slot:activator='{ props }'>
+                          <v-btn
+                            id='feature-model-ls'
+                            v-if='addable'
+                            :disabled='!checkLocalStorage'
+                            class='mb-2 ml-2'
+                            color='secondary'
+                            variant='tonal'
+                            size='small'
+                            icon='mdi-server'
+                            v-bind='props'
+                            v-on='on'
+                            to='/feature-model/local'
+                          >
+                          </v-btn>
+                        </template>
+                        <span>Upload from local storage</span>
+                      </v-tooltip>
                         <v-dialog v-model="dialogDelete" max-width="400px">
                             <v-card>
                                 <v-card-title
