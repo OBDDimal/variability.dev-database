@@ -10,6 +10,10 @@ export class Negation extends ConstraintItem {
         return 1;
     }
 
+    toList() {
+        return ['¬', ...this.addPossibleBracketsToList(this.item)]
+    }
+
     toString() {
         return `¬${this.addPossibleBrackets(this.item)}`;
     }
@@ -36,5 +40,24 @@ export class Negation extends ConstraintItem {
 
     removeConstraint() {
         this.item.removeConstraint();
+    }
+
+    evaluate(tmp = false) {
+        const item = this.item.evaluate(tmp);
+
+        if (item === undefined) {
+            return undefined;
+        } else {
+            return !item;
+        }
+    }
+
+    quickFix(target) {
+        if (this.item.evaluate() === target) {
+            return this.item.quickFix(!target);
+        }
+
+        console.error("Quick fix, Negation")
+        return [];
     }
 }

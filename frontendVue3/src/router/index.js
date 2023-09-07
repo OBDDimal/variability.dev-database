@@ -66,6 +66,15 @@ const routes = [
             title: 'History Detail',
         },
     },
+    {
+        path: '/configurator/:productLineName',
+        name: 'Configurator',
+        props: true,
+        component: () => import('@/views/FeatureModelConfiguration.vue'),
+        meta: {
+            title: 'Feature Model Configurator',
+        },
+    },
 ];
 
 const router = createRouter({

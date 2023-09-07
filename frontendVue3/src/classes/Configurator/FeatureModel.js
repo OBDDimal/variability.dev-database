@@ -36,7 +36,7 @@ export class FeatureModel {
     }
 
     loadXmlData(version) {
-        return api.get(`${process.env.VUE_APP_DOMAIN}configurator/feature-models/${this.productLineName}/${version.version}`)
+        return api.get(`${import.meta.env.VITE_APP_DOMAIN}configurator/feature-models/${this.productLineName}/${version.version}`)
             .then((xmlRaw) => {
                 const xml = beautify(xmlRaw.data);
 

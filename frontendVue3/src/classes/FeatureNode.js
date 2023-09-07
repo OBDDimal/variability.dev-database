@@ -18,6 +18,10 @@ export class FeatureNode {
         this.isHidden = false;
         this.d3Node = null;
         this.markedAsEdited = false;
+
+        this.isSelected = false;
+        this.isImplicit = false;
+        this.isExplicit = false;
     }
     setDisplayName(newName ){
         ///Sets the Displayname of the Featurenode
@@ -26,7 +30,7 @@ export class FeatureNode {
         }else{
             this.displayName= newName.slice(0, CONSTANTS.DISPLAY_NAME_RAW) + CONSTANTS.POINTS;
         }
-       
+
     }
     color() {
         if (this.markedAsEdited) {
@@ -358,6 +362,46 @@ export class FeatureNode {
 
     highlightConstraints() {
         this.constraints.forEach((constraint) => constraint.isHighlighted = true);
+    }
+
+    decisionPropagation() {
+        console.log(this.name, this.isSelected, this.isImplicit, this.isExplicit);
+
+        if (!this.isLeaf()) {
+
+            // Select mandatory child-features in and groups
+            if (this.isAnd()) {
+                if (this.isSelected) {
+                    this.children.filter(c => c.isMandatory).forEach(c => {
+                        c.isSelected = true;
+                        c.isImplicit = true;
+                    });
+                } else {
+                    this.descendants().slice(1).forEach(d => {
+                        d.isSelected = false;
+                        d.isImplicit = false;
+                        d.isExplicit = false;
+                    })
+                }
+            }
+
+            // Deselect not selected alternatives in alternative groups
+            if (this.isAlt()) {
+                if (this.isSelected && this.children.find(c => c.isSelected)) {
+                    this.children.filter(c => !c.isSelected).forEach(c => {
+                        c.isImplicit = true;
+                    });
+                } else {
+                    this.descendants().slice(1).forEach(d => {
+                        d.isSelected = false;
+                        d.isImplicit = false;
+                        d.isExplicit = false;
+                    })
+                }
+            }
+
+            this.children.forEach(c => c.decisionPropagation());
+        }
     }
 }
 

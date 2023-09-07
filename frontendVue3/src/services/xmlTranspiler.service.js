@@ -88,9 +88,9 @@ function readConstraintItem(item, data) {
         if (childItems.length > 1 || item.tagName === 'not') {
             switch (item.tagName) {
                 case 'disj':
-                    return new Disjunction(childItems[0], childItems[1]);
+                    return new Disjunction(childItems);
                 case 'conj':
-                    return new Conjunction(childItems[0], childItems[1]);
+                    return new Conjunction(childItems);
                 case 'imp':
                     return new Implication(childItems[0], childItems[1]);
                 case 'not':
