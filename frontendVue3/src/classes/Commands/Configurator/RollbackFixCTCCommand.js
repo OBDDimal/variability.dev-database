@@ -1,3 +1,7 @@
+import { RollbackCommand } from '@/classes/Commands/Configurator/RollbackCommand';
+import { ConfigurationCommand } from '@/classes/Commands/Configurator/ConfigurationCommand';
+import { SelectionState } from '@/classes/Configurator/SelectionState';
+
 export class RollbackFixCTCCommand extends RollbackCommand {
     constructor(featureModel, commandManger, constraint, initialResetCommand) {
         super(featureModel, commandManger, initialResetCommand);

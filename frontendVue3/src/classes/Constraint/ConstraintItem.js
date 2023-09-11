@@ -1,4 +1,6 @@
-import {operatorPrecedence} from "@/services/booleanExpressionParser.service";
+const operatorPrecedence = {};
+const operators = ['not', 'implies', 'and', 'or'];
+operators.forEach((operator, i) => operatorPrecedence[operator] = i);
 
 export class ConstraintItem {
 

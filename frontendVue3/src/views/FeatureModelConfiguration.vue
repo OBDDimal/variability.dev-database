@@ -2,7 +2,7 @@
   <div class="main">
     <!-- Loading screen -->
     <v-overlay
-        contained="true"
+        :contained=true
         class="align-center justify-center"
         :opacity="featureModel.loadingOpacity"
         :value="featureModel.loading"
@@ -16,7 +16,7 @@
     </v-overlay>
 
     <!-- Main content of the configurator -->
-    <v-container fluid="true" v-if="featureModel.loadingOpacity !== 0">
+    <v-container :fluid="true" v-if="featureModel.loadingOpacity !== 0">
 
       <!-- First row with the three columns: Versions, Features, Third Column (#SAT, Explanations, Configuration history) -->
       <v-row>
@@ -31,8 +31,8 @@
 
               <!-- Statistics about the versions as tooltip-->
               <v-tooltip bottom>
-                <template v-slot:activator="{ on, attrs }">
-                  <v-icon v-on="on" v-bind="attrs">mdi-information</v-icon>
+                <template v-slot:activator="{ props }">
+                  <v-icon v-bind="props">mdi-information</v-icon>
                 </template>
                 <table>
                   <tr>
@@ -97,7 +97,7 @@
             <!-- Table with all versions -->
             <v-data-table
                 :search="searchVersions"
-                :headers="[{text: 'Selection', value: 'selectionState'}, {text: 'Version', value: 'version', groupable: false}, {text: 'Actions', value: 'actions', groupable: false}]"
+                :headers="headers"
                 :items="featureModel.versions"
                 item-key="version"
                 show-group-by
@@ -340,7 +340,7 @@
         <!-- Third column (#SAT, Explanations, Configuration history) -->
         <v-col cols="4">
           <!-- #SAT -->
-          <v-card height="5vh;">
+          <v-card height="5vh">
             <v-card-title>{{ featureModel.satCount }}</v-card-title>
             <v-card-subtitle>Number of possible configurations</v-card-subtitle>
             <v-card-actions>
@@ -408,7 +408,7 @@
               <v-tabs v-model="tabsColumnTopRight" class="mt-2">
 
                 <!-- Explanations tab -->
-                <v-window-item key="explanations" style="height: 25vh;">
+                <v-tab key="explanations" style="height: 25vh;">
                   <div>
                     <!-- Reason 1 -->
                     <div class="text-h6" v-if="selectedVersion?.selectionState === SelectionState.ImplicitlySelected">
@@ -442,10 +442,10 @@
                       </v-list>
                     </div>
                   </div>
-                </v-window-item>
+                </v-tab>
 
                 <!-- Configuration history tab -->
-                <v-window-item key="configurationHistory">
+                <v-tab key="configurationHistory">
                   <v-data-table
                       :headers="[{text: 'Description', value: 'description'}, {text: '# Possible configs', value: 'newSatCount'}]"
                       :items="commandManager.commands"
@@ -461,7 +461,7 @@
                       hide-default-footer
                   >
                   </v-data-table>
-                </v-window-item>
+                </v-tab>
               </v-tabs>
             </v-card-text>
           </v-card>
@@ -487,12 +487,12 @@
               <v-tabs v-model="tabsBottom">
 
                 <!-- Feature Model Viewer -->
-                <v-window-item value="featureModelViewer" key="featureModelViewer">
+                <v-tab value="featureModelViewer" key="featureModelViewer">
                   <feature-model-viewer :version="selectedVersion"></feature-model-viewer>
-                </v-window-item>
+                </v-tab>
 
                 <!-- List Tree -->
-                <v-window-item value="listTree" key="listTree">
+                <v-tab value="listTree" key="listTree">
 
                   <v-container class="fill-height">
                     <v-layout column class="fill-height">
@@ -521,10 +521,10 @@
                     </v-layout>
                   </v-container>
 
-                </v-window-item>
+                </v-tab>
 
                 <!-- Cross-Tree Constraint Viewer -->
-                <v-window-item value="ctc" key="ctc">
+                <v-tab value="ctc" key="ctc">
 
                   <!-- Filter only the invalid ctcs and reset them to default -->
                   <v-btn rounded outlined @click="filteredConstraints = allConstraints.filter(c => c.evaluation === false)" class="mx-2">Only invalid </v-btn>
@@ -598,7 +598,7 @@
 
                   </v-data-table>
 
-                </v-window-item>
+                </v-tab>
               </v-tabs>
 
             </v-card-text>
@@ -635,6 +635,7 @@ export default {
   components: {DoubleCheckbox, FeatureModelViewer},
 
   data: () => ({
+    headers: [{text: 'Selection', value: 'selectionState'}, {text: 'Version', value: 'version'}, {text: 'Actions', value: 'actions'}],
     commandManager: new ConfiguratorManager(),
     initialResetCommand: undefined,
     featureModel: FeatureModel,
