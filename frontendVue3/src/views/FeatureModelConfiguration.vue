@@ -273,7 +273,7 @@
 
             <!-- Table with all features that are currently fitlered and searched -->
             <v-data-table
-                :headers="[{text: 'Selection', value: 'selectionState'}, {text: 'Name', value: 'name', groupable: false}, {text: 'Actions', groupable: false, value: 'actions'}]"
+                :headers="[{text: 'Selection', key: 'selectionState'}, {text: 'Name', key: 'name', groupable: false}, {text: 'Actions', groupable: false, key: 'actions'}]"
                 :search="searchFeatures"
                 :items="features"
                 item-key="name"
@@ -635,7 +635,7 @@ export default {
   components: {DoubleCheckbox, FeatureModelViewer},
 
   data: () => ({
-    headers: [{text: 'Selection', value: 'selectionState'}, {text: 'Version', value: 'version'}, {text: 'Actions', value: 'actions'}],
+    headers: [{text: 'Selection', key: 'selectionState'}, {text: 'Version', key: 'version', groupable:false}, {text: 'Actions', key: 'actions', groupable:false}],
     commandManager: new ConfiguratorManager(),
     initialResetCommand: undefined,
     featureModel: FeatureModel,
