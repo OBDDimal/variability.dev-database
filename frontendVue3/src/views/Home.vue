@@ -10,7 +10,7 @@
             :items="confirmedFeatureModels"
             :loading="loading"
             :addable="true"
-        />
+        />    
         <tutorial-mode
         :show="showTutorial"
         :next-steps="tutorialSteps"
@@ -19,12 +19,11 @@
         ></tutorial-mode>
         <v-btn
         id="tutorial-mode"
-        fab
-        fixed
-        right
-        bottom
+        position="absolute"
+        location="right bottom"
         color="primary"
-        @click="showTutorial = true">
+        @click="showTutorial = true"
+        >
         <v-icon> mdi-school </v-icon>
         </v-btn>
     </div>
@@ -33,7 +32,7 @@
 <script setup>
 import FeatureModelTable from '@/components/FeatureModelTable.vue';
 import TutorialMode from '@/components/TutorialMode';
-import { onMounted } from 'vue';
+import { onMounted, ref } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useFileStore } from '@/store/file';
 
@@ -85,7 +84,7 @@ const check2 = false;
 const check3 = false;
 const loading = true;
 const info = '';
-const showTutorial = false;
+const showTutorial = ref(false);
 const tutorialSteps = [
     {
         title: 'Welcome to the tutorial!',

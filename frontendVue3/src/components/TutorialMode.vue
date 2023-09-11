@@ -71,12 +71,8 @@
 
                 <v-card-actions>
                     <v-spacer></v-spacer>
-                    <v-btn text color="error" @click="$emit('close')"
-                        >Close</v-btn
-                    >
-                    <v-btn color="primary" text @click="startTutorial"
-                        >Start Tutorial</v-btn
-                    >
+                    <v-btn text color="error" @click="$emit('close')">Close</v-btn>
+                    <v-btn color="primary" text @click="startTutorial">Start Tutorial</v-btn>
                 </v-card-actions>
             </v-card>
             <svg
@@ -112,7 +108,7 @@
 </template>
 
 <script setup>
-import { onMounted, ref, computed, watch , defineEmits} from 'vue';
+import { onMounted, ref, computed, watch, defineEmits } from 'vue';
 
 const step = ref(undefined);
 const beforeSteps = ref([]);
@@ -222,45 +218,45 @@ function startTutorial() {
 
 function setBubblePosition() {
     const tutorialDialog = document.querySelector('#tutorial-dialog');
-    if (isMobile) {
+    if (isMobile.value) {
         tutorialDialog.style.position = 'block';
     } else {
         tutorialDialog.style.position = 'absolute';
     }
     if (step.value.elementCssSelector) {
-        const rect = document
-            .querySelector(step.value.elementCssSelector)
-            .getBoundingClientRect();
-        const middleX = (rect.left - rect.right) / 2 + rect.right;
-        const middleY = (rect.bottom - rect.top) / 2 + rect.top;
+        reset(); /// Reset bubble position until fixed
+        // const rect = document
+        //     .querySelector(step.value.elementCssSelector)
+        //     .getBoundingClientRect();
+        // const middleX = (rect.right - rect.left ) / 2+ rect.left;
+        // const middleY = (rect.bottom - rect.top) / 2 + rect.top;
+        // console.log(document
+        //     .querySelector(step.value.elementCssSelector));
+        // console.log(rect);
+        // console.log("midX: "+ middleX+"; midY: "+middleY);
 
-        tutorialDialog.style.left = null;
-        tutorialDialog.style.right = null;
-        tutorialDialog.style.top = null;
-        tutorialDialog.style.bottom = null;
-
-        if (
-            middleX + 400 >
-            (window.innerWidth || document.documentElement.clientWidth)
-        ) {
-            tutorialDialog.style.left = `calc(${middleX}px - 400px)`;
-            isLeft.value = false;
-        } else {
-            tutorialDialog.style.left = `calc(${middleX}px + 2rem)`;
-            isLeft.value = true;
-        }
-        if (
-            middleY + 200 >
-            (window.innerHeight || document.documentElement.clientHeight)
-        ) {
-            tutorialDialog.style.bottom = `calc(${
-                window.innerHeight - middleY
-            }px)`;
-            isTop.value = false;
-        } else {
-            tutorialDialog.style.top = middleY + 'px';
-            isTop.value = true;
-        }
+        // if (
+        //     middleX + 400 >
+        //     (window.innerWidth || document.documentElement.clientWidth)
+        // ) {
+        //     tutorialDialog.style.left = `calc(${middleX}px - 400px)`;
+        //     isLeft.value = false;
+        // } else {
+        //     tutorialDialog.style.left = `calc(${middleX}px + 2rem)`;
+        //     isLeft.value = true;
+        // }
+        // if (
+        //     middleY + 200 >
+        //     (window.innerHeight || document.documentElement.clientHeight)
+        // ) {
+        //     tutorialDialog.style.bottom = `calc(${window.innerHeight - middleY
+        //         }px)`;
+        //     isTop.value = false;
+        //     console.log("out of border");
+        // } else {
+        //     tutorialDialog.style.top = middleY + 'px';
+        //     isTop.value = true;
+        // }
     }
 }
 
@@ -278,17 +274,12 @@ function nextStep() {
 }
 
 function exit() {
-    if (!isMobile.value) {
-        const tutorialDialog = document.querySelector('#tutorial-dialog');
-        tutorialDialog.style.left = '';
-        tutorialDialog.style.top = '';
-        tutorialDialog.style.position = '';
-    }
+    reset();
     step.value = undefined;
     beforeSteps.value = [];
-    isTop.value = Boolean;
-    isLeft.value = Boolean;
-    isMobile.value = Boolean;
+    isTop.value = false;
+    isLeft.value = false;
+    isMobile.value = false;
     counter.value = 0;
     localStorage[props.localStorageIdentifier] = true;
     emit('close');
@@ -303,17 +294,23 @@ function beforeStep() {
 }
 
 function reset() {
-    if (!isMobile.value) {
-        const tutorialDialog = document.querySelector('#tutorial-dialog');
-        tutorialDialog.style.left = 0;
-        tutorialDialog.style.top = 0;
-        tutorialDialog.style.position = 'absolute';
+    try {
+        if (!isMobile.value) {
+            const tutorialDialog = document.querySelector('#tutorial-dialog');
+            if(tutorialDialog){
+                tutorialDialog.style.left = 0;
+                tutorialDialog.style.top = 0;
+                tutorialDialog.style.position = 'absolute';
+            }
+        }
+    } catch (error) {
+        console.error(error);
     }
 }
 
-watch(props.show, (newValue, oldValue) => {
+watch(props.show, (oldValue) => {
+    /// TODO needed? seems to be never accessed.. more likely to be in reset function?
     if (oldValue) {
-        console.log("Watcher fired");
         step.value = undefined;
         beforeSteps.value = [];
         isTop.value = false;
@@ -325,14 +322,8 @@ watch(props.show, (newValue, oldValue) => {
         reset();
     }
 });
-// TODO Needed????
-const showDialog= computed(()=>{
-    return {
-            get() {
-                return props.show;
-            },
-            set() {},
-        }
+const showDialog = computed(() => {
+    return props.show;
 });
 </script>
 
