@@ -43,7 +43,7 @@ export class DecisionPropagationCommand extends ConfigurationCommand {
             const deselected_vars = this.featureModel.features.filter(f => f.selectionState === SelectionState.ExplicitlyDeselected).map(f => -f.id);
             const config = [...selected_vars, ...deselected_vars];
 
-            api.post(`${process.env.VUE_APP_DOMAIN}configurator/decision-propagation`, ({
+            api.post(`${import.meta.env.VITE_APP_DOMAIN}configurator/decision-propagation`, ({
                 "name": this.featureModel.productLineName,
                 "config": config,
                 "selected_roots": selected_roots,

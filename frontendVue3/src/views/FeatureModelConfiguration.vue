@@ -23,152 +23,132 @@
         <!-- Versions -->
         <v-col cols="4">
           <v-card>
-            <v-card-title>
-              <!-- Heading Versions -->
-              <div class="mr-2" v-if="featureModel && featureModel.versions">
-                Versions ({{ featureModel.versions?.length }})
-              </div>
-
-              <!-- Statistics about the versions as tooltip-->
-              <v-tooltip bottom>
-                <template v-slot:activator="{ props }">
-                  <v-icon v-bind="props">mdi-information</v-icon>
-                </template>
-                <table>
-                  <tr>
-                    <th>Selection</th>
-                    <th>All</th>
-                  </tr>
-                  <tr>
-                    <td>All</td>
-                    <td>{{ featureModel.versions?.length }}</td>
-                  </tr>
-                  <tr>
-                    <td>Unselected</td>
-                    <td>{{ countSelectionStateInList(featureModel.versions, SelectionState.Unselected) }}</td>
-                  </tr>
-                  <tr>
-                    <td>Explicitly selected</td>
-                    <td>{{ countSelectionStateInList(featureModel.versions, SelectionState.ExplicitlySelected) }}</td>
-                  </tr>
-                  <tr>
-                    <td>Explicitly deselected</td>
-                    <td>{{ countSelectionStateInList(featureModel.versions, SelectionState.ExplicitlyDeselected) }}</td>
-                  </tr>
-                  <tr>
-                    <td>Implicitly selected</td>
-                    <td>{{ countSelectionStateInList(featureModel.versions, SelectionState.ImplicitlySelected) }}</td>
-                  </tr>
-                  <tr>
-                    <td>Implicitly deselected</td>
-                    <td>{{ countSelectionStateInList(featureModel.versions, SelectionState.ImplicitlyDeselected) }}</td>
-                  </tr>
-                </table>
-              </v-tooltip>
-
-              <v-spacer></v-spacer>
-
-              <!-- Search box for versions -->
-              <v-text-field
-                  v-model="searchVersions"
-                  append-icon="mdi-magnify"
-                  label="Search"
-                  single-line
-                  hide-details
-                  class="mr-2"
-              ></v-text-field>
-
-              <!-- Reset button to reset the searchbox -->
-              <v-tooltip bottom>
-                <template v-slot:activator="{ props }">
-                  <v-btn
-                      rounded
-                      outlined
-                      icon
-                      v-bind="props"
-                      @click="searchVersions = ''">
-                    <v-icon>mdi-close</v-icon>
-                  </v-btn>
-                </template>
-                <span>Reset search</span>
-              </v-tooltip>
-            </v-card-title>
-
-            <!-- Table with all versions -->
-            <v-data-table
-                :search="searchVersions"
-                :headers="headers"
-                :items="featureModel.versions"
-                item-key="version"
-                show-group-by
-                fixed-header
-                height="40vh"
-                single-select
-                disable-pagination
-                hide-default-footer
-                :item-class="v => v === selectedVersion ? 'selected-version clickable' : 'clickable'"
-                @click:row="selectVersion($event)"
-            >
-              <!-- Customization of the column VERSION -->
-              <template v-slot:item.version="{ item }">
+            <v-card-title >
+              <v-layout row class="align-center">
+                <!-- Heading Versions -->
+                <div class="mr-2" v-if="featureModel && featureModel.versions">
+                  Versions ({{ featureModel.versions?.length }})
+                </div>
+                <!-- Statistics about the versions as tooltip-->
                 <v-tooltip bottom>
                   <template v-slot:activator="{ props }">
-                    <span v-bind="props">{{ item.version }}</span>
+                    <v-icon v-bind="props">mdi-information</v-icon>
                   </template>
-                  <span>BDD root ID: {{ item.rootId }}</span>
+                  <table>
+                    <tr>
+                      <th>Selection</th>
+                      <th>All</th>
+                    </tr>
+                    <tr>
+                      <td>All</td>
+                      <td>{{ featureModel.versions?.length }}</td>
+                    </tr>
+                    <tr>
+                      <td>Unselected</td>
+                      <td>{{ countSelectionStateInList(featureModel.versions, SelectionState.Unselected) }}</td>
+                    </tr>
+                    <tr>
+                      <td>Explicitly selected</td>
+                      <td>{{ countSelectionStateInList(featureModel.versions, SelectionState.ExplicitlySelected) }}</td>
+                    </tr>
+                    <tr>
+                      <td>Explicitly deselected</td>
+                      <td>{{ countSelectionStateInList(featureModel.versions, SelectionState.ExplicitlyDeselected) }}</td>
+                    </tr>
+                    <tr>
+                      <td>Implicitly selected</td>
+                      <td>{{ countSelectionStateInList(featureModel.versions, SelectionState.ImplicitlySelected) }}</td>
+                    </tr>
+                    <tr>
+                      <td>Implicitly deselected</td>
+                      <td>{{ countSelectionStateInList(featureModel.versions, SelectionState.ImplicitlyDeselected) }}</td>
+                    </tr>
+                  </table>
                 </v-tooltip>
-              </template>
 
-              <!-- Customization of the column SELECTIONSTATE -->
-              <template v-slot:item.selectionState="{ item }">
-                <DoubleCheckbox v-bind:selection-item="item" @select="decisionPropagation(item, $event)"></DoubleCheckbox>
-              </template>
+                <!-- Search box for versions -->
+                <v-text-field
+                    v-model="searchVersions"
+                    append-icon="mdi-magnify"
+                    :clearable=true
+                    label="Search"
+                    single-line
+                    hide-details="auto"
+                    class="mr-2 ml-2"
+                ></v-text-field>
+              </v-layout>
+            </v-card-title>
 
-              <!-- Customization of the column ACTIONS -->
-              <template v-slot:item.actions="{ item }">
-                <!-- Context menu for selected version -->
-                <v-menu offset-y
+            <v-table height="50vh">
+              <thead>
+                <tr>
+                  <th class="text-left" v-for="item in headersVersions">
+                    {{ item.title }}
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr
+                  v-for="item in featureModel.versions"
+                  :key="item.version"
+                  @click="(item) => selectVersion(item)"
+                >
+                  <td>
+                    <DoubleCheckbox v-bind:selection-item="item" @select="(eventState) => decisionPropagation(item, eventState)"></DoubleCheckbox>
+                  </td>
+                  <td>
+                    <v-tooltip bottom>
+                      <template v-slot:activator="{ props }">
+                        <span v-bind="props">{{ item.version }}</span>
+                      </template>
+                      <span>BDD root ID: {{ item.rootId }}</span>
+                    </v-tooltip>
+                  </td>
+                  <td>
+                    <v-menu offset-y
                         v-if="item === selectedVersion">
-                  <template v-slot:activator="{ props }">
-                    <v-btn icon rounded outlined v-bind="props">
-                      <v-icon>mdi-dots-vertical</v-icon>
-                    </v-btn>
-                  </template>
+                      <template v-slot:activator="{ props }">
+                        <v-btn icon rounded outlined v-bind="props">
+                          <v-icon>mdi-dots-vertical</v-icon>
+                        </v-btn>
+                      </template>
 
-                  <v-list>
-                    <!-- Filter features button -->
-                    <v-list-item @click="filterFeaturesInVersion(item)">
-                      <v-tooltip bottom>
-                        <template v-slot:activator="{ props}">
-                          <div v-bind="props" >Filter included features</div>
-                        </template>
-                        <span>Filter features that are in this version</span>
-                      </v-tooltip>
-                    </v-list-item>
+                      <v-list>
+                        <!-- Filter features button -->
+                        <v-list-item @click="filterFeaturesInVersion(item)">
+                          <v-tooltip bottom>
+                            <template v-slot:activator="{ props }">
+                              <div v-bind="props">Filter included features</div>
+                            </template>
+                            <span>Filter features that are in this version</span>
+                          </v-tooltip>
+                        </v-list-item>
 
-                    <!-- Filter inverted features button -->
-                    <v-list-item @click="filterFeaturesNotInVersion(item)">
-                      <v-tooltip bottom>
-                        <template v-slot:activator="{ props }">
-                          <div v-bind="props">Filter not included features</div>
-                        </template>
-                        <span>Filter features that are not in this version</span>
-                      </v-tooltip>
-                    </v-list-item>
+                        <!-- Filter inverted features button -->
+                        <v-list-item @click="filterFeaturesNotInVersion(item)">
+                          <v-tooltip bottom>
+                            <template v-slot:activator="{ props }">
+                              <div v-bind="props">Filter not included features</div>
+                            </template>
+                            <span>Filter features that are not in this version</span>
+                          </v-tooltip>
+                        </v-list-item>
 
-                    <!-- Fix by rollback button -->
-                    <v-list-item @click="rollbackFixVersion(item)" v-if="item.selectionState === SelectionState.ImplicitlyDeselected">
-                      <v-tooltip bottom>
-                        <template v-slot:activator="{ props }">
-                          <div v-bind="props">Rollback Fix</div>
-                        </template>
-                        <span>Rollback all steps in the configuration history until this implicit decision was made</span>
-                      </v-tooltip>
-                    </v-list-item>
-                  </v-list>
-                </v-menu>
-              </template>
-            </v-data-table>
+                        <!-- Fix by rollback button -->
+                        <v-list-item @click="rollbackFixVersion(item)" v-if="item.selectionState === SelectionState.ImplicitlyDeselected">
+                          <v-tooltip bottom>
+                            <template v-slot:activator="{ props }">
+                              <div v-bind="props">Rollback Fix</div>
+                            </template>
+                            <span>Rollback all steps in the configuration history until this implicit decision was made</span>
+                          </v-tooltip>
+                        </v-list-item>
+                      </v-list>
+                    </v-menu>
+                  </td>
+                </tr>
+              </tbody>
+            </v-table>
           </v-card>
         </v-col>
 
@@ -176,93 +156,79 @@
         <v-col cols="4">
           <v-card>
             <v-card-title>
-              <!-- Heading features -->
-              <div class="mr-2">
-                <span v-if="features?.length === featureModel.features?.length">Features ({{ featureModel.features?.length }}) </span>
-                <span v-else>Features ({{ features?.length }}/{{ featureModel.features?.length }}) </span>
-              </div>
+              <v-layout row class="align-center">
+                <!-- Heading features -->
+                <div class="mr-2">
+                  <span v-if="features?.length === featureModel.features?.length">Features ({{ featureModel.features?.length }}) </span>
+                  <span v-else>Features ({{ features?.length }}/{{ featureModel.features?.length }}) </span>
+                </div>
 
-              <!-- Statistics about the features as tooltip-->
-              <v-tooltip bottom>
-                <template v-slot:activator="{ props }">
-                  <v-icon v-bind="props">mdi-information</v-icon>
-                </template>
-                <table>
-                  <tr>
-                    <th>Selection</th>
-                    <th v-if="versionForFilteringFeatures">Filtered</th>
-                    <th>All</th>
-                  </tr>
-                  <tr>
-                    <td>All</td>
-                    <td v-if="versionForFilteringFeatures">{{ features?.length }}</td>
-                    <td>{{ featureModel.features?.length }}</td>
-                  </tr>
-                  <tr>
-                    <td>Unselected</td>
-                    <td v-if="versionForFilteringFeatures">{{
-                        countSelectionStateInList(features, SelectionState.Unselected)
-                      }}
-                    </td>
-                    <td>{{ countSelectionStateInList(featureModel.features, SelectionState.Unselected) }}</td>
-                  </tr>
-                  <tr>
-                    <td>Explicitly selected</td>
-                    <td v-if="versionForFilteringFeatures">
-                      {{ countSelectionStateInList(features, SelectionState.ExplicitlySelected) }}
-                    </td>
-                    <td>{{ countSelectionStateInList(featureModel.features, SelectionState.ExplicitlySelected) }}</td>
-                  </tr>
-                  <tr>
-                    <td>Explicitly deselected</td>
-                    <td v-if="versionForFilteringFeatures">
-                      {{ countSelectionStateInList(features, SelectionState.ExplicitlyDeselected) }}
-                    </td>
-                    <td>{{ countSelectionStateInList(featureModel.features, SelectionState.ExplicitlyDeselected) }}</td>
-                  </tr>
-                  <tr>
-                    <td>Implicitly selected</td>
-                    <td v-if="versionForFilteringFeatures">
-                      {{ countSelectionStateInList(features, SelectionState.ImplicitlySelected) }}
-                    </td>
-                    <td>{{ countSelectionStateInList(featureModel.features, SelectionState.ImplicitlySelected) }}</td>
-                  </tr>
-                  <tr>
-                    <td>Implicitly deselected</td>
-                    <td v-if="versionForFilteringFeatures">
-                      {{ countSelectionStateInList(features, SelectionState.ImplicitlyDeselected) }}
-                    </td>
-                    <td>{{ countSelectionStateInList(featureModel.features, SelectionState.ImplicitlyDeselected) }}</td>
-                  </tr>
-                </table>
-              </v-tooltip>
+                <!-- Statistics about the features as tooltip-->
+                <v-tooltip bottom>
+                  <template v-slot:activator="{ props }">
+                    <v-icon v-bind="props">mdi-information</v-icon>
+                  </template>
+                  <table>
+                    <tr>
+                      <th>Selection</th>
+                      <th v-if="versionForFilteringFeatures">Filtered</th>
+                      <th>All</th>
+                    </tr>
+                    <tr>
+                      <td>All</td>
+                      <td v-if="versionForFilteringFeatures">{{ features?.length }}</td>
+                      <td>{{ featureModel.features?.length }}</td>
+                    </tr>
+                    <tr>
+                      <td>Unselected</td>
+                      <td v-if="versionForFilteringFeatures">{{
+                          countSelectionStateInList(features, SelectionState.Unselected)
+                        }}
+                      </td>
+                      <td>{{ countSelectionStateInList(featureModel.features, SelectionState.Unselected) }}</td>
+                    </tr>
+                    <tr>
+                      <td>Explicitly selected</td>
+                      <td v-if="versionForFilteringFeatures">
+                        {{ countSelectionStateInList(features, SelectionState.ExplicitlySelected) }}
+                      </td>
+                      <td>{{ countSelectionStateInList(featureModel.features, SelectionState.ExplicitlySelected) }}</td>
+                    </tr>
+                    <tr>
+                      <td>Explicitly deselected</td>
+                      <td v-if="versionForFilteringFeatures">
+                        {{ countSelectionStateInList(features, SelectionState.ExplicitlyDeselected) }}
+                      </td>
+                      <td>{{ countSelectionStateInList(featureModel.features, SelectionState.ExplicitlyDeselected) }}</td>
+                    </tr>
+                    <tr>
+                      <td>Implicitly selected</td>
+                      <td v-if="versionForFilteringFeatures">
+                        {{ countSelectionStateInList(features, SelectionState.ImplicitlySelected) }}
+                      </td>
+                      <td>{{ countSelectionStateInList(featureModel.features, SelectionState.ImplicitlySelected) }}</td>
+                    </tr>
+                    <tr>
+                      <td>Implicitly deselected</td>
+                      <td v-if="versionForFilteringFeatures">
+                        {{ countSelectionStateInList(features, SelectionState.ImplicitlyDeselected) }}
+                      </td>
+                      <td>{{ countSelectionStateInList(featureModel.features, SelectionState.ImplicitlyDeselected) }}</td>
+                    </tr>
+                  </table>
+                </v-tooltip>
 
-              <v-spacer></v-spacer>
-
-              <!-- Search box for features -->
-              <v-text-field
-                  v-model="searchFeatures"
-                  append-icon="mdi-magnify"
-                  label="Search"
-                  single-line
-                  hide-details
-                  class="mr-2"
-              ></v-text-field>
-
-              <!-- Reset button to reset the searchbox -->
-              <v-tooltip bottom>
-                <template v-slot:activator="{ props }">
-                  <v-btn
-                      rounded
-                      outlined
-                      icon
-                      v-bind="props"
-                      @click="resetFeaturesTable()">
-                    <v-icon>mdi-close</v-icon>
-                  </v-btn>
-                </template>
-                <span>Reset search and filter</span>
-              </v-tooltip>
+                <!-- Search box for features -->
+                <v-text-field
+                    v-model="searchFeatures"
+                    append-icon="mdi-magnify"
+                    label="Search"
+                    :clearable=true
+                    single-line
+                    hide-details
+                    class="mr-2 ml-2"
+                ></v-text-field>
+              </v-layout>
             </v-card-title>
 
             <!-- Optional information when filtered by features initiated from on single version -->
@@ -273,7 +239,7 @@
 
             <!-- Table with all features that are currently fitlered and searched -->
             <v-data-table
-                :headers="[{text: 'Selection', key: 'selectionState'}, {text: 'Name', key: 'name', groupable: false}, {text: 'Actions', groupable: false, key: 'actions'}]"
+                :headers="headersFeatures"
                 :search="searchFeatures"
                 :items="features"
                 item-key="name"
@@ -628,6 +594,7 @@ import { DecisionPropagationCommand } from '@/classes/Commands/Configurator/Deci
 import { Feature } from '@/classes/Configurator/Feature';
 import { FeatureNodeConstraintItem } from '@/classes/Constraint/FeatureNodeConstraintItem';
 import { SelectionState } from '@/classes/Configurator/SelectionState';
+import { tr } from 'vuetify/locale';
 
 export default {
   name: 'FeatureModelConfiguration',
@@ -635,7 +602,15 @@ export default {
   components: {DoubleCheckbox, FeatureModelViewer},
 
   data: () => ({
-    headers: [{text: 'Selection', key: 'selectionState'}, {text: 'Version', key: 'version', groupable:false}, {text: 'Actions', key: 'actions', groupable:false}],
+    headersVersions: [
+        {title: 'Selection', align:'start', key: 'selectionState'},
+        {title: 'Version', key: 'version', groupable:false},
+        {title: 'Actions', key: 'actions'}],
+    headersFeatures: [
+        {title: 'Selection', key: 'selectionState'},
+        {title: 'Name', key: 'name', groupable: false},
+        {title: 'Actions', groupable: false, key: 'actions'}
+    ],
     commandManager: new ConfiguratorManager(),
     initialResetCommand: undefined,
     featureModel: FeatureModel,
@@ -770,6 +745,9 @@ export default {
   },
 
   computed: {
+    tr() {
+      return tr
+    },
     Feature() {
       return Feature
     },
