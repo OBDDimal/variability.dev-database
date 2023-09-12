@@ -30,7 +30,7 @@
                   Versions ({{ featureModel.versions?.length }})
                 </div>
                 <!-- Statistics about the versions as tooltip-->
-                <v-tooltip bottom>
+                <v-tooltip location="bottom">
                   <template v-slot:activator="{ props }">
                     <v-icon v-bind="props">mdi-information</v-icon>
                   </template>
@@ -69,7 +69,7 @@
                 <!-- Search box for versions -->
                 <v-text-field
                     v-model="searchVersions"
-                    append-icon="mdi-magnify"
+                    append-inner-icon="mdi-magnify"
                     :clearable=true
                     label="Search"
                     single-line
@@ -79,76 +79,80 @@
               </v-layout>
             </v-card-title>
 
-            <v-table height="50vh">
-              <thead>
-                <tr>
-                  <th class="text-left" v-for="item in headersVersions">
-                    {{ item.title }}
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr
-                  v-for="item in featureModel.versions"
-                  :key="item.version"
-                  @click="(item) => selectVersion(item)"
-                >
-                  <td>
-                    <DoubleCheckbox v-bind:selection-item="item" @select="(eventState) => decisionPropagation(item, eventState)"></DoubleCheckbox>
-                  </td>
-                  <td>
-                    <v-tooltip bottom>
-                      <template v-slot:activator="{ props }">
-                        <span v-bind="props">{{ item.version }}</span>
-                      </template>
-                      <span>BDD root ID: {{ item.rootId }}</span>
-                    </v-tooltip>
-                  </td>
-                  <td>
-                    <v-menu offset-y
-                        v-if="item === selectedVersion">
-                      <template v-slot:activator="{ props }">
-                        <v-btn icon rounded outlined v-bind="props">
-                          <v-icon>mdi-dots-vertical</v-icon>
-                        </v-btn>
-                      </template>
+            <v-data-table
+                :search="searchVersions"
+                :headers="headersVersions"
+                :items="featureModel.versions"
+                item-key="version"
+                show-group-by
+                fixed-header
+                height="40vh"
+                single-select
+                disable-pagination
+                hide-default-footer
+                :item-class="v => v === selectedVersion ? 'selected-version clickable' : 'clickable'"
+                @click:row="selectVersion"
+            >
+              <!-- Customization of the column VERSION -->
+              <template v-slot:item.version="{ item }">
+                <v-tooltip location="bottom">
+                  <template v-slot:activator="{ props }">
+                    <span v-bind="props">{{ item.selectable.version }}</span>
+                  </template>
+                  <span>BDD root ID: {{ item.selectable.rootId }}</span>
+                </v-tooltip>
+              </template>
 
-                      <v-list>
-                        <!-- Filter features button -->
-                        <v-list-item @click="filterFeaturesInVersion(item)">
-                          <v-tooltip bottom>
-                            <template v-slot:activator="{ props }">
-                              <div v-bind="props">Filter included features</div>
-                            </template>
-                            <span>Filter features that are in this version</span>
-                          </v-tooltip>
-                        </v-list-item>
+              <!-- Customization of the column SELECTIONSTATE -->
+              <template v-slot:item.selectionState="{ item }">
+                <DoubleCheckbox v-bind:selection-item="item.selectable" @select="(selected) => decisionPropagation(item.selectable, selected)"></DoubleCheckbox>
+              </template>
 
-                        <!-- Filter inverted features button -->
-                        <v-list-item @click="filterFeaturesNotInVersion(item)">
-                          <v-tooltip bottom>
-                            <template v-slot:activator="{ props }">
-                              <div v-bind="props">Filter not included features</div>
-                            </template>
-                            <span>Filter features that are not in this version</span>
-                          </v-tooltip>
-                        </v-list-item>
+              <!-- Customization of the column ACTIONS -->
+              <template v-slot:item.actions="{ item }">
+                <!-- Context menu for selected version -->
+                <v-menu offset-y
+                        v-if="item.selectable === selectedVersion">
+                  <template v-slot:activator="{ props }">
+                    <v-btn icon rounded outlined v-bind="props" >
+                      <v-icon>mdi-dots-vertical</v-icon>
+                    </v-btn>
+                  </template>
 
-                        <!-- Fix by rollback button -->
-                        <v-list-item @click="rollbackFixVersion(item)" v-if="item.selectionState === SelectionState.ImplicitlyDeselected">
-                          <v-tooltip bottom>
-                            <template v-slot:activator="{ props }">
-                              <div v-bind="props">Rollback Fix</div>
-                            </template>
-                            <span>Rollback all steps in the configuration history until this implicit decision was made</span>
-                          </v-tooltip>
-                        </v-list-item>
-                      </v-list>
-                    </v-menu>
-                  </td>
-                </tr>
-              </tbody>
-            </v-table>
+                  <v-list>
+                    <!-- Filter features button -->
+                    <v-list-item @click="filterFeaturesInVersion(item)">
+                      <v-tooltip location="bottom">
+                        <template v-slot:activator="{ props }">
+                          <div v-bind="props">Filter included features</div>
+                        </template>
+                        <span>Filter features that are in this version</span>
+                      </v-tooltip>
+                    </v-list-item>
+
+                    <!-- Filter inverted features button -->
+                    <v-list-item @click="filterFeaturesNotInVersion(item)">
+                      <v-tooltip location="bottom">
+                        <template v-slot:activator="{ props }">
+                          <div v-bind="props">Filter not included features</div>
+                        </template>
+                        <span>Filter features that are not in this version</span>
+                      </v-tooltip>
+                    </v-list-item>
+
+                    <!-- Fix by rollback button -->
+                    <v-list-item @click="rollbackFixVersion(item)" v-if="item.selectable.selectionState === SelectionState.ImplicitlyDeselected">
+                      <v-tooltip location="bottom">
+                        <template v-slot:activator="{ props }">
+                          <div v-bind="props">Rollback Fix</div>
+                        </template>
+                        <span>Rollback all steps in the configuration history until this implicit decision was made</span>
+                      </v-tooltip>
+                    </v-list-item>
+                  </v-list>
+                </v-menu>
+              </template>
+            </v-data-table>
           </v-card>
         </v-col>
 
@@ -164,7 +168,7 @@
                 </div>
 
                 <!-- Statistics about the features as tooltip-->
-                <v-tooltip bottom>
+                <v-tooltip location="bottom">
                   <template v-slot:activator="{ props }">
                     <v-icon v-bind="props">mdi-information</v-icon>
                   </template>
@@ -221,7 +225,7 @@
                 <!-- Search box for features -->
                 <v-text-field
                     v-model="searchFeatures"
-                    append-icon="mdi-magnify"
+                    append-inner-icon="mdi-magnify"
                     label="Search"
                     :clearable=true
                     single-line
@@ -236,6 +240,7 @@
               Filtered by version {{ versionForFilteringFeatures.version }}
               {{ features?.length }}
             </v-card-subtitle>
+
 
             <!-- Table with all features that are currently fitlered and searched -->
             <v-data-table
@@ -252,24 +257,24 @@
             >
               <!-- Customization of the column NAME -->
               <template v-slot:item.name="{ item }">
-                <v-tooltip bottom>
+                <v-tooltip location="bottom">
                   <template v-slot:activator="{ props }">
-                    <span v-bind="props">{{ item.name }}</span>
+                    <span v-bind="props">{{ item.selectable.name }}</span>
                   </template>
-                  <span>Var ID: {{ item.id }}</span>
+                  <span>Var ID: {{ item.selectable.id }}</span>
                 </v-tooltip>
               </template>
 
               <!-- Customization of the column SELECTIONSTATE -->
               <template v-slot:item.selectionState="{ item }">
-                <DoubleCheckbox v-bind:selection-item="item" @select="decisionPropagation(item, $event)"></DoubleCheckbox>
+                <DoubleCheckbox v-bind:selection-item="item.selectable" @select="(selection) => decisionPropagation(item.selectable, selection)"></DoubleCheckbox>
               </template>
 
               <!-- Customization of the column ACTIONS -->
               <template v-slot:item.actions="{ item }">
                 <!-- Context menu -->
                 <v-menu offset-y
-                        v-if="!item.fix && (item.selectionState === SelectionState.ImplicitlyDeselected || item.selectionState === SelectionState.ImplicitlySelected)">
+                        v-if="!item.selectable.fix && (item.selectable.selectionState === SelectionState.ImplicitlyDeselected || item.selectable.selectionState === SelectionState.ImplicitlySelected)">
                   <template v-slot:activator="{ props }">
                     <v-btn icon rounded outlined v-bind="props">
                       <v-icon>mdi-dots-vertical</v-icon>
@@ -278,7 +283,7 @@
 
                   <v-list>
                     <!-- Fix feature by rollback button -->
-                    <v-list-item @click="rollbackFixFeature(item)">
+                    <v-list-item @click="rollbackFixFeature(item.selectable)">
                       <v-tooltip bottom>
                         <template v-slot:activator="{ props }">
                           <div v-bind="props">Rollback Fix</div>
@@ -288,7 +293,7 @@
                     </v-list-item>
 
                     <!-- Fix feature by quick fix button -->
-                    <v-list-item @click="quickFixFeature(item)">
+                    <v-list-item @click="quickFixFeature(item.selectable)">
                       <v-tooltip bottom>
                         <template v-slot:activator="{ props }">
                           <div v-bind="props">Quick Fix</div>
@@ -689,8 +694,8 @@ export default {
       this.features = this.featureModel.features.filter(f => !version.features.includes(f))
     },
 
-    selectVersion(version) {
-      this.selectedVersion.empty();
+    selectVersion(event, row) {
+      let version = row.item.selectable;
       this.featureModel.loading = true;
       this.featureModel.loadXmlData(version).then(() => {
         this.selectedVersion = version;
