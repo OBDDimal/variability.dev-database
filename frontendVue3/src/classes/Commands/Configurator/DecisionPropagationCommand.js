@@ -31,11 +31,7 @@ export class DecisionPropagationCommand extends ConfigurationCommand {
     execute() {
         if (!this.executed) {
             this.featureModel.loading = true;
-            if (this.featureOrVersion.selectionState === this.newSelectionState) {
-                this.featureOrVersion.selectionState = SelectionState.Unselected;
-            } else {
-                this.featureOrVersion.selectionState = this.newSelectionState;
-            }
+            this.featureOrVersion.selectionState = this.newSelectionState;
 
             const selected_roots = this.featureModel.versions.filter(v => v.selectionState === SelectionState.ExplicitlySelected).map(v => v.rootId);
             const available_roots = this.featureModel.versions.filter(v => !selected_roots.includes(v) && v.selectionState !== SelectionState.ExplicitlyDeselected).map(v => v.rootId)
