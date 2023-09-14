@@ -11,10 +11,10 @@ export class DecisionPropagationCommand extends ConfigurationCommand {
         this.executed = false;
         this.newSatCount = 0;
 
-        if (this.featureOrVersion.selectionState === this.newSelectionState) {
-            if (newSelectionState === SelectionState.ExplicitlySelected) {
+        if (this.newSelectionState === SelectionState.Unselected) {
+            if (this.featureOrVersion.selectionState === SelectionState.ExplicitlySelected) {
                 this.description = "Undone selection"
-            } else if (newSelectionState === SelectionState.ExplicitlyDeselected) {
+            } else if (this.featureOrVersion.selectionState === SelectionState.ExplicitlyDeselected) {
                 this.description = "Undone deselection";
             }
         } else {

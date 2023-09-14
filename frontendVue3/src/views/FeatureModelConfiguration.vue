@@ -311,7 +311,7 @@
         <!-- Third column (#SAT, Explanations, Configuration history) -->
         <v-col cols="4">
           <!-- #SAT -->
-          <v-card height="5vh">
+          <v-card>
             <v-card-title>{{ featureModel.satCount }}</v-card-title>
             <v-card-subtitle>Number of possible configurations</v-card-subtitle>
             <v-card-actions>
@@ -367,7 +367,7 @@
           </v-card>
 
           <!-- Explanations and configuration history -->
-          <v-card style="margin-top:1vh;" height="33.5vh">
+          <v-card style="margin-top:1vh;" height="38vh">
             <v-card-title>
               <v-tabs v-model="tabsColumnTopRight">
                 <v-tab key="explanations">Explanations</v-tab>
@@ -376,10 +376,10 @@
             </v-card-title>
 
             <v-card-text>
-              <v-tabs v-model="tabsColumnTopRight" class="mt-2">
+              <v-window v-model="tabsColumnTopRight" class="mt-2">
 
                 <!-- Explanations tab -->
-                <v-tab key="explanations" style="height: 25vh;">
+                <v-window-item key="explanations" style="height: 25vh;">
                   <div>
                     <!-- Reason 1 -->
                     <div class="text-h6" v-if="selectedVersion?.selectionState === SelectionState.ImplicitlySelected">
@@ -413,16 +413,16 @@
                       </v-list>
                     </div>
                   </div>
-                </v-tab>
+                </v-window-item>
 
                 <!-- Configuration history tab -->
-                <v-tab key="configurationHistory">
+                <v-window-item key="configurationHistory">
                   <v-data-table
-                      :headers="[{text: 'Description', value: 'description'}, {text: '# Possible configs', value: 'newSatCount'}]"
+                      :headers="[{title: 'Description', key: 'description'}, {title: '# Possible configs', key: 'newSatCount'}]"
                       :items="commandManager.commands"
                       single-select
                       class="elevation-1"
-                      @click:row="command => commandManager.redoCommand(command)"
+                      @click:row="redoCommand"
                       :item-class="command => command.marked ? 'active-command clickable' : 'clickable'"
                       disable-sort
                       disable-filtering
@@ -432,8 +432,8 @@
                       hide-default-footer
                   >
                   </v-data-table>
-                </v-tab>
-              </v-tabs>
+                </v-window-item>
+              </v-window>
             </v-card-text>
           </v-card>
 
@@ -455,15 +455,15 @@
             </v-tabs>
 
             <v-card-text v-if="selectedVersion?.root">
-              <v-tabs v-model="tabsBottom">
+              <v-window v-model="tabsBottom">
 
                 <!-- Feature Model Viewer -->
-                <v-tab value="featureModelViewer" key="featureModelViewer">
+                <v-window-item value="featureModelViewer" key="featureModelViewer">
                   <feature-model-viewer :version="selectedVersion"></feature-model-viewer>
-                </v-tab>
+                </v-window-item>
 
                 <!-- List Tree -->
-                <v-tab value="listTree" key="listTree">
+                <v-window-item value="listTree" key="listTree">
 
                   <v-container class="fill-height">
                     <v-layout column class="fill-height">
@@ -492,10 +492,10 @@
                     </v-layout>
                   </v-container>
 
-                </v-tab>
+                </v-window-item>
 
                 <!-- Cross-Tree Constraint Viewer -->
-                <v-tab value="ctc" key="ctc">
+                <v-window-item value="ctc" key="ctc">
 
                   <!-- Filter only the invalid ctcs and reset them to default -->
                   <v-btn rounded outlined @click="filteredConstraints = allConstraints.filter(c => c.evaluation === false)" class="mx-2">Only invalid </v-btn>
@@ -507,7 +507,7 @@
                       :items="filteredConstraints"
                       show-group-by
                       :footer-props="{'items-per-page-options': [10, 20, 50, 100, 200]}"
-                      :headers="[{text: 'Valid', value: 'evaluation', key: 'evaluation'}, {text: 'Constraints', key: 'formula', value: 'formula', groupable: false}, {text: 'Actions', key: 'actions', value: 'actions', groupable: false}]"
+                      :headers="[{title: 'Valid', value: 'evaluation', key: 'evaluation'}, {title: 'Constraints', key: 'formula', value: 'formula', groupable: false}, {title: 'Actions', key: 'actions', value: 'actions', groupable: false}]"
                       :sort-by="[{key: 'evaluation', ord: 'desc'}]"
                   >
 
@@ -569,8 +569,8 @@
 
                   </v-data-table>
 
-                </v-tab>
-              </v-tabs>
+                </v-window-item>
+              </v-window>
 
             </v-card-text>
           </v-card>
@@ -707,6 +707,11 @@ export default {
         this.filteredConstraints = this.allConstraints;
         this.featureModel.loading = false;
       });
+    },
+
+    redoCommand(event, row) {
+      let command = row.item.selectable;
+      this.commandManager.redoCommand(command)
     },
 
     resetFeaturesTable() {
