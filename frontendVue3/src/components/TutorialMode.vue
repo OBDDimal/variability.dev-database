@@ -1,6 +1,6 @@
 <template>
-    <v-dialog v-model="showDialog" persistent width="400" @keydown.esc="$emit('close')">
-        <div id="tutorial-dialog">
+    <v-dialog v-model="showDialog" persistent width="400" @keydown.esc="exit()" content-class="tutorial-dialog">
+        <div>
             <svg
                 v-if="!isMobile && isTop && isLeft"
                 height="50px"
@@ -109,7 +109,7 @@
 
 <script setup>
 import { onMounted, ref, computed, watch, defineEmits } from 'vue';
-
+const DIALOG_SELECTOR= '.tutorial-dialog';
 const step = ref(undefined);
 const beforeSteps = ref([]);
 const isTop = ref(false);
@@ -127,7 +127,7 @@ const props = defineProps({
                 title: 'Welcome to the tutorial!',
                 description:
                     'You can restart the tutorial anytime by clicking on this icon on the left.',
-                elementCssSelector: '#tutorial-mode',
+                elementCssSelector: DIALOG_SELECTOR,
             },
             {
                 title: 'The menu',
@@ -217,7 +217,7 @@ function startTutorial() {
 }
 
 function setBubblePosition() {
-    const tutorialDialog = document.querySelector('#tutorial-dialog');
+    const tutorialDialog = document.querySelector(DIALOG_SELECTOR);
     if (isMobile.value) {
         tutorialDialog.style.position = 'block';
     } else {
@@ -225,38 +225,35 @@ function setBubblePosition() {
     }
     if (step.value.elementCssSelector) {
         reset(); /// Reset bubble position until fixed
-        // const rect = document
-        //     .querySelector(step.value.elementCssSelector)
-        //     .getBoundingClientRect();
-        // const middleX = (rect.right - rect.left ) / 2+ rect.left;
-        // const middleY = (rect.bottom - rect.top) / 2 + rect.top;
-        // console.log(document
-        //     .querySelector(step.value.elementCssSelector));
-        // console.log(rect);
-        // console.log("midX: "+ middleX+"; midY: "+middleY);
-
-        // if (
-        //     middleX + 400 >
-        //     (window.innerWidth || document.documentElement.clientWidth)
-        // ) {
-        //     tutorialDialog.style.left = `calc(${middleX}px - 400px)`;
-        //     isLeft.value = false;
-        // } else {
-        //     tutorialDialog.style.left = `calc(${middleX}px + 2rem)`;
-        //     isLeft.value = true;
-        // }
-        // if (
-        //     middleY + 200 >
-        //     (window.innerHeight || document.documentElement.clientHeight)
-        // ) {
-        //     tutorialDialog.style.bottom = `calc(${window.innerHeight - middleY
-        //         }px)`;
-        //     isTop.value = false;
-        //     console.log("out of border");
-        // } else {
-        //     tutorialDialog.style.top = middleY + 'px';
-        //     isTop.value = true;
-        // }
+        const rect = document
+            .querySelector(step.value.elementCssSelector)
+            .getBoundingClientRect();
+        const middleX = (rect.right - rect.left ) / 2+ rect.left;
+        const middleY = (rect.bottom - rect.top) / 2 + rect.top;
+        tutorialDialog.style.left = null;
+        tutorialDialog.style.right = null;
+        tutorialDialog.style.top = null;
+        tutorialDialog.style.bottom = null;
+        if (
+            middleX + 400 >
+            (window.innerWidth || document.documentElement.clientWidth)
+        ) {
+            tutorialDialog.style.left = `calc(${middleX}px - 400px)`;
+            isLeft.value = false;
+        } else {
+            tutorialDialog.style.left = `calc(${middleX}px + 2rem)`;
+            isLeft.value = true;
+        }
+        if (
+            middleY + 200 >
+            (window.innerHeight || document.documentElement.clientHeight)
+        ) {
+            tutorialDialog.style.bottom = `calc(${window.innerHeight - middleY}px)`;
+            isTop.value = false;
+        } else {
+            tutorialDialog.style.top = middleY + 'px';
+            isTop.value = true;
+        }
     }
 }
 
@@ -296,11 +293,11 @@ function beforeStep() {
 function reset() {
     try {
         if (!isMobile.value) {
-            const tutorialDialog = document.querySelector('#tutorial-dialog');
+            const tutorialDialog = document.querySelector(DIALOG_SELECTOR);
             if(tutorialDialog){
                 tutorialDialog.style.left = 0;
                 tutorialDialog.style.top = 0;
-                tutorialDialog.style.position = 'absolute';
+                tutorialDialog.style.position = 'fixed';
             }
         }
     } catch (error) {
@@ -328,12 +325,12 @@ const showDialog = computed(() => {
 </script>
 
 <style lang="scss">
-#tutorial-dialog {
+>>> .tutorial-dialog {
     max-width: 400px;
     transition: all 0.75s;
 
     > .v-card {
         margin-top: -10px;
     }
-}
+  }
 </style>
