@@ -272,6 +272,7 @@ export default {
             this.rootNode,
             this.constraints
         );
+        this.commandManager.executeReload();
         update.updateSvg(this.d3Data);
     },
 
@@ -281,8 +282,9 @@ export default {
         },
 
         coloring(coloringIndex) {
-            this.d3Data.coloringIndex = coloringIndex;
-            update.updateSvg(this.d3Data);
+          this.d3Data.coloringIndex = coloringIndex;
+          this.commandManager.executeReload();
+          update.updateSvg(this.d3Data);
         },
 
         onChangeFoundNodeIndex(index) {
