@@ -4,7 +4,7 @@ export const RECT_MARGIN = {right: 8, left: 8};
 export const RECT_HEIGHT = 35;
 
 export const TRIANGLE_HORIZONTAL_ROTATION=270;
-export const TRIANGLE_BORDER_OFFSET=10;
+export const TRIANGLE_BORDER_OFFSET=11;
 export const MONOSPACE_HEIGHT_WIDTH_FACTOR = 0.6;
 export const MANDATORY_CIRCLE_RADIUS = 6;
 export const GROUP_SEGMENT_RADIUS = 25; // Radius of the segment that represents the 'alt' and 'and' groups.
