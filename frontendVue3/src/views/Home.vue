@@ -17,15 +17,16 @@
         local-storage-identifier="homeTutorialCompleted"
         @close="showTutorial = false"
         ></tutorial-mode>
-        <v-btn
-        id="tutorial-mode"
-        position="absolute"
-        location="right bottom"
-        color="primary"
-        @click="showTutorial = true"
-        >
-        <v-icon> mdi-school </v-icon>
-        </v-btn>
+        <teleport to="footer">
+            <v-btn
+            id="tutorial-mode"
+            color="primary"
+            @click="showTutorial = true"
+            >
+                <v-icon> mdi-school </v-icon>
+            </v-btn>
+        </teleport>
+      
     </div>
 </template>
 
