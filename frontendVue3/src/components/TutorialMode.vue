@@ -1,5 +1,10 @@
 <template>
-    <v-dialog v-model="showDialog" persistent width="400" @keydown.esc="exit()" content-class="tutorial-dialog">
+    <v-dialog content-class="tutorial-dialog" 
+        v-model="showDialog" 
+        persistent width="400" 
+        @keydown.esc="exit"
+        @click:outside="exit" 
+     >
             <svg
                 v-if="!isMobile && isTop && isLeft"
                 height="50px"
