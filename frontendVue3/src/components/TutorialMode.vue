@@ -304,21 +304,6 @@ function reset() {
         console.error(error);
     }
 }
-
-watch(props.show, (oldValue) => {
-    /// TODO needed? seems to be never accessed.. more likely to be in reset function?
-    if (oldValue) {
-        step.value = undefined;
-        beforeSteps.value = [];
-        isTop.value = false;
-        isLeft.value = false;
-        isMobile.value = false;
-        counter.value = 0;
-
-        // Reset position to 0 0 when restarting the tutorial again
-        reset();
-    }
-});
 const showDialog = computed(() => {
     return props.show;
 });
