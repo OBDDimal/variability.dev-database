@@ -311,9 +311,11 @@ const showDialog = computed(() => {
 >>> .tutorial-dialog {
     max-width: 400px;
     transition: all 0.75s;
-
     > .v-card {
         margin-top: -10px;
     }
   }
+  .v-dialog > .v-overlay__content {
+    margin: 0px;
+}
 </style>
