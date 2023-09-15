@@ -31,65 +31,67 @@
                             density="comfortable"
                         >
                         </v-text-field>
-                        <v-tooltip location="top">
-                            <template v-slot:activator="{ props }">
-                                <v-btn
-                                    id="feature-model-upload"
-                                    v-if="addable"
-                                    class="mb-2 ml-4"
-                                    color="primary"
-                                    variant="tonal"
-                                    size="small"
-                                    icon="mdi-upload"
-                                    v-bind="props"
-                                    @click="createDialog = true"
-                                >
-                                </v-btn>
-                            </template>
-                            <span>Upload feature model</span>
-                        </v-tooltip>
-                        <v-tooltip top>
-                            <template v-slot:activator="{ on, attrs }">
-                                <v-btn
-                                    id="feature-model-create"
-                                    v-if="addable"
-                                    class="mb-2 ml-2"
-                                    color="success"
-                                    variant="tonal"
-                                    size="small"
-                                    icon="mdi-plus"
-                                    v-bind="attrs"
-                                    v-on="on"
-                                    to="/feature-model/new"
-                                >
-                                </v-btn>
-                            </template>
-                            <span>Create feature model</span>
-                        </v-tooltip>
-                        <v-tooltip top>
-                            <template v-slot:activator="{ on, attrs }">
-                                <v-btn
-                                    id="feature-model-ls"
-                                    v-if="addable"
-                                    :disabled="!checkLocalStorage"
-                                    class="mb-2 ml-2"
-                                    color="secondary"
-                                    variant="tonal"
-                                    size="small"
-                                    icon="mdi-server"
-                                    v-bind="attrs"
-                                    v-on="on"
-                                    to="/feature-model/local"
-                                >
-                                </v-btn>
-                            </template>
-                            <span>Upload from local storage</span>
-                        </v-tooltip>
+                      <v-tooltip location='top'>
+                        <template v-slot:activator='{ props }'>
+                          <v-btn
+                            id='feature-model-upload'
+                            v-if='addable'
+                            class='mb-2 ml-4'
+                            color='primary'
+                            variant='tonal'
+                            size='small'
+                            icon='mdi-upload'
+                            v-bind='props'
+                            @click='createDialog = true'
+                          >
+                          </v-btn>
+                        </template>
+                        <span>Upload feature model</span>
+                      </v-tooltip>
+
+                      <v-tooltip location='top'>
+                        <template v-slot:activator='{ props }'>
+                          <v-btn
+                            id='feature-model-create'
+                            v-if='addable'
+                            class='mb-2 ml-2'
+                            color='success'
+                            variant='tonal'
+                            size='small'
+                            icon='mdi-plus'
+                            v-bind='props'
+                            v-on='on'
+                            to='/feature-model/new'
+                          >
+                          </v-btn>
+                        </template>
+                        <span>Create feature model</span>
+                      </v-tooltip>
+
+                      <v-tooltip location='top'>
+                        <template v-slot:activator='{ props }'>
+                          <v-btn
+                            id='feature-model-ls'
+                            v-if='addable'
+                            :disabled='!checkLocalStorage'
+                            class='mb-2 ml-2'
+                            color='secondary'
+                            variant='tonal'
+                            size='small'
+                            icon='mdi-server'
+                            v-bind='props'
+                            v-on='on'
+                            to='/feature-model/local'
+                          >
+                          </v-btn>
+                        </template>
+                        <span>Upload from local storage</span>
+                      </v-tooltip>
                         <v-dialog v-model="dialogDelete" max-width="400px">
                             <v-card>
                                 <v-card-title
                                     class="text-h5"
-                                    style="word-break: break-word"
+                                    style="white-space: normal;"
                                 >
                                     Are you sure you want to delete this feature
                                     model?
@@ -156,6 +158,7 @@
                         variant="tonal"
                         size="small"
                         icon="mdi-play"
+                        @click="handleClick(item.raw)"
                     >
                     </v-btn>
                     <v-btn
@@ -174,7 +177,7 @@
                         variant="tonal"
                         icon="mdi-eye"
                         size="small"
-                        :to="'/feature-model/' + item.id"
+                        :to="'/feature-model/' + item.raw.id"
                     >
                     </v-btn>
                     <!-- <v-btn small rounded color="error" class="mr-2"> <v-icon>mdi-delete</v-icon></v-btn> -->
@@ -228,12 +231,13 @@
 
 <script setup>
 import FileCreate from '@/components/upload_cards/FileCreate.vue';
-import { useAuthStore } from '@/store/auth';
 import { computed, ref } from 'vue';
 import { useRouter } from 'vue-router';
+import { useFileStore } from '@/store/file';
 
+const emit = defineEmits(['onDelete']);
 const router = useRouter();
-const authStore = useAuthStore();
+const fileStore = useFileStore();
 
 const props = defineProps({
     headline: {
@@ -283,47 +287,34 @@ const headers = [
         sortable: false,
     },
 ];
-const search = '';
-const removeLoading = false;
-const dialog = false;
+const search = ref('');
+const removeLoading = ref(false);
 const createDialog = ref(false);
-const dialogDelete = false;
-const dialogAnalysis = false;
-
+const dialogDelete = ref(false);
+const editedItem = ref(null);
+const defaultItem = ref(undefined);
 const checkLocalStorage = computed(() => {
     return !!localStorage.featureModelData;
 });
 
 async function deleteItemConfirm() {
-    this.removeLoading = true;
-    /*await this.$store.dispatch(
-    'deleteFeatureModel',
-    this.editedItem.id
-  );
-  await this.$store.dispatch('fetchFiles');
-  this.$emit('onDelete');*/
-    this.removeLoading = false;
+    removeLoading.value = true;
+    await fileStore.deleteFeatureModel(
+    editedItem.value.id
+    );
+    await fileStore.fetchConfirmedFeatureModels();
+    emit('onDelete');
+    removeLoading.value = false;
 
-    this.closeDelete();
-}
-function close() {
-    this.dialog = false;
-    /*this.$nextTick(() => {
-    this.editedItem = Object.assign({}, this.defaultItem);
-    this.editedIndex = -1;
-  });*/
+    closeDelete();
 }
 function closeDelete() {
-    this.dialogDelete = false;
-    /*this.$nextTick(() => {
-    this.editedItem = Object.assign({}, this.defaultItem);
-    this.editedIndex = -1;
-  });*/
+    dialogDelete.value = false;
+    editedItem.value = { ...defaultItem };
 }
 function deleteItem(item) {
-    this.editedIndex = this.items.indexOf(item);
-    this.editedItem = Object.assign({}, item);
-    this.dialogDelete = true;
+    editedItem.value = { ...item.raw };
+    dialogDelete.value = true;
 }
 function handleClick(value) {
     console.log(value);
@@ -332,7 +323,6 @@ function handleClick(value) {
         params: { id: value.id, slug: value.slug },
     });
 }
-function setHovered() {}
 </script>
 
 <style>
