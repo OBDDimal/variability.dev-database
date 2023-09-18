@@ -33,7 +33,7 @@
 <script setup>
 import FeatureModelTable from '@/components/FeatureModelTable.vue';
 import TutorialMode from '@/components/TutorialMode';
-import { onMounted, ref, ref } from 'vue';
+import { onMounted, ref } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useFileStore } from '@/store/file';
 

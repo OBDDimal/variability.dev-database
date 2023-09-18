@@ -111,7 +111,7 @@
 </template>
 
 <script setup>
-import { onMounted, ref, computed, watch, defineEmits } from 'vue';
+import { onMounted, ref, computed} from 'vue';
 const DIALOG_SELECTOR= '.tutorial-dialog';
 const step = ref(undefined);
 const beforeSteps = ref([]);
@@ -313,7 +313,7 @@ const showDialog = computed(() => {
 </script>
 
 <style lang="scss">
->>> .tutorial-dialog {
+.tutorial-dialog {
     max-width: 400px;
     transition: all 0.75s;
     > .v-card {
