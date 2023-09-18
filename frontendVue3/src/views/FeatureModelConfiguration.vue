@@ -449,21 +449,21 @@
 
             <!-- Tabs to select (Feature Model Viewer, List Tree, Cross-Tree Constraints -->
             <v-tabs v-model="tabsBottom">
-              <v-tab key="featureModelViewer" href="#featureModelViewer">Feature Model Viewer</v-tab>
-              <v-tab key="listTree" href="#listTree">List Tree</v-tab>
-              <v-tab key="ctc" href="#ctc">Cross Tree Constraints</v-tab>
+              <v-tab key="featureModelViewer">Feature Model Viewer</v-tab>
+              <v-tab key="listTree">List Tree</v-tab>
+              <v-tab key="ctc">Cross Tree Constraints</v-tab>
             </v-tabs>
 
             <v-card-text v-if="selectedVersion?.root">
               <v-window v-model="tabsBottom">
 
                 <!-- Feature Model Viewer -->
-                <v-window-item value="featureModelViewer" key="featureModelViewer">
+                <v-window-item key="featureModelViewer">
                   <feature-model-viewer :version="selectedVersion"></feature-model-viewer>
                 </v-window-item>
 
                 <!-- List Tree -->
-                <v-window-item value="listTree" key="listTree">
+                <v-window-item key="listTree">
 
                   <v-container class="fill-height">
                     <v-layout column class="fill-height">
@@ -495,7 +495,7 @@
                 </v-window-item>
 
                 <!-- Cross-Tree Constraint Viewer -->
-                <v-window-item value="ctc" key="ctc">
+                <v-window-item key="ctc">
 
                   <!-- Filter only the invalid ctcs and reset them to default -->
                   <v-btn rounded outlined @click="filteredConstraints = allConstraints.filter(c => c.evaluation === false)" class="mx-2">Only invalid </v-btn>
@@ -513,7 +513,7 @@
 
                     <!-- Customization of the column FORMULA -->
                     <template v-slot:item.formula="{ item }">
-                      <div v-for="(f, i) in item.formula" :key="i" style="display: inline;">
+                      <div v-for="(f, i) in item.selectable.formula" :key="i" style="display: inline;">
                         <v-chip
                             class="ml-2 mr-2"
                             v-if="f instanceof FeatureNodeConstraintItem"
@@ -529,14 +529,14 @@
                     <!-- Customization of the column EVALUATION -->
                     <template v-slot:item.evaluation="{ item }">
                       <v-avatar size="30"
-                                :color="evaluateCTC(item)"></v-avatar>
+                                :color="evaluateCTC(item.selectable)"></v-avatar>
                     </template>
 
                     <!-- Customization of the column ACTIONS -->
                     <template v-slot:item.actions="{ item }">
                       <!-- Context menu -->
                       <v-menu offset-y
-                              v-if="item.evaluation === false">
+                              v-if="item.selectable.evaluation === false">
                         <template v-slot:activator="{ props }">
                           <v-btn icon rounded outlined v-bind="props" >
                             <v-icon>mdi-dots-vertical</v-icon>
@@ -545,8 +545,8 @@
 
                         <v-list>
                           <!-- Fix ctc by rollback button -->
-                          <v-list-item @click="rollbackFixCTC(item)">
-                            <v-tooltip bottom>
+                          <v-list-item @click="rollbackFixCTC(item.selectable)">
+                            <v-tooltip location="bottom">
                               <template v-slot:activator="{ props }">
                                 <div v-bind="props">Rollback Fix</div>
                               </template>
@@ -555,8 +555,8 @@
                           </v-list-item>
 
                           <!-- Fix ctc by quick fix button -->
-                          <v-list-item @click="quickFixCTC(item)">
-                            <v-tooltip bottom>
+                          <v-list-item @click="quickFixCTC(item.selectable)">
+                            <v-tooltip location="bottom">
                               <template v-slot:activator="{ props }">
                                 <div v-bind="props">Quick Fix</div>
                               </template>
