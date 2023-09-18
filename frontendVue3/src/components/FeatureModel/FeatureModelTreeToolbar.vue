@@ -7,6 +7,7 @@
             absolute
             permanent
             location="start"
+            id="feature-model-toolbar"
         >
             <v-list dense>
                 <v-list-item
@@ -104,6 +105,7 @@
                     :disabled="!isUndoAvailable || !editRights"
                     @click="$emit('undo')"
                     prepend-icon="mdi-undo"
+                    id="feature-model-toolbar-undo"
                 >
                     <v-list-item-title>Undo</v-list-item-title>
                 </v-list-item>
@@ -235,7 +237,7 @@
 
                 <v-list-item
                     @click="$emit('show-tutorial')"
-                    id="tutorial-mode"
+                    id="tutorial-mode-button"
                     prepend-icon="mdi-school"
                 >
                     <v-list-item-title>Tutorial</v-list-item-title>

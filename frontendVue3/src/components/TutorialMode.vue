@@ -130,13 +130,13 @@ const props = defineProps({
                 title: 'Welcome to the tutorial!',
                 description:
                     'You can restart the tutorial anytime by clicking on this icon on the left.',
-                elementCssSelector: DIALOG_SELECTOR,
+                elementCssSelector: "#tutorial-mode-button",
             },
             {
                 title: 'The menu',
                 description:
-                    "For a more precise description of the menu's icons click on this icon on the left.",
-                elementCssSelector: '#feature-model-toolbar-extend',
+                    "For a more precise description of the menu's icons hover over the menu.",
+                elementCssSelector: '#feature-model-toolbar',
             },
             {
                 title: 'Your feature model',
