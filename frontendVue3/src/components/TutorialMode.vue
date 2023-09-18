@@ -111,6 +111,7 @@
 </template>
 
 <script setup>
+import { count } from 'd3';
 import { onMounted, ref, computed} from 'vue';
 const DIALOG_SELECTOR= '.tutorial-dialog';
 const step = ref(undefined);
@@ -286,7 +287,7 @@ function exit() {
 }
 
 function beforeStep() {
-    counter.value = counter - 1;
+    counter.value = counter.value - 1;
     step.value = beforeSteps.value.shift();
     if (!isMobile.value) {
         setBubblePosition();
