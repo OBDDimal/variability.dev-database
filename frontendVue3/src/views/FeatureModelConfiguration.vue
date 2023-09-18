@@ -105,7 +105,7 @@
 
               <!-- Customization of the column SELECTIONSTATE -->
               <template v-slot:item.selectionState="{ item }">
-                <DoubleCheckbox v-bind:selection-item="item.selectable" @select="(selected) => decisionPropagation(item.selectable, selected)"></DoubleCheckbox>
+                <DoubleCheckbox v-bind:selection-item="item.selectable" @select="(selected) => decisionPropagation(item.selectable, selected)" @click.stop=""></DoubleCheckbox>
               </template>
 
               <!-- Customization of the column ACTIONS -->
@@ -608,11 +608,11 @@ export default {
 
   data: () => ({
     headersVersions: [
-        {title: 'Selection', align:'start', key: 'selectionState'},
+        {title: 'Selection', align:'start', key: 'selectionState', width: '10%'},
         {title: 'Version', key: 'version', groupable:false},
         {title: 'Actions', key: 'actions'}],
     headersFeatures: [
-        {title: 'Selection', key: 'selectionState'},
+        {title: 'Selection', key: 'selectionState', width: '10%'},
         {title: 'Name', key: 'name', groupable: false},
         {title: 'Actions', groupable: false, key: 'actions'}
     ],
