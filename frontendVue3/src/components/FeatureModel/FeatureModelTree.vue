@@ -181,6 +181,7 @@ import { EditCommand } from '@/classes/Commands/FeatureModel/EditCommand';
 import { RemoveCommand } from '@/classes/Commands/FeatureModel/RemoveCommand';
 import * as update_service from '@/services/FeatureModel/update.service';
 import { useDisplay } from 'vuetify';
+import { zoomFit } from '@/services/FeatureModel/view.service.js';
 
 
 export default {
@@ -273,11 +274,14 @@ export default {
             this.constraints
         );
         update.updateSvg(this.d3Data);
+        zoomFit(this.d3Data)
     },
 
     methods: {
         resetView(levels, maxChildren) {
             view.reset(this.d3Data, levels, maxChildren);
+            update.updateSvg(this.d3Data);
+            zoomFit(this.d3Data);
         },
 
         coloring(coloringIndex) {

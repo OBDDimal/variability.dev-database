@@ -4,7 +4,7 @@
     <!-- First row with the three columns: Versions, Features, Third Column (#SAT, Explanations, Configuration history) -->
     <v-row>
       <v-col cols='4'>
-        <v-card>
+        <v-card height='89.5vh'>
           <v-card-title>
             <v-layout class='align-center' row>
               <!-- Heading features -->
@@ -100,7 +100,7 @@
                 :search='searchFeatures'
                 disable-pagination
                 fixed-header
-                height='40vh'
+                height='68vh'
                 hide-default-footer
                 item-key='name'
                 show-group-by
@@ -270,7 +270,7 @@
       <!-- Third column (#SAT, Explanations, Configuration history) -->
       <v-col cols='3'>
         <!-- #SAT -->
-        <v-card>
+        <v-card height='25vh'>
           <v-card-title>{{ featureModel.satCount }}</v-card-title>
           <v-card-subtitle>Number of possible configurations</v-card-subtitle>
           <v-card-actions>
@@ -326,7 +326,7 @@
         </v-card>
 
         <!-- Explanations and configuration history -->
-        <v-card height='38vh' style='margin-top:1vh;'>
+        <v-card height='63.5vh' style='margin-top:1vh;'>
           <v-card-title>
             <v-tabs v-model='tabsColumnTopRight'>
               <v-tab key='explanations'>Explanations</v-tab>
@@ -385,7 +385,7 @@
                   disable-pagination
                   disable-sort
                   fixed-header
-                  height='25vh'
+                  height='47vh'
                   hide-default-footer
                   single-select
                   @click:row='redoCommand'
