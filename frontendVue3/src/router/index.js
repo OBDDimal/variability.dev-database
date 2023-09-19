@@ -75,6 +75,15 @@ const routes = [
             title: 'Feature Model Configurator',
         },
     },
+    {
+        path: '/configuratorsolo/:productLineName',
+        name: 'ConfiguratorSolo',
+        props: true,
+        component: () => import('@/views/FeatureModelSoloConfigurator.vue'),
+        meta: {
+            title: 'Feature Model Configurator Solo',
+        },
+    },
 ];
 
 const router = createRouter({

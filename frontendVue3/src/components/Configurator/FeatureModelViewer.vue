@@ -191,7 +191,7 @@ export default {
 <style lang="scss">
 #svg-container {
   width: 100%;
-  height: 40vh;
+  height: 120vh;
 }
 .node {
   cursor: pointer;

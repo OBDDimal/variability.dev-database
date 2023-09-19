@@ -366,7 +366,6 @@ function updateSegments(d3Data, visibleD3Nodes) {
 }
 
 export function updateSvg(d3Data) {
-    /*const start = performance.now();*/
 
     // Calculate rect widths of all d3Nodes once for better performance instead of repeatedly during update.
     d3Data.root.descendants().forEach((d3Node) => {
@@ -402,8 +401,6 @@ export function updateSvg(d3Data) {
     updateFeatureNodes(d3Data, visibleD3Nodes);
     updatePseudoNodes(d3Data, visibleD3Nodes);
     updateLinks(d3Data, visibleD3Nodes);
-
-    /*console.log('Rendertime', performance.now() - start);*/
 }
 
 // Calculates rect-width dependent on font-size dynamically.
