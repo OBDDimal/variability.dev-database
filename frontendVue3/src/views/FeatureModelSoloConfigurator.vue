@@ -9,10 +9,7 @@
             <v-layout class='align-center' row>
               <!-- Heading features -->
               <div class='mr-2'>
-                <span
-                  v-if='features?.length === featureModel.features?.length'>Features ({{ featureModel.features?.length
-                  }}) </span>
-                <span v-else>Features ({{ features?.length }}/{{ featureModel.features?.length }}) </span>
+                <span>Features ({{ featureModel.features?.length }}) </span>
               </div>
 
               <!-- Statistics about the features as tooltip-->
@@ -77,7 +74,7 @@
             <v-tab key='dataTable'>Data Table</v-tab>
             <v-tab key='treeView'>Tree View</v-tab>
           </v-tabs>
-            <!-- Search box for features -->
+          <!-- Search box for features -->
           <v-text-field
             v-model='searchFeatures'
             :clearable=true
@@ -125,8 +122,9 @@
                 <!-- Customization of the column ACTIONS -->
                 <template v-slot:item.actions='{ item }'>
                   <!-- Context menu -->
-                  <v-menu v-if='!item.selectable.fix && (item.selectable.selectionState === SelectionState.ImplicitlyDeselected || item.selectable.selectionState === SelectionState.ImplicitlySelected)'
-                          offset-y>
+                  <v-menu
+                    v-if='!item.selectable.fix && (item.selectable.selectionState === SelectionState.ImplicitlyDeselected || item.selectable.selectionState === SelectionState.ImplicitlySelected)'
+                    offset-y>
                     <template v-slot:activator='{ props }'>
                       <v-btn icon outlined rounded v-bind='props'>
                         <v-icon>mdi-dots-vertical</v-icon>
@@ -158,7 +156,7 @@
                 </template>
               </v-data-table>
             </v-window-item>
-            <v-window-item key="treeView">
+            <v-window-item key='treeView'>
               Not Implemented yet. Waiting for V-TreeView Component
             </v-window-item>
           </v-window>
@@ -270,7 +268,7 @@
       <!-- Third column (#SAT, Explanations, Configuration history) -->
       <v-col cols='3'>
         <!-- #SAT -->
-        <v-card height='25vh'>
+        <v-card height='21vh'>
           <v-card-title>{{ featureModel.satCount }}</v-card-title>
           <v-card-subtitle>Number of possible configurations</v-card-subtitle>
           <v-card-actions>
@@ -323,10 +321,18 @@
             </v-tooltip>
 
           </v-card-actions>
+          <v-layout class='align-center justify-center' row>
+            <v-btn class='ma-2' @click='openFileDialog'>
+              Open
+            </v-btn>
+            <v-btn class='ma-2'>
+              Save
+            </v-btn>
+          </v-layout>
         </v-card>
 
         <!-- Explanations and configuration history -->
-        <v-card height='63.5vh' style='margin-top:1vh;'>
+        <v-card height='67.5vh' style='margin-top:1vh;'>
           <v-card-title>
             <v-tabs v-model='tabsColumnTopRight'>
               <v-tab key='explanations'>Explanations</v-tab>
@@ -346,7 +352,7 @@
                   </div>
 
                   <!-- Reason 2 -->
-                  <div v-if='conflictingCTCsOfSelectedVersion' class='text-h6'>
+                  <div v-if='missingFeaturesOfSelectedVersion?.length !== 0' class='text-h6'>
                     Conflicting Cross-Tree-Constraints
                     <v-btn icon outlined rounded @click="tabsSecondColumn = 'ctc'">
                       <v-icon>mdi-arrow-top-right</v-icon>
@@ -400,6 +406,14 @@
     </v-row>
 
   </v-container>
+
+  <configurator-open-file-dialog
+    :show='showOpenDialog'
+    @close='showOpenDialog = false'
+    @open='(file) => openFile(file)'
+  >
+  </configurator-open-file-dialog>
+
 </template>
 
 <script>
@@ -419,10 +433,11 @@ import { tr } from 'vuetify/locale';
 import { Feature } from '@/classes/Configurator/Feature';
 import { FeatureNodeConstraintItem } from '@/classes/Constraint/FeatureNodeConstraintItem';
 import { SelectionState } from '@/classes/Configurator/SelectionState';
+import ConfiguratorOpenFileDialog from '@/components/Configurator/ConfiguratorOpenFileDialog.vue';
 
 export default {
   name: 'FeatureModelSoloConfigurator',
-  components: { FeatureModelViewer, DoubleCheckbox },
+  components: { ConfiguratorOpenFileDialog, FeatureModelViewer, DoubleCheckbox },
 
   data: () => ({
     headersVersions: [
@@ -446,7 +461,8 @@ export default {
     tabsColumnTopRight: undefined,
     tabsFirstColumn: undefined,
     tabsSecondColumn: undefined,
-    versionForFilteringFeatures: undefined
+    versionForFilteringFeatures: undefined,
+    showOpenDialog: true
   }),
 
   props: {
@@ -580,6 +596,25 @@ export default {
     evaluateCTC(item) {
       const evaluation = item.constraint.evaluate();
       return evaluation ? 'green' : (evaluation === undefined ? '' : 'red');
+    },
+
+    openFileDialog() {
+      this.showOpenDialog = true;
+    },
+
+    openFile(file) {
+      let reader = new FileReader();
+      reader.addEventListener('load', (event) => {
+        this.featureModel.loadXmlDataFromFile(event.target.result, this.selectedVersion)
+        this.allConstraints = this.selectedVersion.constraints.map((e) => ({
+          constraint: e,
+          formula: e.toList(),
+          evaluation: e.evaluate()
+        }));
+        this.filteredConstraints = this.allConstraints;
+      });
+      reader.readAsText(file[0]);
+      this.showOpenDialog = false;
     }
   },
 
