@@ -1,5 +1,5 @@
 <template>
-  <v-container v-if='featureModel.loadingOpacity !== 0' :fluid='true'>
+  <v-container :fluid='true'>
 
     <!-- First row with the three columns: Versions, Features, Third Column (#SAT, Explanations, Configuration history) -->
     <v-row>
@@ -9,7 +9,7 @@
             <v-layout class='align-center' row>
               <!-- Heading features -->
               <div class='mr-2'>
-                <span>Features ({{ featureModel.features?.length }}) </span>
+                <span>Features ({{ featureModelSolo.features?.length }}) </span>
               </div>
 
               <!-- Statistics about the features as tooltip-->
@@ -20,49 +20,31 @@
                 <table>
                   <tr>
                     <th>Selection</th>
-                    <th v-if='versionForFilteringFeatures'>Filtered</th>
                     <th>All</th>
                   </tr>
                   <tr>
                     <td>All</td>
-                    <td v-if='versionForFilteringFeatures'>{{ features?.length }}</td>
-                    <td>{{ featureModel.features?.length }}</td>
+                    <td>{{ featureModelSolo.features?.length }}</td>
                   </tr>
                   <tr>
                     <td>Unselected</td>
-                    <td v-if='versionForFilteringFeatures'>{{
-                        countSelectionStateInList(features, SelectionState.Unselected)
-                      }}
-                    </td>
-                    <td>{{ countSelectionStateInList(featureModel.features, SelectionState.Unselected) }}</td>
+                    <td>{{ countSelectionStateInList(featureModelSolo.features, SelectionState.Unselected) }}</td>
                   </tr>
                   <tr>
                     <td>Explicitly selected</td>
-                    <td v-if='versionForFilteringFeatures'>
-                      {{ countSelectionStateInList(features, SelectionState.ExplicitlySelected) }}
-                    </td>
-                    <td>{{ countSelectionStateInList(featureModel.features, SelectionState.ExplicitlySelected) }}</td>
+                    <td>{{ countSelectionStateInList(featureModelSolo.features, SelectionState.ExplicitlySelected) }}</td>
                   </tr>
                   <tr>
                     <td>Explicitly deselected</td>
-                    <td v-if='versionForFilteringFeatures'>
-                      {{ countSelectionStateInList(features, SelectionState.ExplicitlyDeselected) }}
-                    </td>
-                    <td>{{ countSelectionStateInList(featureModel.features, SelectionState.ExplicitlyDeselected) }}</td>
+                    <td>{{ countSelectionStateInList(featureModelSolo.features, SelectionState.ExplicitlyDeselected) }}</td>
                   </tr>
                   <tr>
                     <td>Implicitly selected</td>
-                    <td v-if='versionForFilteringFeatures'>
-                      {{ countSelectionStateInList(features, SelectionState.ImplicitlySelected) }}
-                    </td>
-                    <td>{{ countSelectionStateInList(featureModel.features, SelectionState.ImplicitlySelected) }}</td>
+                    <td>{{ countSelectionStateInList(featureModelSolo.features, SelectionState.ImplicitlySelected) }}</td>
                   </tr>
                   <tr>
                     <td>Implicitly deselected</td>
-                    <td v-if='versionForFilteringFeatures'>
-                      {{ countSelectionStateInList(features, SelectionState.ImplicitlyDeselected) }}
-                    </td>
-                    <td>{{ countSelectionStateInList(featureModel.features, SelectionState.ImplicitlyDeselected) }}</td>
+                    <td>{{ countSelectionStateInList(featureModelSolo.features, SelectionState.ImplicitlyDeselected) }}</td>
                   </tr>
                 </table>
               </v-tooltip>
@@ -167,7 +149,7 @@
       <v-col cols='5'>
         <!-- Details of the selected version -->
         <v-card height='89.5vh'>
-          <v-card-title>Details for version: {{ selectedVersion?.version }}</v-card-title>
+          <v-card-title>Details for {{featureModelName}}:</v-card-title>
 
           <!-- Tabs to select (Feature Model Viewer, List Tree, Cross-Tree Constraints -->
           <v-tabs v-model='tabsSecondColumn'>
@@ -175,12 +157,12 @@
             <v-tab key='ctc'>Cross Tree Constraints</v-tab>
           </v-tabs>
 
-          <v-card-text v-if='selectedVersion?.root'>
+          <v-card-text v-if='featureModelSolo?.root'>
             <v-window v-model='tabsSecondColumn'>
 
               <!-- Feature Model Viewer -->
               <v-window-item key='featureModelViewer'>
-                <feature-model-viewer :version='selectedVersion'></feature-model-viewer>
+                <feature-model-viewer-solo :feature-model='featureModelSolo'></feature-model-viewer-solo>
               </v-window-item>
 
               <!-- Cross-Tree Constraint Viewer -->
@@ -269,7 +251,7 @@
       <v-col cols='3'>
         <!-- #SAT -->
         <v-card height='21vh'>
-          <v-card-title>{{ featureModel.satCount }}</v-card-title>
+          <v-card-title>{{ featureModelSolo.satCount }}</v-card-title>
           <v-card-subtitle>Number of possible configurations</v-card-subtitle>
           <v-card-actions>
 
@@ -346,37 +328,6 @@
               <!-- Explanations tab -->
               <v-window-item key='explanations' style='height: 25vh;'>
                 <div>
-                  <!-- Reason 1 -->
-                  <div v-if='selectedVersion?.selectionState === SelectionState.ImplicitlySelected' class='text-h6'>
-                    {{ selectedVersion.selectionStateDescription }}
-                  </div>
-
-                  <!-- Reason 2 -->
-                  <div v-if='missingFeaturesOfSelectedVersion?.length !== 0' class='text-h6'>
-                    Conflicting Cross-Tree-Constraints
-                    <v-btn icon outlined rounded @click="tabsSecondColumn = 'ctc'">
-                      <v-icon>mdi-arrow-top-right</v-icon>
-                    </v-btn>
-                  </div>
-
-                  <!-- Reason 3 -->
-                  <div v-if='missingFeaturesOfSelectedVersion?.length !== 0'>
-                    <div class='text-h6'>These features are selected but are missing in the selected version</div>
-                    <v-list lines='one'>
-                      <v-table>
-                        <template v-slot:default>
-                          <tbody>
-                          <tr
-                            v-for='item in missingFeaturesOfSelectedVersion'
-                            :key='item.name'
-                          >
-                            <td>{{ item.name }}</td>
-                          </tr>
-                          </tbody>
-                        </template>
-                      </v-table>
-                    </v-list>
-                  </div>
                 </div>
               </v-window-item>
 
@@ -418,11 +369,7 @@
 
 <script>
 import DoubleCheckbox from '@/components/Configurator/DoubleCheckbox.vue';
-import FeatureModelViewer from '@/components/Configurator/FeatureModelViewer.vue';
 import { ConfiguratorManager } from '@/classes/Configurator/ConfiguratorManager';
-import { FeatureModel } from '@/classes/Configurator/FeatureModel';
-import api from '@/services/api.service';
-import { ResetCommand } from '@/classes/Commands/Configurator/ResetCommand';
 import { QuickFixCTCCommand } from '@/classes/Commands/Configurator/QuickFixCTCCommand';
 import { QuickFixFeatureCommand } from '@/classes/Commands/Configurator/QuickFixFeatureCommand';
 import { RollbackFixFeatureCommand } from '@/classes/Commands/Configurator/RollbackFixFeatureCommand';
@@ -434,10 +381,12 @@ import { Feature } from '@/classes/Configurator/Feature';
 import { FeatureNodeConstraintItem } from '@/classes/Constraint/FeatureNodeConstraintItem';
 import { SelectionState } from '@/classes/Configurator/SelectionState';
 import ConfiguratorOpenFileDialog from '@/components/Configurator/ConfiguratorOpenFileDialog.vue';
+import FeatureModelViewerSolo from '@/components/Configurator/FeatureModelViewerSolo.vue';
+import { FeatureModelSolo } from '@/classes/Configurator/FeatureModelSolo';
 
 export default {
   name: 'FeatureModelSoloConfigurator',
-  components: { ConfiguratorOpenFileDialog, FeatureModelViewer, DoubleCheckbox },
+  components: { ConfiguratorOpenFileDialog, FeatureModelViewerSolo, DoubleCheckbox },
 
   data: () => ({
     headersVersions: [
@@ -451,17 +400,15 @@ export default {
     ],
     commandManager: new ConfiguratorManager(),
     initialResetCommand: undefined,
-    featureModel: FeatureModel,
+    featureModelSolo: FeatureModelSolo,
+    featureModelName: '',
     features: undefined,
-    selectedVersion: undefined,
     filteredConstraints: undefined,
     allConstraints: undefined,
     searchFeatures: '',
-    searchVersions: '',
     tabsColumnTopRight: undefined,
     tabsFirstColumn: undefined,
     tabsSecondColumn: undefined,
-    versionForFilteringFeatures: undefined,
     showOpenDialog: true
   }),
 
@@ -470,11 +417,11 @@ export default {
   },
 
   created() {
-    this.initData();
+    this.openFileDialog();
   },
 
   methods: {
-    initData() {
+    /*initData() {
       api.get(`${import.meta.env.VITE_APP_DOMAIN}configurator/mappings/${this.productLineName}`)
         .then((mappings) => {
           this.featureModel = FeatureModel.create(mappings.data['root-mapping'], mappings.data['feature-mapping']);
@@ -499,34 +446,34 @@ export default {
         })
         .catch(() => {
         });
-    },
+    },*/
 
     quickFixCTC(item) {
       const pc = item.constraint.quickFix(true);
 
-      const command = new QuickFixCTCCommand(this.featureModel, pc);
+      const command = new QuickFixCTCCommand(this.featureModelSolo, pc);
       this.commandManager.execute(command);
     },
 
     quickFixFeature(feature) {
-      const command = new QuickFixFeatureCommand(this.featureModel, feature);
+      const command = new QuickFixFeatureCommand(this.featureModelSolo, feature);
       this.commandManager.execute(command);
     },
 
     rollbackFixFeature(feature) {
-      const command = new RollbackFixFeatureCommand(this.featureModel, this.commandManager, feature, this.initialResetCommand);
+      const command = new RollbackFixFeatureCommand(this.featureModelSolo, this.commandManager, feature, this.initialResetCommand);
       this.commandManager.execute(command);
     },
 
     rollbackFixVersion(version) {
-      const command = new RollbackFixVersionCommand(this.featureModel, this.commandManager, version, this.initialResetCommand);
+      const command = new RollbackFixVersionCommand(this.featureModelSolo, this.commandManager, version, this.initialResetCommand);
       this.commandManager.execute(command);
     },
 
     rollbackFixCTC(item) {
       const constraint = item.constraint;
 
-      const command = new RollbackFixCTCCommand(this.featureModel, this.commandManager, constraint, this.initialResetCommand);
+      const command = new RollbackFixCTCCommand(this.featureModelSolo, this.commandManager, constraint, this.initialResetCommand);
       this.commandManager.execute(command);
     },
 
@@ -536,13 +483,13 @@ export default {
     },
 
     filterFeaturesNotInVersion(version) {
-      this.features = this.featureModel.features.filter(f => !version.features.includes(f));
+      this.features = this.featureModelSolo.features.filter(f => !version.features.includes(f));
     },
 
     selectVersion(event, row) {
       let version = row.item.selectable;
-      this.featureModel.loading = true;
-      this.featureModel.loadXmlData(version).then(() => {
+      this.featureModelSolo.loading = true;
+      this.featureModelSolo.loadXmlData(version).then(() => {
         this.selectedVersion = version;
         this.allConstraints = this.selectedVersion.constraints.map((e) => ({
           constraint: e,
@@ -550,7 +497,7 @@ export default {
           evaluation: e.evaluate()
         }));
         this.filteredConstraints = this.allConstraints;
-        this.featureModel.loading = false;
+        this.featureModelSolo.loading = false;
       });
     },
 
@@ -561,12 +508,12 @@ export default {
 
     resetFeaturesTable() {
       this.searchFeatures = '';
-      this.features = this.featureModel.features;
+      this.features = this.featureModelSolo.features;
       this.versionForFilteringFeatures = undefined;
     },
 
     decisionPropagation(item, selectionState) {
-      const command = new DecisionPropagationCommand(this.featureModel, item, selectionState);
+      const command = new DecisionPropagationCommand(this.featureModelSolo, item, selectionState);
       this.commandManager.execute(command);
     },
 
@@ -605,8 +552,10 @@ export default {
     openFile(file) {
       let reader = new FileReader();
       reader.addEventListener('load', (event) => {
-        this.featureModel.loadXmlDataFromFile(event.target.result, this.selectedVersion)
-        this.allConstraints = this.selectedVersion.constraints.map((e) => ({
+        this.featureModelSolo = FeatureModelSolo.loadXmlDataFromFile(event.target.result);
+        this.features = this.featureModelSolo.features;
+        this.featureModelName = file[0].name;
+        this.allConstraints = this.featureModelSolo.constraints.map((e) => ({
           constraint: e,
           formula: e.toList(),
           evaluation: e.evaluate()
@@ -635,21 +584,21 @@ export default {
     },
 
     missingFeaturesOfSelectedVersion() {
-      if (!this.featureModel || !this.selectedVersion || !this.selectedVersion.root) {
+      if (!this.featureModelSolo || !this.featureModelSolo.root) {
         return [];
       }
 
-      return this.featureModel.features
+      return this.featureModelSolo.features
         .filter(f => f.selectionState === SelectionState.ExplicitlySelected || f.selectionState === SelectionState.ImplicitlySelected)
-        .filter(f => !this.selectedVersion.features.includes(f));
+        .filter(f => !this.featureModelSolo.features.includes(f));
     },
 
     conflictingCTCsOfSelectedVersion() {
-      if (!this.featureModel || !this.selectedVersion || !this.selectedVersion.root) {
+      if (!this.featureModelSolo || this.featureModelSolo.root) {
         return [];
       }
 
-      return this.selectedVersion.constraints.some(c => c.evaluate() === false);
+      return this.featureModelSolo.constraints.some(c => c.evaluate() === false);
     }
   }
 };

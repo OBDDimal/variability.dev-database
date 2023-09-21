@@ -1,7 +1,5 @@
-import {SelectionState} from "@/classes/Configurator/SelectionState";
 import beautify from "xml-beautifier";
 import {FeatureNode} from "@/classes/Configurator/FeatureNode";
-import {Version} from "@/classes/Configurator/Version";
 import {Feature} from "@/classes/Configurator/Feature";
 import {Constraint} from "@/classes/Constraint";
 import {FeatureNodeConstraintItem} from "@/classes/Constraint/FeatureNodeConstraintItem";
@@ -10,11 +8,12 @@ import {Conjunction} from "@/classes/Constraint/Conjunction";
 import {Implication} from "@/classes/Constraint/Implication";
 import {Negation} from "@/classes/Constraint/Negation";
 
-export class FeatureModel {
-    constructor(features, constraints, root) {
+export class FeatureModelSolo {
+    constructor(features, constraints, root, featureDict) {
         this.features = features;
         this.constraints = constraints;
         this.root = root;
+        this.featureDict = featureDict;
         this.satCount = 0;
         this.name = undefined;
         this.loading = true;
@@ -31,17 +30,18 @@ export class FeatureModel {
 
         const struct = xmlDocument.querySelector('struct');
         const usedFeatures = [];
-        const root = this.parseChildren(struct, null, usedFeatures, 0)[0];
+        const featureDict = {};
+        const root = FeatureModelSolo.parseChildren(struct, null, usedFeatures, 0, featureDict)[0];
 
-        const constraints = this.readConstraints(
+        const constraints = FeatureModelSolo.readConstraints(
             [...xmlDocument.querySelector('constraints').childNodes],
-            this.featureDict
+            featureDict
         );
 
-        return new FeatureModel(usedFeatures, constraints, root)
+        return new FeatureModelSolo(usedFeatures, constraints, root, featureDict);
     }
 
-    parseChildren(struct, parent, usedFeatures, count) {
+    static parseChildren(struct, parent, usedFeatures, count, featureDict) {
         let toReturn = [];
 
         for (const child of struct.childNodes) {
@@ -49,9 +49,10 @@ export class FeatureModel {
             if (child.tagName) {
                 const featureName = child.getAttribute('name');
 
-                const feature = new Feature(count, name);
+                const feature = new Feature(count, featureName);
                 count++;
                 usedFeatures.push(feature);
+                featureDict[featureName] = feature;
                 let toAppend = new FeatureNode(
                     feature,
                     parent,
@@ -60,7 +61,7 @@ export class FeatureModel {
                     child.getAttribute('mandatory') === 'true',
                     child.getAttribute('abstract') === 'true'
                 );
-                toAppend.children = this.parseChildren(child, toAppend, usedFeatures, count);
+                toAppend.children = FeatureModelSolo.parseChildren(child, toAppend, usedFeatures, count, featureDict);
                 toReturn.push(toAppend);
             }
         }
@@ -68,19 +69,19 @@ export class FeatureModel {
         return toReturn;
     }
 
-    readConstraints(constraints, featureMap) {
+    static readConstraints(constraints, featureMap) {
         return constraints
             .filter((rule) => rule.tagName)
             .map((rule) => {
                 return [...rule.childNodes]
                     .filter((item) => item.tagName)
                     .map(
-                        (item) => new Constraint(this.readConstraintItem(item, featureMap))
+                        (item) => new Constraint(FeatureModelSolo.readConstraintItem(item, featureMap))
                     )[0];
             });
     }
 
-    readConstraintItem(item, featureMap) {
+    static readConstraintItem(item, featureMap) {
         if (item.tagName === 'var') {
             return new FeatureNodeConstraintItem(
                 featureMap[item.innerHTML.trim()]
@@ -88,7 +89,7 @@ export class FeatureModel {
         } else {
             const childItems = [...item.childNodes]
                 .filter((childItem) => childItem.tagName)
-                .map((childItem) => this.readConstraintItem(childItem, featureMap));
+                .map((childItem) => FeatureModelSolo.readConstraintItem(childItem, featureMap));
 
             switch (item.tagName) {
                 case 'disj':
@@ -116,18 +117,6 @@ export class FeatureModel {
         const allFeatures = this.getAllFeatures(versions);
         const commonFeatures = this.getCommonFeatures(versions);
         return allFeatures.filter(x => !commonFeatures.includes(x));
-    }
-
-    getAvailableVersions() {
-        return this.versions.filter(v => v.selectionState === SelectionState.Unselected);
-    }
-
-    getSelectedVersions() {
-        return this.versions.filter(v => v.selectionState === SelectionState.ImplicitlySelected || v.selectionState === SelectionState.ExplicitlySelected);
-    }
-
-    getDeselectedVersions() {
-        return this.versions.filter(v => v.selectionState === SelectionState.ImplicitlyDeselected || v.selectionState === SelectionState.ExplicitlyDeselected);
     }
 
     calcVersionDecisionPropagation() {
