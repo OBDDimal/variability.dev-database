@@ -17,17 +17,7 @@
         <!--  Data Table for Metrics: -->
         <v-data-table v-model:expanded="expanded" :headers="factHeaders" :items="metrics" item-value="name" show-expand
             class="elevation-1">
-            <template v-slot:row="{ item }">
-                <tr>
-                    <td :colspan="columns.length">
-                        <!-- TODO : mdi-arrow-right-bold-box-outline -->
-                        More info about {{ item.raw.name }}
-                    </td>
-                    <td :colspan="columns.length">
-                        <!-- TODO : mdi-arrow-right-bold-box-outline -->
-                        More info about {{ item.raw.value }}
-                    </td>
-                </tr>
+            <template v-slot:headers>
             </template>
             <template v-slot:expanded-row="{ columns, item }">
                 <tr>
@@ -988,6 +978,7 @@ export default {
         initialize() {
             this.fillMetaData();
             this.fillAnalysis();
+            this.fillMetrics();
             return;
         },
         fillMetaData() {
@@ -997,31 +988,73 @@ export default {
                 }
                 var obj = {}; // temporry JSON object to fill for visualisation of metadata
                 obj["name"] = entry.name;
-                obj["value"] = entry.value;
+                obj["value"] = this.getDisplayValue(entry);
                 return obj;
             });
         },
-        fillMetrics() {
 
-        },
         fillAnalysis() {
             this.analysis = facts.analysis.map((entry) => {
                 var obj = {}; // temporry JSON object to fill for visualisation of analysis
                 obj["name"] = entry.name;
                 // Value depends on if Size and Ratio are set
+
+                obj["value"] = this.getDisplayValue(entry);
+                return obj;
+            });
+        },
+        fillMetrics() {
+
+            /**
+             * Metric Data structure:
+             * name: str
+             * value: str
+             * parent: null || str
+             */
+             let root_entries = facts.metrics.filter((entry) => entry.level === 0);
+            this.metrics= facts.metrics.map((entry)=>{
+                var obj = {}; // temporry JSON object to fill for visualisation of analysis
+                obj["name"] = entry.name;
+                // Value depends on if Size and Ratio are set
+
+                obj["value"] = this.getDisplayValue(entry);
+                return obj;
+            });
+            for (let level = 0; level <= this.getMaxLevel(facts.metrics); level++) {
+                //iterating over each level 
+                let entries_on_level = facts.metrics.filter((entry) => entry.level === level);
+
+            }
+        },
+        getMaxLevel(arr) {
+            // Iterate over an Array of metric  entries and return the highest found level
+            var maxLevel = 0;
+            arr.forEach(function (entry, index) {
+                if (entry.level >= maxLevel) {
+                    maxLevel = entry.level;
+                }
+            });
+            return maxLevel;
+        },
+        getDisplayValue(entry) {
+            // Determine which value of an entry should be displayed ( size and ratio attributes overwrite value)
+            try {
                 var value_str = "";
                 if (entry.size !== null) {
                     value_str = "" + entry.size;
                     if (entry.ratio !== null) { // append optional ratio
-                        var rounded= Math.round(100* entry.ratio);
+                        var rounded = Math.round(100 * entry.ratio);
                         value_str = value_str + " (" + rounded + "\%)";
                     }
                 } else {
                     value_str = entry.value;
                 }
-                obj["value"] = value_str;
-                return obj;
-            });
+                return value_str
+            } catch (e) {
+                console.error(e);
+                return "Failed to determine which value to display";
+            }
+
         }
 
     },
