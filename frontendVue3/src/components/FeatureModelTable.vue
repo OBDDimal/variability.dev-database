@@ -87,36 +87,6 @@
                         </template>
                         <span>Upload from local storage</span>
                       </v-tooltip>
-                        <v-dialog v-model="dialogDelete" max-width="400px">
-                            <v-card>
-                                <v-card-title
-                                    class="text-h5"
-                                    style="white-space: normal;"
-                                >
-                                    Are you sure you want to delete this feature
-                                    model?
-                                </v-card-title>
-                                <v-card-actions>
-                                    <v-spacer></v-spacer>
-                                    <v-btn
-                                        color="primary"
-                                        text
-                                        @click="closeDelete"
-                                        >Cancel
-                                    </v-btn>
-                                    <v-spacer></v-spacer>
-                                    <v-btn
-                                        :loading="removeLoading"
-                                        color="primary"
-                                        text
-                                        @click="deleteItemConfirm"
-                                    >
-                                        Delete
-                                    </v-btn>
-                                    <v-spacer></v-spacer>
-                                </v-card-actions>
-                            </v-card>
-                        </v-dialog>
                         <!--        <v-dialog v-if="editedItem.analysis" v-model="dialogAnalysis" max-width="80%">
                     <v-card>
                       <v-card-title class="text-h5">
@@ -157,18 +127,8 @@
                         color="success"
                         variant="tonal"
                         size="small"
-                        icon="mdi-play"
+                        icon="mdi-information"
                         @click="handleClick(item.raw)"
-                    >
-                    </v-btn>
-                    <v-btn
-                        :disabled="item.owner === false"
-                        class="float-end mr-2"
-                        color="error"
-                        variant="tonal"
-                        icon="mdi-delete"
-                        size="small"
-                        @click.stop="deleteItem(item)"
                     >
                     </v-btn>
                     <v-btn
@@ -288,34 +248,11 @@ const headers = [
     },
 ];
 const search = ref('');
-const removeLoading = ref(false);
 const createDialog = ref(false);
-const dialogDelete = ref(false);
-const editedItem = ref(null);
-const defaultItem = ref(undefined);
 const checkLocalStorage = computed(() => {
     return !!localStorage.featureModelData;
 });
 
-async function deleteItemConfirm() {
-    removeLoading.value = true;
-    await fileStore.deleteFeatureModel(
-    editedItem.value.id
-    );
-    await fileStore.fetchConfirmedFeatureModels();
-    emit('onDelete');
-    removeLoading.value = false;
-
-    closeDelete();
-}
-function closeDelete() {
-    dialogDelete.value = false;
-    editedItem.value = { ...defaultItem };
-}
-function deleteItem(item) {
-    editedItem.value = { ...item.raw };
-    dialogDelete.value = true;
-}
 function handleClick(value) {
     console.log(value);
     router.push({
