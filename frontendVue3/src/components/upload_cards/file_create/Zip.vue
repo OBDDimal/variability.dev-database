@@ -74,45 +74,9 @@
                         label="Family"
                         append-icon="mdi-plus"
                         @click:append="addFamilyMenu = !addFamilyMenu"
-                        @change="familyChange"
                     ></v-autocomplete>
                 </v-col>
                 <v-col class="py-1" cols="12" md="6">
-                    <!--                    <div
-                        class="mb-3"
-                        v-if="
-                            latestFeatureModelVersion == null && family !== null
-                        "
-                    >
-                        No feature models in this family yet
-                    </div>
-                    <div
-                        class="mb-3"
-                        v-else-if="
-                            latestFeatureModelVersion !== null &&
-                            family !== null
-                        "
-                    >
-                        Currently
-                        <span style="font-weight: bold">{{
-                            numberOfModelsInFamily
-                        }}</span>
-                        {{
-                            numberOfModelsInFamily === 1
-                                ? 'Feature Model'
-                                : 'Feature Models'
-                        }}
-                        in
-                        <span style="font-weight: bold">{{
-                            this.newFamilyIsObject ? family.text : family
-                        }}</span>
-                        family
-                        <br />
-                        Latest version:
-                        <span style="font-weight: bold">{{
-                            latestFeatureModelVersion
-                        }}</span>
-                    </div>-->
                 </v-col>
             </v-row>
             <v-row>
@@ -124,13 +88,13 @@
                         append-icon="mdi-plus"
                         item-value="id"
                         item-title="label"
-                        chips
                         variant="outlined"
                         density="comfortable"
                         hide-details
+                        chips
+                        multiple
                         hint="Choose or create tags for your feature model"
                         label="Tags"
-                        multiple
                         @click:append="addTagMenu = !addTagMenu"
                     ></v-autocomplete>
                 </v-col>
@@ -238,17 +202,5 @@ let checkboxRules = [(v) => !!v || 'Checkbox must be checked'];
 let addTagMenu = ref(false);
 let addFamilyMenu = ref(false);
 
-watch(
-    () => formData.family,
-    (value) => {
-        console.log(getFeatureModelOfFamily(value));
-    }
-);
-
-async function getFeatureModelOfFamily(id) {
-    const res = await fileStore.fetchFeatureModelOfFamily(id);
-    console.log(res.length);
-    return res;
-}
 </script>
 

@@ -41,31 +41,25 @@
               </v-select>
             </v-col>
             <v-col class="py-0" cols="12" md="6">
-              <v-text-field
-              v-model="formData.family"
+              <!-- Change back to v-combobox when new family upload is working properly -->
+                    <v-autocomplete
+                        v-model="formData.family"
+                        :items="fileStore.myOwnFamilies"
                         item-title="label"
+                        item-value="id"
                         :required="true"
                         :rules="familyRules"
                         variant="outlined"
                         density="comfortable"
-                        hint="Create new family"
+                        hint="Add to or create new family"
                         label="Family"
-                        @change="familyChange"
-              ></v-text-field>
+                        append-icon="mdi-plus"
+                        @click:append="addFamilyMenu = !addFamilyMenu"
+                    ></v-autocomplete>
             </v-col>
-            <v-col class="py-0" cols="12" md="6">
-              <v-text-field
-                data-cy="file-create-multiple-family-description-textfield"
-                v-model="formData.familydescription"
-                variant="outlined"
-                density="comfortable"
-                hint="Describe your new family"
-                label="New Family Description"
-              ></v-text-field>
-            </v-col>
-            
+
           </v-row>
-          
+
           <v-row>
             <v-col class="py-0" cols="12">
                 <v-combobox
@@ -127,14 +121,14 @@
               <!--<div class="d-flex align-center">
                 <v-spacer></v-spacer>
                 <span v-if="uploadStatus !== ''" class="text-subtitle-1">{{ uploadStatus }}</span>
-                
+
               </div>-->
               <action-buttons
                   :data="formData"
                   :valid="form"
                   @close="$emit('close')"
                   @submit-click="showDetails = true"
-                  @uploadSuccessfull="(uploadInfo) => $emit('uploadSuccessfull', uploadInfo)"
+                  @uploadSuccessfull="(uploadInfo) => emit('uploadSuccessfull', uploadInfo)"
                 ></action-buttons>
             </v-col>
           </v-row>
@@ -149,7 +143,7 @@
 </template>
 
 <script setup>
-import { computed, onMounted, reactive, ref, watch } from 'vue';
+import {  reactive, ref } from 'vue';
 import { useFileStore } from '@/store/file';
 import { storeToRefs } from 'pinia';
 import TagCreate from '@/components/upload_cards/TagCreate.vue';
@@ -159,7 +153,7 @@ import ActionButtons from '@/components/upload_cards/file_create/ActionButtons.v
 
 const fileStore = useFileStore();
 
-const emit = defineEmits(['close']);
+const emit = defineEmits(['close', 'uploadSuccessfull']);
 
 const form = ref(null);
 
@@ -168,8 +162,7 @@ let formData = reactive({
   description: '',
   files: null,
   license: null,
-  family: '',
-  familydescription: '',
+  family: null,
   version: '',
   tags: [],
   legalShare: false,
@@ -181,14 +174,13 @@ const showDetails = ref(false);
 
 let fileRules = [(v) => !!v || 'File is required'];
 
-let { licenses, tags, myOwnTags } = storeToRefs(fileStore);
+let { licenses } = storeToRefs(fileStore);
 let licenseRules = [(v) => !!v || 'License is required'];
 
 let familyRules = [(v) => !!v || 'Family is required'];
 
 let checkboxRules = [(v) => !!v || 'Checkbox must be checked'];
 
-let newTag = { label: '', description: '', is_public: false };
 
 let addTagMenu = ref(false);
 let addFamilyMenu = ref(false);
