@@ -158,11 +158,14 @@
             @add="(data) => add(data)"
             @close="showAddDialog = false"
         ></feature-model-tree-add-dialog>
+        <feature-model-fact-label-bar>
+        </feature-model-fact-label-bar>
     </div>
 </template>
 
 <script>
 import FeatureModelTreeToolbar from './FeatureModelTreeToolbar.vue';
+import FeatureModelFactLabelBar from './FeatureModelFactLabelBar.vue';
 import FeatureModelTreeContextMenu from './FeatureModelTreeContextMenu.vue';
 import FeatureModelTreeEditDialog from '@/components/FeatureModel/FeatureModelTreeEditDialog.vue';
 import FeatureModelTreeAddDialog from '@/components/FeatureModel/FeatureModelTreeAddDialog';
@@ -189,6 +192,7 @@ export default {
     components: {
       FeatureModelTreeErrorDialog,
       FeatureModelTreeLoadingDialog,
+      FeatureModelFactLabelBar,
         FeatureModelTreeToolbar,
         FeatureModelTreeContextMenu,
         FeatureModelTreeEditDialog,
