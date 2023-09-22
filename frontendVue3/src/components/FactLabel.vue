@@ -8,16 +8,22 @@
         </div>
         <v-divider class="border-opacity-100"></v-divider>
         <!--  Data Table for MetaData: -->
-        <v-data-table>
+        <v-data-table :headers="factHeaders" :items="metadata" item-value="name"
+            class="elevation-1">
             <template v-slot:top>
                 <v-toolbar flat>
                     <v-toolbar-title>{{ name }}</v-toolbar-title>
                 </v-toolbar>
             </template>
-            <template v-slot:expanded-row="{ columns, item }">
+            <template v-slot:row="{ item }">
                 <tr>
                     <td :colspan="columns.length">
+                        <!-- TODO : mdi-arrow-right-bold-box-outline -->
                         More info about {{ item.raw.name }}
+                    </td>
+                    <td :colspan="columns.length">
+                        <!-- TODO : mdi-arrow-right-bold-box-outline -->
+                        More info about {{ item.raw.value }}
                     </td>
                 </tr>
             </template>
@@ -25,10 +31,29 @@
             </template>
         </v-data-table>
         <!--  Data Table for Metrics: -->
-        <v-data-table>
+        <v-data-table v-model:expanded="expanded" :headers="factHeaders" :items="metadata" item-value="name" show-expand
+            class="elevation-1">
+            <template v-slot:top>
+                <v-toolbar flat>
+                    <v-toolbar-title>{{ name }}</v-toolbar-title>
+                </v-toolbar>
+            </template>
+            <template v-slot:row="{ item }">
+                <tr>
+                    <td :colspan="columns.length">
+                        <!-- TODO : mdi-arrow-right-bold-box-outline -->
+                        More info about {{ item.raw.name }}
+                    </td>
+                    <td :colspan="columns.length">
+                        <!-- TODO : mdi-arrow-right-bold-box-outline -->
+                        More info about {{ item.raw.value }}
+                    </td>
+                </tr>
+            </template>
             <template v-slot:expanded-row="{ columns, item }">
                 <tr>
                     <td :colspan="columns.length">
+                        <!-- TODO : mdi-arrow-right-bold-box-outline -->
                         More info about {{ item.raw.name }}
                     </td>
                 </tr>
@@ -968,6 +993,8 @@ export default {
 
     data: () => ({
         name: "Feature Model Fact Label",
+        expanded: [],
+        factHeaders: [{ key: "name" }, { key: "value" }],
         metadata: [], // Array of simple k,v pairs
 
         metrics: [], //complex array of k,v with optional parent 
@@ -989,10 +1016,10 @@ export default {
             this.metadata = facts.metadata.map((entry) => {
                 if (entry.name === "Name") {
                     this.name = entry.value;
-
                 }
                 var obj = {};
-                obj[entry.name] = entry.value;
+                obj["name"] = entry.name;
+                obj["value"] = entry.value;
                 return obj;
             });
             console.log(this.metadata);
