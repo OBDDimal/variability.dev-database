@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div @click.middle="fitToView">
         <div class="float-right mt-2 mr-3" style="position: absolute; right: 0">
             <v-toolbar
                 floating
@@ -278,6 +278,7 @@ export default {
 
     methods: {
         resetView(levels, maxChildren) {
+            this.d3Data.direction ='v';
             view.reset(this.d3Data, levels, maxChildren);
         },
 
@@ -322,6 +323,7 @@ export default {
         toggleDirection() {
             this.d3Data.direction = this.d3Data.direction === 'v' ? 'h' : 'v';
             update.updateSvg(this.d3Data);
+            view.zoomFit(this.d3Data);
         },
 
         hideCurrentNode(d3Node) {
