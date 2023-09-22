@@ -60,7 +60,6 @@
                             size='small'
                             icon='mdi-plus'
                             v-bind='props'
-                            v-on='on'
                             to='/feature-model/new'
                           >
                           </v-btn>
@@ -80,7 +79,6 @@
                             size='small'
                             icon='mdi-server'
                             v-bind='props'
-                            v-on='on'
                             to='/feature-model/local'
                           >
                           </v-btn>
@@ -145,35 +143,40 @@
                 <template v-slot:item.id="{ item }">
                     {{ item.value }}
                 </template>
-                <template v-slot:item.tags="{ item }">
-                    <div v-if="item.columns.tags.length <= 2">
-                        <v-chip
-                            v-for="(tag, index) in item.columns.tags"
-                            :key="index"
-                            class="ma-1"
-                        >
-                            {{ tag.label }}
-                        </v-chip>
-                    </div>
-                    <div v-else>
-                        <v-chip class="ma-1">
-                            {{ item.columns.tags[0].label }}
-                        </v-chip>
-                        <v-chip class="ma-1">
-                            {{ item.columns.tags[1].label }}
-                        </v-chip>
-                        <span class="ma-1"
-                            >+ {{ item.columns.tags.length - 2 }}</span
-                        >
-                    </div>
-                </template>
-                <template v-slot:item.owner="{ item }">
-                    <v-icon v-if="item.raw.owner" color="success">
-                        mdi-check</v-icon
-                    >
+              <template v-slot:item.tags="{ item }">
+                <div v-if="showAllTags || item.showTags|| item.columns.tags.length <= 2">
+                  <v-chip
+                    v-for="(tag, index) in item.columns.tags"
+                    :key="index"
+                    class="ma-1"
+                  >
+                    {{ tag.label }}
+                  </v-chip>
+                   <v-icon
+                     v-if="item.columns.tags.length >= 2"
+                class="expand-tags-button"
+                @click="item.showTags = false"
+            >
+                mdi-chevron-up
+            </v-icon>
+                </div>
+                <div v-else>
+                  <v-chip class="ma-1">
+                    {{ item.columns.tags[0].label }}
+                  </v-chip>
+                  <v-chip class="ma-1">
+                    {{ item.columns.tags[1].label }}
+                  </v-chip>
+                  <span class="ma-1" @click="item.showTags=true">+ {{ item.columns.tags.length - 2 }}</span>
+                   <v-icon
+                class="expand-tags-button"
+                @click="item.showTags = true"
+            >
+                mdi-chevron-down
+            </v-icon>
 
-                    <v-icon v-else color="error"> mdi-cancel</v-icon>
-                </template>
+                </div>
+              </template>
                 <template v-slot:item.family="{ item }">
                     {{ item.raw.family.label }} ({{ item.raw.version }})
                 </template>
@@ -198,6 +201,7 @@ import { useFileStore } from '@/store/file';
 const emit = defineEmits(['onDelete']);
 const router = useRouter();
 const fileStore = useFileStore();
+const showAllTags = ref(false);
 
 const props = defineProps({
     headline: {
@@ -225,7 +229,6 @@ const props = defineProps({
         default: true,
     },
 });
-
 const headers = [
     /*{
         title: 'ID',
@@ -234,12 +237,12 @@ const headers = [
         key: 'id',
     },*/
     { title: 'Label', key: 'label' },
+    { title: 'Family (Version)', key: 'family' },
     /*{ text: 'Description', value: 'description' },*/
     /*{ title: 'License', key: 'license.label' },*/
-    { title: 'Tags', key: 'tags' },
+    { title: 'Tags', key: 'tags'  },
     { title: 'Uploaded on', key: 'uploaded' },
-    { title: 'Owner', key: 'owner' },
-    { title: 'Family (Version)', key: 'family' },
+
     {
         title: '',
         align: 'center',
@@ -268,5 +271,15 @@ function handleClick(value) {
     height: 100%;
     width: 3px;
     display: inline-block;
+}
+.expand-tags-button {
+    cursor: pointer;
+    margin-left: 4px;
+    font-size: 18px;
+    line-height: 1;
+    color: #000000;
+    background-color: #ccc; /* Grauer Hintergrund */
+    border-radius: 50%; /* Runde Form */
+    padding: 6px; /* Innenabstand */
 }
 </style>
