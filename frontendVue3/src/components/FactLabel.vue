@@ -1,43 +1,22 @@
 <template>
     <v-card>
-        <div class="text-h6 mb-1">
-            Feature Model Fact Label
-        </div>
-        <v-divider class="border-opacity-100"></v-divider>
-        <div class="text-h6 mb-1">
-        </div>
         <v-divider class="border-opacity-100"></v-divider>
         <!--  Data Table for MetaData: -->
-        <v-data-table :headers="factHeaders" :items="metadata" item-value="name"
-            class="elevation-1">
+        <v-data-table :headers="factHeaders" :items="metadata" item-value="name" class="elevation-1">
             <template v-slot:top>
                 <v-toolbar flat>
                     <v-toolbar-title>{{ name }}</v-toolbar-title>
                 </v-toolbar>
             </template>
-            <template v-slot:row="{ item }">
-                <tr>
-                    <td :colspan="columns.length">
-                        <!-- TODO : mdi-arrow-right-bold-box-outline -->
-                        More info about {{ item.raw.name }}
-                    </td>
-                    <td :colspan="columns.length">
-                        <!-- TODO : mdi-arrow-right-bold-box-outline -->
-                        More info about {{ item.raw.value }}
-                    </td>
-                </tr>
+            <template v-slot:headers>
             </template>
             <template v-slot:bottom>
             </template>
         </v-data-table>
+        <v-divider class="border-opacity-100"></v-divider>
         <!--  Data Table for Metrics: -->
-        <v-data-table v-model:expanded="expanded" :headers="factHeaders" :items="metadata" item-value="name" show-expand
+        <v-data-table v-model:expanded="expanded" :headers="factHeaders" :items="metrics" item-value="name" show-expand
             class="elevation-1">
-            <template v-slot:top>
-                <v-toolbar flat>
-                    <v-toolbar-title>{{ name }}</v-toolbar-title>
-                </v-toolbar>
-            </template>
             <template v-slot:row="{ item }">
                 <tr>
                     <td :colspan="columns.length">
@@ -61,16 +40,12 @@
             <template v-slot:bottom>
             </template>
         </v-data-table>
+        <v-divider class="border-opacity-100"></v-divider>
         <!--  Data Table for Analysis: -->
-        <v-data-table>
-            <template v-slot:bottom>
+        <v-data-table :headers="factHeaders" :items="analysis" item-value="name" class="elevation-1">
+            <template v-slot:headers>
             </template>
-            <template v-slot:expanded-row="{ columns, item }">
-                <tr>
-                    <td :colspan="columns.length">
-                        More info about {{ item.raw.name }}
-                    </td>
-                </tr>
+            <template v-slot:bottom>
             </template>
         </v-data-table>
 
@@ -984,6 +959,8 @@ const facts = {
         }
     ]
 }
+const FM_CHAR_NAME_DESC = "Name"; // FM Characterization Name Descriptor
+
 export default {
     name: 'FactLabel',
 
@@ -994,7 +971,7 @@ export default {
     data: () => ({
         name: "Feature Model Fact Label",
         expanded: [],
-        factHeaders: [{ key: "name" }, { key: "value" }],
+        factHeaders: [{ key: "name", sortable: false }, { key: "value", sortable: false }],
         metadata: [], // Array of simple k,v pairs
 
         metrics: [], //complex array of k,v with optional parent 
@@ -1010,29 +987,41 @@ export default {
     methods: {
         initialize() {
             this.fillMetaData();
+            this.fillAnalysis();
             return;
         },
         fillMetaData() {
             this.metadata = facts.metadata.map((entry) => {
-                if (entry.name === "Name") {
-                    this.name = entry.value;
+                if (entry.name === FM_CHAR_NAME_DESC) {
+                    this.name = entry.value; //handle special entry Name which defines Name of FM
                 }
-                var obj = {};
+                var obj = {}; // temporry JSON object to fill for visualisation of metadata
                 obj["name"] = entry.name;
                 obj["value"] = entry.value;
                 return obj;
             });
-            console.log(this.metadata);
-            // facts.metadata.forEach(function(metadata_entry, index){
-            //     console.log(key);
-            //     //this.metadata.push({key,value});
-            // });
         },
         fillMetrics() {
 
         },
         fillAnalysis() {
-
+            this.analysis = facts.analysis.map((entry) => {
+                var obj = {}; // temporry JSON object to fill for visualisation of analysis
+                obj["name"] = entry.name;
+                // Value depends on if Size and Ratio are set
+                var value_str = "";
+                if (entry.size !== null) {
+                    value_str = "" + entry.size;
+                    if (entry.ratio !== null) { // append optional ratio
+                        var rounded= Math.round(100* entry.ratio);
+                        value_str = value_str + " (" + rounded + "\%)";
+                    }
+                } else {
+                    value_str = entry.value;
+                }
+                obj["value"] = value_str;
+                return obj;
+            });
         }
 
     },
