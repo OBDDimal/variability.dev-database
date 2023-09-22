@@ -74,7 +74,6 @@
                         label="Family"
                         append-icon="mdi-plus"
                         @click:append="addFamilyMenu = !addFamilyMenu"
-                        @change="familyChange"
                     ></v-autocomplete>
                 </v-col>
                 <v-col class="py-1" cols="12" md="6">
@@ -241,7 +240,7 @@ let descriptionRules = [
 
 let fileRules = [(v) => !!v || 'File is required'];
 
-let { licenses, tags, myOwnTags } = storeToRefs(fileStore);
+let { licenses, myOwnTags } = storeToRefs(fileStore);
 let licenseRules = [(v) => !!v || 'License is required'];
 
 let familyRules = [(v) => !!v || 'Family is required'];
@@ -253,16 +252,4 @@ let versionRules = [(v) => !!v || 'Version is required'];
 let addTagMenu = ref(false);
 let addFamilyMenu = ref(false);
 
-watch(
-    () => formData.family,
-    (value) => {
-        console.log(getFeatureModelOfFamily(value));
-    }
-);
-
-async function getFeatureModelOfFamily(id) {
-    const res = await fileStore.fetchFeatureModelOfFamily(id);
-    console.log(res.length);
-    return res;
-}
 </script>
