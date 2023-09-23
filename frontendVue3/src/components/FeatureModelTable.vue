@@ -7,6 +7,9 @@
                 :items="items"
                 items-per-page="5"
                 :search="props.search"
+                @custom-sort="customSort"
+                sort-by.sync="sortBy"
+                sort-desc="sortDesc"
             >
                 <template v-slot:top>
                     <v-toolbar flat style="background-color: transparent">
@@ -153,7 +156,7 @@
                     {{ tag.label }}
                   </v-chip>
                    <v-icon
-                     v-if="item.columns.tags.length >= 2"
+                     v-if="item.columns.tags.length > 2"
                 class="expand-tags-button"
                 @click="item.showTags = false"
             >
@@ -177,10 +180,10 @@
 
                 </div>
               </template>
-                <template v-slot:item.family="{ item }">
+                <template v-slot:item.family.label="{ item }">
                     {{ item.raw.family.label }} ({{ item.raw.version }})
                 </template>
-                <template v-slot:item.uploaded="{ item }">
+                <template v-slot:item.uploaded_at="{ item }">
                     {{ new Date(item.raw.uploaded_at).toLocaleString('en-US') }}
                 </template>
                 <template v-slot:no-data> {{ noDataText }} </template>
@@ -202,6 +205,8 @@ const emit = defineEmits(['onDelete']);
 const router = useRouter();
 const fileStore = useFileStore();
 const showAllTags = ref(false);
+const sortBy = ref(null);
+const sortDesc = ref(false);
 
 const props = defineProps({
     headline: {
@@ -236,12 +241,12 @@ const headers = [
         sortable: false,
         key: 'id',
     },*/
-    { title: 'Label', key: 'label' },
-    { title: 'Family (Version)', key: 'family' },
+    { title: 'Label', key: 'label', sortable: 'label' },
+    { title: 'Family (Version)', key: 'family.label',  sortable: 'family.label' },
     /*{ text: 'Description', value: 'description' },*/
     /*{ title: 'License', key: 'license.label' },*/
     { title: 'Tags', key: 'tags'  },
-    { title: 'Uploaded on', key: 'uploaded' },
+    { title: 'Uploaded on', key: 'uploaded_at', sortable: true },
 
     {
         title: '',
@@ -264,6 +269,8 @@ function handleClick(value) {
     });
 }
 </script>
+
+
 
 <style>
 .highlighted {
