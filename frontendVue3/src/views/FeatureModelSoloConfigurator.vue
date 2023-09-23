@@ -307,8 +307,11 @@
             <v-btn class='ma-2' @click='openFileDialog'>
               Open
             </v-btn>
-            <v-btn class='ma-2'>
-              Save
+            <v-btn class='ma-2' @click='save'>
+              Save Local Storage
+            </v-btn>
+            <v-btn class='ma-2' @click='downloadXML'>
+              Download
             </v-btn>
           </v-layout>
         </v-card>
@@ -383,7 +386,12 @@ import { SelectionState } from '@/classes/Configurator/SelectionState';
 import ConfiguratorOpenFileDialog from '@/components/Configurator/ConfiguratorOpenFileDialog.vue';
 import FeatureModelViewerSolo from '@/components/Configurator/FeatureModelViewerSolo.vue';
 import { FeatureModelSolo } from '@/classes/Configurator/FeatureModelSolo';
+import { jsonToXML } from '@/services/xmlTranspiler.service';
+import { useAppStore } from '@/store/app';
+import * as xmlTranspiler from '@/services/xmlTranspiler.service';
+import { ResetCommand } from '@/classes/Commands/SoloConfigurator/ResetCommand';
 
+const appStore = useAppStore();
 export default {
   name: 'FeatureModelSoloConfigurator',
   components: { ConfiguratorOpenFileDialog, FeatureModelViewerSolo, DoubleCheckbox },
@@ -409,7 +417,8 @@ export default {
     tabsColumnTopRight: undefined,
     tabsFirstColumn: undefined,
     tabsSecondColumn: undefined,
-    showOpenDialog: true
+    showOpenDialog: true,
+    xml: undefined
   }),
 
   props: {
@@ -447,6 +456,23 @@ export default {
         .catch(() => {
         });
     },*/
+
+    save() {
+      localStorage.featureModelData = this.featureModelSolo.parseToConfig();
+      console.log(this.featureModelSolo.parseToConfig());
+      window.onbeforeunload = null;
+
+      appStore.updateSnackbar(
+          'Successfully saved in local storage',
+          'success',
+          5000,
+          true
+      );
+    },
+
+    downloadXML() {
+        this.featureModelSolo.downloadXMLConfig();
+    },
 
     quickFixCTC(item) {
       const pc = item.constraint.quickFix(true);
@@ -552,15 +578,19 @@ export default {
     openFile(file) {
       let reader = new FileReader();
       reader.addEventListener('load', (event) => {
-        this.featureModelSolo = FeatureModelSolo.loadXmlDataFromFile(event.target.result);
+        this.xml = event.target.result;
+        this.featureModelSolo = FeatureModelSolo.loadXmlDataFromFile(this.xml);
         this.features = this.featureModelSolo.features;
-        this.featureModelName = file[0].name;
+        this.featureModelName = file[0].name.slice(0, file[0].name.length-4);
+        this.featureModelSolo.name = this.featureModelName;
         this.allConstraints = this.featureModelSolo.constraints.map((e) => ({
           constraint: e,
           formula: e.toList(),
           evaluation: e.evaluate()
         }));
         this.filteredConstraints = this.allConstraints;
+        this.initialResetCommand = new ResetCommand(this.featureModelSolo, this.xml);
+        this.initialResetCommand.execute();
       });
       reader.readAsText(file[0]);
       this.showOpenDialog = false;

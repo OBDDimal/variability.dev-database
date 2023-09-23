@@ -652,6 +652,16 @@ export default {
             this.selectedVersion = this.featureModel.versions[0];
             this.initialResetCommand = new ResetCommand(this.featureModel);
             this.initialResetCommand.execute();
+            this.featureModel.loadXmlData(this.selectedVersion).then(() => {
+            this.allConstraints = this.selectedVersion.constraints.map((e) => ({
+              constraint: e,
+              formula: e.toList(),
+              evaluation: e.evaluate()
+            }));
+            this.filteredConstraints = this.allConstraints;
+            this.featureModel.loading = false;
+          });
+
           })
           .catch(() => {
           });

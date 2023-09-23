@@ -8,4 +8,27 @@ export class Feature {
         this.featureNodes = [];
         this.constraints = [];
     }
+
+    toConfigString(){
+      let configText = '';
+
+      switch (this.selectionState){
+        case SelectionState.ImplicitlySelected:
+          configText = "automatic=\"selected\"";
+          break;
+        case SelectionState.ExplicitlySelected:
+          configText = "manual=\"selected\"";
+          break;
+        case SelectionState.ImplicitlyDeselected:
+          configText = "manual=\"deselected\"";
+          break;
+        case SelectionState.ExplicitlyDeselected:
+          configText = "automatic=\"deselected\"";
+          break;
+        case 'Unselected':
+          break;
+      }
+
+      return `<feature ${configText} name="${this.name}"/>`
+    }
 }

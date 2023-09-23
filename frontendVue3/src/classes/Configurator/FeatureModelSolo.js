@@ -15,7 +15,7 @@ export class FeatureModelSolo {
         this.root = root;
         this.featureDict = featureDict;
         this.satCount = 0;
-        this.name = undefined;
+        this.name = '';
         this.loading = true;
         this.loadingOpacity = 0;
     }
@@ -102,6 +102,35 @@ export class FeatureModelSolo {
                     return new Negation(childItems[0]);
             }
         }
+    }
+
+    parseToConfig(){
+      let xml = `<?xml version="1.0" encoding="UTF-8" standalone="no"?>\n`;
+
+      xml += '<configuration>\n';
+      this.features.forEach((f) => {
+        xml += f.toConfigString() + "\n"
+      });
+      xml += '</configuration>';
+
+      return xml;
+    }
+
+    downloadXMLConfig() {
+      const xml = this.parseToConfig();
+
+      const filename = `${this.name}_config.xml`;
+      const pom = document.createElement('a');
+      const bb = new Blob([xml], { type: 'application/xml' });
+
+      pom.setAttribute('href', window.URL.createObjectURL(bb));
+      pom.setAttribute('download', filename);
+
+      pom.dataset.downloadurl = ['application/xml', pom.download, pom.href].join(
+          ':'
+      );
+
+      pom.click();
     }
 
     getAllFeatures(versions) {
