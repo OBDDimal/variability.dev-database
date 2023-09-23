@@ -31,7 +31,6 @@
                         <v-list-item-subtitle>Label</v-list-item-subtitle>
 
                         <template v-slot:append>
-                            <v-list-item-action end>
                                 <v-btn
                                     icon="mdi-pencil"
                                     variant="tonal"
@@ -192,17 +191,6 @@
                                 See Family
                             </v-btn>
                         </div>
-                    </div>
-                    <div class="d-inline-block">
-                        <v-btn
-                            variant="tonal"
-                            color="error"
-                            :disabled="file.owner === false"
-                            @click="deleteItem(item)"
-                            prepend-icon="mdi-delete"
-                        >
-                            Delete Model
-                        </v-btn>
                     </div>
                 </div>
             </v-col>
@@ -383,29 +371,6 @@
                 </div>
             </v-col>
         </v-row>
-        <v-dialog v-model="dialogDelete" max-width="400px">
-            <v-card>
-                <v-card-title class="text-h5" style="word-break: break-word">
-                    Are you sure you want to delete this feature model?
-                </v-card-title>
-                <v-card-actions>
-                    <v-spacer></v-spacer>
-                    <v-btn color="primary" text @click="closeDelete"
-                        >Cancel
-                    </v-btn>
-                    <v-spacer></v-spacer>
-                    <v-btn
-                        :loading="removeLoading"
-                        color="primary"
-                        text
-                        @click="deleteItemConfirm"
-                    >
-                        Delete
-                    </v-btn>
-                    <v-spacer></v-spacer>
-                </v-card-actions>
-            </v-card>
-        </v-dialog>
         <v-dialog
             v-model="dialogArtifact"
             fullscreen
@@ -671,6 +636,9 @@
 </template>
 
 <script setup>
+import { defineProps } from 'vue';
+
+
 import { computed, onMounted, reactive, ref, watch } from 'vue';
 import api from '@/services/api.service';
 import { useFileStore } from '@/store/file';
@@ -681,6 +649,8 @@ const route = useRoute();
 const fileStore = useFileStore();
 
 const API_URL = import.meta.env.VITE_APP_DOMAIN;
+// Über die defineProps-Funktion greifen wir auf die übergebenen Parameter zu
+const props = defineProps(['id', 'slug']);
 
 let file = reactive({});
 const loading = ref(true);
@@ -725,6 +695,127 @@ const itemsAnalysis = [
     },
 ];
 const showTutorial = ref(false);
+
+const selectedCols = ref([
+    'input_file',
+    'input_hash',
+    'svo',
+    'dvo',
+    'dvo_time',
+    'bdd_compiler',
+    'bdd_bootstrap',
+    'bdd_compile',
+    'bdd_timeout',
+    'bdd_size',
+]);
+
+watch(
+    () => selectedCols.value,
+    (newValue) => {
+        console.log('moin');
+        /*console.log(
+            headerCsvArtifactFull.filter(
+                (el) => newValue.indexOf(el.key) !== -1
+            )
+        );*/
+        headerCsvArtifact.value = headerCsvArtifactFull.filter(
+            (el) => newValue.indexOf(el.key) !== -1
+        );
+    }
+);
+
+onMounted(async () => {
+    loading.value = true;
+    await getFile();
+    console.log('file', file);
+    loading.value = false;
+    showTutorial.value = !localStorage.fileDetailTutorialCompleted;
+    //await this.fetchFeatureModelOfFamily(this.family.id)
+});
+
+/*watch: {
+        selectedRightFM: function (newValue) {
+            console.log(newValue);
+        },
+    },*/
+const isRightFmSelected = computed(() => {
+    return selectedRightFM.value !== -1;
+});
+const getMyFM = computed(() => {
+    return fileStore.myConfirmedFeatureModels;
+});
+const getStati = computed(() => {
+    return {
+        success: {
+            percentage:
+                (itemsAnalysis.filter((obj) => obj.status === 1).length /
+                    itemsAnalysis.length) *
+                100,
+            absolute: itemsAnalysis.filter((obj) => obj.status === 1).length,
+        },
+        error: {
+            percentage:
+                (itemsAnalysis.filter((obj) => obj.status === -1).length /
+                    itemsAnalysis.length) *
+                100,
+            absolute: itemsAnalysis.filter((obj) => obj.status === -1).length,
+        },
+        progress: {
+            percentage:
+                (itemsAnalysis.filter((obj) => obj.status === 0).length /
+                    itemsAnalysis.length) *
+                100,
+            absolute: itemsAnalysis.filter((obj) => obj.status === 0).length,
+        },
+        amount: itemsAnalysis.length,
+    };
+});
+
+async function getFile() {
+  console.log("ID:" + route.params.id);
+    const id = route.params.id;
+    await api
+        .get(`${API_URL}files/${id}/`)
+        .then((response) => {
+            file = response.data;
+        })
+        .catch((error) => {
+            console.log('getfile', error);
+        });
+}
+function showArtifactDialog(item) {
+    selectedArtifact.value = item;
+    dialogArtifact.value = true;
+}
+async function compare() {
+    shouldCompare.value = true;
+    loadingComparableFM.value = true;
+    fileStore.fetchConfirmedFeatureModels();
+    loadingComparableFM.value = false;
+}
+/*async fetchFeatureModelOfFamily(value) {
+  await api
+    .get(`${API_URL}files/uploaded/confirmed/?family=${value}`)
+    .then((response) => {
+      this.files = response.data
+      this.loadingTable = false
+    })
+},*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 const tutorialSteps = [
     {
         title: 'Welcome to the tutorial!',
@@ -3187,123 +3278,7 @@ C1164:~FEATURE_SH_NOFORK  or  FEATURE_PREFER_APPLETS
 
     `;
 
-const selectedCols = ref([
-    'input_file',
-    'input_hash',
-    'svo',
-    'dvo',
-    'dvo_time',
-    'bdd_compiler',
-    'bdd_bootstrap',
-    'bdd_compile',
-    'bdd_timeout',
-    'bdd_size',
-]);
 
-watch(
-    () => selectedCols.value,
-    (newValue) => {
-        console.log('moin');
-        /*console.log(
-            headerCsvArtifactFull.filter(
-                (el) => newValue.indexOf(el.key) !== -1
-            )
-        );*/
-        headerCsvArtifact.value = headerCsvArtifactFull.filter(
-            (el) => newValue.indexOf(el.key) !== -1
-        );
-    }
-);
-
-onMounted(async () => {
-    loading.value = true;
-    await getFile();
-    console.log('file', file);
-    loading.value = false;
-    showTutorial.value = !localStorage.fileDetailTutorialCompleted;
-    //await this.fetchFeatureModelOfFamily(this.family.id)
-});
-
-/*watch: {
-        selectedRightFM: function (newValue) {
-            console.log(newValue);
-        },
-    },*/
-const isRightFmSelected = computed(() => {
-    return selectedRightFM.value !== -1;
-});
-const getMyFM = computed(() => {
-    return fileStore.myConfirmedFeatureModels;
-});
-const getStati = computed(() => {
-    return {
-        success: {
-            percentage:
-                (itemsAnalysis.filter((obj) => obj.status === 1).length /
-                    itemsAnalysis.length) *
-                100,
-            absolute: itemsAnalysis.filter((obj) => obj.status === 1).length,
-        },
-        error: {
-            percentage:
-                (itemsAnalysis.filter((obj) => obj.status === -1).length /
-                    itemsAnalysis.length) *
-                100,
-            absolute: itemsAnalysis.filter((obj) => obj.status === -1).length,
-        },
-        progress: {
-            percentage:
-                (itemsAnalysis.filter((obj) => obj.status === 0).length /
-                    itemsAnalysis.length) *
-                100,
-            absolute: itemsAnalysis.filter((obj) => obj.status === 0).length,
-        },
-        amount: itemsAnalysis.length,
-    };
-});
-
-async function getFile() {
-    const id = route.params.id;
-    await api
-        .get(`${API_URL}files/uploaded/confirmed/${id}/`)
-        .then((response) => {
-            file = response.data;
-        })
-        .catch((error) => {
-            console.log('getfile', error);
-        });
-}
-function deleteItem() {
-    this.dialogDelete = true;
-}
-function closeDelete() {
-    this.dialogDelete = false;
-}
-async function deleteItemConfirm() {
-    removeLoading.value = true;
-    await fileStore.deleteFeatureModel(file.value.id);
-    await fileStore.fetchConfirmedFeatureModels;
-    removeLoading.value = false;
-    await router.push('/');
-}
-function showArtifactDialog(item) {
-    selectedArtifact.value = item;
-    dialogArtifact.value = true;
-}
-async function compare() {
-    shouldCompare.value = true;
-    loadingComparableFM.value = true;
-    fileStore.fetchConfirmedFeatureModels();
-    loadingComparableFM.value = false;
-}
-/*async fetchFeatureModelOfFamily(value) {
-  await api
-    .get(`${API_URL}files/uploaded/confirmed/?family=${value}`)
-    .then((response) => {
-      this.files = response.data
-      this.loadingTable = false
-    })
-},*/
 </script>
 
 <style>
