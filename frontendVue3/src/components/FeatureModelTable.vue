@@ -4,10 +4,9 @@
             <v-data-table
                 :loading="props.loading"
                 :headers="headers"
-                :items="items"
+                :items="filteredItems"
                 items-per-page="5"
-                :search="props.search"
-                @custom-sort="customSort"
+                :search="search"
                 sort-by.sync="sortBy"
                 sort-desc="sortDesc"
             >
@@ -260,7 +259,30 @@ const createDialog = ref(false);
 const checkLocalStorage = computed(() => {
     return !!localStorage.featureModelData;
 });
+const filteredItems = computed(() => {
+  // Wenn die Suche leer ist, zeige alle Elemente
+  if (!search.value) {
+    return props.items;
+  }
 
+  // Andernfalls filtere die Elemente basierend auf der Suche und priorisiere direkte Übereinstimmungen
+  const searchLowerCase = search.value.toLowerCase();
+  const directMatches = [];
+  const otherMatches = [];
+
+  props.items.forEach((item) => {
+    const itemLabel = item.label.toLowerCase();
+
+    if (itemLabel === searchLowerCase) {
+      directMatches.unshift(item); // Priorisiere direkte Übereinstimmungen
+    } else if (itemLabel.includes(searchLowerCase)) {
+      otherMatches.push(item);
+    }
+  });
+
+  // Füge direkte Übereinstimmungen zuerst hinzu, gefolgt von anderen Übereinstimmungen
+  return [...directMatches, ...otherMatches];
+});
 function handleClick(value) {
     console.log(value);
     router.push({
