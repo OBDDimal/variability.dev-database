@@ -2,7 +2,7 @@
     <v-card>
         <v-divider class="border-opacity-100"></v-divider>
         <!--  Data Table for MetaData: -->
-        <v-data-table :headers="factHeaders" :items="metadata" item-value="name" class="elevation-1">
+        <v-data-table :headers="factHeaders" :items="metadata" item-value="name">
             <template v-slot:top>
                 <v-toolbar flat>
                     <v-toolbar-title>{{ name }}</v-toolbar-title>
@@ -15,24 +15,49 @@
         </v-data-table>
         <v-divider class="border-opacity-100"></v-divider>
         <!--  Data Table for Metrics: -->
-        <v-data-table v-model:expanded="expanded" :headers="factHeaders" :items="metrics" item-value="name" show-expand
-            class="elevation-1">
+        <v-data-table v-model:expanded="expandedRoot" :headers="expandableHeaders" :items="metrics" item-value="name">
             <template v-slot:headers>
             </template>
-            <template v-slot:expanded-row="{ columns, item }">
+            <template v-slot:expanded-row="{ item, columns }">
                 <tr>
                     <td :colspan="columns.length">
-                        <!-- TODO : mdi-arrow-right-bold-box-outline -->
-                        More info about {{ item.raw.name }}
+                        <v-data-table v-model:expanded="expandedSubs" :headers="expandableHeaders" :items="item.raw.childs"
+                            item-value="name">
+                            <template v-slot:headers>
+                            </template>
+                            <template v-slot:expanded-row="{ item, columns }">
+                <tr>
+                    <td :colspan="columns.length">
+                        <v-data-table :headers="factHeaders"
+                            :items="item.raw.childs" 
+                            item-value="name"
+                            :show-expand="false">
+                            <template v-slot:headers>
+                            </template>
+
+                            <template v-slot:bottom>
+                            </template>
+                        </v-data-table>
+
                     </td>
                 </tr>
             </template>
+
             <template v-slot:bottom>
             </template>
         </v-data-table>
+
+        </td>
+        </tr>
+        </template>
+
+        <template v-slot:bottom>
+        </template>
+        </v-data-table>
+
         <v-divider class="border-opacity-100"></v-divider>
         <!--  Data Table for Analysis: -->
-        <v-data-table :headers="factHeaders" :items="analysis" item-value="name" class="elevation-1">
+        <v-data-table :headers="factHeaders" :items="analysis" item-value="name">
             <template v-slot:headers>
             </template>
             <template v-slot:bottom>
@@ -960,12 +985,13 @@ export default {
 
     data: () => ({
         name: "Feature Model Fact Label",
-        expanded: [],
+        expandedRoot: [],
+        expandedSubs: [],
+        expandedSubSubs: [],
         factHeaders: [{ key: "name", sortable: false }, { key: "value", sortable: false }],
+        expandableHeaders: [{ key: 'data-table-expand' }, { key: "name", sortable: false }, { key: "value", sortable: false }],
         metadata: [], // Array of simple k,v pairs
-
-        metrics: [], //complex array of k,v with optional parent 
-
+        metrics: [],
         analysis: [],
     }),
 
@@ -1004,27 +1030,36 @@ export default {
             });
         },
         fillMetrics() {
-
-            /**
-             * Metric Data structure:
-             * name: str
-             * value: str
-             * parent: null || str
-             */
-             let root_entries = facts.metrics.filter((entry) => entry.level === 0);
-            this.metrics= facts.metrics.map((entry)=>{
-                var obj = {}; // temporry JSON object to fill for visualisation of analysis
+            if (this.getMaxLevel > 2) {
+                console.error("incompatible Metrics, format only supported until depth of 3");
+            }
+            let root_entries = this.getEntriesOnLevel(facts.metrics, 0);
+            let sub_entries = this.getEntriesOnLevel(facts.metrics, 1);
+            let sub_sub_entries = this.getEntriesOnLevel(facts.metrics, 2);
+            this.sortInParent(sub_entries, sub_sub_entries);
+            this.sortInParent(root_entries, sub_entries);
+            this.metrics = root_entries;
+        },
+        sortInParent(parentArray, childArray) {
+            // TODO desc
+            childArray.forEach((child) => {
+                parentArray.forEach((parent) => {
+                    if (child.parent === parent.name) {
+                        parent.childs.push(child);
+                    }
+                });
+            });
+        },
+        getEntriesOnLevel(arr, level) {
+            let entries = arr.filter((entry) => entry.level === level);
+            return entries.map((entry) => {
+                var obj = {};
                 obj["name"] = entry.name;
-                // Value depends on if Size and Ratio are set
-
                 obj["value"] = this.getDisplayValue(entry);
+                obj["parent"] = entry.parent;
+                obj["childs"] = [];
                 return obj;
             });
-            for (let level = 0; level <= this.getMaxLevel(facts.metrics); level++) {
-                //iterating over each level 
-                let entries_on_level = facts.metrics.filter((entry) => entry.level === level);
-
-            }
         },
         getMaxLevel(arr) {
             // Iterate over an Array of metric  entries and return the highest found level
