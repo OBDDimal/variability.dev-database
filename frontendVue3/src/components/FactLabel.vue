@@ -3,12 +3,19 @@
         <v-divider class="border-opacity-100"></v-divider>
         <!--  Data Table for MetaData: -->
         <v-data-table :headers="factHeaders" :items="metadata" item-value="name">
+            <template v-slot:headers>
+            </template>
             <template v-slot:top>
                 <v-toolbar flat>
                     <v-toolbar-title>{{ name }}</v-toolbar-title>
+                    <a :href="fmHref" target="_blank" rel="noopener noreferrer">
+                    <v-icon >mdi-link-variant</v-icon>
+                    </a>
                 </v-toolbar>
-            </template>
-            <template v-slot:headers>
+               <v-card flat align-center>
+                {{ desc }}
+               </v-card>
+
             </template>
             <template v-slot:bottom>
             </template>
@@ -975,7 +982,8 @@ const facts = {
     ]
 }
 const FM_CHAR_NAME_DESC = "Name"; // FM Characterization Name Descriptor
-
+const FM_CHAR_HREF_DESC= "Reference"
+const FM_CHAR_DESC_DESC="Description"
 export default {
     name: 'FactLabel',
 
@@ -984,7 +992,9 @@ export default {
     props: {},
 
     data: () => ({
-        name: "Feature Model Fact Label",
+        name: "",
+        fmHref:"",
+        desc:"",
         expandedRoot: [],
         expandedSubs: [],
         expandedSubSubs: [],
@@ -1008,10 +1018,21 @@ export default {
             return;
         },
         fillMetaData() {
-            this.metadata = facts.metadata.map((entry) => {
+            this.metadata = facts.metadata.filter((entry) => {
                 if (entry.name === FM_CHAR_NAME_DESC) {
                     this.name = entry.value; //handle special entry Name which defines Name of FM
+                    return false;
+                }else if (entry.name === FM_CHAR_HREF_DESC) {
+                    this.fmHref = entry.value; //handle special entry Name which defines Name of FM
+                    return false;
+                }else if (entry.name === FM_CHAR_DESC_DESC) {
+                    this.desc = entry.value; //handle special entry Name which defines Name of FM
+                    return false;
+                }else{
+                    return true;
                 }
+            });
+            this.metadata = this.metadata.map((entry) => {
                 var obj = {}; // temporry JSON object to fill for visualisation of metadata
                 obj["name"] = entry.name;
                 obj["value"] = this.getDisplayValue(entry);
