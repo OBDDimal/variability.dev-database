@@ -105,10 +105,6 @@ import { AddCommand } from '@/classes/Commands/Constraints/AddCommand';
 import { CommandManager } from '@/classes/Commands/CommandManager';
 import { EditCommand } from '@/classes/Commands/Constraints/EditCommand';
 import { DeleteCommand } from '@/classes/Commands/Constraints/DeleteCommand';
-import * as init from '@/services/FeatureModel/init.service';
-import * as dragAndDrop from '@/services/FeatureModel/dragAndDrop.service';
-import * as view from '@/services/FeatureModel/view.service';
-import * as update from '@/services/FeatureModel/update.service';
 
 export default {
     name: 'Constraints',

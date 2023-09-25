@@ -44,6 +44,13 @@
                             <v-col cols="6" sm="auto">
                                 <v-btn
                                     variant="outlined"
+                                    @click="appendText('EQUI', true, true)"
+                                    >equi
+                                </v-btn>
+                            </v-col>
+                            <v-col cols="6" sm="auto">
+                                <v-btn
+                                    variant="outlined"
                                     @click="appendText('NOT', true, true)"
                                     >not
                                 </v-btn>
@@ -79,7 +86,7 @@
                                         clearable
                                         hide-details
                                     ></v-text-field>
-                                    <label v-if="!isValid"> 
+                                    <label v-if="!isValid">
                                         {{ errorText }}
                                     </label>
                             </v-col>
