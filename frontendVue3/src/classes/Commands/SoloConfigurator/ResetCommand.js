@@ -4,9 +4,8 @@ import axios from 'axios';
 
 export class ResetCommand extends ConfigurationCommand {
     constructor(featureModel, xml) {
-        super(featureModel);
+        super(featureModel, xml);
         this.executed = false;
-        this.xml = xml;
         this.newSatCount = 0;
 
         this.description = "Reset";
@@ -16,22 +15,23 @@ export class ResetCommand extends ConfigurationCommand {
         if (!this.executed) {
             this.featureModel.loading = true;
             const content = new TextEncoder().encode(this.xml);
+            console.log(content)
             axios.post(`${import.meta.env.VITE_APP_DOMAIN_FEATUREIDESERVICE}propagation`,
               ({      name: this.featureModel.name+".xml",
                       selection: [],
-                      content: Array.from(content)
+                      deselection: [],
+                      content: this.xml
               }))
                 .then((d) => {
                     const data = d.data;
-                    console.log(data)
-                    //this.newSatCount = this.formatScientificNotation(data.count);
+
+                    this.newSatCount = this.formatScientificNotation(data.satCount);
 
                     this.newExplicitlySelectedFeatures = [];
-                    this.newImplicitlySelectedFeatures = this.featureModel.features.filter(f => data.impliedSelection.includes(f.name))
-                    console.log(this.newImplicitlySelectedFeatures)
+                    this.newImplicitlySelectedFeatures = this.featureModel.features.filter(f => data.impliedSelection.includes(f.name));
                     this.newExplicitlyDeselectedFeatures = [];
-                    this.newImplicitlyDeselectedFeatures = [];
-                    this.newUnselectedFeatures = [];
+                    this.newImplicitlyDeselectedFeatures = this.featureModel.features.filter(f => data.impliedDeselection.includes(f.name));
+                    this.newUnselectedFeatures = this.featureModel.features.filter(f => !(data.impliedDeselection.includes(f.name) || data.impliedSelection.includes(f.name)));
 
                     this.executed = true;
 

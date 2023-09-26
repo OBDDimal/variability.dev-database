@@ -2,9 +2,10 @@ import {Command} from "@/classes/Commands/Command";
 import {SelectionState} from "@/classes/Configurator/SelectionState";
 
 export class ConfigurationCommand extends Command {
-    constructor(featureModel) {
+    constructor(featureModel, xml) {
         super();
         this.featureModel = featureModel;
+        this.xml = xml;
 
         this.oldExplicitlySelectedFeatures = featureModel.features.filter(f => f.selectionState === SelectionState.ExplicitlySelected);
         this.oldImplicitlySelectedFeatures = featureModel.features.filter(f => f.selectionState === SelectionState.ImplicitlySelected);

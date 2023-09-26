@@ -29,7 +29,7 @@ export class Conjunction extends GroupConstraintItem {
             }
         }
 
-        console.error("Quick Fix, Conjunction")
+        console.error("Quick Fix, Equivalence")
         return [];
     }
 }

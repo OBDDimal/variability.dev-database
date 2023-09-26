@@ -65,7 +65,7 @@ export default {
 
   methods: {
     init() {
-      init.initialize(this.d3Data, this.featureModel.root)
+      init.initialize(this.d3Data, this.featureModel.root, true)
       this.resetView(4, 3);
     },
     resetView(levels, maxChildren) {
@@ -191,7 +191,7 @@ export default {
 <style lang="scss">
 #svg-container {
   width: 100%;
-  height: 80vh;
+  height: 76vh;
 }
 .node {
   cursor: pointer;

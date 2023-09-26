@@ -378,18 +378,18 @@ import { QuickFixFeatureCommand } from '@/classes/Commands/Configurator/QuickFix
 import { RollbackFixFeatureCommand } from '@/classes/Commands/Configurator/RollbackFixFeatureCommand';
 import { RollbackFixVersionCommand } from '@/classes/Commands/Configurator/RollbackFixVersionCommand';
 import { RollbackFixCTCCommand } from '@/classes/Commands/Configurator/RollbackFixCTCCommand';
-import { DecisionPropagationCommand } from '@/classes/Commands/Configurator/DecisionPropagationCommand';
+import { DecisionPropagationCommand } from '@/classes/Commands/SoloConfigurator/DecisionPropagationCommand';
 import { tr } from 'vuetify/locale';
+import api from '@/services/api.service';
 import { Feature } from '@/classes/Configurator/Feature';
 import { FeatureNodeConstraintItem } from '@/classes/Constraint/FeatureNodeConstraintItem';
 import { SelectionState } from '@/classes/Configurator/SelectionState';
 import ConfiguratorOpenFileDialog from '@/components/Configurator/ConfiguratorOpenFileDialog.vue';
 import FeatureModelViewerSolo from '@/components/Configurator/FeatureModelViewerSolo.vue';
 import { FeatureModelSolo } from '@/classes/Configurator/FeatureModelSolo';
-import { jsonToXML } from '@/services/xmlTranspiler.service';
 import { useAppStore } from '@/store/app';
-import * as xmlTranspiler from '@/services/xmlTranspiler.service';
 import { ResetCommand } from '@/classes/Commands/SoloConfigurator/ResetCommand';
+import beautify from 'xml-beautifier';
 
 const appStore = useAppStore();
 export default {
@@ -417,45 +417,44 @@ export default {
     tabsColumnTopRight: undefined,
     tabsFirstColumn: undefined,
     tabsSecondColumn: undefined,
-    showOpenDialog: true,
+    showOpenDialog: false,
     xml: undefined
   }),
 
   props: {
-    productLineName: undefined
+    id: undefined
   },
 
   created() {
-    this.openFileDialog();
+    if(this.id) {
+      this.initData();
+    } else {
+      this.openFileDialog();
+    }
   },
 
   methods: {
-    /*initData() {
-      api.get(`${import.meta.env.VITE_APP_DOMAIN}configurator/mappings/${this.productLineName}`)
-        .then((mappings) => {
-          this.featureModel = FeatureModel.create(mappings.data['root-mapping'], mappings.data['feature-mapping']);
-          this.featureModel.productLineName = this.productLineName;
-
-          this.features = this.featureModel.features;
-
-          this.featureModel.loadXmlData(this.featureModel.versions[2]);
-          this.selectedVersion = this.featureModel.versions[2];
-          this.initialResetCommand = new ResetCommand(this.featureModel);
-          this.initialResetCommand.execute();
-          this.featureModel.loading = true;
-          this.featureModel.loadXmlData(this.selectedVersion).then(() => {
-            this.allConstraints = this.selectedVersion.constraints.map((e) => ({
-              constraint: e,
-              formula: e.toList(),
-              evaluation: e.evaluate()
-            }));
-            this.filteredConstraints = this.allConstraints;
-            this.featureModel.loading = false;
-          });
-        })
-        .catch(() => {
-        });
-    },*/
+    initData() {
+      api.get(`${import.meta.env.VITE_APP_DOMAIN}files/${this.id}/`).then(
+          (data) => {
+              api.get(data.data.local_file).then((rawData) => {
+                  this.xml = beautify(rawData.data);
+                  this.featureModelSolo = FeatureModelSolo.loadXmlDataFromFile(this.xml);
+                  this.features = this.featureModelSolo.features;
+                  this.featureModelName = data.data.label;
+                  this.featureModelSolo.name = this.featureModelName;
+                  this.allConstraints = this.featureModelSolo.constraints.map((e) => ({
+                    constraint: e,
+                    formula: e.toList(),
+                    evaluation: e.evaluate()
+                  }));
+                  this.filteredConstraints = this.allConstraints;
+                  this.initialResetCommand = new ResetCommand(this.featureModelSolo, this.xml);
+                  this.initialResetCommand.execute();
+              });
+          }
+      );
+    },
 
     save() {
       localStorage.featureModelData = this.featureModelSolo.parseToConfig();
@@ -539,7 +538,8 @@ export default {
     },
 
     decisionPropagation(item, selectionState) {
-      const command = new DecisionPropagationCommand(this.featureModelSolo, item, selectionState);
+      console.log(item)
+      const command = new DecisionPropagationCommand(this.featureModelSolo, this.xml, item, selectionState);
       this.commandManager.execute(command);
     },
 

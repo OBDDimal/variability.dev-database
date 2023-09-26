@@ -85,7 +85,7 @@ function convertToConstraintItem(operator, stack) {
         } else if (operator === 'implies') {
             constraintItem = new Implication(first, second);
         } else if (operator === 'equi') {
-            constraintItem = new Equivalence(first, second);
+            constraintItem = new Equivalence([first, second]);
         }
     }
 

@@ -95,7 +95,7 @@ function readConstraintItem(item, data) {
                 case 'imp':
                     return new Implication(childItems[0], childItems[1]);
                 case 'eq':
-                    return new Equivalence(childItems[0], childItems[1]);
+                    return new Equivalence(childItems);
                 case 'not':
                     return new Negation(childItems[0]);
             }

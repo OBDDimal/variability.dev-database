@@ -10,6 +10,7 @@ import {Conjunction} from "@/classes/Constraint/Conjunction";
 import {Implication} from "@/classes/Constraint/Implication";
 import {Negation} from "@/classes/Constraint/Negation";
 import api from "@/services/api.service";
+import { Equivalence } from '@/classes/Constraint/Equivalence';
 
 export class FeatureModel {
     constructor(versions, featureDict, features) {
@@ -118,6 +119,8 @@ export class FeatureModel {
                     return new Implication(childItems[0], childItems[1]);
                 case 'not':
                     return new Negation(childItems[0]);
+                case 'eq':
+                    return new Equivalence(childItems);
             }
         }
     }

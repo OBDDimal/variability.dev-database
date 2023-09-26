@@ -7,6 +7,7 @@ import {Disjunction} from "@/classes/Constraint/Disjunction";
 import {Conjunction} from "@/classes/Constraint/Conjunction";
 import {Implication} from "@/classes/Constraint/Implication";
 import {Negation} from "@/classes/Constraint/Negation";
+import { Equivalence } from '@/classes/Constraint/Equivalence';
 
 export class FeatureModelSolo {
     constructor(features, constraints, root, featureDict) {
@@ -100,6 +101,8 @@ export class FeatureModelSolo {
                     return new Implication(childItems[0], childItems[1]);
                 case 'not':
                     return new Negation(childItems[0]);
+                case 'eq':
+                    return new Equivalence(childItems);
             }
         }
     }

@@ -76,7 +76,7 @@ const routes = [
         },
     },
     {
-        path: '/configuratorsolo/:productLineName',
+        path: '/configuratorsolo/:id?',
         name: 'ConfiguratorSolo',
         props: true,
         component: () => import('@/views/FeatureModelSoloConfigurator.vue'),

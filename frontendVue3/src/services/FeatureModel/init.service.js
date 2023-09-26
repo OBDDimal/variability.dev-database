@@ -9,7 +9,7 @@ export function initData(d3Data, data) {
     d3Data.root.each((d3Node) => (d3Node.data.d3Node = d3Node));
 }
 
-export function initialize(d3Data, data) {
+export function initialize(d3Data, data, solo = false) {
     // Flexlayout belongs to a d3-plugin that calculates the width between all nodes dynamically.
     d3Data.flexlayout = flextree()
         .nodeSize((d3Node) => calcNodeSize(d3Data, d3Node))
@@ -23,13 +23,24 @@ export function initialize(d3Data, data) {
         .on('zoom', (event) => svgContent.attr('transform', event.transform));
 
     // Create svg-container.
-    const svg = d3
+    let svg = undefined;
+    if(solo) {
+      svg = d3
         .select('#svg-container')
         .append('svg')
-        .attr('height', d3.select('#svg-container').height)
+        .attr('height', d3.select('#svg-container').style('height'))
+        .attr('width', d3.select('#svg-container').style('width'))
         .attr('preserveAspectRatio', 'xMidYMid meet')
         .call(d3Data.zoom) // Zooming and penning.
         .on('dblclick.zoom', null);
+    } else {
+      svg = d3
+        .select('#svg-container')
+        .append('svg')
+        .attr('preserveAspectRatio', 'xMidYMid meet')
+        .call(d3Data.zoom) // Zooming and penning.
+        .on('dblclick.zoom', null);
+    }
 
     const svgContent = svg.append('g');
 
