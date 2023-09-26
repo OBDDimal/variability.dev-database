@@ -3,8 +3,9 @@ import {Implication} from "@/classes/Constraint/Implication";
 import {Conjunction} from "@/classes/Constraint/Conjunction";
 import {Disjunction} from "@/classes/Constraint/Disjunction";
 import {FeatureNodeConstraintItem} from "@/classes/Constraint/FeatureNodeConstraintItem";
+import { Equivalence } from '@/classes/Constraint/Equivalence';
 
-const operators = ['not', 'implies', 'and', 'or'];
+const operators = ['not', 'implies', 'and', 'or', 'equi'];
 export const operatorPrecedence = {};
 operators.forEach((operator, i) => operatorPrecedence[operator] = i);
 
@@ -83,6 +84,8 @@ function convertToConstraintItem(operator, stack) {
             constraintItem = new Disjunction([first, second]);
         } else if (operator === 'implies') {
             constraintItem = new Implication(first, second);
+        } else if (operator === 'equi') {
+            constraintItem = new Equivalence(first, second);
         }
     }
 

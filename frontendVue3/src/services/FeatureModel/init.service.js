@@ -19,7 +19,7 @@ export function initialize(d3Data, data) {
 
     d3Data.zoom = d3
         .zoom()
-        //.scaleExtent([0.1, 8])
+        .scaleExtent([0.125, 5])
         .on('zoom', (event) => svgContent.attr('transform', event.transform));
 
     // Create svg-container.

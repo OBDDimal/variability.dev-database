@@ -137,7 +137,6 @@ import { EXAMPLE_FEATURE_MODEL_XML } from '@/classes/constants';
 import TutorialMode from '@/components/TutorialMode';
 import { NewEmptyModelCommand } from '@/classes/Commands/FeatureModel/NewEmptyModelCommand';
 import { SliceCommand } from "@/classes/Commands/FeatureModel/SliceCommand";
-import { FeatureNode } from "@/classes/FeatureNode";
 import FeatureModelInformation from '@/components/FeatureModel/FeatureModelInformation';
 import { useAppStore } from '@/store/app';
 import axios from "axios";
@@ -299,12 +298,22 @@ export default {
                     this.featureModelCommandManager.execute(command);
                     this.updateFeatureModel();
                 } catch (e) {
-                  console.log(e);
                   this.loadingData = false;
+                  appStore.updateSnackbar(
+                'Could not slice the Feature, because an unknown error occurred.',
+                'error',
+                3000,
+                true
+                  )
                 }
             } else {
                 this.loadingData = false;
-                this.errorNew("FeatureIDE Service is not available to slice the feature.");
+                appStore.updateSnackbar(
+              'Could not slice the Feature, because Service is down.',
+              'error',
+              3000,
+              true
+                )
             }
             this.loadingData = false;
         },

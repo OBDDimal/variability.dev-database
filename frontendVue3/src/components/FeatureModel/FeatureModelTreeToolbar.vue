@@ -116,7 +116,7 @@
                     <v-list-item-title>Redo</v-list-item-title>
                 </v-list-item>
 
-                <v-menu offset-y :close-on-content-click="false">
+                <v-menu offset-y :close-on-content-click="false" >
                     <template v-slot:activator="{ props }">
                         <v-list-item v-bind="props" prepend-icon="mdi-palette">
                             <v-list-item-title>Coloring</v-list-item-title>
@@ -126,7 +126,7 @@
                         <v-list-item
                             v-for="(item, i) in itemsColoring"
                             :key="i"
-                            @click="selectedColoring(item)"
+                            @click="selectedColoring(i)"
                         >
                                 <v-list-item-title
                                 >{{item}}</v-list-item-title>
@@ -347,13 +347,14 @@ export default {
         maxChildren: 3,
         spaceBetweenParentChild: 75,
         spaceBetweenSiblings: 20,
-        itemsColoring: ['Count', 'Direct Children', 'Total Children'],
+        itemsColoring: ['Standard', 'Direct Children', 'Total Children'],
         isShortName: false,
         semanticEditing: false,
         quickEdit: false,
         drawer: true,
         discardChangesConfirmDialog: false,
         saveDialog: false,
+        isColorMenuOpened: false,
     }),
 
     watch: {

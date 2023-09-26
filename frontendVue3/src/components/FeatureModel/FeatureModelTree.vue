@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div @click.middle="fitToView">
         <div class="float-right mt-2 mr-3" style="position: absolute; right: 0">
             <v-toolbar
                 floating
@@ -273,20 +273,23 @@ export default {
             this.rootNode,
             this.constraints
         );
+        this.commandManager.executeReload();
         update.updateSvg(this.d3Data);
         zoomFit(this.d3Data)
     },
 
     methods: {
         resetView(levels, maxChildren) {
+            this.d3Data.direction ='v';
             view.reset(this.d3Data, levels, maxChildren);
             update.updateSvg(this.d3Data);
             zoomFit(this.d3Data);
         },
 
         coloring(coloringIndex) {
-            this.d3Data.coloringIndex = coloringIndex;
-            update.updateSvg(this.d3Data);
+          this.d3Data.coloringIndex = coloringIndex;
+          this.commandManager.executeReload();
+          update.updateSvg(this.d3Data);
         },
 
         onChangeFoundNodeIndex(index) {
@@ -324,6 +327,7 @@ export default {
         toggleDirection() {
             this.d3Data.direction = this.d3Data.direction === 'v' ? 'h' : 'v';
             update.updateSvg(this.d3Data);
+            view.zoomFit(this.d3Data);
         },
 
         hideCurrentNode(d3Node) {

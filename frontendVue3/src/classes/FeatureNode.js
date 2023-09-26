@@ -90,6 +90,10 @@ export class FeatureNode {
         this.groupType = groupType;
     }
 
+    setColor(color) {
+        this.colorValue = color;
+    }
+
     uncollapse(toRoot = true) {
         if (this.isCollapsed && !this.isLeaf()) {
             this.d3Node.children = this.d3Node.collapsedChildren;
