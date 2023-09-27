@@ -8,6 +8,7 @@ import {Conjunction} from "@/classes/Constraint/Conjunction";
 import {Implication} from "@/classes/Constraint/Implication";
 import {Negation} from "@/classes/Constraint/Negation";
 import { Equivalence } from '@/classes/Constraint/Equivalence';
+import { SelectionState } from '@/classes/Configurator/SelectionState';
 
 export class FeatureModelSolo {
     constructor(features, constraints, root, featureDict) {
@@ -42,6 +43,21 @@ export class FeatureModelSolo {
         return new FeatureModelSolo(usedFeatures, constraints, root, featureDict);
     }
 
+    static loadXmlDataFromConfig(fileText) {
+        const xml = beautify(fileText);
+        // To remove the <?xml...?> line
+        let m = xml.split('\n').splice(1).join('\n');
+
+        const parser = new DOMParser();
+        const xmlDocument = parser.parseFromString(m, 'text/xml');
+
+        const struct = xmlDocument.querySelector('configuration');
+        const usedFeatures = [];
+        FeatureModelSolo.parseChildrenFromConfig(struct, usedFeatures, 0);
+
+        return usedFeatures;
+    }
+
     static parseChildren(struct, parent, usedFeatures, count, featureDict) {
         let toReturn = [];
 
@@ -68,6 +84,37 @@ export class FeatureModelSolo {
         }
 
         return toReturn;
+    }
+
+    static parseChildrenFromConfig(struct, usedFeatures, count) {
+
+        for (const child of struct.childNodes) {
+            // To remove #text nodes, as they don't have a tagName
+            if (child.tagName) {
+                const featureName = child.getAttribute('name');
+                const automatic = child.getAttribute('automatic');
+                const manual = child.getAttribute('manual');
+
+                const feature = new Feature(count, featureName);
+                count++;
+                if(automatic === 'selected') {
+                  feature.selectionState = SelectionState.ImplicitlySelected;
+                }
+
+                if(manual === 'selected') {
+                  feature.selectionState = SelectionState.ExplicitlySelected;
+                }
+
+                if(automatic === 'deselected') {
+                  feature.selectionState = SelectionState.ImplicitlyDeselected;
+                }
+
+                if(manual === 'deselected') {
+                  feature.selectionState = SelectionState.ExplicitlyDeselected;
+                }
+                usedFeatures.push(feature);
+            }
+        }
     }
 
     static readConstraints(constraints, featureMap) {

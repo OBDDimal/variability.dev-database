@@ -1,5 +1,4 @@
 import { ConfigurationCommand } from '@/classes/Commands/SoloConfigurator/ConfigurationCommand';
-import { jsonToXML } from '@/services/xmlTranspiler.service';
 import axios from 'axios';
 
 export class ResetCommand extends ConfigurationCommand {
@@ -15,12 +14,11 @@ export class ResetCommand extends ConfigurationCommand {
         if (!this.executed) {
             this.featureModel.loading = true;
             const content = new TextEncoder().encode(this.xml);
-            console.log(content)
             axios.post(`${import.meta.env.VITE_APP_DOMAIN_FEATUREIDESERVICE}propagation`,
               ({      name: this.featureModel.name+".xml",
                       selection: [],
                       deselection: [],
-                      content: this.xml
+                      content: Array.from(content)
               }))
                 .then((d) => {
                     const data = d.data;

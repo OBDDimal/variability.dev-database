@@ -250,7 +250,7 @@
       <!-- Third column (#SAT, Explanations, Configuration history) -->
       <v-col cols='3'>
         <!-- #SAT -->
-        <v-card height='21vh'>
+        <v-card >
           <v-card-title>{{ featureModelSolo.satCount }}</v-card-title>
           <v-card-subtitle>Number of possible configurations</v-card-subtitle>
           <v-card-actions>
@@ -313,11 +313,17 @@
             <v-btn class='ma-2' @click='downloadXML'>
               Download
             </v-btn>
+
+          </v-layout>
+          <v-layout class='align-center justify-center' row>
+            <v-btn v-if="featureModelName" class='ma-2' @click='openConfigFileDialog'>
+                Load Config
+            </v-btn>
           </v-layout>
         </v-card>
 
         <!-- Explanations and configuration history -->
-        <v-card height='67.5vh' style='margin-top:1vh;'>
+        <v-card height='63.5vh' style='margin-top:1vh;'>
           <v-card-title>
             <v-tabs v-model='tabsColumnTopRight'>
               <v-tab key='explanations'>Explanations</v-tab>
@@ -368,6 +374,13 @@
   >
   </configurator-open-file-dialog>
 
+  <configurator-open-file-dialog
+    :show='showOpenConfigDialog'
+    @close='showOpenConfigDialog = false'
+    @open='(file) => openConfig(file)'
+  >
+  </configurator-open-file-dialog>
+
 </template>
 
 <script>
@@ -390,6 +403,7 @@ import { FeatureModelSolo } from '@/classes/Configurator/FeatureModelSolo';
 import { useAppStore } from '@/store/app';
 import { ResetCommand } from '@/classes/Commands/SoloConfigurator/ResetCommand';
 import beautify from 'xml-beautifier';
+import { LoadConfigCommand } from '@/classes/Commands/SoloConfigurator/LoadConfigCommand';
 
 const appStore = useAppStore();
 export default {
@@ -418,6 +432,7 @@ export default {
     tabsFirstColumn: undefined,
     tabsSecondColumn: undefined,
     showOpenDialog: false,
+    showOpenConfigDialog: false,
     xml: undefined
   }),
 
@@ -575,6 +590,10 @@ export default {
       this.showOpenDialog = true;
     },
 
+    openConfigFileDialog() {
+      this.showOpenConfigDialog = true;
+    },
+
     openFile(file) {
       let reader = new FileReader();
       reader.addEventListener('load', (event) => {
@@ -594,6 +613,18 @@ export default {
       });
       reader.readAsText(file[0]);
       this.showOpenDialog = false;
+    },
+
+    openConfig(file) {
+      let reader = new FileReader();
+      reader.addEventListener('load', (event) => {
+        const features = FeatureModelSolo.loadXmlDataFromConfig(event.target.result);
+
+        const command = new LoadConfigCommand(this.featureModelSolo, this.xml, features);
+        this.commandManager.execute(command);
+      });
+      reader.readAsText(file[0]);
+      this.showOpenConfigDialog = false;
     }
   },
 
