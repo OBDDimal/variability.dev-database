@@ -25,45 +25,76 @@
                             ></v-icon>
                         </template>
 
-                        <v-list-item-title>
+                        <v-list-item-title v-if="!isLabelEditing">
                             {{ loading ? '...' : file.label }}
                         </v-list-item-title>
-                        <v-list-item-subtitle>Label</v-list-item-subtitle>
+                      <!--
+                        <v-list-item-title v-else>
+                            <v-text-field v-model="editedItem.label" variant="outlined"
+                            density="comfortable" />
 
+                        </v-list-item-title>-->
+                        <v-list-item-subtitle>Label</v-list-item-subtitle>
+                        <!--
                         <template v-slot:append>
+                            <v-list-item-action>
+
                                 <v-btn
+                                    v-if="!isLabelEditing && file.owner"
                                     icon="mdi-pencil"
                                     variant="tonal"
                                     color="primary"
                                     size="small"
+                                    @click="isLabelEditing = true; editItem(file.label);"
                                 >
                                 </v-btn>
+                              <v-btn  v-else-if="!loading" variant="tonal"
+                                    color="primary"
+                                    size="small" icon="mdi-check" @click="updateItem(); isLabelEditing=false">
+
+                            </v-btn>
+                              <v-progress-circular v-else indeterminate></v-progress-circular>
                             </v-list-item-action>
-                        </template>
+
+                        </template>-->
                     </v-list-item>
 
                     <v-list-item>
                         <template v-slot:prepend>
                             <v-icon></v-icon>
                         </template>
-                        <v-list-item-title>
+                        <v-list-item-title v-if="!isDescriptionEditing">
                             {{ loading ? '...' : file.description }}
                         </v-list-item-title>
+                      <!--
+                      <v-list-item-title v-else>
+                            <v-text-field v-model="editedItem.description" variant="outlined"
+                            density="comfortable" />
+
+                        </v-list-item-title>-->
                         <v-list-item-subtitle>
                             Description
                         </v-list-item-subtitle>
-
+                        <!--
                         <template v-slot:append>
                             <v-list-item-action>
                                 <v-btn
+                                    v-if="!isDescriptionEditing && file.owner"
                                     icon="mdi-pencil"
                                     variant="tonal"
                                     color="primary"
                                     size="small"
+                                    @click="isDescriptionEditing = true; editItem(file.label);"
                                 >
                                 </v-btn>
+                              <v-btn  v-else-if="!loading" variant="tonal"
+                                    color="primary"
+                                    size="small" icon="mdi-check" @click="updateItem(); isDescriptionEditing=false">
+
+                            </v-btn>
+                              <v-progress-circular v-else indeterminate></v-progress-circular>
                             </v-list-item-action>
-                        </template>
+                        </template>-->
                     </v-list-item>
 
                     <v-divider inset></v-divider>
@@ -91,7 +122,7 @@
                             <v-icon color="primary" icon="mdi-tag"></v-icon>
                         </template>
 
-                        <v-list-item-title v-if="!loading">
+                        <v-list-item-title v-if="!isTagsEditing && !loading">
                             <v-chip
                                 class="mr-2"
                                 v-for="tag in file.tags"
@@ -101,20 +132,47 @@
                                 {{ tag.label }}
                             </v-chip>
                         </v-list-item-title>
-                        <v-list-item-title v-else>...</v-list-item-title>
-                        <v-list-item-subtitle>Tags</v-list-item-subtitle>
+                      <!--
+                      <v-list-item-title v-else-if="isTagsEditing">
+                            <v-autocomplete
+                        v-model="editedItem.tags"
+                        :items="myOwnTags"
+                        item-value="id"
+                        item-title="label"
+                        chips
+                        variant="outlined"
+                        density="comfortable"
+                        hide-details
+                        hint="Choose or create tags for your feature model"
+                        label="Tags"
+                        multiple
+                    ></v-autocomplete>
 
+                        </v-list-item-title>-->
+                      <v-list-item-title v-else>...</v-list-item-title>
+
+                        <v-list-item-subtitle>Tags</v-list-item-subtitle>
+                        <!--
                         <template v-slot:append>
                             <v-list-item-action>
                                 <v-btn
+                                    v-if="!isTagsEditing && file.owner"
                                     icon="mdi-pencil"
                                     variant="tonal"
                                     color="primary"
                                     size="small"
+                                    @click="isTagsEditing = true; editItem(file.tags);"
                                 >
                                 </v-btn>
+                              <v-btn  v-else-if="!loading" variant="tonal"
+                                    color="primary"
+                                    size="small" icon="mdi-check" @click="updateItem(); isTagsEditing=false">
+
+                            </v-btn>
+                              <v-progress-circular v-else indeterminate></v-progress-circular>
                             </v-list-item-action>
                         </template>
+                        -->
                     </v-list-item>
                     <v-divider inset></v-divider>
                     <v-list-item>
@@ -146,7 +204,6 @@
                             ></v-icon>
                         </template>
 
-                        <v-list-item-content>
                             <v-list-item-title>
                                 {{ loading ? '...' : file.family.label }} ({{
                                     loading ? '...' : file.version
@@ -155,7 +212,6 @@
                             <v-list-item-subtitle>
                                 Family and version
                             </v-list-item-subtitle>
-                        </v-list-item-content>
                     </v-list-item>
                 </v-list>
                 <div
@@ -168,7 +224,7 @@
                                 color="primary"
                                 variant="tonal"
                                 prepend-icon="mdi-eye"
-                                :to="'/feature-model/' + file.id"
+                                :to="'/feature-model/' + route.params.id"
                             >
                                 View Model
                             </v-btn>
@@ -179,7 +235,7 @@
                                 color="primary"
                                 @click="
                                     router.push({
-                                        name: 'FamilyDetail',
+                                        name: 'HistoryDetail',
                                         params: {
                                             id: file.family.id,
                                             slug: file.family.slug,
@@ -199,7 +255,7 @@
                     <h5 class="text-h5 mb-4">Artifacts (tbd)</h5>
                     <div class="my-3">
                         <v-list rounded>
-                            <v-subheader>REPORTS</v-subheader>
+                            <v-list-subheader>REPORTS</v-list-subheader>
                             <v-list-item
                                 v-for="(item, i) in artifacts"
                                 :key="i"
@@ -636,9 +692,6 @@
 </template>
 
 <script setup>
-import { defineProps } from 'vue';
-
-
 import { computed, onMounted, reactive, ref, watch } from 'vue';
 import api from '@/services/api.service';
 import { useFileStore } from '@/store/file';
@@ -648,20 +701,19 @@ const router = useRouter();
 const route = useRoute();
 const fileStore = useFileStore();
 
-const API_URL = import.meta.env.VITE_APP_DOMAIN;
-// Über die defineProps-Funktion greifen wir auf die übergebenen Parameter zu
-const props = defineProps(['id', 'slug']);
 
+const API_URL = import.meta.env.VITE_APP_DOMAIN;
+
+const isLabelEditing = ref(false);
+const isDescriptionEditing = ref(false) ;
+const isTagsEditing = ref(false);
 let file = reactive({});
 const loading = ref(true);
-const dialogDelete = ref(false);
 const dialogArtifact = ref(false);
 const shouldCompare = ref(false);
 const loadingComparableFM = ref(false);
 const selectedRightFM = ref(-1);
 const selectedArtifact = {};
-const rightFmIsSelected = ref(false);
-const removeLoading = ref(false);
 const searchAnalysis = ref('');
 const headersAnalysis = [
     /*{
@@ -694,6 +746,11 @@ const itemsAnalysis = [
         status: 0,
     },
 ];
+function getAnalysis(){
+  api.get(`${API_URL}analyses/`).then((response)=>
+  console.log(response.data)).catch((error)=>console.log(error))
+}
+
 const showTutorial = ref(false);
 
 const selectedCols = ref([
@@ -725,9 +782,9 @@ watch(
 );
 
 onMounted(async () => {
+    getAnalysis()
     loading.value = true;
     await getFile();
-    console.log('file', file);
     loading.value = false;
     showTutorial.value = !localStorage.fileDetailTutorialCompleted;
     //await this.fetchFeatureModelOfFamily(this.family.id)
@@ -773,7 +830,7 @@ const getStati = computed(() => {
 
 async function getFile() {
   console.log("ID:" + route.params.id);
-    const id = route.params.id;
+  const id = route.params.id;
     await api
         .get(`${API_URL}files/${id}/`)
         .then((response) => {
