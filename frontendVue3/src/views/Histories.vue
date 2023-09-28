@@ -148,7 +148,7 @@ const router = useRouter();
 const API_URL = import.meta.env.VITE_APP_DOMAIN;
 const { families } = storeToRefs(useFileStore());
 
-const search = '';
+const search = ref('');
 const dialog = ref(false);
 const editedIndex = ref(-1);
 const headers = [
