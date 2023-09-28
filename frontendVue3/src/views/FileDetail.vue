@@ -746,10 +746,11 @@ const itemsAnalysis = [
         status: 0,
     },
 ];
-function getAnalysis(){
+//TODO: Fetch analysis for File
+/*function getAnalysis(){
   api.get(`${API_URL}analyses/`).then((response)=>
   console.log(response.data)).catch((error)=>console.log(error))
-}
+}*/
 
 const showTutorial = ref(false);
 
@@ -782,12 +783,10 @@ watch(
 );
 
 onMounted(async () => {
-    getAnalysis()
     loading.value = true;
     await getFile();
     loading.value = false;
     showTutorial.value = !localStorage.fileDetailTutorialCompleted;
-    //await this.fetchFeatureModelOfFamily(this.family.id)
 });
 
 /*watch: {
@@ -829,7 +828,6 @@ const getStati = computed(() => {
 });
 
 async function getFile() {
-  console.log("ID:" + route.params.id);
   const id = route.params.id;
     await api
         .get(`${API_URL}files/${id}/`)
