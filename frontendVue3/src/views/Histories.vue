@@ -33,7 +33,7 @@
                             density="comfortable"
                         ></v-text-field>
                         <v-dialog v-model="dialog" max-width="500px">
-                            <template v-slot:activator="{ props }">
+                          <template v-slot:activator="{ props }">
                                 <v-btn
                                     class="ml-4"
                                     color="primary"
@@ -195,7 +195,7 @@ const formTitle = computed(() => {
 });
 
 function editItem(item) {
-    editedIndex.value = item.index+1;
+    editedIndex.value = item.raw.id;
     editedItem = Object.assign({}, item.raw);
     labelValue.value = editedItem.label;
     descriptionValue.value = editedItem.description;
