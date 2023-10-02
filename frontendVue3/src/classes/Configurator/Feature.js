@@ -20,10 +20,10 @@ export class Feature {
           configText = "manual=\"selected\"";
           break;
         case SelectionState.ImplicitlyDeselected:
-          configText = "manual=\"deselected\"";
+          configText = "automatic=\"deselected\"";
           break;
         case SelectionState.ExplicitlyDeselected:
-          configText = "automatic=\"deselected\"";
+          configText = "manual=\"deselected\"";
           break;
         case 'Unselected':
           break;

@@ -4,6 +4,7 @@ import * as collapse from '@/services/FeatureModel/collapse.service.js';
 import {FeatureNode} from '@/classes/Configurator/FeatureNode';
 import {PseudoNode} from '@/classes/PseudoNode';
 import * as count from '@/services/FeatureModel/count.service';
+import d3 from 'd3';
 
 function updateFeatureNodes(d3Data, visibleD3Nodes) {
     const featureNode = d3Data.container.featureNodesContainer
@@ -74,6 +75,7 @@ function updateFeatureNodes(d3Data, visibleD3Nodes) {
     rectAndTextUpdate
         .select('rect')
         .classed('is-searched-feature', (d3Node) => d3Node.data.isSearched)
+        .attr('id', (d3Node) => d3Node.data.name)
         .attr('fill', (d3Node) => d3Node.data.color())
         .attr('x', (d3Node) =>
             d3Data.direction === 'v' ? -d3Node.width / 2 : 0
@@ -439,4 +441,10 @@ function dblClickEvent(event, d3Data, d3Node) {
             touchtime = new Date().getTime();
         }
     }
+}
+
+export function reColorNode(d3Data, features){
+    console.log(features);
+    const filtered = d3.selectAll(`#${features[0].name}`);
+    console.log(filtered);
 }

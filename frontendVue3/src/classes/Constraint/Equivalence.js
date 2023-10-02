@@ -29,7 +29,7 @@ export class Equivalence extends GroupConstraintItem {
             return this.items.map(i => (i, i.evaluate())).filter(i => i[1] === true).forEach(i => i[0].quickFix(false));
         }
 
-        console.error("Quick Fix, Disjunction")
+        console.error("Quick Fix, Equivalence")
         return [];
     }
 }

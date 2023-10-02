@@ -79,7 +79,7 @@
                 :search='searchFeatures'
                 disable-pagination
                 fixed-header
-                height='68vh'
+                height='67.75vh'
                 hide-default-footer
                 item-key='name'
                 show-group-by
@@ -96,14 +96,14 @@
                 </template>
 
                 <!-- Customization of the column SELECTIONSTATE -->
-                <template v-slot:item.selectionState='{ item }'>
+                <template v-slot:item.selectionState='{ item }' >
                   <DoubleCheckbox v-bind:selection-item='item.selectable'
-                                  @select='(selection) => decisionPropagation(item.selectable, selection)'></DoubleCheckbox>
+                                  @select='(selection) => decisionPropagation(item.selectable, selection)' ></DoubleCheckbox>
                 </template>
 
                 <!-- Customization of the column ACTIONS -->
-                <template v-slot:item.actions='{ item }'>
-                  <!-- Context menu -->
+<!--                <template v-slot:item.actions='{ item }'>
+                  &lt;!&ndash; Context menu &ndash;&gt;
                   <v-menu
                     v-if='!item.selectable.fix && (item.selectable.selectionState === SelectionState.ImplicitlyDeselected || item.selectable.selectionState === SelectionState.ImplicitlySelected)'
                     offset-y>
@@ -114,7 +114,7 @@
                     </template>
 
                     <v-list>
-                      <!-- Fix feature by rollback button -->
+                      &lt;!&ndash; Fix feature by rollback button &ndash;&gt;
                       <v-list-item @click='rollbackFixFeature(item.selectable)'>
                         <v-tooltip bottom>
                           <template v-slot:activator='{ props }'>
@@ -124,7 +124,7 @@
                         </v-tooltip>
                       </v-list-item>
 
-                      <!-- Fix feature by quick fix button -->
+                      &lt;!&ndash; Fix feature by quick fix button &ndash;&gt;
                       <v-list-item @click='quickFixFeature(item.selectable)'>
                         <v-tooltip bottom>
                           <template v-slot:activator='{ props }'>
@@ -135,7 +135,7 @@
                       </v-list-item>
                     </v-list>
                   </v-menu>
-                </template>
+                </template>-->
               </v-data-table>
             </v-window-item>
             <v-window-item key='treeView'>
@@ -162,26 +162,27 @@
 
               <!-- Feature Model Viewer -->
               <v-window-item key='featureModelViewer'>
-                <feature-model-viewer-solo :feature-model='featureModelSolo'></feature-model-viewer-solo>
+                <feature-model-viewer-solo ref="featureModelViewerSolo" :feature-model='featureModelSolo'></feature-model-viewer-solo>
               </v-window-item>
 
               <!-- Cross-Tree Constraint Viewer -->
               <v-window-item key='ctc'>
 
                 <!-- Filter only the invalid ctcs and reset them to default -->
-                <v-btn class='mx-2' outlined
+<!--                <v-btn class='mx-2' outlined
                        rounded @click='filteredConstraints = allConstraints.filter(c => c.evaluation === false)'>
                   Only invalid
                 </v-btn>
-                <v-btn outlined rounded @click='filteredConstraints = allConstraints'>Reset</v-btn>
+                <v-btn outlined rounded @click='filteredConstraints = allConstraints'>Reset</v-btn>-->
 
                 <!-- Table with all ctcs -->
                 <v-data-table
                   :footer-props="{'items-per-page-options': [10, 20, 50, 100, 200]}"
-                  :headers="[{title: 'Valid', value: 'evaluation', key: 'evaluation'}, {title: 'Constraints', key: 'formula', value: 'formula', groupable: false}, {title: 'Actions', key: 'actions', value: 'actions', groupable: false}]"
+                  :headers="[{title: 'Valid', value: 'evaluation', key: 'evaluation'}, {title: 'Constraints', key: 'formula', value: 'formula', groupable: false}]"
                   :items='filteredConstraints'
                   :sort-by="[{key: 'evaluation', ord: 'desc'}]"
-                  height='68vh'
+                  fixed-header
+                  height='72vh'
                   show-group-by
                 >
 
@@ -207,8 +208,8 @@
                   </template>
 
                   <!-- Customization of the column ACTIONS -->
-                  <template v-slot:item.actions='{ item }'>
-                    <!-- Context menu -->
+<!--                  <template v-slot:item.actions='{ item }'>
+                    &lt;!&ndash; Context menu &ndash;&gt;
                     <v-menu v-if='item.selectable.evaluation === false'
                             offset-y>
                       <template v-slot:activator='{ props }'>
@@ -218,7 +219,7 @@
                       </template>
 
                       <v-list>
-                        <!-- Fix ctc by rollback button -->
+                        &lt;!&ndash; Fix ctc by rollback button &ndash;&gt;
                         <v-list-item @click='rollbackFixCTC(item.selectable)'>
                           <v-tooltip location='bottom'>
                             <template v-slot:activator='{ props }'>
@@ -228,7 +229,7 @@
                           </v-tooltip>
                         </v-list-item>
 
-                        <!-- Fix ctc by quick fix button -->
+                        &lt;!&ndash; Fix ctc by quick fix button &ndash;&gt;
                         <v-list-item @click='quickFixCTC(item.selectable)'>
                           <v-tooltip location='bottom'>
                             <template v-slot:activator='{ props }'>
@@ -239,7 +240,7 @@
                         </v-list-item>
                       </v-list>
                     </v-menu>
-                  </template>
+                  </template>-->
 
                 </v-data-table>
               </v-window-item>
@@ -323,7 +324,7 @@
         </v-card>
 
         <!-- Explanations and configuration history -->
-        <v-card height='63.5vh' style='margin-top:1vh;'>
+        <v-card height='63vh' style='margin-top:1vh;'>
           <v-card-title>
             <v-tabs v-model='tabsColumnTopRight'>
               <v-tab key='explanations'>Explanations</v-tab>
@@ -404,6 +405,7 @@ import { useAppStore } from '@/store/app';
 import { ResetCommand } from '@/classes/Commands/SoloConfigurator/ResetCommand';
 import beautify from 'xml-beautifier';
 import { LoadConfigCommand } from '@/classes/Commands/SoloConfigurator/LoadConfigCommand';
+import { reColorNode } from '@/services/Configurator/update.service';
 
 const appStore = useAppStore();
 export default {
@@ -411,14 +413,9 @@ export default {
   components: { ConfiguratorOpenFileDialog, FeatureModelViewerSolo, DoubleCheckbox },
 
   data: () => ({
-    headersVersions: [
-      { title: 'Selection', align: 'start', key: 'selectionState', width: '10%' },
-      { title: 'Version', key: 'version', groupable: false },
-      { title: 'Actions', key: 'actions' }],
     headersFeatures: [
       { title: 'Selection', key: 'selectionState', width: '10%' },
       { title: 'Name', key: 'name', groupable: false },
-      { title: 'Actions', groupable: false, key: 'actions' }
     ],
     commandManager: new ConfiguratorManager(),
     initialResetCommand: undefined,
@@ -556,6 +553,8 @@ export default {
       console.log(item)
       const command = new DecisionPropagationCommand(this.featureModelSolo, this.xml, item, selectionState);
       this.commandManager.execute(command);
+      const featuresToColor = this.featureModelSolo.features.filter(f => f.selectionState === SelectionState.ExplicitlySelected).map(f => f.id);
+      reColorNode(this.$refs.featureModelViewerSolo.d3Data, featuresToColor)
     },
 
     resetCommand() {

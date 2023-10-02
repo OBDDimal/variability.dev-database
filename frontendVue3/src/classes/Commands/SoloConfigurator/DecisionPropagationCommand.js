@@ -53,7 +53,6 @@ export class DecisionPropagationCommand extends ConfigurationCommand {
                     this.newUnselectedFeatures = this.featureModel.features.filter(f => !(selection.includes(f.name) || data.impliedSelection.includes(f.name) || deselection.includes(f.name) || data.impliedDeselection.includes(f.name)))
 
                     this.executed = true;
-
                     super.execute();
                     this.featureModel.loading = false;
                 })
