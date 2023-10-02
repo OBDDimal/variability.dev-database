@@ -1,5 +1,5 @@
 <template>
-    <v-card>
+    <v-card variant="outlined">
         <v-divider class="border-opacity-100"></v-divider>
         <!--  Data Table for MetaData: -->
         <v-data-table :headers="factHeaders" :items="metadata" item-value="name">
@@ -20,7 +20,7 @@
             <template v-slot:bottom>
             </template>
         </v-data-table>
-        <v-divider class="border-opacity-100"></v-divider>
+        <v-divider class="border-opacity-100" thickness="10"></v-divider>
         <!--  Data Table for Metrics: -->
         <v-data-table v-model:expanded="expandedRoot" :headers="expandableHeaders" :items="metrics" item-value="name">
             <template v-slot:headers>
@@ -68,7 +68,7 @@
         </template>
         </v-data-table>
 
-        <v-divider class="border-opacity-100"></v-divider>
+        <v-divider class="border-opacity-100" thickness="10"></v-divider>
         <!--  Data Table for Analysis: -->
         <v-data-table :headers="factHeaders" :items="analysis" item-value="name">
             <template v-slot:headers>
