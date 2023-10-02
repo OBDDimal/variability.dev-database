@@ -122,15 +122,18 @@
                             <v-icon color="primary" icon="mdi-tag"></v-icon>
                         </template>
 
-                        <v-list-item-title v-if="!isTagsEditing && !loading">
+                        <v-list-item-title v-if="!isTagsEditing && !loading" style="white-space: normal">
                             <v-chip
                                 class="mr-2"
-                                v-for="tag in file.tags"
+                                v-for="(tag) in visibleTags"
                                 :key="tag.id"
                                 size="small"
                             >
                                 {{ tag.label }}
                             </v-chip>
+                          <v-icon v-if="file.tags.length > 5" @click="toggleTags">
+                            {{ isTagsExpanded ? 'mdi-chevron-up' : 'mdi-chevron-down' }}
+                                </v-icon>
                         </v-list-item-title>
                       <!--
                       <v-list-item-title v-else-if="isTagsEditing">
@@ -703,7 +706,13 @@ const fileStore = useFileStore();
 
 
 const API_URL = import.meta.env.VITE_APP_DOMAIN;
-
+const visibleTags = computed(() => {
+  return isTagsExpanded.value ? file.tags : file.tags.slice(0, 5);
+});
+function toggleTags() {
+  isTagsExpanded.value = !isTagsExpanded.value;
+}
+const isTagsExpanded = ref(false);
 const isLabelEditing = ref(false);
 const isDescriptionEditing = ref(false) ;
 const isTagsEditing = ref(false);
