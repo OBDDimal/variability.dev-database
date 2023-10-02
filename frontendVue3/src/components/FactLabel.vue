@@ -9,12 +9,12 @@
                 <v-toolbar flat>
                     <v-toolbar-title>{{ name }}</v-toolbar-title>
                     <a :href="fmHref" target="_blank" rel="noopener noreferrer">
-                    <v-icon >mdi-link-variant</v-icon>
+                        <v-icon>mdi-link-variant</v-icon>
                     </a>
                 </v-toolbar>
-               <v-card flat align-center>
-                {{ desc }}
-               </v-card>
+                <v-card flat align-center>
+                    {{ desc }}
+                </v-card>
 
             </template>
             <template v-slot:bottom>
@@ -29,15 +29,20 @@
                 <tr>
                     <td :colspan="columns.length">
                         <v-data-table v-model:expanded="expandedSubs" :headers="expandableHeaders" :items="item.raw.childs"
-                            item-value="name">
+                            item-value="name" :expand-on-click="true">
                             <template v-slot:headers>
                             </template>
+                            <template v-slot:item.data-table-expand="{ item }">
+                                <template v-if="item.raw.childs && item.raw.childs.length > 0">
+                                    <v-icon icon="mdi-chevron-down"></v-icon>
+                                </template>
+                            </template>
                             <template v-slot:expanded-row="{ item, columns }">
+                                <template v-if="item.raw.childs && item.raw.childs.length > 0">
+                                    <!-- only print when subitems exist-->
                 <tr>
                     <td :colspan="columns.length">
-                        <v-data-table :headers="factHeaders"
-                            :items="item.raw.childs" 
-                            item-value="name"
+                        <v-data-table :headers="factHeaders" :items="item.raw.childs" item-value="name"
                             :show-expand="false">
                             <template v-slot:headers>
                             </template>
@@ -48,6 +53,7 @@
 
                     </td>
                 </tr>
+            </template>
             </template>
 
             <template v-slot:bottom>
@@ -982,8 +988,8 @@ const facts = {
     ]
 }
 const FM_CHAR_NAME_DESC = "Name"; // FM Characterization Name Descriptor
-const FM_CHAR_HREF_DESC= "Reference"
-const FM_CHAR_DESC_DESC="Description"
+const FM_CHAR_HREF_DESC = "Reference"
+const FM_CHAR_DESC_DESC = "Description"
 export default {
     name: 'FactLabel',
 
@@ -993,8 +999,8 @@ export default {
 
     data: () => ({
         name: "",
-        fmHref:"",
-        desc:"",
+        fmHref: "",
+        desc: "",
         expandedRoot: [],
         expandedSubs: [],
         expandedSubSubs: [],
@@ -1022,13 +1028,13 @@ export default {
                 if (entry.name === FM_CHAR_NAME_DESC) {
                     this.name = entry.value; //handle special entry Name which defines Name of FM
                     return false;
-                }else if (entry.name === FM_CHAR_HREF_DESC) {
+                } else if (entry.name === FM_CHAR_HREF_DESC) {
                     this.fmHref = entry.value; //handle special entry Name which defines Name of FM
                     return false;
-                }else if (entry.name === FM_CHAR_DESC_DESC) {
+                } else if (entry.name === FM_CHAR_DESC_DESC) {
                     this.desc = entry.value; //handle special entry Name which defines Name of FM
                     return false;
-                }else{
+                } else {
                     return true;
                 }
             });
