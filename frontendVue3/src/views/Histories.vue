@@ -129,12 +129,6 @@
                 <template v-slot:item.id="{ index }">
                     {{ index + 1 }}
                 </template>
-                <template v-slot:item.owner="{ item }">
-                    <v-icon v-if="item.raw.owner" color="success">
-                        mdi-check
-                    </v-icon>
-                    <v-icon v-else color="error"> mdi-cancel</v-icon>
-                </template>
             </v-data-table>
         </v-card>
     </div>
@@ -154,7 +148,7 @@ const router = useRouter();
 const API_URL = import.meta.env.VITE_APP_DOMAIN;
 const { families } = storeToRefs(useFileStore());
 
-const search = '';
+const search = ref('');
 const dialog = ref(false);
 const editedIndex = ref(-1);
 const headers = [
@@ -166,7 +160,7 @@ const headers = [
     },*/
     { title: 'Label', key: 'label' },
     { title: 'Description', key: 'description' },
-    { title: 'Owner', key: 'owner' },
+    //{ title: 'Owner', key: 'owner' },
     {
         title: '',
         align: 'center',
