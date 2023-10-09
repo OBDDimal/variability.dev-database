@@ -4,9 +4,11 @@
             <v-data-table
                 :loading="props.loading"
                 :headers="headers"
-                :items="items"
+                :items="filteredItems"
                 items-per-page="5"
-                :search="props.search"
+                :search="search"
+                sort-by.sync="sortBy"
+                sort-desc="sortDesc"
             >
                 <template v-slot:top>
                     <v-toolbar flat style="background-color: transparent">
@@ -60,7 +62,6 @@
                             size='small'
                             icon='mdi-plus'
                             v-bind='props'
-                            v-on='on'
                             to='/feature-model/new'
                           >
                           </v-btn>
@@ -80,43 +81,12 @@
                             size='small'
                             icon='mdi-server'
                             v-bind='props'
-                            v-on='on'
                             to='/feature-model/local'
                           >
                           </v-btn>
                         </template>
                         <span>Upload from local storage</span>
                       </v-tooltip>
-                        <v-dialog v-model="dialogDelete" max-width="400px">
-                            <v-card>
-                                <v-card-title
-                                    class="text-h5"
-                                    style="white-space: normal;"
-                                >
-                                    Are you sure you want to delete this feature
-                                    model?
-                                </v-card-title>
-                                <v-card-actions>
-                                    <v-spacer></v-spacer>
-                                    <v-btn
-                                        color="primary"
-                                        text
-                                        @click="closeDelete"
-                                        >Cancel
-                                    </v-btn>
-                                    <v-spacer></v-spacer>
-                                    <v-btn
-                                        :loading="removeLoading"
-                                        color="primary"
-                                        text
-                                        @click="deleteItemConfirm"
-                                    >
-                                        Delete
-                                    </v-btn>
-                                    <v-spacer></v-spacer>
-                                </v-card-actions>
-                            </v-card>
-                        </v-dialog>
                         <!--        <v-dialog v-if="editedItem.analysis" v-model="dialogAnalysis" max-width="80%">
                     <v-card>
                       <v-card-title class="text-h5">
@@ -157,18 +127,8 @@
                         color="success"
                         variant="tonal"
                         size="small"
-                        icon="mdi-play"
+                        icon="mdi-information"
                         @click="handleClick(item.raw)"
-                    >
-                    </v-btn>
-                    <v-btn
-                        :disabled="item.owner === false"
-                        class="float-end mr-2"
-                        color="error"
-                        variant="tonal"
-                        icon="mdi-delete"
-                        size="small"
-                        @click.stop="deleteItem(item)"
                     >
                     </v-btn>
                     <v-btn
@@ -185,39 +145,44 @@
                 <template v-slot:item.id="{ item }">
                     {{ item.value }}
                 </template>
-                <template v-slot:item.tags="{ item }">
-                    <div v-if="item.columns.tags.length <= 2">
-                        <v-chip
-                            v-for="(tag, index) in item.columns.tags"
-                            :key="index"
-                            class="ma-1"
-                        >
-                            {{ tag.label }}
-                        </v-chip>
-                    </div>
-                    <div v-else>
-                        <v-chip class="ma-1">
-                            {{ item.columns.tags[0].label }}
-                        </v-chip>
-                        <v-chip class="ma-1">
-                            {{ item.columns.tags[1].label }}
-                        </v-chip>
-                        <span class="ma-1"
-                            >+ {{ item.columns.tags.length - 2 }}</span
-                        >
-                    </div>
-                </template>
-                <template v-slot:item.owner="{ item }">
-                    <v-icon v-if="item.raw.owner" color="success">
-                        mdi-check</v-icon
-                    >
+              <template v-slot:item.tags="{ item }">
+                <div v-if="showAllTags || item.showTags|| item.columns.tags.length <= 2">
+                  <v-chip
+                    v-for="(tag, index) in item.columns.tags"
+                    :key="index"
+                    class="ma-1"
+                  >
+                    {{ tag.label }}
+                  </v-chip>
+                   <v-icon
+                     v-if="item.columns.tags.length > 2"
+                class="expand-tags-button"
+                @click="item.showTags = false"
+            >
+                mdi-chevron-up
+            </v-icon>
+                </div>
+                <div v-else>
+                  <v-chip class="ma-1">
+                    {{ item.columns.tags[0].label }}
+                  </v-chip>
+                  <v-chip class="ma-1">
+                    {{ item.columns.tags[1].label }}
+                  </v-chip>
+                  <span class="ma-1" @click="item.showTags=true">+ {{ item.columns.tags.length - 2 }}</span>
+                   <v-icon
+                class="expand-tags-button"
+                @click="item.showTags = true"
+            >
+                mdi-chevron-down
+            </v-icon>
 
-                    <v-icon v-else color="error"> mdi-cancel</v-icon>
-                </template>
-                <template v-slot:item.family="{ item }">
+                </div>
+              </template>
+                <template v-slot:item.family.label="{ item }">
                     {{ item.raw.family.label }} ({{ item.raw.version }})
                 </template>
-                <template v-slot:item.uploaded="{ item }">
+                <template v-slot:item.uploaded_at="{ item }">
                     {{ new Date(item.raw.uploaded_at).toLocaleString('en-US') }}
                 </template>
                 <template v-slot:no-data> {{ noDataText }} </template>
@@ -238,6 +203,9 @@ import { useFileStore } from '@/store/file';
 const emit = defineEmits(['onDelete']);
 const router = useRouter();
 const fileStore = useFileStore();
+const showAllTags = ref(false);
+const sortBy = ref(null);
+const sortDesc = ref(false);
 
 const props = defineProps({
     headline: {
@@ -265,7 +233,6 @@ const props = defineProps({
         default: true,
     },
 });
-
 const headers = [
     /*{
         title: 'ID',
@@ -273,13 +240,13 @@ const headers = [
         sortable: false,
         key: 'id',
     },*/
-    { title: 'Label', key: 'label' },
+    { title: 'Label', key: 'label', sortable: 'label' },
+    { title: 'Family (Version)', key: 'family.label',  sortable: 'family.label' },
     /*{ text: 'Description', value: 'description' },*/
     /*{ title: 'License', key: 'license.label' },*/
-    { title: 'Tags', key: 'tags' },
-    { title: 'Uploaded on', key: 'uploaded' },
-    { title: 'Owner', key: 'owner' },
-    { title: 'Family (Version)', key: 'family' },
+    { title: 'Tags', key: 'tags'  },
+    { title: 'Uploaded on', key: 'uploaded_at', sortable: true },
+
     {
         title: '',
         align: 'center',
@@ -288,34 +255,34 @@ const headers = [
     },
 ];
 const search = ref('');
-const removeLoading = ref(false);
 const createDialog = ref(false);
-const dialogDelete = ref(false);
-const editedItem = ref(null);
-const defaultItem = ref(undefined);
 const checkLocalStorage = computed(() => {
     return !!localStorage.featureModelData;
 });
+const filteredItems = computed(() => {
+  // Wenn die Suche leer ist, zeige alle Elemente
+  if (!search.value) {
+    return props.items;
+  }
 
-async function deleteItemConfirm() {
-    removeLoading.value = true;
-    await fileStore.deleteFeatureModel(
-    editedItem.value.id
-    );
-    await fileStore.fetchConfirmedFeatureModels();
-    emit('onDelete');
-    removeLoading.value = false;
+  // Andernfalls filtere die Elemente basierend auf der Suche und priorisiere direkte Übereinstimmungen
+  const searchLowerCase = search.value.toLowerCase();
+  const directMatches = [];
+  const otherMatches = [];
 
-    closeDelete();
-}
-function closeDelete() {
-    dialogDelete.value = false;
-    editedItem.value = { ...defaultItem };
-}
-function deleteItem(item) {
-    editedItem.value = { ...item.raw };
-    dialogDelete.value = true;
-}
+  props.items.forEach((item) => {
+    const itemLabel = item.label.toLowerCase();
+
+    if (itemLabel === searchLowerCase) {
+      directMatches.unshift(item); // Priorisiere direkte Übereinstimmungen
+    } else if (itemLabel.includes(searchLowerCase)) {
+      otherMatches.push(item);
+    }
+  });
+
+  // Füge direkte Übereinstimmungen zuerst hinzu, gefolgt von anderen Übereinstimmungen
+  return [...directMatches, ...otherMatches];
+});
 function handleClick(value) {
     console.log(value);
     router.push({
@@ -325,11 +292,23 @@ function handleClick(value) {
 }
 </script>
 
+
+
 <style>
 .highlighted {
     background-color: green;
     height: 100%;
     width: 3px;
     display: inline-block;
+}
+.expand-tags-button {
+    cursor: pointer;
+    margin-left: 4px;
+    font-size: 18px;
+    line-height: 1;
+    color: #000000;
+    background-color: #ccc; /* Grauer Hintergrund */
+    border-radius: 50%; /* Runde Form */
+    padding: 6px; /* Innenabstand */
 }
 </style>

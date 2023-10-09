@@ -25,46 +25,76 @@
                             ></v-icon>
                         </template>
 
-                        <v-list-item-title>
+                        <v-list-item-title v-if="!isLabelEditing">
                             {{ loading ? '...' : file.label }}
                         </v-list-item-title>
-                        <v-list-item-subtitle>Label</v-list-item-subtitle>
+                      <!--
+                        <v-list-item-title v-else>
+                            <v-text-field v-model="editedItem.label" variant="outlined"
+                            density="comfortable" />
 
+                        </v-list-item-title>-->
+                        <v-list-item-subtitle>Label</v-list-item-subtitle>
+                        <!--
                         <template v-slot:append>
-                            <v-list-item-action end>
+                            <v-list-item-action>
+
                                 <v-btn
+                                    v-if="!isLabelEditing && file.owner"
                                     icon="mdi-pencil"
                                     variant="tonal"
                                     color="primary"
                                     size="small"
+                                    @click="isLabelEditing = true; editItem(file.label);"
                                 >
                                 </v-btn>
+                              <v-btn  v-else-if="!loading" variant="tonal"
+                                    color="primary"
+                                    size="small" icon="mdi-check" @click="updateItem(); isLabelEditing=false">
+
+                            </v-btn>
+                              <v-progress-circular v-else indeterminate></v-progress-circular>
                             </v-list-item-action>
-                        </template>
+
+                        </template>-->
                     </v-list-item>
 
                     <v-list-item>
                         <template v-slot:prepend>
                             <v-icon></v-icon>
                         </template>
-                        <v-list-item-title>
+                        <v-list-item-title v-if="!isDescriptionEditing">
                             {{ loading ? '...' : file.description }}
                         </v-list-item-title>
+                      <!--
+                      <v-list-item-title v-else>
+                            <v-text-field v-model="editedItem.description" variant="outlined"
+                            density="comfortable" />
+
+                        </v-list-item-title>-->
                         <v-list-item-subtitle>
                             Description
                         </v-list-item-subtitle>
-
+                        <!--
                         <template v-slot:append>
                             <v-list-item-action>
                                 <v-btn
+                                    v-if="!isDescriptionEditing && file.owner"
                                     icon="mdi-pencil"
                                     variant="tonal"
                                     color="primary"
                                     size="small"
+                                    @click="isDescriptionEditing = true; editItem(file.label);"
                                 >
                                 </v-btn>
+                              <v-btn  v-else-if="!loading" variant="tonal"
+                                    color="primary"
+                                    size="small" icon="mdi-check" @click="updateItem(); isDescriptionEditing=false">
+
+                            </v-btn>
+                              <v-progress-circular v-else indeterminate></v-progress-circular>
                             </v-list-item-action>
-                        </template>
+                        </template>-->
                     </v-list-item>
 
                     <v-divider inset></v-divider>
@@ -92,30 +122,60 @@
                             <v-icon color="primary" icon="mdi-tag"></v-icon>
                         </template>
 
-                        <v-list-item-title v-if="!loading">
+                        <v-list-item-title v-if="!isTagsEditing && !loading" style="white-space: normal">
                             <v-chip
                                 class="mr-2"
-                                v-for="tag in file.tags"
+                                v-for="(tag) in visibleTags"
                                 :key="tag.id"
                                 size="small"
                             >
                                 {{ tag.label }}
                             </v-chip>
+                          <v-icon v-if="file.tags.length > 5" @click="toggleTags">
+                            {{ isTagsExpanded ? 'mdi-chevron-up' : 'mdi-chevron-down' }}
+                                </v-icon>
                         </v-list-item-title>
-                        <v-list-item-title v-else>...</v-list-item-title>
-                        <v-list-item-subtitle>Tags</v-list-item-subtitle>
+                      <!--
+                      <v-list-item-title v-else-if="isTagsEditing">
+                            <v-autocomplete
+                        v-model="editedItem.tags"
+                        :items="myOwnTags"
+                        item-value="id"
+                        item-title="label"
+                        chips
+                        variant="outlined"
+                        density="comfortable"
+                        hide-details
+                        hint="Choose or create tags for your feature model"
+                        label="Tags"
+                        multiple
+                    ></v-autocomplete>
 
+                        </v-list-item-title>-->
+                      <v-list-item-title v-else>...</v-list-item-title>
+
+                        <v-list-item-subtitle>Tags</v-list-item-subtitle>
+                        <!--
                         <template v-slot:append>
                             <v-list-item-action>
                                 <v-btn
+                                    v-if="!isTagsEditing && file.owner"
                                     icon="mdi-pencil"
                                     variant="tonal"
                                     color="primary"
                                     size="small"
+                                    @click="isTagsEditing = true; editItem(file.tags);"
                                 >
                                 </v-btn>
+                              <v-btn  v-else-if="!loading" variant="tonal"
+                                    color="primary"
+                                    size="small" icon="mdi-check" @click="updateItem(); isTagsEditing=false">
+
+                            </v-btn>
+                              <v-progress-circular v-else indeterminate></v-progress-circular>
                             </v-list-item-action>
                         </template>
+                        -->
                     </v-list-item>
                     <v-divider inset></v-divider>
                     <v-list-item>
@@ -147,7 +207,6 @@
                             ></v-icon>
                         </template>
 
-                        <v-list-item-content>
                             <v-list-item-title>
                                 {{ loading ? '...' : file.family.label }} ({{
                                     loading ? '...' : file.version
@@ -156,7 +215,6 @@
                             <v-list-item-subtitle>
                                 Family and version
                             </v-list-item-subtitle>
-                        </v-list-item-content>
                     </v-list-item>
                 </v-list>
                 <div
@@ -169,7 +227,7 @@
                                 color="primary"
                                 variant="tonal"
                                 prepend-icon="mdi-eye"
-                                :to="'/feature-model/' + file.id"
+                                :to="'/feature-model/' + route.params.id"
                             >
                                 View Model
                             </v-btn>
@@ -180,7 +238,7 @@
                                 color="primary"
                                 @click="
                                     router.push({
-                                        name: 'FamilyDetail',
+                                        name: 'HistoryDetail',
                                         params: {
                                             id: file.family.id,
                                             slug: file.family.slug,
@@ -193,17 +251,6 @@
                             </v-btn>
                         </div>
                     </div>
-                    <div class="d-inline-block">
-                        <v-btn
-                            variant="tonal"
-                            color="error"
-                            :disabled="file.owner === false"
-                            @click="deleteItem(item)"
-                            prepend-icon="mdi-delete"
-                        >
-                            Delete Model
-                        </v-btn>
-                    </div>
                 </div>
             </v-col>
             <v-col cols="12" md="6">
@@ -211,7 +258,7 @@
                     <h5 class="text-h5 mb-4">Artifacts (tbd)</h5>
                     <div class="my-3">
                         <v-list rounded>
-                            <v-subheader>REPORTS</v-subheader>
+                            <v-list-subheader>REPORTS</v-list-subheader>
                             <v-list-item
                                 v-for="(item, i) in artifacts"
                                 :key="i"
@@ -383,29 +430,6 @@
                 </div>
             </v-col>
         </v-row>
-        <v-dialog v-model="dialogDelete" max-width="400px">
-            <v-card>
-                <v-card-title class="text-h5" style="word-break: break-word">
-                    Are you sure you want to delete this feature model?
-                </v-card-title>
-                <v-card-actions>
-                    <v-spacer></v-spacer>
-                    <v-btn color="primary" text @click="closeDelete"
-                        >Cancel
-                    </v-btn>
-                    <v-spacer></v-spacer>
-                    <v-btn
-                        :loading="removeLoading"
-                        color="primary"
-                        text
-                        @click="deleteItemConfirm"
-                    >
-                        Delete
-                    </v-btn>
-                    <v-spacer></v-spacer>
-                </v-card-actions>
-            </v-card>
-        </v-dialog>
         <v-dialog
             v-model="dialogArtifact"
             fullscreen
@@ -680,18 +704,25 @@ const router = useRouter();
 const route = useRoute();
 const fileStore = useFileStore();
 
-const API_URL = import.meta.env.VITE_APP_DOMAIN;
 
+const API_URL = import.meta.env.VITE_APP_DOMAIN;
+const visibleTags = computed(() => {
+  return isTagsExpanded.value ? file.tags : file.tags.slice(0, 5);
+});
+function toggleTags() {
+  isTagsExpanded.value = !isTagsExpanded.value;
+}
+const isTagsExpanded = ref(false);
+const isLabelEditing = ref(false);
+const isDescriptionEditing = ref(false) ;
+const isTagsEditing = ref(false);
 let file = reactive({});
 const loading = ref(true);
-const dialogDelete = ref(false);
 const dialogArtifact = ref(false);
 const shouldCompare = ref(false);
 const loadingComparableFM = ref(false);
 const selectedRightFM = ref(-1);
 const selectedArtifact = {};
-const rightFmIsSelected = ref(false);
-const removeLoading = ref(false);
 const searchAnalysis = ref('');
 const headersAnalysis = [
     /*{
@@ -724,7 +755,131 @@ const itemsAnalysis = [
         status: 0,
     },
 ];
+//TODO: Fetch analysis for File
+/*function getAnalysis(){
+  api.get(`${API_URL}analyses/`).then((response)=>
+  console.log(response.data)).catch((error)=>console.log(error))
+}*/
+
 const showTutorial = ref(false);
+
+const selectedCols = ref([
+    'input_file',
+    'input_hash',
+    'svo',
+    'dvo',
+    'dvo_time',
+    'bdd_compiler',
+    'bdd_bootstrap',
+    'bdd_compile',
+    'bdd_timeout',
+    'bdd_size',
+]);
+
+watch(
+    () => selectedCols.value,
+    (newValue) => {
+        console.log('moin');
+        /*console.log(
+            headerCsvArtifactFull.filter(
+                (el) => newValue.indexOf(el.key) !== -1
+            )
+        );*/
+        headerCsvArtifact.value = headerCsvArtifactFull.filter(
+            (el) => newValue.indexOf(el.key) !== -1
+        );
+    }
+);
+
+onMounted(async () => {
+    loading.value = true;
+    await getFile();
+    loading.value = false;
+    showTutorial.value = !localStorage.fileDetailTutorialCompleted;
+});
+
+/*watch: {
+        selectedRightFM: function (newValue) {
+            console.log(newValue);
+        },
+    },*/
+const isRightFmSelected = computed(() => {
+    return selectedRightFM.value !== -1;
+});
+const getMyFM = computed(() => {
+    return fileStore.myConfirmedFeatureModels;
+});
+const getStati = computed(() => {
+    return {
+        success: {
+            percentage:
+                (itemsAnalysis.filter((obj) => obj.status === 1).length /
+                    itemsAnalysis.length) *
+                100,
+            absolute: itemsAnalysis.filter((obj) => obj.status === 1).length,
+        },
+        error: {
+            percentage:
+                (itemsAnalysis.filter((obj) => obj.status === -1).length /
+                    itemsAnalysis.length) *
+                100,
+            absolute: itemsAnalysis.filter((obj) => obj.status === -1).length,
+        },
+        progress: {
+            percentage:
+                (itemsAnalysis.filter((obj) => obj.status === 0).length /
+                    itemsAnalysis.length) *
+                100,
+            absolute: itemsAnalysis.filter((obj) => obj.status === 0).length,
+        },
+        amount: itemsAnalysis.length,
+    };
+});
+
+async function getFile() {
+  const id = route.params.id;
+    await api
+        .get(`${API_URL}files/${id}/`)
+        .then((response) => {
+            file = response.data;
+        })
+        .catch((error) => {
+            console.log('getfile', error);
+        });
+}
+function showArtifactDialog(item) {
+    selectedArtifact.value = item;
+    dialogArtifact.value = true;
+}
+async function compare() {
+    shouldCompare.value = true;
+    loadingComparableFM.value = true;
+    fileStore.fetchConfirmedFeatureModels();
+    loadingComparableFM.value = false;
+}
+/*async fetchFeatureModelOfFamily(value) {
+  await api
+    .get(`${API_URL}files/uploaded/confirmed/?family=${value}`)
+    .then((response) => {
+      this.files = response.data
+      this.loadingTable = false
+    })
+},*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 const tutorialSteps = [
     {
         title: 'Welcome to the tutorial!',
@@ -3187,123 +3342,7 @@ C1164:~FEATURE_SH_NOFORK  or  FEATURE_PREFER_APPLETS
 
     `;
 
-const selectedCols = ref([
-    'input_file',
-    'input_hash',
-    'svo',
-    'dvo',
-    'dvo_time',
-    'bdd_compiler',
-    'bdd_bootstrap',
-    'bdd_compile',
-    'bdd_timeout',
-    'bdd_size',
-]);
 
-watch(
-    () => selectedCols.value,
-    (newValue) => {
-        console.log('moin');
-        /*console.log(
-            headerCsvArtifactFull.filter(
-                (el) => newValue.indexOf(el.key) !== -1
-            )
-        );*/
-        headerCsvArtifact.value = headerCsvArtifactFull.filter(
-            (el) => newValue.indexOf(el.key) !== -1
-        );
-    }
-);
-
-onMounted(async () => {
-    loading.value = true;
-    await getFile();
-    console.log('file', file);
-    loading.value = false;
-    showTutorial.value = !localStorage.fileDetailTutorialCompleted;
-    //await this.fetchFeatureModelOfFamily(this.family.id)
-});
-
-/*watch: {
-        selectedRightFM: function (newValue) {
-            console.log(newValue);
-        },
-    },*/
-const isRightFmSelected = computed(() => {
-    return selectedRightFM.value !== -1;
-});
-const getMyFM = computed(() => {
-    return fileStore.myConfirmedFeatureModels;
-});
-const getStati = computed(() => {
-    return {
-        success: {
-            percentage:
-                (itemsAnalysis.filter((obj) => obj.status === 1).length /
-                    itemsAnalysis.length) *
-                100,
-            absolute: itemsAnalysis.filter((obj) => obj.status === 1).length,
-        },
-        error: {
-            percentage:
-                (itemsAnalysis.filter((obj) => obj.status === -1).length /
-                    itemsAnalysis.length) *
-                100,
-            absolute: itemsAnalysis.filter((obj) => obj.status === -1).length,
-        },
-        progress: {
-            percentage:
-                (itemsAnalysis.filter((obj) => obj.status === 0).length /
-                    itemsAnalysis.length) *
-                100,
-            absolute: itemsAnalysis.filter((obj) => obj.status === 0).length,
-        },
-        amount: itemsAnalysis.length,
-    };
-});
-
-async function getFile() {
-    const id = route.params.id;
-    await api
-        .get(`${API_URL}files/uploaded/confirmed/${id}/`)
-        .then((response) => {
-            file = response.data;
-        })
-        .catch((error) => {
-            console.log('getfile', error);
-        });
-}
-function deleteItem() {
-    this.dialogDelete = true;
-}
-function closeDelete() {
-    this.dialogDelete = false;
-}
-async function deleteItemConfirm() {
-    removeLoading.value = true;
-    await fileStore.deleteFeatureModel(file.value.id);
-    await fileStore.fetchConfirmedFeatureModels;
-    removeLoading.value = false;
-    await router.push('/');
-}
-function showArtifactDialog(item) {
-    selectedArtifact.value = item;
-    dialogArtifact.value = true;
-}
-async function compare() {
-    shouldCompare.value = true;
-    loadingComparableFM.value = true;
-    fileStore.fetchConfirmedFeatureModels();
-    loadingComparableFM.value = false;
-}
-/*async fetchFeatureModelOfFamily(value) {
-  await api
-    .get(`${API_URL}files/uploaded/confirmed/?family=${value}`)
-    .then((response) => {
-      this.files = response.data
-      this.loadingTable = false
-    })
-},*/
 </script>
 
 <style>
