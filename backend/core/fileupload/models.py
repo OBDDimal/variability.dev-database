@@ -20,6 +20,9 @@ class Family(models.Model):
     class Meta:
         verbose_name = "family"
         verbose_name_plural = "families"
+        indexes = [
+            models.Index(fields=['owner']),
+        ]
 
     def __str__(self):
         # do not change that
@@ -160,6 +163,13 @@ class File(models.Model):
     slug = models.SlugField(null=True)
     confirmation_token = models.CharField(default="", max_length=255)
 
+    class Meta:
+        indexes = [
+            models.Index(fields=['owner']),
+            models.Index(fields=['family']),
+            models.Index(fields=['is_confirmed']),
+        ]
+
     def __str__(self):
         # do not change that
         return f"{self.id}"
@@ -169,17 +179,19 @@ class File(models.Model):
             self.slug = slugify(self.label)
         return super().save(*args, **kwargs)
 
+
 class Analysis(models.Model):
     admin_only = models.BooleanField(default=False)
     disabled = models.BooleanField(default=False)
     query = models.TextField()
-    
+
     depends_on = models.ManyToManyField("self", symmetrical=False)
+
 
 class AnalysisResult(models.Model):
     triggered = models.BooleanField(default=False)
     error = models.BooleanField(default=False)
     result = models.JSONField(null=True)
-    
+
     analysis = models.ForeignKey(Analysis, on_delete=models.CASCADE)
     file = models.ForeignKey(File, on_delete=models.CASCADE)
