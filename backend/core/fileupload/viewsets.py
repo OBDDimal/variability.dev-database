@@ -1,3 +1,5 @@
+from django.db.models import Q
+
 from core.fileupload.models import Family, Tag, License, File, Analysis, AnalysisResult
 from core.fileupload.utils import generate_random_string
 from core.fileupload.serializers import (
@@ -439,17 +441,18 @@ class ConfirmedFileViewSet(
         indicating if the user which has sent the request is the owner.
         """
         queryset = File.objects.filter(is_confirmed=True)
-        familyId = self.request.query_params.get("family")
-        if familyId is not None:
-            queryset = queryset.filter(family__id=familyId).order_by("version")
+        family_id = self.request.query_params.get("family")
         owner = self.request.query_params.get("owner")
+
+        filter_conditions = Q(is_confirmed=True)
+        if family_id is not None:
+            filter_conditions &= Q(family__id=family_id)
         if owner is not None:
-            queryset = queryset.filter(owner=owner)
-        files = FilesSerializer(queryset, many=True).data
-        anonymized_files = []
-        for file in files:
-            anonymized_file = anonymize_file(file, request)
-            anonymized_files.append(anonymized_file)
+            filter_conditions &= Q(owner=owner)
+        queryset = (queryset.filter(filter_conditions).select_related('family', 'license').
+                    prefetch_related('tags').order_by("version"))
+
+        anonymized_files = [anonymize_file(FilesSerializer(file).data, request) for file in queryset]
         return Response(anonymized_files)
 
     def retrieve(self, request, *args, **kwargs):
