@@ -1,4 +1,6 @@
+from django.core.cache import cache
 from django.db.models import Q
+from django.utils.decorators import method_decorator
 
 from core.fileupload.models import Family, Tag, License, File, Analysis, AnalysisResult
 from core.fileupload.utils import generate_random_string
@@ -39,6 +41,7 @@ import core.fileupload.githubmirror.github_manager as gm
 from multiprocessing import Process
 from rest_framework.views import APIView
 from django.http.request import QueryDict
+from django.views.decorators.cache import cache_page
 
 import json
 import os
@@ -440,10 +443,22 @@ class ConfirmedFileViewSet(
         Replace email address of file owner with True or False,
         indicating if the user which has sent the request is the owner.
         """
-        queryset = File.objects.filter(is_confirmed=True)
+
         family_id = self.request.query_params.get("family")
         owner = self.request.query_params.get("owner")
+        if family_id is not None and owner is not None:
+            cache_key = f"confirmed_files_{family_id}_{owner}"
+        elif family_id is not None:
+            cache_key = f"confirmed_files_{family_id}_all"
+        elif owner is not None:
+            cache_key = f"confirmed_files_all_{owner}"
+        else:
+            cache_key = "confirmed_files_all"
 
+        cached_data = cache.get(cache_key)
+        if cached_data is not None:
+            return Response(cached_data)
+        queryset = File.objects.filter(is_confirmed=True)
         filter_conditions = Q(is_confirmed=True)
         if family_id is not None:
             filter_conditions &= Q(family__id=family_id)
@@ -453,6 +468,7 @@ class ConfirmedFileViewSet(
                     prefetch_related('tags').order_by("version"))
 
         anonymized_files = [anonymize_file(FilesSerializer(file).data, request) for file in queryset]
+        cache.set(cache_key, anonymized_files, 60 * 15)
         return Response(anonymized_files)
 
     def retrieve(self, request, *args, **kwargs):
@@ -513,11 +529,15 @@ class FamiliesViewSet(
         return anonymized_family
 
     def list(self, request, **kwargs):
+        cached_families = cache.get("families_cache_key")
+        if cached_families is not None:
+            return Response(cached_families)
         queryset = Family.objects.all()
         families = FamiliesSerializer(queryset, many=True).data
         anonymized_families = []
         for family in families:
             anonymized_families.append(self.anonymize_family(family, request))
+        cache.set("families_cache_key", anonymized_families, 60 * 15)
         return Response(anonymized_families)
 
     def retrieve(self, request, *args, **kwargs):
@@ -528,6 +548,7 @@ class FamiliesViewSet(
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
+        cache.delete("families_cache_key")
 
 
 class LicensesViewSet(
