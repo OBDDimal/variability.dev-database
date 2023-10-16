@@ -219,9 +219,9 @@
                 </v-list>
                 <div
                     class="mt-3 d-flex justify-space-between align-center"
-                    id="feature-model-actions"
+                   
                 >
-                    <div>
+                    <div  id="feature-model-actions">
                         <div class="d-inline-block mr-2">
                             <v-btn
                                 color="primary"
@@ -699,6 +699,7 @@ import { computed, onMounted, reactive, ref, watch } from 'vue';
 import api from '@/services/api.service';
 import { useFileStore } from '@/store/file';
 import { useRouter, useRoute } from 'vue-router';
+import TutorialMode from '@/components/TutorialMode';
 
 const router = useRouter();
 const route = useRoute();
