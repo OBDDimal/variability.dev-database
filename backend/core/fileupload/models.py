@@ -1,4 +1,7 @@
 from django.db import models
+from django.db.models.signals import post_migrate
+from django.dispatch import receiver
+
 from core.user.models import User
 from django.core.files.base import ContentFile
 from django.template.defaultfilters import slugify  # new
@@ -67,6 +70,13 @@ class LicenseManager(models.Manager):
         lic.save()
         return lic
 
+    def create_default_license(self):
+        """
+        Creates the default license.
+        """
+        default_license_label = "CC BY - SA 4.0 DEED"
+        default_license, created = self.get_or_create(label=default_license_label)
+        return default_license
 
 class License(models.Model):
     """
@@ -74,13 +84,20 @@ class License(models.Model):
     """
 
     objects = LicenseManager()
-    _default_license = "CC BY - Mention"
+    _default_license = "CC BY - SA 4.0 DEED"
 
     label = models.TextField(blank=False, default=_default_license)
 
     def __str__(self):
         # do not change that
         return f"{self.id}"
+
+    @receiver(post_migrate)
+    def create_default_license(sender, **kwargs):
+        """
+        Creates the default license after migrations.
+        """
+        License.objects.create_default_license()
 
 
 # -------------------------------------------------- File Model --------------------------------------------------
