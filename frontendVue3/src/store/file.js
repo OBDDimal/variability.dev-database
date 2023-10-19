@@ -14,6 +14,7 @@ export const useFileStore = defineStore('file', {
         confirmedFeatureModels: [],
         myConfirmedFeatureModels: [],
         featureModels: [],
+        defaultLicense: null,
     }),
     getters: {
         myOwnTags(state) {
@@ -77,6 +78,7 @@ export const useFileStore = defineStore('file', {
         },
         fetchLicenses() {
             api.get(`${API_URL}licenses/`).then((response) => {
+                this.defaultLicense = response.data.filter((li) => li.label === "CC BY - SA 4.0 DEED").shift();
                 this.licenses = response.data;
             });
         },

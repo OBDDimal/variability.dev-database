@@ -24,11 +24,12 @@
 <script setup>
 import { ref } from 'vue';
 import { useFileStore } from '@/store/file';
+import {storeToRefs} from "pinia";
 const uploadInfo = ref(null);
 const fileStore = useFileStore();
 
 const emit = defineEmits(['close', 'submitClick', 'uploadSuccessfull']);
-
+let { defaultLicense } = storeToRefs(fileStore);
 const props = defineProps({
     data: {
         type: Object,
@@ -62,7 +63,7 @@ async function uploadSingle() {
   let file_object = {};
   file_object['label'] = props.data.label;
   file_object['description'] = props.data.description;
-  file_object['license'] = props.data.license;
+  file_object['license'] = defaultLicense.value.id;
 
 
   file_object['family'] = props.data.family;
@@ -96,7 +97,7 @@ async function handleSuccessfulUpload(format) {
   uploadInfo.value = {
     format: format,
     fileNames: props.data.label,
-    license: props.data.license,
+    license:  defaultLicense.value.id,
   };
   uploadStatus.value = '';
   loading.value = false;
@@ -130,7 +131,7 @@ async function uploadBulk() {
     let date = new Date();
     file_object['label'] = file.name.replace('.xml', '');
     file_object['description'] = `Added in bulk upload on ${date.toLocaleString('en-US', options)}`;
-    file_object['license'] = props.data.license;
+    file_object['license'] =  defaultLicense.value.id;
     file_object['version'] = version;
     /**if (i !== 0) {
         file_object['family'] = uploaded_family_id;
@@ -164,7 +165,7 @@ async function uploadBulk() {
         format: "Bulk",
         fileCount: props.data.files.length,
         fileNames: file_names,
-        license: props.data.license
+        license:  defaultLicense.value.id
       };
     uploadStatus.value = '';
     loading.value = false;
