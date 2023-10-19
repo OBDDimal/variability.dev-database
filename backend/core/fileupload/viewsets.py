@@ -1,6 +1,6 @@
 from django.core.cache import cache
 from django.db.models import Q
-from django.utils.decorators import method_decorator
+from rest_framework.request import Request
 
 from core.fileupload.models import Family, Tag, License, File, Analysis, AnalysisResult
 from core.fileupload.utils import generate_random_string
@@ -40,8 +40,7 @@ from ..auth.tokens import decode_token_to_user
 import core.fileupload.githubmirror.github_manager as gm
 from multiprocessing import Process
 from rest_framework.views import APIView
-from django.http.request import QueryDict
-from django.views.decorators.cache import cache_page
+from django.http.request import QueryDict, HttpRequest
 
 import json
 import os
@@ -276,7 +275,6 @@ class BulkUploadApiView(UploadApiView):
 
         serializers = []
         confirmation_token = generate_random_string(30)
-
         for uploaded_file in files:
             label = uploaded_file["label"]
             description = uploaded_file["description"]
@@ -350,7 +348,6 @@ class ZipUploadApiView(UploadApiView):
 
         serializers = []
         confirmation_token = generate_random_string(30)
-
         for (i, uploaded_file) in enumerate(files.infolist()):
             local_file = SimpleUploadedFile(
                 f"{generate_random_string(20)}.xml", files.read(uploaded_file)
@@ -529,7 +526,7 @@ class FamiliesViewSet(
         return anonymized_family
 
     def list(self, request, **kwargs):
-        cached_families = cache.get("families_cache_key")
+        cached_families = cache.get(f"families_cache_{request.user}")
         if cached_families is not None:
             return Response(cached_families)
         queryset = Family.objects.all()
@@ -537,7 +534,7 @@ class FamiliesViewSet(
         anonymized_families = []
         for family in families:
             anonymized_families.append(self.anonymize_family(family, request))
-        cache.set("families_cache_key", anonymized_families, 60 * 15)
+        cache.set(f"families_cache_{request.user}", anonymized_families, 60 * 15)
         return Response(anonymized_families)
 
     def retrieve(self, request, *args, **kwargs):
@@ -548,7 +545,8 @@ class FamiliesViewSet(
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
-        cache.delete("families_cache_key")
+        cache_key = f"families_cache_{self.request.user}"
+        cache.delete(cache_key)
 
 
 class LicensesViewSet(
