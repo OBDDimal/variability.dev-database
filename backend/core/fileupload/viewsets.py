@@ -102,6 +102,19 @@ class ConfirmFileUploadApiView(APIView):
 
         file_data = []
 
+        django_request = HttpRequest()
+        django_request.method = 'GET'
+        django_request.META = request.META
+        django_request.GET = request.query_params.dict()
+
+        request_with_family = HttpRequest()
+        request_with_family.method = 'GET'
+        request_with_family.user = request.user
+
+        request_with_owner = HttpRequest()
+        request_with_owner.method = 'GET'
+        request_with_owner.user = request.user
+
         for file in files:
             if file.is_confirmed:
                 return Response(
@@ -109,7 +122,19 @@ class ConfirmFileUploadApiView(APIView):
                 )
             file.is_confirmed = True
             file.save()
+            cache.delete_many([f'confirmed_files_{file.owner}', f'confirmed_files_{file.family.id}'])
             file_data.append(FilesSerializer(file).data)
+
+            request_with_family.GET['family'] = file.family.id
+            request_with_owner.GET['owner'] = file.owner.id
+
+        cache.delete('confirmed_files_all')
+        confirmed_file_view = ConfirmedFileViewSet.as_view({'get': 'list'})
+        confirmed_file_view(django_request)
+        ConfirmedFileViewSet.as_view({'get': 'list'})(request_with_family)
+        ConfirmedFileViewSet.as_view({'get': 'list'})(request_with_owner)
+
+        response_with_family = confirmed_file_view(django_request)
 
         return Response({"files": file_data}, status.HTTP_201_CREATED)
 
