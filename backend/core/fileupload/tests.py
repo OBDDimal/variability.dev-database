@@ -522,21 +522,21 @@ class LicenseTest(APITestCase):
         self.client.force_authenticate(self.admin)
         res = self.client.get("/licenses/")
         json = res.json()
-        self.assertEqual(len(json), 2)
+        self.assertEqual(len(json), 3)
 
     def test_license_list_logged_in_user(self):
         # Licenses are listable when logged in with non-admin user
         self.client.force_authenticate(self.user)
         res = self.client.get("/licenses/")
         json = res.json()
-        self.assertEqual(len(json), 2)
+        self.assertEqual(len(json), 3)
 
     def test_license_list_logged_out(self):
         # Licenses are listable when logged out
         self.client.force_authenticate(None)
         res = self.client.get("/licenses/")
         json = res.json()
-        self.assertEqual(len(json), 2)
+        self.assertEqual(len(json), 3)
 
     def test_license_retrieve_logged_in_admin(self):
         # License is retrievable when logged in
