@@ -5,6 +5,7 @@
         <feature-model-table
             v-if="appStore.isOnline"
             :items="confirmedFeatureModels"
+            :availableTags="tags"
             :loading="loading"
             :addable="true"
         />
@@ -51,7 +52,7 @@ import { useDisplay } from 'vuetify';
 
 const breakpoints = useDisplay();
 const appStore = useAppStore();
-const { confirmedFeatureModels } = storeToRefs(useFileStore());
+const { confirmedFeatureModels, tags } = storeToRefs(useFileStore());
 const fileStore = useFileStore();
 
 
@@ -98,6 +99,7 @@ const tutorialSteps = [
 
 onMounted(() => {
     fileStore.fetchConfirmedFeatureModels();
+    fileStore.fetchTags();
 });
 </script>
 

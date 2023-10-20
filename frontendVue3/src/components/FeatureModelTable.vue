@@ -5,7 +5,7 @@
                 :loading="props.loading"
                 :headers="headers"
                 :items="filteredItems"
-                items-per-page="5"
+                items-per-page="10"
                 :search="search"
                 sort-by.sync="sortBy"
                 sort-desc="sortDesc"
@@ -16,6 +16,26 @@
                             {{ headline }}
                         </v-toolbar-title>
                         <v-divider
+                            class="mx-4 hidden-sm-and-down"
+                            inset
+                            vertical
+                        ></v-divider>
+                        <v-spacer class="hidden-sm-and-down"></v-spacer>
+                      <v-select
+                        class="hidden-sm-and-down"
+                        v-model="selectedTags"
+                        :items="props.availableTags"
+                        item-value="id"
+                        item-title="label"
+                        label="Filter by Tags"
+                        chips
+                        multiple
+                        density="comfortable"
+                        variant="filled"
+                        single-line
+                        hide-details
+                      ></v-select>
+                      <v-divider
                             class="mx-4 hidden-sm-and-down"
                             inset
                             vertical
@@ -211,6 +231,7 @@ const fileStore = useFileStore();
 const showAllTags = ref(false);
 const sortBy = ref(null);
 const sortDesc = ref(false);
+const selectedTags = ref([]); // Benutzer ausgewählte Tags
 
 const props = defineProps({
     headline: {
@@ -219,6 +240,10 @@ const props = defineProps({
         default: 'All Feature Models',
     },
     items: {
+        type: Array,
+        required: true,
+    },
+    availableTags: {
         type: Array,
         required: true,
     },
@@ -266,8 +291,18 @@ const checkLocalStorage = computed(() => {
 });
 const filteredItems = computed(() => {
   // Wenn die Suche leer ist, zeige alle Elemente
-  if (!search.value) {
+  if (!search.value && selectedTags.value.length === 0) {
     return props.items;
+  }
+  // Filter für Tags
+  let tagMatches = [];
+  if (selectedTags.value.length > 0) {
+    tagMatches = props.items.filter(item => {
+      const itemTagIds = item.tags.map(tag => tag.id);
+      return selectedTags.value.every(tagId => itemTagIds.includes(tagId));
+    });
+  } else {
+    tagMatches = props.items;
   }
 
   // Andernfalls filtere die Elemente basierend auf der Suche und priorisiere direkte Übereinstimmungen
@@ -275,7 +310,7 @@ const filteredItems = computed(() => {
   const directMatches = [];
   const otherMatches = [];
 
-  props.items.forEach((item) => {
+  tagMatches.forEach((item) => {
     const itemLabel = item.label.toLowerCase();
 
     if (itemLabel === searchLowerCase) {
