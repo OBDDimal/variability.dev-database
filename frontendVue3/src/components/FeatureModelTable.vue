@@ -21,20 +21,21 @@
                             vertical
                         ></v-divider>
                         <v-spacer class="hidden-sm-and-down"></v-spacer>
-                      <v-select
+                      <v-autocomplete
                         class="hidden-sm-and-down"
                         v-model="selectedTags"
                         :items="props.availableTags"
                         item-value="id"
                         item-title="label"
                         label="Filter by Tags"
+                        append-inner-icon="mdi-filter"
                         chips
                         multiple
                         density="comfortable"
                         variant="filled"
                         single-line
                         hide-details
-                      ></v-select>
+                      ></v-autocomplete>
                       <v-divider
                             class="mx-4 hidden-sm-and-down"
                             inset
@@ -210,7 +211,7 @@
                 <template v-slot:item.uploaded_at="{ item }">
                     {{ new Date(item.raw.uploaded_at).toLocaleString('en-US') }}
                 </template>
-                <template v-slot:no-data> {{ noDataText }} </template>
+                <template v-slot:no-data> {{ noDataMessage }} </template>
             </v-data-table>
         </v-card>
         <v-dialog v-model="createDialog" width="auto">
@@ -288,6 +289,15 @@ const search = ref('');
 const createDialog = ref(false);
 const checkLocalStorage = computed(() => {
     return !!localStorage.featureModelData;
+});
+const noDataMessage = computed(() => {
+  // Wenn entweder die Suche oder die Tags aktiviert sind und keine passenden Elemente gefunden wurden
+  if ((search.value || selectedTags.value.length > 0) && filteredItems.value.length === 0) {
+    return "No Feature Model matches the search criteria.";
+  } else {
+    // Wenn weder Suche noch Tags aktiviert sind oder passende Elemente gefunden wurden
+    return props.noDataText;
+  }
 });
 const filteredItems = computed(() => {
   // Wenn die Suche leer ist, zeige alle Elemente

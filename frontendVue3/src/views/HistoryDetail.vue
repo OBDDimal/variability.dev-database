@@ -221,7 +221,7 @@
                 :no-data-text="`No feature models in ${family.label} yet`"
                 :addable="false"
                 headline="Feature Models of Family"
-            />
+                :available-tags="tags"/>
         </div>
     </div>
 </template>
@@ -235,16 +235,15 @@ import {busyBoxConfigs} from "@/assets/busyBoxAnalyzeExample";
 import {useDisplay, useTheme} from "vuetify";
 import {VSkeletonLoader} from 'vuetify/labs/VSkeletonLoader'
 import LineChart from '@/components/Charts/LineChart.vue';
-
-
-
-
-
+import {useFileStore} from "@/store/file";
+import {storeToRefs} from "pinia";
 
 const breakpoints = useDisplay();
 const theme = useTheme();
 const route = useRoute();
 const API_URL = import.meta.env.VITE_APP_DOMAIN;
+const fileStore = useFileStore();
+const { tags } = storeToRefs(useFileStore());
 
 const family = ref({});
 const files = ref([]);
@@ -364,5 +363,6 @@ function onElementHover(elem) {
 onMounted(async () => {
     await getFamily();
     await fetchFeatureModelOfFamily();
+    fileStore.fetchTags();
 });
 </script>

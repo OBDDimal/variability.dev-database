@@ -8,6 +8,7 @@
         <feature-model-table
             id="feature-model-table"
             :items="confirmedFeatureModels"
+            :available-tags="tags"
             :loading="loading"
             :addable="true"
         />
@@ -37,7 +38,7 @@ import { onMounted, ref } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useFileStore } from '@/store/file';
 
-const { confirmedFeatureModels } = storeToRefs(useFileStore());
+const { confirmedFeatureModels, tags } = storeToRefs(useFileStore());
 const fileStore = useFileStore();
 
 const search = '';
@@ -79,7 +80,6 @@ const defaultItem = {
 };
 const licenses = [];
 const families = [];
-const tags = [];
 const check1 = false;
 const check2 = false;
 const check3 = false;
@@ -127,5 +127,6 @@ const tutorialSteps = [
 
 onMounted(() => {
     fileStore.fetchConfirmedFeatureModels();
+    fileStore.fetchTags();
 });
 </script>
