@@ -179,9 +179,14 @@
 
                 </div>
               </template>
-                <template v-slot:item.family.label="{ item }">
-                    {{ item.raw.family.label }} ({{ item.raw.version }})
+              <template v-slot:item.family.label="{ item }">
+                <template v-if="item.raw.family">
+                  {{ item.raw.family.label }} ({{ item.raw.version }})
                 </template>
+                <template v-else>
+                  N/A
+                </template>
+              </template>
                 <template v-slot:item.uploaded_at="{ item }">
                     {{ new Date(item.raw.uploaded_at).toLocaleString('en-US') }}
                 </template>

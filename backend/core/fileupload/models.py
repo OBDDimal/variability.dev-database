@@ -118,13 +118,13 @@ class FileManager(models.Manager):
         if tags is None:
             raise TypeError("Tags is not set")
         family = kwargs.get("family", None)
-        # get file from id
-        if kwargs.get("version", None) is None:
-            raise TypeError("Version is not set")
+        version = kwargs.get("version", None)
         # get license from id
         if kwargs.get("license", None) is None:
             raise TypeError("License not set!")
+
         file = self.model(**kwargs)
+
         file.save()
         file.tags.set(tags)
         file.save()
@@ -157,14 +157,14 @@ class File(models.Model):
     relative_upload_dir = "files/"
 
     owner = models.ForeignKey(User, on_delete=models.RESTRICT)
-    family = models.ForeignKey(Family, on_delete=models.CASCADE)
+    family = models.ForeignKey(Family, on_delete=models.CASCADE, null=True, blank=True)
     label = models.CharField(blank=False, max_length=255)
     description = models.TextField(blank=True)
     local_file = models.FileField(upload_to=relative_upload_dir)
     uploaded_at = models.DateTimeField(auto_now_add=True)
     license = models.ForeignKey(License, on_delete=models.CASCADE)
     tags = models.ManyToManyField(Tag)
-    version = models.CharField(blank=False, null=False, max_length=16)
+    version = models.CharField(blank=True, null=True, max_length=16)
     transpiled_file = models.FileField(
         null=True, blank=True, upload_to=relative_upload_dir
     )

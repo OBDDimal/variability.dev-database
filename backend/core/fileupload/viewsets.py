@@ -69,8 +69,11 @@ def anonymize_file(file, request):
                 tags.append(new_tag)
             anonymized_file[file_key] = tags
         elif file_key == "family":
-            new_family = file_value
-            new_family.update({"owner": new_family["owner"] == user_email})
+            if file_value is not None:
+                new_family = file_value.copy()
+                new_family.update({"owner": new_family.get("owner") == user_email})
+            else:
+                new_family = None
             anonymized_file[file_key] = new_family
         else:
             anonymized_file[file_key] = file_value
@@ -172,8 +175,11 @@ class UploadApiView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def check_family(self, request, family_id):
-        family = Family.objects.get(pk=family_id)
-        return family and family.owner == request.user
+        if family_id:
+            family = Family.objects.get(pk=family_id)
+            return family and family.owner == request.user
+        return True
+
 
     def check_tags(self, request, tag_ids):
         for tag_id in tag_ids:
