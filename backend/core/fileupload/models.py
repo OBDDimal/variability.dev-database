@@ -119,8 +119,9 @@ class FileManager(models.Manager):
             raise TypeError("Tags is not set")
         family = kwargs.get("family", None)
         version = kwargs.get("version", None)
+        private = kwargs.get("private", None)
         # get license from id
-        if kwargs.get("license", None) is None:
+        if kwargs.get("license", None) is None and kwargs.get("private") is None:
             raise TypeError("License not set!")
 
         file = self.model(**kwargs)
@@ -176,6 +177,9 @@ class File(models.Model):
     )  # indicates if the user confirmed the upload
     slug = models.SlugField(null=True)
     confirmation_token = models.CharField(default="", max_length=255)
+    private = models.BooleanField(
+        default=False
+    )
 
     def __str__(self):
         # do not change that
