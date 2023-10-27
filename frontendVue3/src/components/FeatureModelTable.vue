@@ -54,6 +54,12 @@
                             density="comfortable"
                         >
                         </v-text-field>
+                      <v-divider
+                            class="mx-4 hidden-sm-and-down"
+                            inset
+                            vertical
+                        ></v-divider>
+                      <v-switch v-model="showPrivateFiles" v-if="private" style="align-self: center;" label="Show Private Files" class='ml-4 mt-4' color="primary"></v-switch>
                       <v-tooltip location='top'>
                         <template v-slot:activator='{ props }'>
                           <v-btn
@@ -100,9 +106,27 @@
                             color='secondary'
                             variant='tonal'
                             size='small'
-                            icon='mdi-server'
+                            icon='mdi-eye'
                             v-bind='props'
                             to='/feature-model/local'
+                          >
+                          </v-btn>
+                        </template>
+                        <span>See local storage</span>
+                      </v-tooltip>
+                      <v-tooltip location='top'>
+                        <template v-slot:activator='{ props }'>
+                          <v-btn
+                            id='feature-model-ls'
+                            v-if='addable'
+                            :disabled='!checkLocalStorage'
+                            class='mb-2 ml-2'
+                            color='secondary'
+                            variant='tonal'
+                            size='small'
+                            icon='mdi-server'
+                            v-bind='props'
+                            @click='localUploadDialog = true'
                           >
                           </v-btn>
                         </template>
@@ -217,6 +241,9 @@
         <v-dialog v-model="createDialog" width="auto">
             <file-create @close="createDialog = !createDialog"></file-create>
         </v-dialog>
+      <v-dialog v-model="localUploadDialog" width="auto">
+            <PrivateUpload @close="localUploadDialog = !localUploadDialog"></PrivateUpload>
+        </v-dialog>
     </div>
 </template>
 
@@ -225,6 +252,7 @@ import FileCreate from '@/components/upload_cards/FileCreate.vue';
 import { computed, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useFileStore } from '@/store/file';
+import PrivateUpload from "@/components/upload_cards/file_create/PrivateUpload.vue";
 
 const emit = defineEmits(['onDelete']);
 const router = useRouter();
@@ -233,6 +261,8 @@ const showAllTags = ref(false);
 const sortBy = ref(null);
 const sortDesc = ref(false);
 const selectedTags = ref([]); // Benutzer ausgewählte Tags
+const localUploadDialog = ref(false);
+const showPrivateFiles = ref(false);
 
 const props = defineProps({
     headline: {
@@ -262,6 +292,11 @@ const props = defineProps({
         type: Boolean,
         required: false,
         default: true,
+    },
+      private: {
+        type: Boolean,
+        required: false,
+        default: false,
     },
 });
 const headers = [
@@ -301,6 +336,9 @@ const noDataMessage = computed(() => {
 });
 const filteredItems = computed(() => {
   // Wenn die Suche leer ist, zeige alle Elemente
+  if(showPrivateFiles.value){
+    return fileStore.myPrivateFeatureModels;
+  }
   if (!search.value && selectedTags.value.length === 0) {
     return props.items;
   }

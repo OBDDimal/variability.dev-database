@@ -15,6 +15,7 @@ export const useFileStore = defineStore('file', {
         myConfirmedFeatureModels: [],
         featureModels: [],
         defaultLicense: null,
+        myPrivateFeatureModels:[]
     }),
     getters: {
         myOwnTags(state) {
@@ -28,6 +29,11 @@ export const useFileStore = defineStore('file', {
         fetchConfirmedFeatureModels() {
             api.get(`${API_URL}files/uploaded/confirmed/`).then((response) => {
                 this.confirmedFeatureModels = response.data;
+            });
+        },
+        fetchMyPrivateFeatureModels() {
+            api.get(`${API_URL}files/uploaded/private/`).then((response) => {
+                this.myPrivateFeatureModels = response.data;
             });
         },
         async fetchMyConfirmedFeatureModels() {
@@ -141,6 +147,31 @@ export const useFileStore = defineStore('file', {
                 );
                 return false;
               })
+        },
+      async uploadPrivateFile(data) {
+            const appStore = useAppStore();
+          return await api
+              .post(`${API_URL}private-upload/`, data, {
+                headers: { 'Content-Type': 'multipart/form-data' },
+              })
+              .then(() => {
+                appStore.updateSnackbar(
+                  'Upload successfully!',
+                  'success',
+                  5000,
+                  true
+                );
+                return true
+              })
+              .catch((error) => {
+                appStore.updateSnackbar(
+                  'Error! ' + error.message,
+                  'error',
+                  5000,
+                  true
+                );
+                return false;
+              });
         },
         async uploadTag(payload) {
             // payload = { label, description, is_public }

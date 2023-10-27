@@ -25,6 +25,7 @@
 import { ref } from 'vue';
 import { useFileStore } from '@/store/file';
 import {storeToRefs} from "pinia";
+import beautify from "xml-beautifier";
 const uploadInfo = ref(null);
 const fileStore = useFileStore();
 
@@ -46,7 +47,9 @@ let loading = ref(false);
 async function upload() {
   const { valid } = await props.valid.validate();
   if (valid) {
-    if (props.data.files.length === 1) {
+    if (props.data.private){
+      await uploadPrivate();
+    }else if (props.data.files.length === 1) {
       await uploadSingle();
       } else {
       await uploadBulk();
@@ -55,7 +58,28 @@ async function upload() {
     emit('submitClick');
   }
 }
+async function uploadPrivate(){
 
+  loading.value = true;
+  const data = new FormData();
+  let file_data = [];
+  let file_object = {};
+  file_object['label'] = props.data.label;
+  file_object['description'] = props.data.description;
+  file_object['file'] = '0';
+  file_object['tags'] = [];
+  file_object['license'] = defaultLicense.value.id;
+  file_data.push(file_object);
+  const xmlData = localStorage.featureModelData;
+  const blob = new Blob([xmlData], { type: 'application/xml' });
+  data.append('0', blob, 'file.xml');
+  data.append('files', JSON.stringify(file_data));
+  uploadStatus.value = 'Uploading file...';
+  await fileStore.uploadPrivateFile(data);
+  uploadStatus.value = '';
+  loading.value = false;
+  emit('close');
+}
 async function uploadSingle() {
   loading.value = true;
   const data = new FormData();
