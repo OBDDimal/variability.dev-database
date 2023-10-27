@@ -13,7 +13,7 @@ from core.fileupload.viewsets import (
     ConfirmedFileViewSet,
     UnconfirmedFileViewSet,
     ConfirmFileUploadApiView,
-    DeleteFileUploadApiView,
+    DeleteFileUploadApiView, PrivateFileUploadApiView, PrivateFileViewSet,
 )
 from core.user.viewsets import ActivateUserViewSet, UserInfoApiView
 from core.auth.viewsets import LoginViewSet, RegistrationViewSet, RefreshViewSet
@@ -41,6 +41,7 @@ router.register(r"files", FileUploadViewSet, basename="file-upload")
 router.register(
     r"files/uploaded/confirmed", ConfirmedFileViewSet, basename="confirmed-files"
 )
+router.register(r'files/uploaded/private', PrivateFileViewSet, basename='private-files')
 router.register(
     r"files/uploaded/unconfirmed", UnconfirmedFileViewSet, basename="unconfirmed-files"
 )
@@ -55,6 +56,7 @@ urlpatterns = [
     *router.urls,
     path("bulk-upload/", BulkUploadApiView.as_view()),
     path("zip-upload/", ZipUploadApiView.as_view()),
+    path("private-upload/", PrivateFileUploadApiView.as_view()),
     re_path(r"files/uploaded/unconfirmed/confirm/(?P<token>[\w\d]+)", ConfirmFileUploadApiView.as_view()),
     re_path(r"files/uploaded/unconfirmed/delete/(?P<token>[\w\d]+)", DeleteFileUploadApiView.as_view()),
     path("api-auth/", include("rest_framework.urls")),
