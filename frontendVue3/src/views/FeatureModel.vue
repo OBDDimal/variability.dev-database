@@ -42,7 +42,8 @@
         >
             <v-icon>mdi-information</v-icon>
         </v-btn>
-
+        <feature-model-fact-label-bar>
+        </feature-model-fact-label-bar>
         <v-btn
             data-cy="feature-model-constraints-button"
             id="feature-model-constraints"
@@ -122,6 +123,7 @@
 
 <script>
 import FeatureModelTree from '../components/FeatureModel/FeatureModelTree.vue';
+import FeatureModelFactLabelBar from '@/components/FeatureModel/FeatureModelFactLabelBar.vue';
 import Constraints from '../components/Constraints.vue';
 import * as update from '@/services/FeatureModel/update.service';
 import api from '@/services/api.service';
@@ -154,6 +156,7 @@ export default {
         FeatureModelTree,
         Constraints,
         CollaborationNameDialog,
+        FeatureModelFactLabelBar,
     },
 
     props: {

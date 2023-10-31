@@ -1,59 +1,28 @@
 <template>
     <div>
         <div class="float-right mt-2 mr-3" style="position: absolute; right: 0">
-            <v-toolbar
-                floating
-                id="feature-model-search"
-                class="rounded-pill"
-                elevation="9"
-                height="auto"
-                style="border: 2px solid white"
-                width="auto"
-            >
-                <v-btn
-                    :disabled="search.foundNodeIndex === 0"
-                    :small="smAndDown"
-                    icon="mdi-chevron-left"
-                    @click="onChangeFoundNodeIndex(--search.foundNodeIndex)"
-                >
+            <v-toolbar floating id="feature-model-search" class="rounded-pill" elevation="9" height="auto"
+                style="border: 2px solid white" width="auto">
+                <v-btn :disabled="search.foundNodeIndex === 0" :small="smAndDown" icon="mdi-chevron-left"
+                    @click="onChangeFoundNodeIndex(--search.foundNodeIndex)">
                 </v-btn>
 
-                <v-btn
-                    :disabled="
-                        search.foundNodeDistances.length <=
-                        search.foundNodeIndex + 1
-                    "
-                    :small="smAndDown"
-                    icon="mdi-chevron-right"
-                    @click="onChangeFoundNodeIndex(++search.foundNodeIndex)"
-                >
+                <v-btn :disabled="search.foundNodeDistances.length <=
+                    search.foundNodeIndex + 1
+                    " :small="smAndDown" icon="mdi-chevron-right"
+                    @click="onChangeFoundNodeIndex(++search.foundNodeIndex)">
                 </v-btn>
                 <v-spacer></v-spacer>
-                <v-text-field
-                    v-model="search.searchText"
-                    :class="search.showSearch ? '' : 'closed'"
-                    :dense="smAndDown"
-                    class="px-4 expanding-search"
-                    clearable
-                    hide-details
-                    placeholder="Search"
-                    prepend-inner-icon="mdi-magnify"
-                    single-line
-                    @blur="search.showSearch = false"
-                    @focus="search.showSearch = true"
-                    @input="onChangeSearchText"
-                ></v-text-field>
+                <v-text-field v-model="search.searchText" :class="search.showSearch ? '' : 'closed'" :dense="smAndDown"
+                    class="px-4 expanding-search" clearable hide-details placeholder="Search"
+                    prepend-inner-icon="mdi-magnify" single-line @blur="search.showSearch = false"
+                    @focus="search.showSearch = true" @input="onChangeSearchText"></v-text-field>
 
-                <v-badge
-                    v-if="search.foundNodeDistances.length"
-                    :content="
-                        search.foundNodeIndex +
-                        1 +
-                        '/' +
-                        search.foundNodeDistances.length
-                    "
-                    inline
-                ></v-badge>
+                <v-badge v-if="search.foundNodeDistances.length" :content="search.foundNodeIndex +
+                    1 +
+                    '/' +
+                    search.foundNodeDistances.length
+                    " inline></v-badge>
 
                 <!--				<v-btn icon @click="search.showSearch = !search.showSearch">
                   <v-icon>mdi-magnify</v-icon>
@@ -61,111 +30,59 @@
             </v-toolbar>
         </div>
 
-        <feature-model-tree-toolbar
-            :collaborationStatus="collaborationStatus"
-            :direction="d3Data.direction"
-            :editRights="editRights"
-            :is-redo-available="
-                commandManager && commandManager.isRedoAvailable()
-            "
-            :is-save-available="
-                (commandManager && commandManager.isUndoAvailable()) ||
-                commandManager.collaborationManager.constraintCommandManager.isUndoAvailable()
-            "
-            :is-undo-available="
-                commandManager && commandManager.isUndoAvailable()
-            "
-            :is-service-available="isServiceAvailable"
-            @coloring="(coloringIndex) => coloring(coloringIndex)"
-            @export="$emit('exportToXML')"
-            @fitToView="fitToView"
-            @quickEdit="(value) => updateQuickEdit(value)"
-            @redo="redo"
-            @reset="$emit('reset')"
-            @resetView="(levels, maxChildren) => resetView(levels, maxChildren)"
-            @save="$emit('save')"
-            @semanticEditing="(value) => (d3Data.semanticEditing = value)"
-            @shortName="changeShortName"
-            @spaceBetweenParentChild="changeSpaceBetweenParentChild"
-            @spaceBetweenSiblings="changeSpaceBetweenSiblings"
-            @toggleDirection="toggleDirection"
-            @undo="undo"
-            @show-collaboration-dialog="$emit('show-collaboration-dialog')"
-            @show-tutorial="$emit('show-tutorial')"
-            @new-empty-model="$emit('new-empty-model')"
-        ></feature-model-tree-toolbar>
+        <feature-model-tree-toolbar :collaborationStatus="collaborationStatus" :direction="d3Data.direction"
+            :editRights="editRights" :is-redo-available="commandManager && commandManager.isRedoAvailable()
+                " :is-save-available="(commandManager && commandManager.isUndoAvailable()) ||
+        commandManager.collaborationManager.constraintCommandManager.isUndoAvailable()
+        " :is-undo-available="commandManager && commandManager.isUndoAvailable()
+        " :is-service-available="isServiceAvailable" @coloring="(coloringIndex) => coloring(coloringIndex)"
+            @export="$emit('exportToXML')" @fitToView="fitToView" @quickEdit="(value) => updateQuickEdit(value)"
+            @redo="redo" @reset="$emit('reset')" @resetView="(levels, maxChildren) => resetView(levels, maxChildren)"
+            @save="$emit('save')" @semanticEditing="(value) => (d3Data.semanticEditing = value)"
+            @shortName="changeShortName" @spaceBetweenParentChild="changeSpaceBetweenParentChild"
+            @spaceBetweenSiblings="changeSpaceBetweenSiblings" @toggleDirection="toggleDirection" @undo="undo"
+            @show-collaboration-dialog="$emit('show-collaboration-dialog')" @show-tutorial="$emit('show-tutorial')"
+            @new-empty-model="$emit('new-empty-model')"></feature-model-tree-toolbar>
 
         <div id="svg-container"></div>
 
-        <feature-model-tree-context-menu
-            :d3Node="d3Data.contextMenu.selectedD3Node"
-            :d3NodeEvent="d3Data.contextMenu.event"
-            :editRights="editRights"
-            @addAsChild="(d3Node) => openAddAsChildDialog(d3Node)"
+        <feature-model-tree-context-menu :d3Node="d3Data.contextMenu.selectedD3Node" :d3NodeEvent="d3Data.contextMenu.event"
+            :editRights="editRights" @addAsChild="(d3Node) => openAddAsChildDialog(d3Node)"
             @addAsSibling="(d3Node) => openAddAsSiblingDialog(d3Node)"
-            @close="d3Data.contextMenu.selectedD3Node = undefined"
-            @collapse="collapse"
-            @edit="(d3Node) => openEditDialog(d3Node)"
-            @remove="(d3Node) => openRemoveDialog(d3Node)"
-            @hideAllNodesOnThisLevel="
-                (d3Node) => hideAllNodesOnThisLevel(d3Node)
-            "
-            @hideAllOtherNodes="(d3Node) => hideAllOtherNodes(d3Node)"
-            @hideCurrentNode="(d3Node) => hideCurrentNode(d3Node)"
-            @hideLeftSiblings="(d3Node) => hideLeftSiblings(d3Node)"
+            @close="d3Data.contextMenu.selectedD3Node = undefined" @collapse="collapse"
+            @edit="(d3Node) => openEditDialog(d3Node)" @remove="(d3Node) => openRemoveDialog(d3Node)"
+            @hideAllNodesOnThisLevel="(d3Node) => hideAllNodesOnThisLevel(d3Node)
+                " @hideAllOtherNodes="(d3Node) => hideAllOtherNodes(d3Node)"
+            @hideCurrentNode="(d3Node) => hideCurrentNode(d3Node)" @hideLeftSiblings="(d3Node) => hideLeftSiblings(d3Node)"
             @hideRightSiblings="(d3Node) => hideRightSiblings(d3Node)"
-            @highlightConstraints="(d3Node) => highlightConstraints(d3Node)"
-            @resetHighlightConstraints="
-                (d3Node) => resetHighlightConstraints(d3Node)
-            "
-        ></feature-model-tree-context-menu>
+            @highlightConstraints="(d3Node) => highlightConstraints(d3Node)" @resetHighlightConstraints="(d3Node) => resetHighlightConstraints(d3Node)
+                "></feature-model-tree-context-menu>
 
-        <feature-model-tree-edit-dialog
-            :node="editNode"
-            :show="showEditDialog"
-            @close="showEditDialog = false"
-            @edit="(data) => edit(data)"
-        >
+        <feature-model-tree-edit-dialog :node="editNode" :show="showEditDialog" @close="showEditDialog = false"
+            @edit="(data) => edit(data)">
         </feature-model-tree-edit-dialog>
 
-      <feature-model-tree-loading-dialog
-                :show="loadingData"
-        >
+        <feature-model-tree-loading-dialog :show="loadingData">
         </feature-model-tree-loading-dialog>
 
-        <feature-model-tree-error-dialog
-                :show="error"
-                :error-message="errorMessage"
-                @close="$emit('error-closed')"
-        >
+        <feature-model-tree-error-dialog :show="error" :error-message="errorMessage" @close="$emit('error-closed')">
         </feature-model-tree-error-dialog>
 
-      <feature-model-tree-remove-dialog
-        :node="editNode"
-        :show="showRemoveDialog"
-        @close="showRemoveDialog = false"
-        @remove="remove"
-      >
-      </feature-model-tree-remove-dialog>
+        <feature-model-tree-remove-dialog :node="editNode" :show="showRemoveDialog" @close="showRemoveDialog = false"
+            @remove="remove">
+        </feature-model-tree-remove-dialog>
 
-        <feature-model-tree-add-dialog
-            :parent="
-                d3Data.d3ParentOfAddNode
-                    ? d3Data.d3ParentOfAddNode.data
-                    : undefined
-            "
-            :show="showAddDialog"
-            @add="(data) => add(data)"
-            @close="showAddDialog = false"
-        ></feature-model-tree-add-dialog>
-        <feature-model-fact-label-bar>
-        </feature-model-fact-label-bar>
+        <feature-model-tree-add-dialog :parent="d3Data.d3ParentOfAddNode
+                ? d3Data.d3ParentOfAddNode.data
+                : undefined
+            " :show="showAddDialog" @add="(data) => add(data)"
+            @close="showAddDialog = false"></feature-model-tree-add-dialog>
+
     </div>
 </template>
 
 <script>
 import FeatureModelTreeToolbar from './FeatureModelTreeToolbar.vue';
-import FeatureModelFactLabelBar from './FeatureModelFactLabelBar.vue';
 import FeatureModelTreeContextMenu from './FeatureModelTreeContextMenu.vue';
 import FeatureModelTreeEditDialog from '@/components/FeatureModel/FeatureModelTreeEditDialog.vue';
 import FeatureModelTreeAddDialog from '@/components/FeatureModel/FeatureModelTreeAddDialog';
@@ -190,9 +107,8 @@ export default {
     name: 'FeatureModelTree',
 
     components: {
-      FeatureModelTreeErrorDialog,
-      FeatureModelTreeLoadingDialog,
-      FeatureModelFactLabelBar,
+        FeatureModelTreeErrorDialog,
+        FeatureModelTreeLoadingDialog,
         FeatureModelTreeToolbar,
         FeatureModelTreeContextMenu,
         FeatureModelTreeEditDialog,
@@ -286,9 +202,9 @@ export default {
         },
 
         coloring(coloringIndex) {
-          this.d3Data.coloringIndex = coloringIndex;
-          this.commandManager.executeReload();
-          update.updateSvg(this.d3Data);
+            this.d3Data.coloringIndex = coloringIndex;
+            this.commandManager.executeReload();
+            update.updateSvg(this.d3Data);
         },
 
         onChangeFoundNodeIndex(index) {
@@ -382,15 +298,15 @@ export default {
         },
 
         remove() {
-          this.showRemoveDialog = false
+            this.showRemoveDialog = false
 
-          if (this.editNode.isLeaf() && this.editNode.parent.isAnd() && this.editNode.constraints.length === 0) {
-            const removeCommand = new RemoveCommand(this.editNode, this.d3Data.d3AddNodeIndex)
-            this.commandManager.execute(removeCommand)
-            update.updateSvg(this.d3Data)
-          } else {
-            this.$emit('slice', this.editNode)
-          }
+            if (this.editNode.isLeaf() && this.editNode.parent.isAnd() && this.editNode.constraints.length === 0) {
+                const removeCommand = new RemoveCommand(this.editNode, this.d3Data.d3AddNodeIndex)
+                this.commandManager.execute(removeCommand)
+                update.updateSvg(this.d3Data)
+            } else {
+                this.$emit('slice', this.editNode)
+            }
         },
 
         changeShortName(isShortName) {
@@ -440,9 +356,9 @@ export default {
         },
 
         openRemoveDialog(d3Node) {
-          this.closeContextMenu()
-          this.editNode = d3Node.data
-          this.showRemoveDialog = true
+            this.closeContextMenu()
+            this.editNode = d3Node.data
+            this.showRemoveDialog = true
         },
 
         undo() {
@@ -581,7 +497,7 @@ export default {
     stroke-width: 1.5px;
 }
 
-.children-count > circle {
+.children-count>circle {
     fill: white;
     stroke: #888;
     stroke-width: 1.5px;
@@ -591,7 +507,7 @@ export default {
     cursor: pointer;
     vertical-align: middle;
 
-    > circle {
+    >circle {
         fill: white;
         stroke: #888;
         stroke-width: 1.5px;
