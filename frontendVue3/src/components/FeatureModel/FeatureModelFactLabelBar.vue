@@ -2,10 +2,7 @@
     <div>
         <v-navigation-drawer
             v-model="drawer"
-            rail
-            expand-on-hover
-            absolute
-            permanent
+            temporary           
             location="end"
         >
         <fact-label></fact-label>
@@ -22,14 +19,21 @@ export default {
         FactLabel,
     },
 
-    props: {},
+    props: {
+        isOpen: Boolean,
+    },
 
     data: () => ({
-        drawer: true,
     }),
 
 
-    computed: {},
+    computed: {
+        drawer: {
+            get() {
+                return this.isOpen;
+            },
+            set() {this.$emit('close'); },
+        },},
 
     methods: {
 

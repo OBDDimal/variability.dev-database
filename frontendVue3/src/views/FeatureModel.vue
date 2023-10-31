@@ -42,7 +42,9 @@
         >
             <v-icon>mdi-information</v-icon>
         </v-btn>
-        <feature-model-fact-label-bar>
+        <feature-model-fact-label-bar
+        :isOpen="openInformation"
+        @close="openInformation = false">
         </feature-model-fact-label-bar>
         <v-btn
             data-cy="feature-model-constraints-button"
