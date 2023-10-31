@@ -1,5 +1,6 @@
 <template>
     <v-card variant="outlined">
+
         <v-divider class="border-opacity-100"></v-divider>
         <!--  Data Table for MetaData: -->
         <v-data-table :headers="factHeaders" :items="metadata" item-value="name">
@@ -76,7 +77,9 @@
             <template v-slot:bottom>
             </template>
         </v-data-table>
-
+        <v-divider class="border-opacity-100" thickness="10"></v-divider>
+        <v-checkbox-btn v-model="hideMissing" label="Hide Missing" @update:modelValue="hideMissingFacts">
+        </v-checkbox-btn>
     </v-card>
 </template>
 
@@ -104,6 +107,7 @@ export default {
         factHeaders: [{ key: "name", sortable: false }, { key: "value", sortable: false }],
         expandableHeaders: [{ key: 'data-table-expand' }, { key: "name", sortable: false }, { key: "value", sortable: false }],
         facts: null,
+        hideMissing: false,
         metadata: [], // Array of simple k,v pairs
         metrics: [],
         analysis: [],
@@ -116,7 +120,7 @@ export default {
     },
     methods: {
         initialize() {
-            this.facts = FactLabelFactory.getEmptyFactLabel();
+            this.facts = FactLabelFactory.getEmptyFactLabel(); // TODO load only when not set via props
             this.fillMetaData();
             this.fillAnalysis();
             this.fillMetrics();
@@ -216,8 +220,23 @@ export default {
                 return "Failed to determine which value to display";
             }
 
-        }
-
+        },
+        hideMissingFacts() {
+            if (!this.hideMissing) {
+                // restore initial state
+                this.initialize();
+            } else {
+                this.metadata = this.facts.metadata.filter((entry) => {
+                    return entry.value !== null;
+                });
+                this.analysis = this.facts.analysis.filter((entry) => {
+                    return entry.value !== null;
+                });
+                this.metrics = this.facts.metrics.filter((entry) => {
+                    return entry.value !== null;
+                });
+            }
+        },
     },
 };
 </script>
