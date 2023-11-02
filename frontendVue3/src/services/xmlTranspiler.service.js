@@ -6,6 +6,7 @@ import { Conjunction } from '@/classes/Constraint/Conjunction';
 import { Implication } from '@/classes/Constraint/Implication';
 import { Negation } from '@/classes/Constraint/Negation';
 import { SoloDisjunction } from '@/classes/Constraint/SoloDisjunction';
+import { Equivalence } from '@/classes/Constraint/Equivalence';
 
 export function xmlToJson(currentModel, data) {
     /*const start = performance.now();*/
@@ -93,6 +94,8 @@ function readConstraintItem(item, data) {
                     return new Conjunction(childItems[0], childItems[1]);
                 case 'imp':
                     return new Implication(childItems[0], childItems[1]);
+                case 'eq':
+                    return new Equivalence(childItems[0], childItems[1]);
                 case 'not':
                     return new Negation(childItems[0]);
             }
