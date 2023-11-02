@@ -404,6 +404,7 @@ class ConfirmedFileViewSet(
     serializer_class = FilesSerializer
     permission_classes = [IsAuthenticatedOrReadOnly, IsOwnerOrIsAdminOrReadOnly]
 
+
     def list(self, request, **kwargs):
         """
         Replace email address of file owner with True or False,
@@ -430,7 +431,7 @@ class ConfirmedFileViewSet(
             filter_conditions &= Q(family__id=family_id)
         if owner is not None:
             filter_conditions &= Q(owner=owner)
-        queryset = (queryset.filter(filter_conditions).select_related('family', 'license').
+        queryset = (queryset.filter(filter_conditions).select_related('family', 'license', 'owner').
                     prefetch_related('tags').order_by("version"))
 
         anonymized_files = [anonymize_file(FilesSerializer(file).data, request) for file in queryset]
