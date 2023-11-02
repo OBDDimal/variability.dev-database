@@ -1,32 +1,18 @@
 import json
 
-from django.core.cache.utils import make_template_fragment_key
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.files.base import ContentFile
-from django.utils.functional import cached_property
-
 from core.fileupload.models import Family, Tag, License, File, Analysis, AnalysisResult
 from rest_framework import serializers
 from django.http import QueryDict
-
-from core.user.models import User
 from transpiler.g6_transpiler import xml_to_g6
 from core.fileupload.utils import generate_random_string
-from django.core.cache import cache
 
 class FamiliesSerializer(serializers.ModelSerializer):
     """
     A serializer for defining which Feature Model Family attributes should be converted to JSON
     """
-    def get_owner_email(self, instance):
-        cache_key = make_template_fragment_key('owner_email', [instance.pk])
-        owner_email = cache.get(cache_key)
-        if owner_email is None:
-            owner_email = instance.owner.email if instance.owner else ''
-            cache.set(cache_key, owner_email, timeout=None)
-        return owner_email
-
-    owner = serializers.SerializerMethodField(method_name='get_owner_email')
+    owner = serializers.ReadOnlyField(source='owner.email')
 
     class Meta:
         model = Family
@@ -47,15 +33,7 @@ class TagsSerializer(serializers.ModelSerializer):
     """
     A serializer for defining which Tag attributes should be converted to JSON
     """
-    def get_owner_email(self, instance):
-        cache_key = make_template_fragment_key('owner_email', [instance.pk])
-        owner_email = cache.get(cache_key)
-        if owner_email is None:
-            owner_email = instance.owner.email if instance.owner else ''
-            cache.set(cache_key, owner_email, timeout=None)  # Timeout None bedeutet, dass der Cache nicht abläuft
-        return owner_email
-
-    owner = serializers.SerializerMethodField(method_name='get_owner_email')
+    owner = serializers.ReadOnlyField(source='owner.email')
 
     class Meta:
         model = Tag
@@ -66,25 +44,13 @@ class FilesSerializer(serializers.ModelSerializer):
     """
     A serializer for defining which file attributes should be converted to JSON
     """
-
-    def get_owner_email(self, instance):
-        cache_key = make_template_fragment_key('owner_email', [instance.pk])
-        owner_email = cache.get(cache_key)
-        if owner_email is None:
-            owner_email = instance.owner.email if instance.owner else ''
-            cache.set(cache_key, owner_email, timeout=None)  # Timeout None bedeutet, dass der Cache nicht abläuft
-        return owner_email
-
-    owner = serializers.SerializerMethodField(method_name='get_owner_email')
+    owner = serializers.ReadOnlyField(source='owner.email')
     # For further relations on serializers:
     # https://www.django-rest-framework.org/api-guide/relations
     tags = TagsSerializer(many=True)
-
-    license = LicensesSerializer()
-
     family = FamiliesSerializer()
+    license = LicensesSerializer()
     # version = 'self'
-
 
     class Meta:
         model = File
