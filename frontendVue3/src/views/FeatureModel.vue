@@ -243,6 +243,7 @@ export default {
 
         // Start tutorial mode if it has not been completed before
         this.showTutorial = !localStorage.featureModelTutorialCompleted;
+        this.updateFacts();
     },
 
     beforeRouteLeave(to, from, next) {
@@ -279,6 +280,14 @@ export default {
             );
         },
 
+        updateFacts(){
+            let nFeatures=this.data.rootNode.descendants().length;
+            console.log("Updating no of Features to "+ nFeatures);
+            this.facts.metrics.find((fact)=>{
+                    return fact.name==="Features"
+                }).value= nFeatures;
+            this.facts= JSON.parse(JSON.stringify(this.facts)); // TODO doesnt update without
+        },
         reset() {
             // TODO: Transpile the xml file new and restart viewer.
             this.initData();
@@ -368,6 +377,7 @@ export default {
         },
 
         commandEvent() {
+            this.updateFacts();
             // Can't override text for Chrome & Edge
             window.onbeforeunload = function () {
                 return 'Do you really want to leave the page? Collaboration sessions will be closed and data will be lost!';

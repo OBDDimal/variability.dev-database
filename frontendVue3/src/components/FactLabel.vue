@@ -18,6 +18,9 @@
                 </v-card>
 
             </template>
+            <template v-slot:no-data>
+                No Metadata available
+            </template>
             <template v-slot:bottom>
             </template>
         </v-data-table>
@@ -56,7 +59,6 @@
                 </tr>
             </template>
             </template>
-
             <template v-slot:bottom>
             </template>
         </v-data-table>
@@ -64,7 +66,9 @@
         </td>
         </tr>
         </template>
-
+        <template v-slot:no-data>
+                No Metrics available
+            </template>
         <template v-slot:bottom>
         </template>
         </v-data-table>
@@ -73,6 +77,9 @@
         <!--  Data Table for Analysis: -->
         <v-data-table :headers="factHeaders" :items="analysis" item-value="name">
             <template v-slot:headers>
+            </template>
+            <template v-slot:no-data>
+                No Analysis available
             </template>
             <template v-slot:bottom>
             </template>
@@ -118,7 +125,11 @@ export default {
         metrics: [],
         analysis: [],
     }),
-
+    watch:{
+        facts(newFacts, oldFacts){
+            this.initialize();
+        }
+    },
 
     computed: {},
     created() {
