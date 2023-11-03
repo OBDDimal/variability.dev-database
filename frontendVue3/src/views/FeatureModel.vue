@@ -44,6 +44,7 @@
         </v-btn>
         <feature-model-fact-label-bar
         :isOpen="openInformation"
+        :facts="facts"
         @close="openInformation = false">
         </feature-model-fact-label-bar>
         <v-btn
@@ -144,7 +145,7 @@ import { SliceCommand } from "@/classes/Commands/FeatureModel/SliceCommand";
 import FeatureModelInformation from '@/components/FeatureModel/FeatureModelInformation';
 import { useAppStore } from '@/store/app';
 import axios from "axios";
-
+import * as FactLabelFactory from "@/classes/Factlabel/FactLabelFactory"
 const appStore = useAppStore();
 
 export default {
@@ -195,6 +196,7 @@ export default {
             openConstraints: false,
             openInformation: false,
             showTutorial: false,
+            facts: FactLabelFactory.getEmptyFactLabel(),
         };
     },
 

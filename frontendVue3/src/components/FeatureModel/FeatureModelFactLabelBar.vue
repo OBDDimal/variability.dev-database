@@ -5,7 +5,8 @@
             temporary           
             location="end"
         >
-        <fact-label></fact-label>
+        <fact-label
+        :facts="facts"></fact-label>
         </v-navigation-drawer>
     </div>
 </template>
@@ -21,6 +22,7 @@ export default {
 
     props: {
         isOpen: Boolean,
+        facts: Object,
     },
 
     data: () => ({

@@ -95,7 +95,14 @@ export default {
 
     components: {},
 
-    props: {},
+    props: {
+        facts: {
+            type: Object,
+            required: false,
+            default: ()=>  FactLabelFactory.getEmptyFactLabel(),
+
+        },
+    },
 
     data: () => ({
         name: "",
@@ -106,7 +113,6 @@ export default {
         expandedSubSubs: [],
         factHeaders: [{ key: "name", sortable: false }, { key: "value", sortable: false }],
         expandableHeaders: [{ key: 'data-table-expand' }, { key: "name", sortable: false }, { key: "value", sortable: false }],
-        facts: null,
         hideMissing: false,
         metadata: [], // Array of simple k,v pairs
         metrics: [],
@@ -120,7 +126,6 @@ export default {
     },
     methods: {
         initialize() {
-            this.facts = FactLabelFactory.getEmptyFactLabel(); // TODO load only when not set via props
             this.fillMetaData();
             this.fillAnalysis();
             this.fillMetrics();
