@@ -6,7 +6,9 @@
             location="end"
         >
         <fact-label
-        :facts="facts"></fact-label>
+        :metadata="metadata"
+        :metrics="metrics"
+        :analysis="analysis"></fact-label>
         </v-navigation-drawer>
     </div>
 </template>
@@ -22,7 +24,9 @@ export default {
 
     props: {
         isOpen: Boolean,
-        facts: Object,
+        metadata: Array,
+        metrics: Array,
+        analysis: Array,
     },
 
     data: () => ({

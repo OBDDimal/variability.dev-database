@@ -44,7 +44,9 @@
         </v-btn>
         <feature-model-fact-label-bar
         :isOpen="openInformation"
-        :facts="facts"
+        :metadata="facts.metadata"
+        :metrics="facts.metrics"
+        :analysis="facts.analysis"
         @close="openInformation = false">
         </feature-model-fact-label-bar>
         <v-btn
@@ -282,11 +284,9 @@ export default {
 
         updateFacts(){
             let nFeatures=this.data.rootNode.descendants().length;
-            console.log("Updating no of Features to "+ nFeatures);
             this.facts.metrics.find((fact)=>{
                     return fact.name==="Features"
                 }).value= nFeatures;
-            this.facts= JSON.parse(JSON.stringify(this.facts)); // TODO doesnt update without
         },
         reset() {
             // TODO: Transpile the xml file new and restart viewer.

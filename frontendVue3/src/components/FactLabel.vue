@@ -103,8 +103,20 @@ export default {
     components: {},
 
     props: {
-        facts: {
-            type: Object,
+        metadata: {
+            type: Array,
+            required: false,
+            default: ()=>  FactLabelFactory.getEmptyFactLabel(),
+
+        },
+        analysis: {
+            type: Array,
+            required: false,
+            default: ()=>  FactLabelFactory.getEmptyFactLabel(),
+
+        },
+        metrics: {
+            type: Array,
             required: false,
             default: ()=>  FactLabelFactory.getEmptyFactLabel(),
 
@@ -121,17 +133,19 @@ export default {
         factHeaders: [{ key: "name", sortable: false }, { key: "value", sortable: false }],
         expandableHeaders: [{ key: 'data-table-expand' }, { key: "name", sortable: false }, { key: "value", sortable: false }],
         hideMissing: false,
-        metadata: [], // Array of simple k,v pairs
-        metrics: [],
-        analysis: [],
     }),
-    watch:{
-        facts(newFacts, oldFacts){
-            this.initialize();
-        }
-    },
+    watch:{ },
 
-    computed: {},
+    computed: { 
+        showMetadata(){
+            this.fillMetaData();
+        },
+        showMetrics(){
+            this.fillMetrics();
+        },
+        showAnalysis(){
+            this.fillAnalysis();
+        }},
     created() {
         this.initialize();
     },
@@ -143,7 +157,7 @@ export default {
             return;
         },
         fillMetaData() {
-            this.metadata = this.facts.metadata.filter((entry) => {
+            this.showMetadata = this.metadata.filter((entry) => {
                 if (entry.name === FM_CHAR_NAME_DESC) {
                     this.name = entry.value; //handle special entry Name which defines Name of FM
                     return false;
@@ -157,7 +171,7 @@ export default {
                     return true;
                 }
             });
-            this.metadata = this.metadata.map((entry) => {
+            this.showMetadata = this.metadata.map((entry) => {
                 var obj = {}; // temporry JSON object to fill for visualisation of metadata
                 obj["name"] = entry.name;
                 obj["value"] = this.getDisplayValue(entry);
@@ -166,7 +180,7 @@ export default {
         },
 
         fillAnalysis() {
-            this.analysis = this.facts.analysis.map((entry) => {
+            this.showAnalysis = this.analysis.map((entry) => {
                 var obj = {}; // temporry JSON object to fill for visualisation of analysis
                 obj["name"] = entry.name;
                 // Value depends on if Size and Ratio are set
@@ -179,12 +193,12 @@ export default {
             if (this.getMaxLevel > 2) {
                 console.error("incompatible Metrics, format only supported until depth of 3");
             }
-            let root_entries = this.getEntriesOnLevel(this.facts.metrics, 0);
-            let sub_entries = this.getEntriesOnLevel(this.facts.metrics, 1);
-            let sub_sub_entries = this.getEntriesOnLevel(this.facts.metrics, 2);
+            let root_entries = this.getEntriesOnLevel(this.metrics, 0);
+            let sub_entries = this.getEntriesOnLevel(this.metrics, 1);
+            let sub_sub_entries = this.getEntriesOnLevel(this.metrics, 2);
             this.sortInParent(sub_entries, sub_sub_entries);
             this.sortInParent(root_entries, sub_entries);
-            this.metrics = root_entries;
+            this.showMetrics = root_entries;
         },
         sortInParent(parentArray, childArray) {
             // TODO desc
@@ -242,13 +256,13 @@ export default {
                 // restore initial state
                 this.initialize();
             } else {
-                this.metadata = this.facts.metadata.filter((entry) => {
+                this.showMetadata = this.facts.metadata.filter((entry) => {
                     return entry.value !== null;
                 });
-                this.analysis = this.facts.analysis.filter((entry) => {
+                this.showAnalysis = this.facts.analysis.filter((entry) => {
                     return entry.value !== null;
                 });
-                this.metrics = this.facts.metrics.filter((entry) => {
+                this.showMetrics = this.facts.metrics.filter((entry) => {
                     return entry.value !== null;
                 });
             }
