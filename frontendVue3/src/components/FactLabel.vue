@@ -3,7 +3,7 @@
 
         <v-divider class="border-opacity-100"></v-divider>
         <!--  Data Table for MetaData: -->
-        <v-data-table :headers="factHeaders" :items="metadata" item-value="name">
+        <v-data-table :headers="factHeaders" :items="showMetadata" item-value="name">
             <template v-slot:headers>
             </template>
             <template v-slot:top>
@@ -26,7 +26,7 @@
         </v-data-table>
         <v-divider class="border-opacity-100" thickness="10"></v-divider>
         <!--  Data Table for Metrics: -->
-        <v-data-table v-model:expanded="expandedRoot" :headers="expandableHeaders" :items="metrics" item-value="name">
+        <v-data-table v-model:expanded="expandedRoot" :headers="expandableHeaders" :items="showMetrics" item-value="name">
             <template v-slot:headers>
             </template>
             <template v-slot:expanded-row="{ item, columns }">
@@ -67,15 +67,15 @@
         </tr>
         </template>
         <template v-slot:no-data>
-                No Metrics available
-            </template>
+            No Metrics available
+        </template>
         <template v-slot:bottom>
         </template>
         </v-data-table>
 
         <v-divider class="border-opacity-100" thickness="10"></v-divider>
         <!--  Data Table for Analysis: -->
-        <v-data-table :headers="factHeaders" :items="analysis" item-value="name">
+        <v-data-table :headers="factHeaders" :items="showAnalysis" item-value="name">
             <template v-slot:headers>
             </template>
             <template v-slot:no-data>
@@ -85,7 +85,7 @@
             </template>
         </v-data-table>
         <v-divider class="border-opacity-100" thickness="10"></v-divider>
-        <v-checkbox-btn v-model="hideMissing" label="Hide Missing" @update:modelValue="hideMissingFacts">
+        <v-checkbox-btn v-model="hideMissing" label="Hide Missing">
         </v-checkbox-btn>
     </v-card>
 </template>
@@ -106,19 +106,19 @@ export default {
         metadata: {
             type: Array,
             required: false,
-            default: ()=>  FactLabelFactory.getEmptyFactLabel(),
+            default: () => FactLabelFactory.getEmptyFactLabel().metadata,
 
         },
         analysis: {
             type: Array,
             required: false,
-            default: ()=>  FactLabelFactory.getEmptyFactLabel(),
+            default: () => FactLabelFactory.getEmptyFactLabel().analysis,
 
         },
         metrics: {
             type: Array,
             required: false,
-            default: ()=>  FactLabelFactory.getEmptyFactLabel(),
+            default: () => FactLabelFactory.getEmptyFactLabel().metrics,
 
         },
     },
@@ -134,30 +134,44 @@ export default {
         expandableHeaders: [{ key: 'data-table-expand' }, { key: "name", sortable: false }, { key: "value", sortable: false }],
         hideMissing: false,
     }),
-    watch:{ },
+    watch: {},
 
-    computed: { 
-        showMetadata(){
-            this.fillMetaData();
+    computed: {
+        showMetadata() {
+            if (this.hideMissing) {
+                return this.updateMetadata().filter((entry) => {
+                    return entry.value === "";
+                });
+            } else {
+                return this.updateMetadata();
+            }
+
         },
-        showMetrics(){
-            this.fillMetrics();
+        showMetrics() {
+            if (this.hideMissing) {
+                return this.updateMetrics().filter((entry) => {
+                    return entry.value === "";
+                });
+            } else {
+                return this.updateMetrics();
+            }
         },
-        showAnalysis(){
-            this.fillAnalysis();
-        }},
+        showAnalysis() {
+            if (this.hideMissing) {
+                return this.updateAnalysis().filter((entry) => {
+                    return entry.value === "";
+                });
+            } else {
+                return this.updateAnalysis();
+            }
+        }
+    },
     created() {
-        this.initialize();
+
     },
     methods: {
-        initialize() {
-            this.fillMetaData();
-            this.fillAnalysis();
-            this.fillMetrics();
-            return;
-        },
-        fillMetaData() {
-            this.showMetadata = this.metadata.filter((entry) => {
+        updateMetadata() {
+            return this.metadata.filter((entry) => {
                 if (entry.name === FM_CHAR_NAME_DESC) {
                     this.name = entry.value; //handle special entry Name which defines Name of FM
                     return false;
@@ -170,26 +184,14 @@ export default {
                 } else {
                     return true;
                 }
-            });
-            this.showMetadata = this.metadata.map((entry) => {
+            }).map((entry) => {
                 var obj = {}; // temporry JSON object to fill for visualisation of metadata
                 obj["name"] = entry.name;
                 obj["value"] = this.getDisplayValue(entry);
                 return obj;
             });
         },
-
-        fillAnalysis() {
-            this.showAnalysis = this.analysis.map((entry) => {
-                var obj = {}; // temporry JSON object to fill for visualisation of analysis
-                obj["name"] = entry.name;
-                // Value depends on if Size and Ratio are set
-
-                obj["value"] = this.getDisplayValue(entry);
-                return obj;
-            });
-        },
-        fillMetrics() {
+        updateMetrics() {
             if (this.getMaxLevel > 2) {
                 console.error("incompatible Metrics, format only supported until depth of 3");
             }
@@ -198,7 +200,16 @@ export default {
             let sub_sub_entries = this.getEntriesOnLevel(this.metrics, 2);
             this.sortInParent(sub_entries, sub_sub_entries);
             this.sortInParent(root_entries, sub_entries);
-            this.showMetrics = root_entries;
+            return root_entries;
+        },
+        updateAnalysis() {
+            return this.analysis.map((entry) => {
+                var obj = {}; // temporry JSON object to fill for visualisation of analysis
+                obj["name"] = entry.name;
+                // Value depends on if Size and Ratio are set
+                obj["value"] = this.getDisplayValue(entry);
+                return obj;
+            });
         },
         sortInParent(parentArray, childArray) {
             // TODO desc
@@ -250,22 +261,6 @@ export default {
                 return "Failed to determine which value to display";
             }
 
-        },
-        hideMissingFacts() {
-            if (!this.hideMissing) {
-                // restore initial state
-                this.initialize();
-            } else {
-                this.showMetadata = this.facts.metadata.filter((entry) => {
-                    return entry.value !== null;
-                });
-                this.showAnalysis = this.facts.analysis.filter((entry) => {
-                    return entry.value !== null;
-                });
-                this.showMetrics = this.facts.metrics.filter((entry) => {
-                    return entry.value !== null;
-                });
-            }
         },
     },
 };
