@@ -95,7 +95,7 @@ import * as FactLabelFactory from "@/classes/Factlabel/FactLabelFactory"
 const FM_CHAR_NAME_DESC = "Name"; // FM Characterization Name Descriptor
 const FM_CHAR_HREF_DESC = "Reference";
 const FM_CHAR_DESC_DESC = "Description";
-
+const EMPTY_VALUE="";
 
 export default {
     name: 'FactLabel',
@@ -140,7 +140,8 @@ export default {
         showMetadata() {
             if (this.hideMissing) {
                 return this.updateMetadata().filter((entry) => {
-                    return entry.value === "";
+                    console.log(entry);
+                    return entry.value !== EMPTY_VALUE;
                 });
             } else {
                 return this.updateMetadata();
@@ -150,7 +151,7 @@ export default {
         showMetrics() {
             if (this.hideMissing) {
                 return this.updateMetrics().filter((entry) => {
-                    return entry.value === "";
+                    return this.checkEntryIfValueSet(entry);
                 });
             } else {
                 return this.updateMetrics();
@@ -159,7 +160,7 @@ export default {
         showAnalysis() {
             if (this.hideMissing) {
                 return this.updateAnalysis().filter((entry) => {
-                    return entry.value === "";
+                    return entry.value !== EMPTY_VALUE;
                 });
             } else {
                 return this.updateAnalysis();
@@ -211,8 +212,23 @@ export default {
                 return obj;
             });
         },
+        checkEntryIfValueSet(entry) {
+            // Iterate over entry, its childs and subchilds and check if some  value is set
+            // Return True if any (sub) Value is set
+            if(entry.value !== EMPTY_VALUE){
+                return true; // own value set just return true
+            }else if (entry.childs.length === 0) {
+                return false; // No childs and own value not set
+            }else{
+                let someSubValueSet=false;
+                entry.childs.forEach((child)=>{
+                    someSubValueSet= someSubValueSet || this.checkEntryIfValueSet(child);
+                });
+                return someSubValueSet;
+            }
+        },
         sortInParent(parentArray, childArray) {
-            // TODO desc
+            // Iterate over given parentarray and add to each parent all childs with matching parent name
             childArray.forEach((child) => {
                 parentArray.forEach((parent) => {
                     if (child.parent === parent.name) {
@@ -222,6 +238,7 @@ export default {
             });
         },
         getEntriesOnLevel(arr, level) {
+            // Get all entries on certain level
             let entries = arr.filter((entry) => entry.level === level);
             return entries.map((entry) => {
                 var obj = {};
@@ -244,6 +261,7 @@ export default {
         },
         getDisplayValue(entry) {
             // Determine which value of an entry should be displayed ( size and ratio attributes overwrite value)
+            // if no value present set to an empty string
             try {
                 var value_str = "";
                 if (entry.size !== null) {
@@ -252,7 +270,7 @@ export default {
                         var rounded = Math.round(100 * entry.ratio);
                         value_str = value_str + " (" + rounded + "\%)";
                     }
-                } else {
+                } else if (entry.value !== null) {
                     value_str = entry.value;
                 }
                 return value_str
