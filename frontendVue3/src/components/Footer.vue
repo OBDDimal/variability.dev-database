@@ -1,5 +1,6 @@
 <template>
     <v-footer
+        id="footer"
         class="mt-8 d-flex py-4 h-auto"
         style="flex: initial"
         :class="smAndDown ? 'flex-column' : 'justify-space-between'"

@@ -1,6 +1,10 @@
 <template>
-    <v-dialog v-model="showDialog" persistent width="400">
-        <div id="tutorial-dialog">
+    <v-dialog content-class="tutorial-dialog" 
+        v-model="showDialog" 
+        persistent width="400" 
+        @keydown.esc="exit"
+        @click:outside="exit" 
+     >
             <svg
                 v-if="!isMobile && isTop && isLeft"
                 height="50px"
@@ -71,12 +75,8 @@
 
                 <v-card-actions>
                     <v-spacer></v-spacer>
-                    <v-btn text color="error" @click="$emit('close')"
-                        >Close</v-btn
-                    >
-                    <v-btn color="primary" text @click="startTutorial"
-                        >Start Tutorial</v-btn
-                    >
+                    <v-btn text color="error" @click="$emit('close')">Close</v-btn>
+                    <v-btn color="primary" text @click="startTutorial">Start Tutorial</v-btn>
                 </v-card-actions>
             </v-card>
             <svg
@@ -107,20 +107,20 @@
                     "
                 />
             </svg>
-        </div>
     </v-dialog>
 </template>
 
 <script setup>
-import { onMounted, ref, watch } from 'vue';
-
+import { count } from 'd3';
+import { onMounted, ref, computed} from 'vue';
+const DIALOG_SELECTOR= '.tutorial-dialog';
 const step = ref(undefined);
 const beforeSteps = ref([]);
 const isTop = ref(false);
 const isLeft = ref(false);
 const isMobile = ref(false);
 const counter = ref(0);
-
+const emit = defineEmits(['close']);
 const props = defineProps({
     show: Boolean,
     nextSteps: {
@@ -131,13 +131,13 @@ const props = defineProps({
                 title: 'Welcome to the tutorial!',
                 description:
                     'You can restart the tutorial anytime by clicking on this icon on the left.',
-                elementCssSelector: '#tutorial-mode',
+                elementCssSelector: "#tutorial-mode-button",
             },
             {
                 title: 'The menu',
                 description:
-                    "For a more precise description of the menu's icons click on this icon on the left.",
-                elementCssSelector: '#feature-model-toolbar-extend',
+                    "For a more precise description of the menu's icons hover over the menu.",
+                elementCssSelector: '#feature-model-toolbar',
             },
             {
                 title: 'Your feature model',
@@ -213,7 +213,7 @@ onMounted(() => {
 });
 function startTutorial() {
     isMobile.value = 'ontouchstart' in window;
-    step.value = this.nextSteps[this.counter];
+    step.value = props.nextSteps[counter.value];
     counter.value++;
     if (!isMobile.value) {
         setBubblePosition();
@@ -221,24 +221,23 @@ function startTutorial() {
 }
 
 function setBubblePosition() {
-    const tutorialDialog = document.querySelector('#tutorial-dialog');
-    if (this.isMobile) {
+    const tutorialDialog = document.querySelector(DIALOG_SELECTOR);
+    if (isMobile.value) {
         tutorialDialog.style.position = 'block';
     } else {
         tutorialDialog.style.position = 'absolute';
     }
-    if (this.step.elementCssSelector) {
+    if (step.value.elementCssSelector) {
+        reset(); /// Reset bubble position until fixed
         const rect = document
-            .querySelector(this.step.elementCssSelector)
+            .querySelector(step.value.elementCssSelector)
             .getBoundingClientRect();
-        const middleX = (rect.left - rect.right) / 2 + rect.right;
+        const middleX = (rect.right - rect.left ) / 2+ rect.left;
         const middleY = (rect.bottom - rect.top) / 2 + rect.top;
-
         tutorialDialog.style.left = null;
         tutorialDialog.style.right = null;
         tutorialDialog.style.top = null;
         tutorialDialog.style.bottom = null;
-
         if (
             middleX + 400 >
             (window.innerWidth || document.documentElement.clientWidth)
@@ -253,9 +252,7 @@ function setBubblePosition() {
             middleY + 200 >
             (window.innerHeight || document.documentElement.clientHeight)
         ) {
-            tutorialDialog.style.bottom = `calc(${
-                window.innerHeight - middleY
-            }px)`;
+            tutorialDialog.style.bottom = `calc(${window.innerHeight - middleY}px)`;
             isTop.value = false;
         } else {
             tutorialDialog.style.top = middleY + 'px';
@@ -265,41 +262,32 @@ function setBubblePosition() {
 }
 
 function nextStep() {
-    if (this.nextSteps.length > this.counter) {
-        this.beforeSteps.unshift(this.step);
-        this.step = this.nextSteps[this.counter];
-        this.counter++;
-        if (!this.isMobile) {
-            this.setBubblePosition();
+    if (props.nextSteps.length > counter.value) {
+        beforeSteps.value.unshift(step.value);
+        step.value = props.nextSteps[counter.value];
+        counter.value++;
+        if (!isMobile.value) {
+            setBubblePosition();
         }
     } else {
-        this.exit();
+        exit();
     }
 }
 
 function exit() {
-    console.log('start');
-    if (!isMobile.value) {
-        const tutorialDialog = document.querySelector('#tutorial-dialog');
-        tutorialDialog.style.left = '';
-        tutorialDialog.style.top = '';
-        tutorialDialog.style.position = '';
-    }
+    reset();
     step.value = undefined;
     beforeSteps.value = [];
-    isTop.value = Boolean;
-    isLeft.value = Boolean;
-    isMobile.value = Boolean;
+    isTop.value = false;
+    isLeft.value = false;
+    isMobile.value = false;
     counter.value = 0;
     localStorage[props.localStorageIdentifier] = true;
-    console.log('midd');
-    this.$emit('close');
-    console.log('end');
+    emit('close');
 }
 
 function beforeStep() {
-    counter.value = counter - 1;
-    //this.nextSteps.unshift(this.step);
+    counter.value = counter.value - 1;
     step.value = beforeSteps.value.shift();
     if (!isMobile.value) {
         setBubblePosition();
@@ -307,41 +295,33 @@ function beforeStep() {
 }
 
 function reset() {
-    if (!isMobile.value) {
-        const tutorialDialog = document.querySelector('#tutorial-dialog');
-        tutorialDialog.style.left = 0;
-        tutorialDialog.style.top = 0;
-        tutorialDialog.style.position = 'absolute';
+    try {
+        if (!isMobile.value) {
+            const tutorialDialog = document.querySelector(DIALOG_SELECTOR);
+            if(tutorialDialog){
+                tutorialDialog.style.left = 0;
+                tutorialDialog.style.top = 0;
+                tutorialDialog.style.position = 'fixed';
+            }
+        }
+    } catch (error) {
+        console.error(error);
     }
 }
-
-watch(show, (newValue, oldValue) => {
-    if (oldValue) {
-        /*this.nextSteps = [
-        ...this.beforeSteps.reverse(),
-        this.step,
-        ...this.nextSteps,
-    ];*/
-        step.value = undefined;
-        beforeSteps.value = [];
-        isTop.value = false;
-        isLeft.value = false;
-        isMobile.value = false;
-        counter.value = 0;
-
-        // Reset position to 0 0 when restarting the tutorial again
-        reset();
-    }
+const showDialog = computed(() => {
+    return props.show;
 });
 </script>
 
 <style lang="scss">
-#tutorial-dialog {
+.tutorial-dialog {
     max-width: 400px;
     transition: all 0.75s;
-
     > .v-card {
         margin-top: -10px;
     }
+  }
+  .v-dialog > .v-overlay__content {
+    margin: 0px;
 }
 </style>

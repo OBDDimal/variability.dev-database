@@ -115,7 +115,11 @@
             @continue-editing="continueEditing"
         >
         </collaboration-continue-editing-dialog>
-
+        
+        <tutorial-mode
+                :show="showTutorial"
+                @close="showTutorial = false"
+        ></tutorial-mode>
 
     </div>
 </template>

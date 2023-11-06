@@ -10,29 +10,29 @@
             :items="confirmedFeatureModels"
             :loading="loading"
             :addable="true"
-        />
-        <!--    <tutorial-mode
-      :show="showTutorial"
-      @close="showTutorial = false"
-      :next-steps="tutorialSteps"
-      local-storage-identifier="homeTutorialCompleted"
-    ></tutorial-mode>-->
-        <!--        <v-btn
+        />    
+        <tutorial-mode
+        :show="showTutorial"
+        :next-steps="tutorialSteps"
+        local-storage-identifier="homeTutorialCompleted"
+        @close="showTutorial = false"
+        ></tutorial-mode>
+        <teleport to="footer">
+            <v-btn
             id="tutorial-mode"
-            fab
-            fixed
-            right
-            bottom
             color="primary"
             @click="showTutorial = true"
-        >
-            <v-icon> mdi-school </v-icon>
-        </v-btn>-->
+            >
+                <v-icon> mdi-school </v-icon>
+            </v-btn>
+        </teleport>
+      
     </div>
 </template>
 
 <script setup>
 import FeatureModelTable from '@/components/FeatureModelTable.vue';
+import TutorialMode from '@/components/TutorialMode';
 import { onMounted, ref } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useFileStore } from '@/store/file';
@@ -85,7 +85,7 @@ const check2 = false;
 const check3 = false;
 const loading = ref(false);
 const info = '';
-const showTutorial = false;
+const showTutorial = ref(false);
 const tutorialSteps = [
     {
         title: 'Welcome to the tutorial!',
