@@ -140,7 +140,6 @@ export default {
         showMetadata() {
             if (this.hideMissing) {
                 return this.updateMetadata().filter((entry) => {
-                    console.log(entry);
                     return entry.value !== EMPTY_VALUE;
                 });
             } else {
