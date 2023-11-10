@@ -126,6 +126,15 @@
                 </v-list-item-content>
             </v-list-item>
 
+            <v-list-item data-cy="context-menu-remove" v-if="editRights" @click="$emit('remove', d3Node)">
+                <v-list-item-icon>
+                    <v-icon>mdi-delete</v-icon>
+                </v-list-item-icon>
+                <v-list-item-content>
+                    <v-list-item-title>Remove</v-list-item-title>
+                </v-list-item-content>
+            </v-list-item>
+
             <v-list-group data-cy="context-menu-add" v-if="editRights" no-action prepend-icon="mdi-plus">
                 <template v-slot:activator>
                     <v-list-item-title>Add</v-list-item-title>

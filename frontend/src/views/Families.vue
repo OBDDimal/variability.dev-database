@@ -95,6 +95,7 @@
                 </v-toolbar>
             </template>
             <template v-slot:item.actions="{ item }">
+                <div @click.stop>
                 <v-btn
                     :disabled="item.owner === false"
                     class="mr-2"
@@ -105,6 +106,7 @@
                 >
                     <v-icon>mdi-pencil</v-icon>
                 </v-btn>
+            </div>
                 <!-- <v-btn small rounded color="error" class="mr-2"> <v-icon>mdi-delete</v-icon></v-btn> -->
             </template>
             <template v-slot:item.id="{ index }">

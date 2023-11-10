@@ -9,9 +9,14 @@
             :constraints="data.constraints"
             :editRights="editRights"
             :rootNode="data.rootNode"
+            :is-service-available="isServiceAvailable"
+            :loadingData="loadingData"
+            :error="error"
+            :error-message="errorMessage"
             @exportToXML="exportToXML"
             @reset="reset"
             @save="save"
+            @slice="node => slice(node)"
             @update-constraints="updateConstraints"
             @show-collaboration-dialog="
                 showStartCollaborationSessionDialog = true
@@ -19,8 +24,103 @@
             @show-claim-dialog="showClaimDialog"
             @new-empty-model="newEmptyModel"
             @show-tutorial="showTutorial = true"
+            @error-closed="errorClosed"
+            @error-new="message => errorNew(message)"
         >
         </feature-model-tree>
+        <v-btn
+            id="feature-model-information"
+            position="absolute"
+            location="right bottom"
+            theme="dark"
+            elevation="2"
+            icon
+            :x-large="$vuetify.display.mdAndUp"
+            style="background-color: rgb(var(--v-theme-primary))"
+            @click="openInformation = !openInformation"
+            class="mr-15"
+        >
+            <v-icon>mdi-information</v-icon>
+        </v-btn>
+
+        <v-btn
+            data-cy="feature-model-constraints-button"
+            id="feature-model-constraints"
+            position="absolute"
+            location="right bottom"
+            theme="dark"
+            elevation="2"
+            icon
+            :x-large="$vuetify.display.mdAndUp"
+            style="background-color:  rgb(var(--v-theme-primary))"
+            @click="openConstraints = true"
+        >
+            <v-icon>mdi-format-list-checks</v-icon>
+        </v-btn>
+
+        <constraints
+            v-if="data.constraints"
+            ref="constraints"
+            :is-open="openConstraints"
+            @close="openConstraints = false"
+            :command-manager="constraintCommandManager"
+            :constraints="data.constraints"
+            :editRights="editRights"
+            :rootNode="data.rootNode"
+            @update-feature-model="updateFeatureModel"
+        ></constraints>
+
+        <collaboration-toolbar
+              v-if="collaborationStatus"
+              :key="collaborationReloadKey"
+              :collaboration-manager="collaborationManager"
+              :show-claim-dialog="showClaimDialog"
+        ></collaboration-toolbar>
+
+        <v-dialog
+            v-model="showStartCollaborationSessionDialog"
+            persistent
+            width="auto"
+        >
+            <v-card>
+                <v-card-title
+                    >Do you want to start a new collaboration
+                    session?</v-card-title
+                >
+                <v-card-actions>
+                    <v-spacer></v-spacer>
+                    <v-btn
+                        color="red"
+                        variant="text"
+                        @click="showStartCollaborationSessionDialog = false"
+                    >
+                        Cancel
+                    </v-btn>
+
+                    <v-btn color="primary" variant="text" @click="createCollaboration">
+                        Start
+                    </v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
+
+        <collaboration-name-dialog
+            v-if="collaborationKey"
+            @change-name="(name) => collaborationManager.sendName(name)"
+        ></collaboration-name-dialog>
+
+        <collaboration-continue-editing-dialog
+            :show="showContinueEditingDialog"
+            @close="closeFeatureModel"
+            @continue-editing="continueEditing"
+        >
+        </collaboration-continue-editing-dialog>
+        
+        <tutorial-mode
+                :show="showTutorial"
+                @close="showTutorial = false"
+        ></tutorial-mode>
+
     </div>
 </template>
 
@@ -40,11 +140,11 @@ import CollaborationContinueEditingDialog from '@/components/CollaborationContin
 import { EXAMPLE_FEATURE_MODEL_XML } from '@/classes/constants';
 import TutorialMode from '@/components/TutorialMode';
 import { NewEmptyModelCommand } from '@/classes/Commands/FeatureModel/NewEmptyModelCommand';
+import { SliceCommand } from "@/classes/Commands/FeatureModel/SliceCommand";
 import FeatureModelInformation from '@/components/FeatureModel/FeatureModelInformation';
 import { useAppStore } from '@/store/app';
-import { useRouter } from 'vue-router';
+import axios from "axios";
 
-const router = useRouter();
 const appStore = useAppStore();
 
 export default {
@@ -76,6 +176,10 @@ export default {
                 featureOrder: undefined,
                 rootNode: undefined,
             },
+            loadingData: false,
+            error: false,
+            errorMessage: "",
+            isServiceAvailable: false,
             xml: undefined,
             reloadKey: 0,
             collaborationReloadKey: 10000,
@@ -101,7 +205,6 @@ export default {
         );
         this.featureModelCommandManager.commandEvent = this.commandEvent;
         this.constraintCommandManager.commandEvent = this.commandEvent;
-        console.log(this.id);
         if (this.id === 'local') {
             const xml = beautify(localStorage.featureModelData);
             xmlTranspiler.xmlToJson(xml, this.data);
@@ -133,6 +236,7 @@ export default {
                 alert('Wrong key!');
             }
         }
+        this.checkService()
 
         // Start tutorial mode if it has not been completed before
         this.showTutorial = !localStorage.featureModelTutorialCompleted;
@@ -176,6 +280,55 @@ export default {
             // TODO: Transpile the xml file new and restart viewer.
             this.initData();
             this.reloadKey++;
+        },
+
+        async slice(node) {
+            this.loadingData = true;
+            await this.checkService()
+            if (this.isServiceAvailable) {
+                try {
+                    const content = new TextEncoder().encode(jsonToXML(this.data));
+                    let response = await axios.post(`${import.meta.env.VITE_APP_DOMAIN_FEATUREIDESERVICE}slice`, {
+                        name: "hello.xml",
+                        selection: [node.name],
+                        content: Array.from(content)
+                    });
+                    let contentAsString = new TextDecoder().decode(Uint8Array.from(response.data.content));
+                    const xml = beautify(contentAsString);
+                    const command = new SliceCommand(
+                        this,
+                        xml
+                    );
+                    this.featureModelCommandManager.execute(command);
+                    this.updateFeatureModel();
+                } catch (e) {
+                  this.loadingData = false;
+                  appStore.updateSnackbar(
+                'Could not slice the Feature, because an unknown error occurred.',
+                'error',
+                3000,
+                true
+                  )
+                }
+            } else {
+                this.loadingData = false;
+                appStore.updateSnackbar(
+              'Could not slice the Feature, because Service is down.',
+              'error',
+              3000,
+              true
+                )
+            }
+            this.loadingData = false;
+        },
+
+        async checkService() {
+            try {
+                let response = await axios.get(`${import.meta.env.VITE_APP_DOMAIN_FEATUREIDESERVICE}`);
+                this.isServiceAvailable = response.status === 200;
+            } catch (error) {
+                this.isServiceAvailable = false
+            }
         },
 
         newEmptyModel() {
@@ -222,7 +375,7 @@ export default {
             this.showStartCollaborationSessionDialog = false;
             this.collaborationManager.createCollaboration();
             navigator.clipboard.writeText(
-                `${import.meta.env.VITE_APP_DOMAIN}collaboration/${
+                `${import.meta.env.VITE_APP_DOMAIN_FRONTEND}collaboration/${
                     this.collaborationManager.collaborationKey
                 }`
             );
@@ -230,15 +383,23 @@ export default {
 
         continueEditing() {
             this.showContinueEditingDialog = false;
-            this.collaborationManager.closeCollaboration();
             this.editRights = true;
         },
 
         closeFeatureModel() {
             this.showContinueEditingDialog = false;
-            this.collaborationManager.closeCollaboration();
             this.collaborationManager.noConfirm = false;
-            router.push('/');
+            this.$router.push({ path: '/' });
+        },
+
+        errorClosed() {
+            this.error = false;
+            this.errorMessage = '';
+        },
+
+        errorNew(message) {
+            this.error = true;
+            this.errorMessage = message;
         },
     },
 };

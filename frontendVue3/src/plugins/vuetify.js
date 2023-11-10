@@ -2,6 +2,7 @@ import '@mdi/font/css/materialdesignicons.css';
 import 'vuetify/styles';
 import { createVuetify } from 'vuetify';
 import { VDataTable } from 'vuetify/labs/VDataTable';
+import { VBottomSheet} from 'vuetify/labs/VBottomSheet';
 
 export default createVuetify({
     theme: {
@@ -9,6 +10,7 @@ export default createVuetify({
     },
     components: {
         VDataTable,
+        VBottomSheet
     },
 });
 /*{

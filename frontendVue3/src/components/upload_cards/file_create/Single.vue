@@ -30,7 +30,7 @@
                 </v-col>
                 <v-col class="py-1" cols="12" md="6">
                     <v-file-input
-                        v-model="formData.file"
+                        v-model="formData.files"
                         :rules="fileRules"
                         accept=".xml"
                         small-chips
@@ -74,7 +74,6 @@
                         label="Family"
                         append-icon="mdi-plus"
                         @click:append="addFamilyMenu = !addFamilyMenu"
-                        @change="familyChange"
                     ></v-autocomplete>
                 </v-col>
                 <v-col class="py-1" cols="12" md="6">
@@ -190,6 +189,7 @@
                     :valid="form"
                     @close="$emit('close')"
                     @submit-click="showDetails = true"
+                    @uploadSuccessfull="(uploadInfo) => $emit('uploadSuccessfull', uploadInfo)"
                 ></action-buttons>
             </v-row>
         </v-form>
@@ -212,14 +212,14 @@ import ActionButtons from '@/components/upload_cards/file_create/ActionButtons.v
 
 const fileStore = useFileStore();
 
-const emit = defineEmits(['close']);
+const emit = defineEmits(['close', 'uploadSuccessfull']);
 
 const form = ref(null);
 
 let formData = reactive({
     label: '',
     description: '',
-    file: null,
+    files: null,
     license: null,
     family: null,
     version: '',
@@ -240,38 +240,16 @@ let descriptionRules = [
 
 let fileRules = [(v) => !!v || 'File is required'];
 
-let { licenses, tags, myOwnTags } = storeToRefs(fileStore);
+let { licenses, myOwnTags } = storeToRefs(fileStore);
 let licenseRules = [(v) => !!v || 'License is required'];
 
 let familyRules = [(v) => !!v || 'Family is required'];
 
 let checkboxRules = [(v) => !!v || 'Checkbox must be checked'];
 
-let gottenFamilies = ref([]);
-let gottenFiles = ref([]);
-
-let allVersions = ref([]);
-let latestFeatureModelVersion = ref(null);
-let numberOfModelsInFamily = ref(0);
-
 let versionRules = [(v) => !!v || 'Version is required'];
-
-let gottenTags = ref([]);
-let newTag = { label: '', description: '', is_public: false };
 
 let addTagMenu = ref(false);
 let addFamilyMenu = ref(false);
 
-watch(
-    () => formData.family,
-    (value) => {
-        console.log(getFeatureModelOfFamily(value));
-    }
-);
-
-async function getFeatureModelOfFamily(id) {
-    const res = await fileStore.fetchFeatureModelOfFamily(id);
-    console.log(res.length);
-    return res;
-}
 </script>
