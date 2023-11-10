@@ -1,99 +1,108 @@
 <template>
     <div>
         <feature-model-tree
-            v-if="data.rootNode"
-            :key="reloadKey"
-            ref="featureModelTree"
-            :collaborationStatus="collaborationStatus"
-            :command-manager="featureModelCommandManager"
-            :constraints="data.constraints"
-            :editRights="editRights"
-            :rootNode="data.rootNode"
-            @exportToXML="exportToXML"
-            @reset="reset"
-            @save="save"
-            @update-constraints="updateConstraints"
-            @show-collaboration-dialog="
+                v-if="data.rootNode"
+                :key="reloadKey"
+                ref="featureModelTree"
+                :collaborationStatus="collaborationStatus"
+                :command-manager="featureModelCommandManager"
+                :constraints="data.constraints"
+                :is-service-available="isServiceAvailable"
+                :editRights="editRights"
+                :rootNode="data.rootNode"
+                :loadingData="loadingData"
+                :error="error"
+                :error-message="errorMessage"
+                @exportToXML="exportToXML"
+                @reset="reset"
+                @save="save"
+                @slice="node => slice(node)"
+                @update-constraints="updateConstraints"
+                @show-collaboration-dialog="
                 showStartCollaborationSessionDialog = true
             "
-            @show-claim-dialog="showClaimDialog"
-            @new-empty-model="newEmptyModel"
-            @show-tutorial="showTutorial = true"
+                @show-claim-dialog="showClaimDialog"
+                @new-empty-model="newEmptyModel"
+                @show-tutorial="showTutorial = true"
+                @error-closed="errorClosed"
+                @error-new="message => errorNew(message)"
         >
         </feature-model-tree>
 
         <v-btn
-            id="feature-model-information"
-            absolute
-            bottom
-            dark
-            elevation="2"
-            icon
-            right
-            :x-large="$vuetify.breakpoint.mdAndUp"
-            style="background-color: var(--v-primary-base)"
-            @click="openInformation = !openInformation"
-            class="mr-15"
+                id="feature-model-information"
+                absolute
+                bottom
+                dark
+                elevation="2"
+                icon
+                right
+                :x-large="$vuetify.breakpoint.mdAndUp"
+                style="background-color: var(--v-primary-base)"
+                @click="openInformation = !openInformation"
+                class="mr-15"
         >
             <v-icon>mdi-information</v-icon>
         </v-btn>
 
         <v-btn
-            data-cy="feature-model-constraints-button"
-            id="feature-model-constraints"
-            absolute
-            bottom
-            dark
-            elevation="2"
-            icon
-            right
-            :x-large="$vuetify.breakpoint.mdAndUp"
-            style="background-color: var(--v-primary-base)"
-            @click="openConstraints = true"
+                data-cy="feature-model-constraints-button"
+                id="feature-model-constraints"
+                absolute
+                bottom
+                dark
+                elevation="2"
+                icon
+                right
+                :x-large="$vuetify.breakpoint.mdAndUp"
+                style="background-color: var(--v-primary-base)"
+                @click="openConstraints = true"
         >
             <v-icon>mdi-format-list-checks</v-icon>
         </v-btn>
 
         <constraints
-            v-if="data.constraints"
-            ref="constraints"
-            :is-open="openConstraints"
-            @close="openConstraints = false"
-            :command-manager="constraintCommandManager"
-            :constraints="data.constraints"
-            :editRights="editRights"
-            :rootNode="data.rootNode"
-            @update-feature-model="updateFeatureModel"
+                v-if="data.constraints"
+                ref="constraints"
+                :is-open="openConstraints"
+                @close="openConstraints = false"
+                :command-manager="constraintCommandManager"
+                :constraints="data.constraints"
+                :editRights="editRights"
+                :rootNode="data.rootNode"
+                @update-feature-model="updateFeatureModel"
         ></constraints>
 
         <collaboration-toolbar
-            v-if="collaborationStatus"
-            :key="collaborationReloadKey"
-            :collaboration-manager="collaborationManager"
-            :show-claim-dialog="showClaimDialog"
+                v-if="collaborationStatus"
+                :key="collaborationReloadKey"
+                :collaboration-manager="collaborationManager"
+                :show-claim-dialog="showClaimDialog"
         ></collaboration-toolbar>
 
         <v-dialog
-            v-model="showStartCollaborationSessionDialog"
-            persistent
-            width="auto"
+                v-model="showStartCollaborationSessionDialog"
+                persistent
+                width="auto"
         >
             <v-card>
                 <v-card-title
-                    >Do you want to start a new collaboration
-                    session?</v-card-title
+                >Do you want to start a new collaboration
+                    session?
+                </v-card-title
                 >
                 <v-card-actions>
                     <v-spacer></v-spacer>
                     <v-btn
-                        color="red"
-                        text
-                        @click="showStartCollaborationSessionDialog = false"
+                            color="red"
+                            text
+                            @click="showStartCollaborationSessionDialog = false"
                     >
                         Cancel
                     </v-btn>
 
-                    <v-btn data-cy="feature-model-start-collaboration-button" color="primary" text @click="createCollaboration">
+                    <v-btn data-cy="feature-model-start-collaboration-button" color="primary" text
+                           @click="createCollaboration">
                         Start
                     </v-btn>
                 </v-card-actions>
@@ -101,24 +110,24 @@
         </v-dialog>
 
         <collaboration-name-dialog
-            v-if="collaborationKey"
-            @change-name="(name) => collaborationManager.sendName(name)"
+                v-if="collaborationKey"
+                @change-name="(name) => collaborationManager.sendName(name)"
         ></collaboration-name-dialog>
 
         <collaboration-continue-editing-dialog
-            :show="showContinueEditingDialog"
-            @close="closeFeatureModel"
-            @continue-editing="continueEditing"
+                :show="showContinueEditingDialog"
+                @close="closeFeatureModel"
+                @continue-editing="continueEditing"
         >
         </collaboration-continue-editing-dialog>
 
         <feature-model-information
-            v-if="openInformation"
+                v-if="openInformation"
         ></feature-model-information>
 
         <tutorial-mode
-            :show="showTutorial"
-            @close="showTutorial = false"
+                :show="showTutorial"
+                @close="showTutorial = false"
         ></tutorial-mode>
     </div>
 </template>
@@ -131,16 +140,19 @@ import * as update from '@/services/FeatureModel/update.service';
 import api from '@/services/api.service';
 import beautify from 'xml-beautifier';
 import CollaborationManager from '@/classes/CollaborationManager';
-import { CommandManager } from '@/classes/Commands/CommandManager';
+import {CommandManager} from '@/classes/Commands/CommandManager';
 import * as xmlTranspiler from '@/services/xmlTranspiler.service';
-import { jsonToXML } from '@/services/xmlTranspiler.service';
+import {jsonToXML} from '@/services/xmlTranspiler.service';
 import CollaborationToolbar from '@/components/CollaborationToolbar';
 import CollaborationNameDialog from '@/components/CollaborationNameDialog';
 import CollaborationContinueEditingDialog from '@/components/CollaborationContinueEditingDialog';
-import { EXAMPLE_FEATURE_MODEL_XML } from '@/classes/constants';
+import {EXAMPLE_FEATURE_MODEL_XML} from '@/classes/constants';
 import TutorialMode from '@/components/TutorialMode';
-import { NewEmptyModelCommand } from '@/classes/Commands/FeatureModel/NewEmptyModelCommand';
+import {NewEmptyModelCommand} from '@/classes/Commands/FeatureModel/NewEmptyModelCommand';
 import FeatureModelInformation from '@/components/FeatureModel/FeatureModelInformation';
+import axios from "axios";
+import {SliceCommand} from "@/classes/Commands/FeatureModel/SliceCommand";
+import {FeatureNode} from "@/classes/FeatureNode";
 
 export default Vue.extend({
     name: 'FeatureModel',
@@ -170,6 +182,10 @@ export default Vue.extend({
             featureOrder: undefined,
             rootNode: undefined,
         },
+        loadingData: false,
+        error: false,
+        errorMessage: "",
+        isServiceAvailable: false,
         xml: undefined,
         reloadKey: 0,
         collaborationReloadKey: 10000,
@@ -226,6 +242,7 @@ export default Vue.extend({
                 alert('Wrong key!');
             }
         }
+        this.checkService()
 
         // Start tutorial mode if it has not been completed before
         this.showTutorial = !localStorage.featureModelTutorialCompleted;
@@ -269,6 +286,53 @@ export default Vue.extend({
             // TODO: Transpile the xml file new and restart viewer.
             this.initData();
             this.reloadKey++;
+        },
+
+        async slice(node) {
+            this.loadingData = true;
+            await this.checkService()
+            if (this.isServiceAvailable) {
+
+                this.xml = jsonToXML(this.data);
+                const content = new TextEncoder().encode(this.xml);
+                let response = await axios.post(`${process.env.VUE_APP_DOMAIN_FEATUREIDESERVICE}slice`, {
+                    name: "hello.xml",
+                    selection: [node.name],
+                    content: Array.from(content)
+                });
+                let contentAsString = new TextDecoder().decode(Uint8Array.from(response.data.content));
+                const xml = beautify(contentAsString);
+                let newData = {
+                    featureMap: [],
+                    constraints: [],
+                    properties: [],
+                    calculations: undefined,
+                    comments: [],
+                    featureOrder: undefined,
+                    rootNode: new FeatureNode(null, 'Root', 'and', false, false),
+                };
+                xmlTranspiler.xmlToJson(xml, newData);
+                this.xml = xml;
+                const command = new SliceCommand(
+                    this,
+                    newData
+                );
+                this.featureModelCommandManager.execute(command);
+                this.updateFeatureModel();
+            } else {
+                this.errorNew("FeatureIDE Service is not available to slice the feature.")
+            }
+            this.loadingData = false;
+        },
+
+        async checkService() {
+            try {
+                let response = await axios.get(`${process.env.VUE_APP_DOMAIN_FEATUREIDESERVICE}`);
+                this.isServiceAvailable = response.status === 200;
+            } catch (error) {
+                this.isServiceAvailable = false
+            }
+
         },
 
         newEmptyModel() {
@@ -330,6 +394,16 @@ export default Vue.extend({
             this.collaborationManager.closeCollaboration();
             this.collaborationManager.noConfirm = false;
             this.$router.push('/');
+        },
+
+        errorClosed() {
+            this.error = false;
+            this.errorMessage = '';
+        },
+
+        errorNew(message) {
+            this.error = true;
+            this.errorMessage = message;
         },
     },
 });

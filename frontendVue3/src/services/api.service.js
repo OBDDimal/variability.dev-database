@@ -1,7 +1,7 @@
 import axios from 'axios';
 import authService from './auth.service';
 
-const API_URL = process.env.VITE_APP_DOMAIN;
+const API_URL = import.meta.env.VITE_APP_DOMAIN;
 
 // axios instance for checking if token is (still) valid.
 const instance = axios.create({

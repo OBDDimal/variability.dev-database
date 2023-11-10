@@ -127,6 +127,14 @@
                 <v-list-item-title>Edit</v-list-item-title>
             </v-list-item>
 
+            <v-list-item
+                  v-if="editRights"
+                  @click="$emit('remove', d3Node)"
+                  prepend-icon="mdi-delete"
+            >
+                <v-list-item-title>Remove</v-list-item-title>
+            </v-list-item>
+
             <v-list-group v-if="editRights" no-action prepend-icon="mdi-plus">
                 <template v-slot:activator="{ props }">
                     <v-list-item v-bind="props">
