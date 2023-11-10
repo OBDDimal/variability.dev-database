@@ -2,6 +2,20 @@
     <v-container>
         <v-form ref="form" @submit.prevent>
             <v-row>
+              <v-col class="py-1" cols="12">
+                    <v-file-input
+                        v-model="formData.files"
+                        :rules="fileRules"
+                        accept=".xml"
+                        small-chips
+                        variant="outlined"
+                        density="comfortable"
+                        hint="Select the file as .xml"
+                        label="File Upload"
+                        required
+                        show-size
+                    ></v-file-input>
+                </v-col>
                 <v-col class="py-1" cols="12">
                     <v-text-field
                         v-model="formData.label"
@@ -28,35 +42,22 @@
                     >
                     </v-textarea>
                 </v-col>
-                <v-col class="py-1" cols="12" md="6">
-                    <v-file-input
-                        v-model="formData.files"
-                        :rules="fileRules"
-                        accept=".xml"
-                        small-chips
-                        variant="outlined"
-                        density="comfortable"
-                        hint="Select the file as .xml"
-                        label="File Upload"
-                        required
-                        show-size
-                    ></v-file-input>
-                </v-col>
-                <v-col class="py-1" cols="12" md="6">
-                    <v-select
-                        v-model="formData.license"
-                        :items="licenses"
-                        item-title="label"
-                        item-value="id"
-                        :rules="licenseRules"
-                        hint="Select the license of the feature model"
-                        label="License"
-                        variant="outlined"
-                        density="comfortable"
-                        required
-                    >
-                    </v-select>
-                </v-col>
+              <v-col class="py-1" cols="12" md="6">
+                <v-text-field
+                  v-model="formData.license"
+                  label="License"
+                  hint="CC BY-SA 4.0 DEED"
+                  :rules="licenseRules"
+                  variant="outlined"
+                  density="comfortable"
+                  readonly
+                  @click:append="window.location.href = 'https://creativecommons.org/licenses/by-sa/4.0/deed.de'"
+                >
+                  <template v-slot:append>
+                    <v-icon color="primary" @click="redirectToLicensePage">mdi-information</v-icon>
+                  </template>
+                </v-text-field>
+              </v-col>
             </v-row>
             <v-row align="end" justify="space-between">
                 <v-col class="py-1" cols="12" md="6">
@@ -67,7 +68,6 @@
                         item-title="label"
                         item-value="id"
                         :required="true"
-                        :rules="familyRules"
                         variant="outlined"
                         density="comfortable"
                         hint="Add to or create new family"
@@ -176,7 +176,7 @@
                     <v-checkbox
                         v-model="formData.openSource"
                         class="mt-0"
-                        label="All information will be published according to your chosen license"
+                        label="All information will be published under License CC BY-SA 4.0 DEED"
                         density="compact"
                         required
                         :hide-details="!showDetails"
@@ -203,24 +203,24 @@
 </template>
 
 <script setup>
-import { computed, onMounted, reactive, ref, watch } from 'vue';
+import {  reactive, ref } from 'vue';
 import { useFileStore } from '@/store/file';
 import { storeToRefs } from 'pinia';
+
 import TagCreate from '@/components/upload_cards/TagCreate.vue';
 import FamilyCreate from '@/components/upload_cards/FamilyCreate.vue';
 import ActionButtons from '@/components/upload_cards/file_create/ActionButtons.vue';
 
 const fileStore = useFileStore();
-
 const emit = defineEmits(['close', 'uploadSuccessfull']);
-
+let { myOwnTags } = storeToRefs(fileStore);
 const form = ref(null);
 
 let formData = reactive({
     label: '',
     description: '',
     files: null,
-    license: null,
+    license: "CC BY - SA 4.0 DEED",
     family: null,
     version: '',
     tags: [],
@@ -234,22 +234,26 @@ const showDetails = ref(false);
 let labelRules = [(v) => !!v || 'Label is required'];
 
 let descriptionRules = [
-    (v) => !!v || 'Description is required',
     (v) => v.length <= 250 || 'Max 250 characters please',
 ];
 
 let fileRules = [(v) => !!v || 'File is required'];
 
-let { licenses, myOwnTags } = storeToRefs(fileStore);
+
 let licenseRules = [(v) => !!v || 'License is required'];
 
-let familyRules = [(v) => !!v || 'Family is required'];
+//let familyRules = [(v) => !!v || 'Family is required'];
 
 let checkboxRules = [(v) => !!v || 'Checkbox must be checked'];
 
-let versionRules = [(v) => !!v || 'Version is required'];
+//let versionRules = [(v) => !!v || 'Version is required'];
 
 let addTagMenu = ref(false);
 let addFamilyMenu = ref(false);
+const redirectToLicensePage = () => {
+  window.open('https://creativecommons.org/licenses/by-sa/4.0/deed.de', '_blank');
+};
 
 </script>
+
+

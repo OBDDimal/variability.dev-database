@@ -1,4 +1,7 @@
 from django.db import models
+from django.db.models.signals import post_migrate
+from django.dispatch import receiver
+
 from core.user.models import User
 from django.core.files.base import ContentFile
 from django.template.defaultfilters import slugify  # new
@@ -67,6 +70,13 @@ class LicenseManager(models.Manager):
         lic.save()
         return lic
 
+    def create_default_license(self):
+        """
+        Creates the default license.
+        """
+        default_license_label = "CC BY - SA 4.0 DEED"
+        default_license, created = self.get_or_create(label=default_license_label)
+        return default_license
 
 class License(models.Model):
     """
@@ -74,13 +84,20 @@ class License(models.Model):
     """
 
     objects = LicenseManager()
-    _default_license = "CC BY - Mention"
+    _default_license = "CC BY - SA 4.0 DEED"
 
     label = models.TextField(blank=False, default=_default_license)
 
     def __str__(self):
         # do not change that
         return f"{self.id}"
+
+    @receiver(post_migrate)
+    def create_default_license(sender, **kwargs):
+        """
+        Creates the default license after migrations.
+        """
+        License.objects.create_default_license()
 
 
 # -------------------------------------------------- File Model --------------------------------------------------
@@ -101,13 +118,14 @@ class FileManager(models.Manager):
         if tags is None:
             raise TypeError("Tags is not set")
         family = kwargs.get("family", None)
-        # get file from id
-        if kwargs.get("version", None) is None:
-            raise TypeError("Version is not set")
+        version = kwargs.get("version", None)
+        private = kwargs.get("private", None)
         # get license from id
-        if kwargs.get("license", None) is None:
+        if kwargs.get("license", None) is None and kwargs.get("private") is None:
             raise TypeError("License not set!")
+
         file = self.model(**kwargs)
+
         file.save()
         file.tags.set(tags)
         file.save()
@@ -140,14 +158,14 @@ class File(models.Model):
     relative_upload_dir = "files/"
 
     owner = models.ForeignKey(User, on_delete=models.RESTRICT)
-    family = models.ForeignKey(Family, on_delete=models.CASCADE)
+    family = models.ForeignKey(Family, on_delete=models.CASCADE, null=True, blank=True)
     label = models.CharField(blank=False, max_length=255)
     description = models.TextField(blank=True)
     local_file = models.FileField(upload_to=relative_upload_dir)
     uploaded_at = models.DateTimeField(auto_now_add=True)
     license = models.ForeignKey(License, on_delete=models.CASCADE)
     tags = models.ManyToManyField(Tag)
-    version = models.CharField(blank=False, null=False, max_length=16)
+    version = models.CharField(blank=True, null=True, max_length=16)
     transpiled_file = models.FileField(
         null=True, blank=True, upload_to=relative_upload_dir
     )
@@ -159,6 +177,9 @@ class File(models.Model):
     )  # indicates if the user confirmed the upload
     slug = models.SlugField(null=True)
     confirmation_token = models.CharField(default="", max_length=255)
+    private = models.BooleanField(
+        default=False
+    )
 
     def __str__(self):
         # do not change that

@@ -5,7 +5,7 @@
                 :loading="props.loading"
                 :headers="headers"
                 :items="filteredItems"
-                items-per-page="5"
+                items-per-page="10"
                 :search="search"
                 sort-by.sync="sortBy"
                 sort-desc="sortDesc"
@@ -16,6 +16,27 @@
                             {{ headline }}
                         </v-toolbar-title>
                         <v-divider
+                            class="mx-4 hidden-sm-and-down"
+                            inset
+                            vertical
+                        ></v-divider>
+                        <v-spacer class="hidden-sm-and-down"></v-spacer>
+                      <v-autocomplete
+                        class="hidden-sm-and-down"
+                        v-model="selectedTags"
+                        :items="props.availableTags"
+                        item-value="id"
+                        item-title="label"
+                        label="Filter by Tags"
+                        append-inner-icon="mdi-filter"
+                        chips
+                        multiple
+                        density="comfortable"
+                        variant="filled"
+                        single-line
+                        hide-details
+                      ></v-autocomplete>
+                      <v-divider
                             class="mx-4 hidden-sm-and-down"
                             inset
                             vertical
@@ -33,6 +54,12 @@
                             density="comfortable"
                         >
                         </v-text-field>
+                      <v-divider
+                            class="mx-4 hidden-sm-and-down"
+                            inset
+                            vertical
+                        ></v-divider>
+                      <v-switch v-model="showPrivateFiles" v-if="private" style="align-self: center;" label="Show Private Files" class='ml-4 mt-4' color="primary"></v-switch>
                       <v-tooltip location='top'>
                         <template v-slot:activator='{ props }'>
                           <v-btn
@@ -79,9 +106,27 @@
                             color='secondary'
                             variant='tonal'
                             size='small'
-                            icon='mdi-server'
+                            icon='mdi-eye'
                             v-bind='props'
                             to='/feature-model/local'
+                          >
+                          </v-btn>
+                        </template>
+                        <span>See local storage</span>
+                      </v-tooltip>
+                      <v-tooltip location='top'>
+                        <template v-slot:activator='{ props }'>
+                          <v-btn
+                            id='feature-model-ls'
+                            v-if='addable'
+                            :disabled='!checkLocalStorage'
+                            class='mb-2 ml-2'
+                            color='secondary'
+                            variant='tonal'
+                            size='small'
+                            icon='mdi-server'
+                            v-bind='props'
+                            @click='localUploadDialog = true'
                           >
                           </v-btn>
                         </template>
@@ -179,17 +224,25 @@
 
                 </div>
               </template>
-                <template v-slot:item.family.label="{ item }">
-                    {{ item.raw.family.label }} ({{ item.raw.version }})
+              <template v-slot:item.family.label="{ item }">
+                <template v-if="item.raw.family">
+                  {{ item.raw.family.label }} ({{ item.raw.version }})
                 </template>
+                <template v-else>
+                  N/A
+                </template>
+              </template>
                 <template v-slot:item.uploaded_at="{ item }">
                     {{ new Date(item.raw.uploaded_at).toLocaleString('en-US') }}
                 </template>
-                <template v-slot:no-data> {{ noDataText }} </template>
+                <template v-slot:no-data> {{ noDataMessage }} </template>
             </v-data-table>
         </v-card>
         <v-dialog v-model="createDialog" width="auto">
             <file-create @close="createDialog = !createDialog"></file-create>
+        </v-dialog>
+      <v-dialog v-model="localUploadDialog" width="auto">
+            <PrivateUpload @close="localUploadDialog = !localUploadDialog"></PrivateUpload>
         </v-dialog>
     </div>
 </template>
@@ -199,6 +252,7 @@ import FileCreate from '@/components/upload_cards/FileCreate.vue';
 import { computed, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useFileStore } from '@/store/file';
+import PrivateUpload from "@/components/upload_cards/file_create/PrivateUpload.vue";
 
 const emit = defineEmits(['onDelete']);
 const router = useRouter();
@@ -206,6 +260,9 @@ const fileStore = useFileStore();
 const showAllTags = ref(false);
 const sortBy = ref(null);
 const sortDesc = ref(false);
+const selectedTags = ref([]); // Benutzer ausgewählte Tags
+const localUploadDialog = ref(false);
+const showPrivateFiles = ref(false);
 
 const props = defineProps({
     headline: {
@@ -214,6 +271,10 @@ const props = defineProps({
         default: 'All Feature Models',
     },
     items: {
+        type: Array,
+        required: true,
+    },
+    availableTags: {
         type: Array,
         required: true,
     },
@@ -231,6 +292,11 @@ const props = defineProps({
         type: Boolean,
         required: false,
         default: true,
+    },
+      private: {
+        type: Boolean,
+        required: false,
+        default: false,
     },
 });
 const headers = [
@@ -259,10 +325,32 @@ const createDialog = ref(false);
 const checkLocalStorage = computed(() => {
     return !!localStorage.featureModelData;
 });
+const noDataMessage = computed(() => {
+  // Wenn entweder die Suche oder die Tags aktiviert sind und keine passenden Elemente gefunden wurden
+  if ((search.value || selectedTags.value.length > 0) && filteredItems.value.length === 0) {
+    return "No Feature Model matches the search criteria.";
+  } else {
+    // Wenn weder Suche noch Tags aktiviert sind oder passende Elemente gefunden wurden
+    return props.noDataText;
+  }
+});
 const filteredItems = computed(() => {
   // Wenn die Suche leer ist, zeige alle Elemente
-  if (!search.value) {
+  if(showPrivateFiles.value){
+    return fileStore.myPrivateFeatureModels;
+  }
+  if (!search.value && selectedTags.value.length === 0) {
     return props.items;
+  }
+  // Filter für Tags
+  let tagMatches = [];
+  if (selectedTags.value.length > 0) {
+    tagMatches = props.items.filter(item => {
+      const itemTagIds = item.tags.map(tag => tag.id);
+      return selectedTags.value.every(tagId => itemTagIds.includes(tagId));
+    });
+  } else {
+    tagMatches = props.items;
   }
 
   // Andernfalls filtere die Elemente basierend auf der Suche und priorisiere direkte Übereinstimmungen
@@ -270,7 +358,7 @@ const filteredItems = computed(() => {
   const directMatches = [];
   const otherMatches = [];
 
-  props.items.forEach((item) => {
+  tagMatches.forEach((item) => {
     const itemLabel = item.label.toLowerCase();
 
     if (itemLabel === searchLowerCase) {

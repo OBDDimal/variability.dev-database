@@ -5,8 +5,10 @@
         <feature-model-table
             v-if="appStore.isOnline"
             :items="confirmedFeatureModels"
+            :availableTags="tags"
             :loading="loading"
             :addable="true"
+            :private="true"
         />
         <template>
             <v-container v-if="!appStore.isOnline">
@@ -51,7 +53,7 @@ import { useDisplay } from 'vuetify';
 
 const breakpoints = useDisplay();
 const appStore = useAppStore();
-const { confirmedFeatureModels } = storeToRefs(useFileStore());
+const { confirmedFeatureModels, tags, myPrivateFeatureModels } = storeToRefs(useFileStore());
 const fileStore = useFileStore();
 
 
@@ -98,6 +100,8 @@ const tutorialSteps = [
 
 onMounted(() => {
     fileStore.fetchConfirmedFeatureModels();
+    fileStore.fetchMyPrivateFeatureModels();
+    fileStore.fetchTags();
 });
 </script>
 

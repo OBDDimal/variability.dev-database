@@ -24,11 +24,13 @@
 <script setup>
 import { ref } from 'vue';
 import { useFileStore } from '@/store/file';
+import {storeToRefs} from "pinia";
+import beautify from "xml-beautifier";
 const uploadInfo = ref(null);
 const fileStore = useFileStore();
 
 const emit = defineEmits(['close', 'submitClick', 'uploadSuccessfull']);
-
+let { defaultLicense } = storeToRefs(fileStore);
 const props = defineProps({
     data: {
         type: Object,
@@ -45,7 +47,9 @@ let loading = ref(false);
 async function upload() {
   const { valid } = await props.valid.validate();
   if (valid) {
-    if (props.data.files.length === 1) {
+    if (props.data.private){
+      await uploadPrivate();
+    }else if (props.data.files.length === 1) {
       await uploadSingle();
       } else {
       await uploadBulk();
@@ -54,7 +58,28 @@ async function upload() {
     emit('submitClick');
   }
 }
+async function uploadPrivate(){
 
+  loading.value = true;
+  const data = new FormData();
+  let file_data = [];
+  let file_object = {};
+  file_object['label'] = props.data.label;
+  file_object['description'] = props.data.description;
+  file_object['file'] = '0';
+  file_object['tags'] = [];
+  file_object['license'] = defaultLicense.value.id;
+  file_data.push(file_object);
+  const xmlData = localStorage.featureModelData;
+  const blob = new Blob([xmlData], { type: 'application/xml' });
+  data.append('0', blob, 'file.xml');
+  data.append('files', JSON.stringify(file_data));
+  uploadStatus.value = 'Uploading file...';
+  await fileStore.uploadPrivateFile(data);
+  uploadStatus.value = '';
+  loading.value = false;
+  emit('close');
+}
 async function uploadSingle() {
   loading.value = true;
   const data = new FormData();
@@ -62,7 +87,7 @@ async function uploadSingle() {
   let file_object = {};
   file_object['label'] = props.data.label;
   file_object['description'] = props.data.description;
-  file_object['license'] = props.data.license;
+  file_object['license'] = defaultLicense.value.id;
 
 
   file_object['family'] = props.data.family;
@@ -96,7 +121,7 @@ async function handleSuccessfulUpload(format) {
   uploadInfo.value = {
     format: format,
     fileNames: props.data.label,
-    license: props.data.license,
+    license:  defaultLicense.value.id,
   };
   uploadStatus.value = '';
   loading.value = false;
@@ -130,7 +155,7 @@ async function uploadBulk() {
     let date = new Date();
     file_object['label'] = file.name.replace('.xml', '');
     file_object['description'] = `Added in bulk upload on ${date.toLocaleString('en-US', options)}`;
-    file_object['license'] = props.data.license;
+    file_object['license'] =  defaultLicense.value.id;
     file_object['version'] = version;
     /**if (i !== 0) {
         file_object['family'] = uploaded_family_id;
@@ -164,7 +189,7 @@ async function uploadBulk() {
         format: "Bulk",
         fileCount: props.data.files.length,
         fileNames: file_names,
-        license: props.data.license
+        license:  defaultLicense.value.id
       };
     uploadStatus.value = '';
     loading.value = false;

@@ -25,21 +25,21 @@
                 show-size
                 ></v-file-input>
             </v-col>
-            <v-col class="py-0" cols="12" md="6">
-              <v-select
-              v-model="formData.license"
-                        :items="licenses"
-                        item-title="label"
-                        item-value="id"
-                        hint="Select the license of the feature model"
-                        label="License"
-                        :rule="licenseRules"
-                        variant="outlined"
-                        density="comfortable"
-                        required
-              >
-              </v-select>
-            </v-col>
+            <v-col class="py-1" cols="12" md="6">
+                <v-text-field
+                  v-model="formData.license"
+                  label="License"
+                  hint="CC BY-SA 4.0 DEED"
+                  :rules="licenseRules"
+                  variant="outlined"
+                  density="comfortable"
+                  readonly
+                >
+                  <template v-slot:append>
+                    <v-icon color="primary" @click="redirectToLicensePage">mdi-information</v-icon>
+                  </template>
+                </v-text-field>
+              </v-col>
             <v-col class="py-0" cols="12" md="6">
               <!-- Change back to v-combobox when new family upload is working properly -->
                     <v-autocomplete
@@ -111,7 +111,7 @@
                 class="mt-0"
                 hide-details
                 :rules="checkboxRules"
-                label="All information will be published according to your chosen license"
+                label="All information will be published under License CC BY-SA 4.0 DEED"
                 outlined
                 required
               >
@@ -161,7 +161,7 @@ let formData = reactive({
   label: '',
   description: '',
   files: null,
-  license: null,
+  license: "CC BY - SA 4.0 DEED",
   family: null,
   version: '',
   tags: [],
@@ -173,11 +173,6 @@ let formData = reactive({
 const showDetails = ref(false);
 
 let fileRules = [(v) => !!v || 'File is required'];
-
-let { licenses } = storeToRefs(fileStore);
-let licenseRules = [(v) => !!v || 'License is required'];
-
-let familyRules = [(v) => !!v || 'Family is required'];
 
 let checkboxRules = [(v) => !!v || 'Checkbox must be checked'];
 
