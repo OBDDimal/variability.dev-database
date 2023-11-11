@@ -1,5 +1,5 @@
 from django.core.cache import cache
-from django.db.models import Q
+from django.db.models import Q, Prefetch
 from rest_framework.request import Request
 
 from core.fileupload.models import Family, Tag, License, File, Analysis, AnalysisResult
@@ -46,6 +46,8 @@ import json
 import os
 import binascii
 import zipfile
+
+from ..user.models import User
 
 logger = logging.getLogger(__name__)
 
@@ -486,8 +488,14 @@ class ConfirmedFileViewSet(
             filter_conditions &= Q(family__id=family_id)
         if owner is not None:
             filter_conditions &= Q(owner=owner)
-        queryset = (queryset.filter(filter_conditions).select_related('family', 'license').
-                    prefetch_related('tags').order_by("version"))
+        queryset = (queryset.filter(filter_conditions)
+                    .select_related('license')
+                    .prefetch_related(
+            Prefetch('tags', queryset=Tag.objects.select_related('owner')),
+            Prefetch('family', queryset=Family.objects.select_related('owner')),
+            Prefetch('owner', queryset=User.objects.only('email'))
+        )
+                    .order_by("version"))
 
         anonymized_files = [anonymize_file(FilesSerializer(file).data, request) for file in queryset]
         cache.set(cache_key, anonymized_files, 60 * 15)
@@ -554,7 +562,7 @@ class FamiliesViewSet(
         cached_families = cache.get(f"families_cache_{request.user}")
         if cached_families is not None:
             return Response(cached_families)
-        queryset = Family.objects.all()
+        queryset = Family.objects.prefetch_related('owner').all()
         families = FamiliesSerializer(queryset, many=True).data
         anonymized_families = []
         for family in families:
@@ -628,7 +636,7 @@ class TagsViewSet(
         return anonymized_tag
 
     def list(self, request, **kwargs):
-        queryset = Tag.objects.all()
+        queryset = Tag.objects.prefetch_related('owner').all()
         tags = TagsSerializer(queryset, many=True).data
         public_tags = self.remove_private_tags(tags, request)
         anonymized_tags = []
