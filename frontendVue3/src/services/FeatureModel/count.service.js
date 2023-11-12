@@ -4,16 +4,17 @@ import * as CONSTANTS from '@/classes/constants'
 export function colorNodes(allNodes, coloringIndex) {
 	switch (coloringIndex) {
 		case 0:
-			coloring(allNodes, countNodes)
+			resetColorNodes(allNodes)
 			break
 		case 1:
+      resetColorNodes(allNodes)
 			coloring(allNodes, countDirectChildren)
 			break
 		case 2:
+      resetColorNodes(allNodes)
 			coloring(allNodes, countTotalChildren)
 			break
 		default:
-			resetColorNodes(allNodes)
 			break
 	}
 }
@@ -43,7 +44,7 @@ function coloring(allNodes, coloringFunction) {
 /**
  * Counts all nodes
  * @returns {max: number, count: {}}
- */
+
 function countNodes(allNodes) {
 	let count = {}
 	let max = 0
@@ -58,7 +59,7 @@ function countNodes(allNodes) {
 	}
 
 	return { count: count, max: max }
-}
+}*/
 
 function countDirectChildren(allNodes) {
 	let count = {}

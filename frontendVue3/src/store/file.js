@@ -1,5 +1,4 @@
 import { defineStore } from 'pinia';
-import authService from '@/services/auth.service';
 import api from '@/services/api.service';
 import { useAppStore } from '@/store/app';
 import { useAuthStore } from '@/store/auth';
@@ -15,6 +14,8 @@ export const useFileStore = defineStore('file', {
         confirmedFeatureModels: [],
         myConfirmedFeatureModels: [],
         featureModels: [],
+        defaultLicense: null,
+        myPrivateFeatureModels:[]
     }),
     getters: {
         myOwnTags(state) {
@@ -28,7 +29,11 @@ export const useFileStore = defineStore('file', {
         fetchConfirmedFeatureModels() {
             api.get(`${API_URL}files/uploaded/confirmed/`).then((response) => {
                 this.confirmedFeatureModels = response.data;
-                console.log(response.data[0]);
+            });
+        },
+        fetchMyPrivateFeatureModels() {
+            api.get(`${API_URL}files/uploaded/private/`).then((response) => {
+                this.myPrivateFeatureModels = response.data;
             });
         },
         async fetchMyConfirmedFeatureModels() {
@@ -79,6 +84,7 @@ export const useFileStore = defineStore('file', {
         },
         fetchLicenses() {
             api.get(`${API_URL}licenses/`).then((response) => {
+                this.defaultLicense = response.data.filter((li) => li.label === "CC BY - SA 4.0 DEED").shift();
                 this.licenses = response.data;
             });
         },
@@ -94,26 +100,78 @@ export const useFileStore = defineStore('file', {
         },
         async uploadBulkFeatureModels(data) {
             const appStore = useAppStore();
-            await api
-                .post(`${API_URL}bulk-upload/`, data, {
-                    headers: { 'Content-Type': 'multipart/form-data' },
-                })
-                .then(() => {
-                    appStore.updateSnackbar(
-                        'Upload successfully! Check your mails',
-                        'success',
-                        5000,
-                        true
-                    );
-                })
-                .catch((error) => {
-                    appStore.updateSnackbar(
-                        'Error! ' + error.message,
-                        'error',
-                        5000,
-                        true
-                    );
-                });
+          return await api
+              .post(`${API_URL}bulk-upload/`, data, {
+                headers: { 'Content-Type': 'multipart/form-data' },
+              })
+              .then(() => {
+                appStore.updateSnackbar(
+                  'Upload successfully! Check your mails',
+                  'success',
+                  5000,
+                  true
+                );
+                return true
+              })
+              .catch((error) => {
+                appStore.updateSnackbar(
+                  'Error! ' + error.message,
+                  'error',
+                  5000,
+                  true
+                );
+                return false;
+              });
+        },
+        async uploadZipFeatureModels(data) {
+            const appStore = useAppStore();
+          return api
+              .post(`${API_URL}zip-upload/`, data, {
+                headers: { 'Content-Type': 'multipart/form-data' },
+              })
+              .then(() => {
+                appStore.updateSnackbar(
+                  'Upload successfully! Check your mails',
+                  'success',
+                  5000,
+                  true
+                );
+                return true;
+              })
+              .catch((error) => {
+                appStore.updateSnackbar(
+                  'Error! ' + error.message,
+                  'error',
+                  5000,
+                  true
+                );
+                return false;
+              })
+        },
+      async uploadPrivateFile(data) {
+            const appStore = useAppStore();
+          return await api
+              .post(`${API_URL}private-upload/`, data, {
+                headers: { 'Content-Type': 'multipart/form-data' },
+              })
+              .then(() => {
+                appStore.updateSnackbar(
+                  'Upload successfully!',
+                  'success',
+                  5000,
+                  true
+                );
+                return true
+              })
+              .catch((error) => {
+                appStore.updateSnackbar(
+                  'Error! ' + error.message,
+                  'error',
+                  5000,
+                  true
+                );
+                return false;
+              });
         },
         async uploadTag(payload) {
             // payload = { label, description, is_public }

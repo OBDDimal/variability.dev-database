@@ -69,8 +69,11 @@ def anonymize_file(file, request):
                 tags.append(new_tag)
             anonymized_file[file_key] = tags
         elif file_key == "family":
-            new_family = file_value
-            new_family.update({"owner": new_family["owner"] == user_email})
+            if file_value is not None:
+                new_family = file_value.copy()
+                new_family.update({"owner": new_family.get("owner") == user_email})
+            else:
+                new_family = None
             anonymized_file[file_key] = new_family
         else:
             anonymized_file[file_key] = file_value
@@ -172,8 +175,10 @@ class UploadApiView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def check_family(self, request, family_id):
-        family = Family.objects.get(pk=family_id)
-        return family and family.owner == request.user
+        if family_id:
+            family = Family.objects.get(pk=family_id)
+            return family and family.owner == request.user
+        return True
 
     def check_tags(self, request, tag_ids):
         for tag_id in tag_ids:
@@ -198,20 +203,71 @@ class UploadApiView(APIView):
             analysis_result.save()
 
 
-class BulkUploadApiView(UploadApiView):
+class PrivateFileUploadApiView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
     def post(self, request, format=None):
         if not request.data["files"]:
             return Response(
-                    {"files": "This field may not be blank."},
-                    status.HTTP_400_BAD_REQUEST,
-                )
+                {"files": "This field may not be blank."},
+                status.HTTP_400_BAD_REQUEST,
+            )
         try:
             files = json.loads(request.data["files"])
         except:
             return Response(
-                    {"files": "This field must contain JSON."},
-                    status.HTTP_400_BAD_REQUEST,
+                {"files": "This field must contain JSON."},
+                status.HTTP_400_BAD_REQUEST,
+            )
+        for uploaded_file in files:
+            label = uploaded_file["label"]
+            description = uploaded_file["description"]
+            file = request.FILES[uploaded_file["file"]]
+            license = uploaded_file["license"]
+            tags = uploaded_file["tags"]
+
+            if not label or not file:
+                return Response(
+                    {"message": "Missing required fields"},
+                    status=status.HTTP_400_BAD_REQUEST,
                 )
+
+            validated_data = QueryDict("", mutable=True)
+            validated_data["label"] = label
+            validated_data["description"] = description
+            validated_data.setlist("tags", tags)
+            validated_data["local_file"] = file
+            validated_data["private"] = True
+            validated_data["license"] = license
+
+            fs = FilesSerializer(data=validated_data)
+            if fs.is_valid():
+                fs.save(owner=request.user)
+                return Response(
+                    {"message": "File uploaded successfully"},
+                    status=status.HTTP_201_CREATED,
+                )
+            else:
+                return Response(
+                    {"message": "Invalid file format"},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
+
+class BulkUploadApiView(UploadApiView):
+    def post(self, request, format=None):
+        if not request.data["files"]:
+            return Response(
+                {"files": "This field may not be blank."},
+                status.HTTP_400_BAD_REQUEST,
+            )
+        try:
+            files = json.loads(request.data["files"])
+        except:
+            return Response(
+                {"files": "This field must contain JSON."},
+                status.HTTP_400_BAD_REQUEST,
+            )
 
         serializers = []
         confirmation_token = generate_random_string(30)
@@ -264,16 +320,16 @@ class ZipUploadApiView(UploadApiView):
     def post(self, request, format=None):
         if not request.data["files"]:
             return Response(
-                    {"files": "This field may not be blank."},
-                    status.HTTP_400_BAD_REQUEST,
-                )
+                {"files": "This field may not be blank."},
+                status.HTTP_400_BAD_REQUEST,
+            )
         try:
             file_data = json.loads(request.data["files"])
         except:
             return Response(
-                    {"files": "This field must contain JSON."},
-                    status.HTTP_400_BAD_REQUEST,
-                )
+                {"files": "This field must contain JSON."},
+                status.HTTP_400_BAD_REQUEST,
+            )
 
         label = file_data["label"]
         description = file_data["description"]
@@ -299,7 +355,7 @@ class ZipUploadApiView(UploadApiView):
             validated_data["label"] = label
             validated_data["description"] = description
             validated_data["license"] = license
-            validated_data["version"] = f"{i+1}.0.0"
+            validated_data["version"] = f"{i + 1}.0.0"
             validated_data["family"] = family
             validated_data.setlist("tags", tags)
             validated_data["local_file"] = local_file
@@ -403,6 +459,29 @@ class ConfirmedFileViewSet(
         if not instance.is_confirmed:
             return Response(status=status.HTTP_404_NOT_FOUND)
         return Response(anonymized_file)
+
+
+class PrivateFileViewSet(viewsets.ModelViewSet):
+    queryset = File.objects.filter(private=True)
+    serializer_class = FilesSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly, IsOwnerOrIsAdminOrReadOnly]
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.queryset.filter(owner=request.user)
+        serializer = self.serializer_class(queryset, many=True)
+        files = serializer.data
+        anonymized_files = []
+        for file in files:
+            anonymized_file = anonymize_file(file, request)
+            anonymized_files.append(anonymized_file)
+        return Response(anonymized_files)
+
+    def retrieve(self, request, *args, **kwargs):
+        instance = self.get_object()
+        if instance.owner != request.user:
+            return Response({"error": "Access denied"}, status=status.HTTP_403_FORBIDDEN)
+        serializer = self.serializer_class(instance)
+        return Response(serializer.data)
 
 
 class FamiliesViewSet(
@@ -521,6 +600,7 @@ class TagsViewSet(
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
 
+
 class AnalysesViewSet(
     viewsets.GenericViewSet,
     mixins.CreateModelMixin,
@@ -528,7 +608,6 @@ class AnalysesViewSet(
     mixins.DestroyModelMixin,
     mixins.ListModelMixin,
 ):
-
     queryset = Analysis.objects.all()
     serializer_class = AnalysesSerializer
     permission_classes = [
@@ -540,12 +619,12 @@ class AnalysesViewSet(
         analyses = AnalysesSerializer(queryset, many=True).data
         return Response(analyses)
 
+
 class AnalysisResultsViewSet(
     viewsets.GenericViewSet,
     mixins.RetrieveModelMixin,
     mixins.ListModelMixin,
 ):
-
     queryset = AnalysisResult.objects.all()
     serializer_class = AnalysisResultsSerializer
 

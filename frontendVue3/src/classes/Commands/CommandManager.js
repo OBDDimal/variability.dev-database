@@ -1,5 +1,7 @@
 import * as commandFactory from "@/classes/Commands/CommandFactory";
 import * as update from '@/services/FeatureModel/update.service.js';
+import { getColorsFromService } from '@/services/FeatureModel/colorsFromService.service';
+import { ReloadCommand } from '@/classes/Commands/ReloadCommand';
 
 export class CommandManager {
     constructor() {
@@ -10,6 +12,10 @@ export class CommandManager {
         this.remoteCommands = null;
         this.commandEvent = null;
         this.d3Data = null;
+    }
+
+    executeReload(){
+      this.fadeOut(this.d3Data, new ReloadCommand());
     }
 
     execute(command, initiator = true) {
@@ -111,10 +117,57 @@ export class CommandManager {
     }
 
     fadeOut(d3Data, command) {
-        // Rerender for edits and fade them out
-        setTimeout(() => {
-            command.unmarkChanges();
-            update.updateSvg(d3Data);
-        }, 5000);
+        if(command instanceof ReloadCommand){
+            if(d3Data.coloringIndex < 1) {
+                getColorsFromService(this.collaborationManager.featureModel.data, d3Data).then(
+                  value => {
+                    if (!value) {
+                      d3Data.coloringIndex = 0;
+                    } else {
+                      d3Data.coloringIndex = -1;
+                    }
+                  }
+                );
+            }
+            // Rerender for edits and fade them out
+            setTimeout(() => {
+                command.unmarkChanges();
+                update.updateSvg(d3Data);
+            }, 500);
+        } else if(this.type !== 'constraint') {
+            if(d3Data.coloringIndex < 1) {
+                getColorsFromService(this.collaborationManager.featureModel.data, d3Data).then(
+                  value => {
+                    if (!value) {
+                      d3Data.coloringIndex = 0;
+                    } else {
+                      d3Data.coloringIndex = -1;
+                    }
+                  }
+                );
+            }
+            // Rerender for edits and fade them out
+            setTimeout(() => {
+                command.unmarkChanges();
+                update.updateSvg(d3Data);
+            }, 3000);
+        } else {
+            if(this.collaborationManager.featureModelCommandManager.d3Data.coloringIndex < 1) {
+                getColorsFromService(this.collaborationManager.featureModel.data, this.collaborationManager.featureModelCommandManager.d3Data).then(
+                  value => {
+                    if (!value) {
+                      this.collaborationManager.featureModelCommandManager.d3Data.coloringIndex = 0;
+                    } else {
+                      this.collaborationManager.featureModelCommandManager.d3Data.coloringIndex = -1;
+                    }
+                  }
+                );
+            }
+            // Rerender for edits and fade them out
+            setTimeout(() => {
+                command.unmarkChanges();
+                update.updateSvg(this.collaborationManager.featureModelCommandManager.d3Data);
+            }, 500);
+        }
     }
 }

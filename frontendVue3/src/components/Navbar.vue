@@ -85,13 +85,6 @@
             >
                 <div class="hidden-md-and-down">Admin</div>
             </v-btn>
-            <v-btn
-                v-if="!authStore.loggedIn && appStore.isOnline"
-                to="/register"
-                prepend-icon="mdi-account-plus"
-            >
-                Register
-            </v-btn>
             <v-menu
                 v-model="loginMenu"
                 :close-on-content-click="false"

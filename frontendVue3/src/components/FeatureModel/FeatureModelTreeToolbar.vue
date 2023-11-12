@@ -7,6 +7,7 @@
             absolute
             permanent
             location="start"
+            id="feature-model-toolbar"
         >
             <v-list dense>
                 <v-list-item
@@ -104,6 +105,7 @@
                     :disabled="!isUndoAvailable || !editRights"
                     @click="$emit('undo')"
                     prepend-icon="mdi-undo"
+                    id="feature-model-toolbar-undo"
                 >
                     <v-list-item-title>Undo</v-list-item-title>
                 </v-list-item>
@@ -116,7 +118,7 @@
                     <v-list-item-title>Redo</v-list-item-title>
                 </v-list-item>
 
-                <v-menu offset-y :close-on-content-click="false">
+                <v-menu offset-y :close-on-content-click="false" >
                     <template v-slot:activator="{ props }">
                         <v-list-item v-bind="props" prepend-icon="mdi-palette">
                             <v-list-item-title>Coloring</v-list-item-title>
@@ -126,13 +128,10 @@
                         <v-list-item
                             v-for="(item, i) in itemsColoring"
                             :key="i"
-                            @click="selectedColoring(item)"
+                            @click="selectedColoring(i)"
                         >
-                            <v-list-item-content>
                                 <v-list-item-title
-                                    v-text="item"
-                                ></v-list-item-title>
-                            </v-list-item-content>
+                                >{{item}}</v-list-item-title>
                         </v-list-item>
                     </v-list>
                 </v-menu>
@@ -238,7 +237,7 @@
 
                 <v-list-item
                     @click="$emit('show-tutorial')"
-                    id="tutorial-mode"
+                    id="tutorial-mode-button"
                     prepend-icon="mdi-school"
                 >
                     <v-list-item-title>Tutorial</v-list-item-title>
@@ -314,6 +313,15 @@
                         </v-list-item>
                     </v-list>
                 </v-menu>
+                <v-list-item
+                    id="featureide-service-status"
+                >
+                  <template v-slot:prepend>
+                    <v-icon v-if=isServiceAvailable>mdi-wifi</v-icon>
+                    <v-icon v-if=!isServiceAvailable>mdi-wifi-off</v-icon>
+                  </template>
+                    <v-list-item-title>FeatureIDE Service Status</v-list-item-title>
+                </v-list-item>
             </v-list>
         </v-navigation-drawer>
     </div>
@@ -329,6 +337,7 @@ export default {
         isUndoAvailable: Boolean,
         isRedoAvailable: Boolean,
         isSaveAvailable: Boolean,
+        isServiceAvailable: Boolean,
         direction: String,
         editRights: undefined,
         collaborationStatus: undefined,
@@ -340,13 +349,14 @@ export default {
         maxChildren: 3,
         spaceBetweenParentChild: 75,
         spaceBetweenSiblings: 20,
-        itemsColoring: ['Count', 'Direct Children', 'Total Children'],
+        itemsColoring: ['Standard', 'Direct Children', 'Total Children'],
         isShortName: false,
         semanticEditing: false,
         quickEdit: false,
         drawer: true,
         discardChangesConfirmDialog: false,
         saveDialog: false,
+        isColorMenuOpened: false,
     }),
 
     watch: {

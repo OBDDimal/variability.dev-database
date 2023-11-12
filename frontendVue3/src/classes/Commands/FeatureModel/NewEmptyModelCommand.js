@@ -23,7 +23,7 @@ export class NewEmptyModelCommand extends Command {
             calculations: undefined,
             comments: [],
             featureOrder: undefined,
-            rootNode: new FeatureNode(null, 'Root', 'and', false, false),
+            rootNode: new FeatureNode(null, 'Root', 'and', true, false),
         };
     }
 

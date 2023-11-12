@@ -62,6 +62,9 @@ class FilesSerializer(serializers.ModelSerializer):
         """
         Check that the uploaded file contains valid xml
         """
+        family = data.get('family', None)
+        if family is None:
+            data['family'] = None
         try:
             contents = ""
             for line in data['local_file']:
@@ -108,7 +111,8 @@ class FilesSerializer(serializers.ModelSerializer):
 
         tags = list(map(lambda tag: Tag.objects.get(id=tag), data.getlist('tags')))
 
-        if 'family' in data:
+        family = None
+        if 'family' in data and data['family']:
             family = Family.objects.get(id=data['family'])
 
         license = License.objects.get(id=data['license'])

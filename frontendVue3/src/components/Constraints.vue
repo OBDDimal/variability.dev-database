@@ -72,29 +72,28 @@
 
             <template v-slot:item.formula="{ item }">
                 <v-chip
-                    v-model="item.checked"
-                    :color="item.constraint.color"
-                    :style="`color: ${computeColor(item.constraint.color)}`"
-                    @click="highlightConstraint(item)"
+                    :color="item.raw.constraint.color"
+                    @click="highlightConstraint(item.raw)"
                 >
-                    {{ item.formula }}
+                {{ item.raw.formula }}
                 </v-chip>
             </template>
 
             <template v-slot:item.actions="{ item }">
-                <v-icon
-                    class="mr-6"
-                    @click="openAddEditDialog('Edit', item.constraint)"
+                <v-btn
+                    icon="mdi-pencil"
+                    variant="text"
+                    @click="openAddEditDialog('Edit', item.raw.constraint)"
                     :disabled="!editRights"
                 >
-                    mdi-pencil
-                </v-icon>
-                <v-icon
-                    @click="deleteConstraint(item.constraint)"
+                </v-btn>
+                <v-btn
+                    icon="mdi-delete"
+                    variant="text"
+                    @click="deleteConstraint(item.raw.constraint)"
                     :disabled="!editRights"
                 >
-                    mdi-delete
-                </v-icon>
+                </v-btn>
             </template>
         </v-data-table>
     </v-bottom-sheet>
@@ -116,7 +115,7 @@ export default {
 
     props: {
         commandManager: CommandManager,
-        constraints: undefined,
+        constraints: Array,
         rootNode: undefined,
         editRights: undefined,
         isOpen: Boolean,
@@ -124,8 +123,8 @@ export default {
 
     data: () => ({
         headers: [
-            { text: 'Constraint', value: 'formula', width: '50%' },
-            { text: 'Actions', value: 'actions', width: '50%' },
+            { title: 'Constraint', key: 'formula', width: '50%' },
+            { title: 'Actions', key: 'actions', width: '50%' },
         ],
         search: '',
         showAddEditDialog: false,
@@ -134,7 +133,7 @@ export default {
         updateKey: 0,
     }),
 
-    computed: {
+  computed: {
         isOpenDialog: {
             get() {
                 return this.isOpen;
@@ -145,14 +144,12 @@ export default {
             return this.constraints.map((e) => ({
                 constraint: e,
                 formula: e.toString(),
-                checked: false,
             }));
         },
     },
 
     methods: {
         highlightConstraint(constraintRow) {
-            constraintRow.checked = !constraintRow.checked;
             constraintRow.constraint.toggleHighlighted();
             constraintRow.constraint
                 .getFeatureNodes()
@@ -177,35 +174,16 @@ export default {
             }
             this.closeAddEditDialog();
             this.commandManager.execute(command);
+            this.$emit('update-feature-model');
         },
 
         deleteConstraint(constraint) {
+            if(constraint.isHighlighted){ //reset highlight to free up color
+                constraint.toggleHighlighted();
+            }
             const command = new DeleteCommand(this.constraints, constraint);
             this.commandManager.execute(command);
-        },
-
-        computeColor(bg) {
-            const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(bg);
-            const rgb = result
-                ? [
-                      parseInt(result[1], 16),
-                      parseInt(result[2], 16),
-                      parseInt(result[3], 16),
-                      // eslint-disable-next-line no-mixed-spaces-and-tabs
-                  ]
-                : null;
-            if (rgb) {
-                if (rgb[0] * 0.299 + rgb[1] * 0.587 + rgb[2] * 0.114 > 170) {
-                    return '#000';
-                } else {
-                    return '#fff';
-                }
-            } else {
-                if (this.$vuetify.theme.dark) {
-                    return '#fff';
-                }
-                return '#000';
-            }
+            this.$emit('update-feature-model');
         },
 
         openAddEditDialog(mode, constraint) {
@@ -221,10 +199,12 @@ export default {
 
         undo() {
             this.commandManager.undo();
+            this.$emit('update-feature-model');
         },
 
         redo() {
             this.commandManager.redo();
+            this.$emit('update-feature-model');
         },
     },
 
