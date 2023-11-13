@@ -164,7 +164,7 @@ class File(models.Model):
     local_file = models.FileField(upload_to=relative_upload_dir)
     uploaded_at = models.DateTimeField(auto_now_add=True)
     license = models.ForeignKey(License, on_delete=models.CASCADE)
-    tags = models.ManyToManyField(Tag)
+    tags = models.ManyToManyField(Tag, blank=True)
     version = models.CharField(blank=True, null=True, max_length=16)
     transpiled_file = models.FileField(
         null=True, blank=True, upload_to=relative_upload_dir
