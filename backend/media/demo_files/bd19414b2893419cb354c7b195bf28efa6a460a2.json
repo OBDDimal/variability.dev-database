@@ -1,0 +1,91 @@
+{
+  "id": "NPC",
+  "fm_attributes": {
+    "type": "and",
+    "mandatory": "true"
+  },
+  "children": [
+    {
+      "id": "Mood",
+      "fm_attributes": {
+        "type": "alt",
+        "mandatory": "true"
+      },
+      "children": [
+        {
+          "id": "Hostile",
+          "fm_attributes": {
+            "type": "feature"
+          },
+          "children": []
+        },
+        {
+          "id": "Friendly",
+          "fm_attributes": {
+            "type": "feature"
+          },
+          "children": []
+        }
+      ]
+    },
+    {
+      "id": "Profession",
+      "fm_attributes": {
+        "type": "or",
+        "mandatory": "true"
+      },
+      "children": [
+        {
+          "id": "Warrior",
+          "fm_attributes": {
+            "type": "feature"
+          },
+          "children": []
+        },
+        {
+          "id": "Villager",
+          "fm_attributes": {
+            "type": "feature"
+          },
+          "children": []
+        },
+        {
+          "id": "Farmer",
+          "fm_attributes": {
+            "type": "feature"
+          },
+          "children": []
+        }
+      ]
+    },
+    {
+      "id": "HarvestSkills",
+      "fm_attributes": {
+        "type": "and"
+      },
+      "children": [
+        {
+          "id": "Hauling",
+          "fm_attributes": {
+            "type": "feature"
+          },
+          "children": []
+        },
+        {
+          "id": "Threshing",
+          "fm_attributes": {
+            "type": "feature"
+          },
+          "children": []
+        },
+        {
+          "id": "Reaping",
+          "fm_attributes": {
+            "type": "feature"
+          },
+          "children": []
+        }
+      ]
+    }
+  ]
+}

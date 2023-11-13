@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><featureModel><properties></properties><struct><and mandatory="true" name="NPC"><alt mandatory="true" name="Mood"><feature name="Hostile"/><feature name="Friendly"/></alt><or mandatory="true" name="Profession"><feature name="Warrior"/><feature name="Villager"/><feature name="Farmer"/></or><and name="HarvestSkills"><feature name="Hauling"/><feature name="Threshing"/><feature name="Reaping"/></and></and></struct><constraints><rule><imp><conj>
+        <disj>
+        <var>Farmer</var> 
+        <var>Villager</var>
+        </disj> 
+        <not><var>Warrior</var></not>
+        </conj> <var>Friendly</var></imp></rule><rule><imp><var>Farmer</var> <var>HarvestSkills</var></imp></rule></constraints><comments></comments></featureModel>

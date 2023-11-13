@@ -1,0 +1,77 @@
+{
+  "id": "Toasty",
+  "fm_attributes": {
+    "type": "and",
+    "mandatory": "true"
+  },
+  "children": [
+    {
+      "id": "Bread",
+      "fm_attributes": {
+        "type": "alt",
+        "mandatory": "true"
+      },
+      "children": [
+        {
+          "id": "WholeGrain",
+          "fm_attributes": {
+            "type": "feature"
+          },
+          "children": []
+        },
+        {
+          "id": "White",
+          "fm_attributes": {
+            "type": "feature"
+          },
+          "children": []
+        }
+      ]
+    },
+    {
+      "id": "Toppings",
+      "fm_attributes": {
+        "type": "or",
+        "mandatory": "true"
+      },
+      "children": [
+        {
+          "id": "Cheese",
+          "fm_attributes": {
+            "type": "feature"
+          },
+          "children": []
+        },
+        {
+          "id": "Ham",
+          "fm_attributes": {
+            "type": "feature"
+          },
+          "children": []
+        }
+      ]
+    },
+    {
+      "id": "Extras",
+      "fm_attributes": {
+        "type": "or"
+      },
+      "children": [
+        {
+          "id": "Pineapple",
+          "fm_attributes": {
+            "type": "feature"
+          },
+          "children": []
+        },
+        {
+          "id": "Cucumber",
+          "fm_attributes": {
+            "type": "feature"
+          },
+          "children": []
+        }
+      ]
+    }
+  ]
+}
