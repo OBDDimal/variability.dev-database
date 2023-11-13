@@ -191,6 +191,13 @@ class File(models.Model):
             models.Index(fields=['is_confirmed']),
         ]
 
+    class Meta:
+        indexes = [
+            models.Index(fields=['owner']),
+            models.Index(fields=['family']),
+            models.Index(fields=['is_confirmed']),
+        ]
+
     def __str__(self):
         # do not change that
         return f"{self.id}"
