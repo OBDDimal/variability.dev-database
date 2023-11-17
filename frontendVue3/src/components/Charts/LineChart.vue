@@ -25,15 +25,6 @@ ChartJS.register(
   Tooltip,
   Legend
 )
-
-const labels = ref(['January', 'February', 'March', 'April', 'May', 'June', 'July'])
-const datasets = ref([
-  {
-    label: 'Data One',
-    backgroundColor: '#f87979',
-    data: [40, 39, 10, 40, 39, 80, 40]
-  }
-])
 const { chartData } = defineProps(['chartData']);
 /*const chartData = ref({
   labels: labels.value,
