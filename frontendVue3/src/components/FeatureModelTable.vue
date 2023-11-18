@@ -1,7 +1,7 @@
 <template>
-    <div>
-        <v-card variant="elevated" rounded class="pa-2">
-                  <v-data-table
+  <div>
+    <v-card variant="elevated" rounded class="pa-2">
+      <v-data-table
 
         :loading="props.loading"
         :headers="headers"
@@ -159,11 +159,11 @@
       </v-dialog>-->
           </v-toolbar>
         </template>
-        <template #item="{item}" >
+        <template #item="{item}">
           <tr @mouseenter="HandleMouseover(item.raw.id)"
               @mouseleave="HandleMouseleave(item.raw.id)"
-            >
-            <td  >
+          >
+            <td>
               <v-btn
                 variant="text"
                 color="primary"
@@ -247,21 +247,21 @@
         </template>
         <template v-slot:no-data> {{ noDataMessage }}</template>
       </v-data-table>
-        </v-card>
-        <v-dialog v-model="createDialog" width="auto">
-            <file-create @close="createDialog = !createDialog"></file-create>
-        </v-dialog>
-      <v-dialog v-model="localUploadDialog" width="auto">
-            <PrivateUpload @close="localUploadDialog = !localUploadDialog"></PrivateUpload>
-        </v-dialog>
-    </div>
+    </v-card>
+    <v-dialog v-model="createDialog" width="auto">
+      <file-create @close="createDialog = !createDialog"></file-create>
+    </v-dialog>
+    <v-dialog v-model="localUploadDialog" width="auto">
+      <PrivateUpload @close="localUploadDialog = !localUploadDialog"></PrivateUpload>
+    </v-dialog>
+  </div>
 </template>
 
 <script setup>
 import FileCreate from '@/components/upload_cards/FileCreate.vue';
-import { computed, ref } from 'vue';
-import { useRouter } from 'vue-router';
-import { useFileStore } from '@/store/file';
+import {computed, ref} from 'vue';
+import {useRouter} from 'vue-router';
+import {useFileStore} from '@/store/file';
 import PrivateUpload from "@/components/upload_cards/file_create/PrivateUpload.vue";
 
 const emit = defineEmits(['onDelete', 'onHover', 'onMouseLeave']);
@@ -275,65 +275,65 @@ const localUploadDialog = ref(false);
 const showPrivateFiles = ref(false);
 
 const props = defineProps({
-    headline: {
-        type: String,
-        required: false,
-        default: 'All Feature Models',
-    },
-    items: {
-        type: Array,
-        required: true,
-    },
-    availableTags: {
-        type: Array,
-        required: true,
-    },
-    loading: {
-        type: Boolean,
-        required: false,
-        default: false,
-    },
-    noDataText: {
-        type: String,
-        required: false,
-        default: 'No feature models yet',
-    },
-    addable: {
-        type: Boolean,
-        required: false,
-        default: true,
-    },
-      private: {
-        type: Boolean,
-        required: false,
-        default: false,
-    },
+  headline: {
+    type: String,
+    required: false,
+    default: 'All Feature Models',
+  },
+  items: {
+    type: Array,
+    required: true,
+  },
+  availableTags: {
+    type: Array,
+    required: true,
+  },
+  loading: {
+    type: Boolean,
+    required: false,
+    default: false,
+  },
+  noDataText: {
+    type: String,
+    required: false,
+    default: 'No feature models yet',
+  },
+  addable: {
+    type: Boolean,
+    required: false,
+    default: true,
+  },
+  private: {
+    type: Boolean,
+    required: false,
+    default: false,
+  },
 });
 const headers = [
-    /*{
-        title: 'ID',
-        align: 'start',
-        sortable: false,
-        key: 'id',
-    },*/
-    { title: 'Label', key: 'label', sortable: 'label' },
-    { title: 'Family (Version)', key: 'family.label',  sortable: 'family.label' },
-    /*{ text: 'Description', value: 'description' },*/
-    /*{ title: 'License', key: 'license.label' },*/
-    { title: 'Tags', key: 'tags'  },
-    { title: 'Uploaded on', key: 'uploaded_at', sortable: true },
+  /*{
+      title: 'ID',
+      align: 'start',
+      sortable: false,
+      key: 'id',
+  },*/
+  {title: 'Label', key: 'label', sortable: 'label'},
+  {title: 'Family (Version)', key: 'family.label', sortable: 'family.label'},
+  /*{ text: 'Description', value: 'description' },*/
+  /*{ title: 'License', key: 'license.label' },*/
+  {title: 'Tags', key: 'tags'},
+  {title: 'Uploaded on', key: 'uploaded_at', sortable: true},
 
-    {
-        title: '',
-        align: 'center',
-        key: 'actions',
-        sortable: false,
-    },
+  {
+    title: '',
+    align: 'center',
+    key: 'actions',
+    sortable: false,
+  },
 ];
 const search = ref('');
 const createDialog = ref(false);
 const checkLocalStorage = computed(() => {
-    return !!localStorage.featureModelData;
+  return !!localStorage.featureModelData;
 });
 const noDataMessage = computed(() => {
   // Wenn entweder die Suche oder die Tags aktiviert sind und keine passenden Elemente gefunden wurden
@@ -346,7 +346,7 @@ const noDataMessage = computed(() => {
 });
 const filteredItems = computed(() => {
   // Wenn die Suche leer ist, zeige alle Elemente
-  if(showPrivateFiles.value){
+  if (showPrivateFiles.value) {
     return fileStore.myPrivateFeatureModels;
   }
   if (!search.value && selectedTags.value.length === 0) {
@@ -381,39 +381,41 @@ const filteredItems = computed(() => {
   // Füge direkte Übereinstimmungen zuerst hinzu, gefolgt von anderen Übereinstimmungen
   return [...directMatches, ...otherMatches];
 });
+
 function handleClick(value) {
-    console.log(value);
-    router.push({
-        name: 'FileDetail',
-        params: { id: value.id, slug: value.slug },
-    });
+  console.log(value);
+  router.push({
+    name: 'FileDetail',
+    params: {id: value.id, slug: value.slug},
+  });
 }
 
-function HandleMouseover(id){
+function HandleMouseover(id) {
   emit('onHover', id)
 }
-function HandleMouseleave(id){
+
+function HandleMouseleave(id) {
   emit('onMouseLeave', id)
 }
 </script>
 
 
-
 <style>
 .highlighted {
-    background-color: green;
-    height: 100%;
-    width: 3px;
-    display: inline-block;
+  background-color: green;
+  height: 100%;
+  width: 3px;
+  display: inline-block;
 }
+
 .expand-tags-button {
-    cursor: pointer;
-    margin-left: 4px;
-    font-size: 18px;
-    line-height: 1;
-    color: #000000;
-    background-color: #ccc; /* Grauer Hintergrund */
-    border-radius: 50%; /* Runde Form */
-    padding: 6px; /* Innenabstand */
+  cursor: pointer;
+  margin-left: 4px;
+  font-size: 18px;
+  line-height: 1;
+  color: #000000;
+  background-color: #ccc; /* Grauer Hintergrund */
+  border-radius: 50%; /* Runde Form */
+  padding: 6px; /* Innenabstand */
 }
 </style>

@@ -1,5 +1,5 @@
 <template>
-  <Line :data="chartData" :options="options" ref="myChart" />
+  <Line :data="chartData" :options="options" ref="myChart"/>
 </template>
 
 <script setup>
@@ -13,7 +13,7 @@ import {
   Tooltip,
   Legend,
 } from 'chart.js'
-import { Line } from 'vue-chartjs'
+import {Line} from 'vue-chartjs'
 import {ref} from "vue";
 
 ChartJS.register(
@@ -25,11 +25,7 @@ ChartJS.register(
   Tooltip,
   Legend
 )
-const { chartData } = defineProps(['chartData']);
-/*const chartData = ref({
-  labels: labels.value,
-  datasets: datasets.value
-})*/
+const {chartData} = defineProps(['chartData']);
 
 const options = ref({
   responsive: true,
