@@ -1,5 +1,5 @@
 <template>
-  <Line :data="chartData" :options="options" />
+  <Line :data="chartData" :options="options" ref="myChart" />
 </template>
 
 <script setup>
@@ -11,7 +11,7 @@ import {
   LineElement,
   Title,
   Tooltip,
-  Legend
+  Legend,
 } from 'chart.js'
 import { Line } from 'vue-chartjs'
 import {ref} from "vue";
@@ -33,5 +33,6 @@ const { chartData } = defineProps(['chartData']);
 
 const options = ref({
   responsive: true,
+  pointHoverRadius: 10,
 })
 </script>

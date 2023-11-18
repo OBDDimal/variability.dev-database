@@ -221,13 +221,15 @@
                 :no-data-text="`No feature models in ${family.label} yet`"
                 :addable="false"
                 headline="Feature Models of Family"
+                @onHover  ="(id) => onElementHover(id)"
+                @onMouseLeave ="(id) => onMouseLeave(id)"
                 :available-tags="tags"/>
         </div>
     </div>
 </template>
 
 <script setup>
-import {onMounted, reactive, ref} from 'vue';
+import {computed, onMounted, reactive, ref, watch} from 'vue';
 import {useRoute} from 'vue-router';
 import api from '@/services/api.service';
 import FeatureModelTable from "@/components/FeatureModelTable.vue";
@@ -248,17 +250,51 @@ const { tags } = storeToRefs(useFileStore());
 const family = ref({});
 const files = ref([]);
 const loadingTable = ref(true);
-const numberOfFeaturesData = reactive({
-    labels: [],
-    datasets: [],
+const labels = ref([])
+const numberOfFeaturesData = computed(() => {
+  return {
+    labels: labels.value,
+    datasets: [
+      {
+                    label: 'Number of Features',
+                    borderColor: 'green',
+                    fill: false,
+                    data: data.value,
+                    pointRadius: (() => {return files.value.map(elem => elem.active ? 10 : 4)})()
+
+                },
+    ],
+  };
 });
-const numberOfConstraintsData = reactive({
-    labels: [],
-    datasets: [],
+
+const numberOfConstraintsData = computed(() => {
+  return {
+    labels: labels.value,
+    datasets: [
+      {
+        label: 'Number of Constraints',
+        borderColor: 'blue',
+        fill: false,
+        data: dataConstraints.value,
+         pointRadius: (() => {return files.value.map(elem => elem.active ? 10 : 4)})()
+      },
+    ],
+  };
 });
-const numberOfConfigurationsData = reactive({
-    labels: [],
-    datasets: [],
+
+const numberOfConfigurationsData = computed(() => {
+  return {
+    labels: labels.value,
+    datasets: [
+      {
+                    label: 'Number of Configurations (log 10)',
+                    borderColor: 'red',
+                    fill: false,
+                    data: dataConfigurations.value,
+                    pointRadius: (() => {return files.value.map(elem => elem.active ? 10 : 4)})()
+                },
+    ],
+  };
 });
 async function getFamily() {
     const id = route.params.id;
@@ -273,6 +309,9 @@ async function getFamily() {
             console.log(error);
         });
 }
+const data = ref([]);
+const dataConstraints = ref([]);
+const dataConfigurations = ref([])
 async function fetchFeatureModelOfFamily() {
     await api
         .get(`${API_URL}files/uploaded/confirmed/?family=${family.value.id}`)
@@ -288,53 +327,21 @@ async function fetchFeatureModelOfFamily() {
                 ...elem,
                 active: false,
             }));
-            const labels = sorted.map((elem) => elem.version);
-            numberOfFeaturesData.labels = labels;
-            numberOfConstraintsData.labels = labels;
-            numberOfConfigurationsData.labels = labels;
-            let data = [];
-            let dataConstraints = [];
-            let dataConfigurations = [];
+            labels.value = sorted.map((elem) => elem.version);
             for (let i = 0; i < sorted.length; i++) {
                 const elem = sorted[i];
                 const res = await getNumbersFromFile(
                     elem.local_file,
                     sorted[i].label
                 );
-                data.push(res.amountFeatures);
-                dataConstraints.push(res.amountConstraints);
-                dataConfigurations.push(res.amountConfigurations);
+                data.value.push(res.amountFeatures);
+                dataConstraints.value.push(res.amountConstraints);
+                dataConfigurations.value.push(res.amountConfigurations);
             }
-
-            numberOfFeaturesData.datasets = [
-                {
-                    label: 'Number of Features',
-                    borderColor: 'green',
-                    fill: false,
-                    data,
-                },
-            ];
-
-            numberOfConstraintsData.datasets = [
-                {
-                    label: 'Number of Constraints',
-                    borderColor: 'blue',
-                    fill: false,
-                    data: dataConstraints,
-                },
-            ];
-
-            numberOfConfigurationsData.datasets = [
-                {
-                    label: 'Number of Configurations (log 10)',
-                    borderColor: 'red',
-                    fill: false,
-                    data: dataConfigurations,
-                },
-            ];
             loadingTable.value = false;
         });
 }
+
 async function getNumbersFromFile(path, label) {
   try {
     const response = await api.get(`${API_URL.slice(0, -1)}${path}`);
@@ -354,11 +361,20 @@ async function getNumbersFromFile(path, label) {
 }
 function onElementHover(elem) {
   if (elem !== undefined) {
-    files.value.find((file) => file.version === elem).active = true;
+    files.value.find((file) => file.id === elem).active = true;
   } else {
     files.value.forEach((file) => (file.active = false));
   }
 }
+function onMouseLeave(elem) {
+  if (elem !== undefined) {
+    files.value.find((file) => file.id === elem).active = false;
+  } else {
+    files.value.forEach((file) => (file.active = false));
+  }
+}
+
+
 
 onMounted(async () => {
     await getFamily();

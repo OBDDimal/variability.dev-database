@@ -8,6 +8,7 @@
         :items="filteredItems"
         items-per-page="10"
         :search="search"
+        :hover="true"
         sort-by.sync="sortBy"
         sort-desc="sortDesc"
 
@@ -159,7 +160,8 @@
           </v-toolbar>
         </template>
         <template #item="{item}" >
-          <tr
+          <tr @mouseenter="HandleMouseover(item.raw.id)"
+              @mouseleave="HandleMouseleave(item.raw.id)"
             >
             <td  >
               <v-btn
@@ -174,7 +176,6 @@
             </td>
             <td>
               <template v-if="item.raw.family">
-                {{item.raw.active}}
                 {{ item.raw.family.label }} ({{ item.raw.version }})
               </template>
               <template v-else>
@@ -263,7 +264,7 @@ import { useRouter } from 'vue-router';
 import { useFileStore } from '@/store/file';
 import PrivateUpload from "@/components/upload_cards/file_create/PrivateUpload.vue";
 
-const emit = defineEmits(['onDelete']);
+const emit = defineEmits(['onDelete', 'onHover', 'onMouseLeave']);
 const router = useRouter();
 const fileStore = useFileStore();
 const showAllTags = ref(false);
@@ -386,6 +387,13 @@ function handleClick(value) {
         name: 'FileDetail',
         params: { id: value.id, slug: value.slug },
     });
+}
+
+function HandleMouseover(id){
+  emit('onHover', id)
+}
+function HandleMouseleave(id){
+  emit('onMouseLeave', id)
 }
 </script>
 
