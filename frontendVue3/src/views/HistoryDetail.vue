@@ -395,14 +395,10 @@ function OnTableChange(idList){
   visibleFiles.value = files.value
   .filter((file) => idList.includes(file.id))
   .map((file) => files.value.findIndex((f) => f.id === file.id));
-  console.log("vF:"  +fullDataList.value)
   data.value = fullDataList.value.slice(visibleFiles.value[0], visibleFiles.value.slice(-1)[0]+1)
   dataConstraints.value = fullConstraintsList.value.slice(visibleFiles.value[0], visibleFiles.value.slice(-1)[0]+1)
   dataConfigurations.value = fullConfigurationsList.value.slice(visibleFiles.value[0], visibleFiles.value.slice(-1)[0]+1)
   labels.value = FulllabelsList.value.slice(visibleFiles.value[0], visibleFiles.value.slice(-1)[0]+1)
-  console.log("vF:"  +data.value)
-  console.log("vF:"  +dataConstraints.value)
-  console.log("vF:"  +dataConfigurations.value)
 }
 
 onMounted(async () => {

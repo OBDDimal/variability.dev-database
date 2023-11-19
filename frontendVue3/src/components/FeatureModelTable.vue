@@ -385,7 +385,6 @@ const filteredItems = computed(() => {
 });
 
 function handleClick(value) {
-  console.log(value);
   router.push({
     name: 'FileDetail',
     params: {id: value.id, slug: value.slug},
@@ -416,8 +415,6 @@ watchEffect(() => {
 
   // Log or return the currently displayed items
   const ids = displayedItems.map((elem) => elem.id)
-  console.log('Displayed Items:', displayedItems);
-  console.log('Displayed Items:', ids);
   emit('tableChange', ids)
 
   // or return/display the items as needed
