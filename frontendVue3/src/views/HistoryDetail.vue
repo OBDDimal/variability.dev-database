@@ -268,7 +268,7 @@ const numberOfFeaturesData = computed(() => {
         fill: false,
         data: data.value,
         pointRadius: (() => {
-          return files.value.slice(visibleFiles.value[0], visibleFiles.value.slice(-1)[0]+1).map(elem => elem.active ? 10 : 4)
+          return files.value.filter(file => visibleFiles.value.includes(file.id)).map(elem => elem.active ? 10 : 4)
         })()
 
       },
@@ -286,7 +286,7 @@ const numberOfConstraintsData = computed(() => {
         fill: false,
         data: dataConstraints.value,
         pointRadius: (() => {
-          return files.value.slice(visibleFiles.value[0], visibleFiles.value.slice(-1)[0]+1).map(elem => elem.active ? 10 : 4)
+          return files.value.filter(file => visibleFiles.value.includes(file.id)).map(elem => elem.active ? 10 : 4)
         })()
       },
     ],
@@ -303,7 +303,7 @@ const numberOfConfigurationsData = computed(() => {
         fill: false,
         data: dataConfigurations.value,
         pointRadius: (() => {
-          return files.value.slice(visibleFiles.value[0], visibleFiles.value.slice(-1)[0]+1).map(elem => elem.active ? 10 : 4)
+          return files.value.filter(file => visibleFiles.value.includes(file.id)).map(elem => elem.active ? 10 : 4)
         })()
       },
     ],
@@ -343,16 +343,16 @@ async function fetchFeatureModelOfFamily() {
         ...elem,
         active: false,
       }));
-      FulllabelsList.value = sorted.map((elem) => elem.version);
+      FulllabelsList.value = sorted.map((elem) => ({id: elem.id, version: elem.version}));
       for (let i = 0; i < sorted.length; i++) {
         const elem = sorted[i];
         const res = await getNumbersFromFile(
           elem.local_file,
           sorted[i].label
         );
-        fullDataList.value.push(res.amountFeatures);
-        fullConstraintsList.value.push(res.amountConstraints);
-        fullConfigurationsList.value.push(res.amountConfigurations);
+        fullDataList.value.push({id: elem.id, data: res.amountFeatures});
+        fullConstraintsList.value.push({ id: elem.id, data:res.amountConstraints});
+        fullConfigurationsList.value.push({id: elem.id, data:res.amountConfigurations});
       }
       loadingTable.value = false;
     });
@@ -394,11 +394,11 @@ function onMouseLeave(elem) {
 function OnTableChange(idList){
   visibleFiles.value = files.value
   .filter((file) => idList.includes(file.id))
-  .map((file) => files.value.findIndex((f) => f.id === file.id));
-  data.value = fullDataList.value.slice(visibleFiles.value[0], visibleFiles.value.slice(-1)[0]+1)
-  dataConstraints.value = fullConstraintsList.value.slice(visibleFiles.value[0], visibleFiles.value.slice(-1)[0]+1)
-  dataConfigurations.value = fullConfigurationsList.value.slice(visibleFiles.value[0], visibleFiles.value.slice(-1)[0]+1)
-  labels.value = FulllabelsList.value.slice(visibleFiles.value[0], visibleFiles.value.slice(-1)[0]+1)
+  .map((file) => file.id);
+  data.value = fullDataList.value.filter(file => idList.includes(file.id)).map(elem => elem.data)
+  dataConstraints.value = fullConstraintsList.value.filter(file => idList.includes(file.id)).map(elem => elem.data)
+  dataConfigurations.value = fullConfigurationsList.value.filter(file => idList.includes(file.id)).map(elem => elem.data)
+  labels.value = FulllabelsList.value.filter(file => idList.includes(file.id)).map(elem => elem.version)
 }
 
 onMounted(async () => {
