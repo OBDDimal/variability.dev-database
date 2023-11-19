@@ -11,6 +11,8 @@
         :hover="true"
         sort-by.sync="sortBy"
         sort-desc="sortDesc"
+        :page="currentPage"
+        @update:page="updateCurrentPage"
 
       >
         <template v-slot:top>
@@ -259,12 +261,12 @@
 
 <script setup>
 import FileCreate from '@/components/upload_cards/FileCreate.vue';
-import {computed, ref} from 'vue';
+import {computed, ref, watchEffect} from 'vue';
 import {useRouter} from 'vue-router';
 import {useFileStore} from '@/store/file';
 import PrivateUpload from "@/components/upload_cards/file_create/PrivateUpload.vue";
 
-const emit = defineEmits(['onDelete', 'onHover', 'onMouseLeave']);
+const emit = defineEmits(['onDelete', 'onHover', 'onMouseLeave', 'tableChange']);
 const router = useRouter();
 const fileStore = useFileStore();
 const showAllTags = ref(false);
@@ -397,6 +399,29 @@ function HandleMouseover(id) {
 function HandleMouseleave(id) {
   emit('onMouseLeave', id)
 }
+
+
+const itemsPerPage = ref(10);
+const currentPage = ref(1);
+const updateCurrentPage = (value) => {
+  currentPage.value = value;
+};
+
+// Watch for changes in the currentPage and itemsPerPage
+// You can use these values to determine the currently displayed items
+watchEffect(() => {
+  const startIndex = (currentPage.value - 1) * itemsPerPage.value;
+  const endIndex = startIndex + itemsPerPage.value;
+  const displayedItems = filteredItems.value.slice(startIndex, endIndex);
+
+  // Log or return the currently displayed items
+  const ids = displayedItems.map((elem) => elem.id)
+  console.log('Displayed Items:', displayedItems);
+  console.log('Displayed Items:', ids);
+  emit('tableChange', ids)
+
+  // or return/display the items as needed
+});
 </script>
 
 

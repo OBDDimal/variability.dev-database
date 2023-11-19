@@ -224,6 +224,7 @@
         headline="Feature Models of Family"
         @onHover="(id) => onElementHover(id)"
         @onMouseLeave="(id) => onMouseLeave(id)"
+        @tableChange="(idList) => OnTableChange(idList)"
         :available-tags="tags"/>
     </div>
   </div>
@@ -252,6 +253,11 @@ const family = ref({});
 const files = ref([]);
 const loadingTable = ref(true);
 const labels = ref([])
+const visibleFiles = ref([]);
+const fullDataList = ref([]);
+const fullConstraintsList = ref([]);
+const fullConfigurationsList = ref([]);
+const FulllabelsList = ref([]);
 const numberOfFeaturesData = computed(() => {
   return {
     labels: labels.value,
@@ -262,7 +268,7 @@ const numberOfFeaturesData = computed(() => {
         fill: false,
         data: data.value,
         pointRadius: (() => {
-          return files.value.map(elem => elem.active ? 10 : 4)
+          return files.value.slice(visibleFiles.value[0], visibleFiles.value.slice(-1)[0]+1).map(elem => elem.active ? 10 : 4)
         })()
 
       },
@@ -280,7 +286,7 @@ const numberOfConstraintsData = computed(() => {
         fill: false,
         data: dataConstraints.value,
         pointRadius: (() => {
-          return files.value.map(elem => elem.active ? 10 : 4)
+          return files.value.slice(visibleFiles.value[0], visibleFiles.value.slice(-1)[0]+1).map(elem => elem.active ? 10 : 4)
         })()
       },
     ],
@@ -297,7 +303,7 @@ const numberOfConfigurationsData = computed(() => {
         fill: false,
         data: dataConfigurations.value,
         pointRadius: (() => {
-          return files.value.map(elem => elem.active ? 10 : 4)
+          return files.value.slice(visibleFiles.value[0], visibleFiles.value.slice(-1)[0]+1).map(elem => elem.active ? 10 : 4)
         })()
       },
     ],
@@ -337,16 +343,16 @@ async function fetchFeatureModelOfFamily() {
         ...elem,
         active: false,
       }));
-      labels.value = sorted.map((elem) => elem.version);
+      FulllabelsList.value = sorted.map((elem) => elem.version);
       for (let i = 0; i < sorted.length; i++) {
         const elem = sorted[i];
         const res = await getNumbersFromFile(
           elem.local_file,
           sorted[i].label
         );
-        data.value.push(res.amountFeatures);
-        dataConstraints.value.push(res.amountConstraints);
-        dataConfigurations.value.push(res.amountConfigurations);
+        fullDataList.value.push(res.amountFeatures);
+        fullConstraintsList.value.push(res.amountConstraints);
+        fullConfigurationsList.value.push(res.amountConfigurations);
       }
       loadingTable.value = false;
     });
@@ -385,7 +391,19 @@ function onMouseLeave(elem) {
     files.value.forEach((file) => (file.active = false));
   }
 }
-
+function OnTableChange(idList){
+  visibleFiles.value = files.value
+  .filter((file) => idList.includes(file.id))
+  .map((file) => files.value.findIndex((f) => f.id === file.id));
+  console.log("vF:"  +fullDataList.value)
+  data.value = fullDataList.value.slice(visibleFiles.value[0], visibleFiles.value.slice(-1)[0]+1)
+  dataConstraints.value = fullConstraintsList.value.slice(visibleFiles.value[0], visibleFiles.value.slice(-1)[0]+1)
+  dataConfigurations.value = fullConfigurationsList.value.slice(visibleFiles.value[0], visibleFiles.value.slice(-1)[0]+1)
+  labels.value = FulllabelsList.value.slice(visibleFiles.value[0], visibleFiles.value.slice(-1)[0]+1)
+  console.log("vF:"  +data.value)
+  console.log("vF:"  +dataConstraints.value)
+  console.log("vF:"  +dataConfigurations.value)
+}
 
 onMounted(async () => {
   await getFamily();
