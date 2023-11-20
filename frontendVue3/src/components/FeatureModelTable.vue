@@ -6,12 +6,13 @@
         :loading="props.loading"
         :headers="headers"
         :items="filteredItems"
-        items-per-page="10"
+        :items-per-page="itemsPerPage"
         :search="search"
         :hover="true"
         sort-by.sync="sortBy"
         sort-desc="sortDesc"
         :page="currentPage"
+        @update:itemsPerPage="updateItemsPerPage"
         @update:page="updateCurrentPage"
 
       >
@@ -406,6 +407,9 @@ const updateCurrentPage = (value) => {
   currentPage.value = value;
 };
 
+const updateItemsPerPage = (value) => {
+  itemsPerPage.value = value;
+};
 // Watch for changes in the currentPage and itemsPerPage
 // You can use these values to determine the currently displayed items
 watchEffect(() => {
