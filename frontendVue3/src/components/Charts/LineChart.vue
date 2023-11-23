@@ -30,5 +30,6 @@ const {chartData} = defineProps(['chartData']);
 const options = ref({
   responsive: true,
   pointHoverRadius: 10,
+  maintainAspectRatio: false
 })
 </script>

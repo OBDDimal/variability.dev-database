@@ -14,7 +14,6 @@
     <v-row justify="center">
       <v-col cols="12" sm="6" md="3">
         <div v-if="breakpoints.mdAndUp">
-          numberOfFeaturesData
           <v-sheet
             v-if="loadingTable"
             :color="`grey ${
@@ -68,7 +67,6 @@
       </v-col>
       <v-col cols="12" sm="6" md="3">
         <div v-if="breakpoints.mdAndUp">
-          Number of Constraints
           <v-sheet
             v-if="loadingTable"
             :color="`grey ${
@@ -124,7 +122,6 @@
       </v-col>
       <v-col cols="12" sm="6" md="3">
         <div v-if="breakpoints.mdAndUp">
-          Number of Configurations
           <v-sheet
             v-if="loadingTable"
             :color="`grey ${
