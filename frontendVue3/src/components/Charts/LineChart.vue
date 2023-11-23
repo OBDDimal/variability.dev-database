@@ -27,9 +27,29 @@ ChartJS.register(
 )
 const {chartData} = defineProps(['chartData']);
 
+
+/*const chartData = ref({
+  labels: labels.value,
+  datasets: datasets.value
+})*/
+const emit = defineEmits(['onHover', 'onUnHover']);
 const options = ref({
   responsive: true,
   pointHoverRadius: 10,
-  maintainAspectRatio: false
+  onHover: handleHover,
+  onLeave: handleMouseLeave(),
+  maintainAspectRatio: false,
 })
+function handleMouseLeave(event, elements){
+    emit("onUnHover")
+}
+function handleHover(event, elements){
+  if (elements.length > 0) {
+    const hoveredIndex = elements[0].index;
+    emit("onHover", hoveredIndex)
+  }
+  else {
+    emit("onUnHover")
+  }
+}
 </script>

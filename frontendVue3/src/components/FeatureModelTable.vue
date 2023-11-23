@@ -2,13 +2,11 @@
   <div>
     <v-card variant="elevated" rounded class="pa-2">
       <v-data-table
-
         :loading="props.loading"
         :headers="headers"
         :items="filteredItems"
         :items-per-page="itemsPerPage"
         :search="search"
-        :hover="true"
         sort-by.sync="sortBy"
         sort-desc="sortDesc"
         :page="currentPage"
@@ -165,8 +163,10 @@
         <template #item="{item}">
           <tr @mouseenter="HandleMouseover(item.raw.id)"
               @mouseleave="HandleMouseleave(item.raw.id)"
+
           >
-            <td>
+            <td class="text-xs-left color-corner"
+              v-bind:class="{'purple': item.raw.active}">
               <v-btn
                 variant="text"
                 color="primary"
@@ -428,12 +428,28 @@ watchEffect(() => {
 
 <style>
 .highlighted {
-  background-color: green;
-  height: 100%;
-  width: 3px;
-  display: inline-block;
+    background-color: mediumpurple;
+    height: 100%;
+    width: 3px;
 }
-
+.color-corner {
+  position: relative;
+    &:before {
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    content: "";
+    width: 0;
+    height: 0;
+    border-right: 15px solid transparent;
+    border-bottom: 15px solid transparent;
+  }
+}
+.purple:before {
+  border-left: 15px solid mediumpurple;
+  border-top: 15px solid mediumpurple;
+}
 .expand-tags-button {
   cursor: pointer;
   margin-left: 4px;

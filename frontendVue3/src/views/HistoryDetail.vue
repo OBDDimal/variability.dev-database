@@ -19,160 +19,162 @@
             :color="`grey ${
                             theme.global.current.value.dark ? 'darken-2' : 'lighten-4'
                         }`"
-            class="pa-3"
-          >
-            <v-skeleton-loader
-              class="mx-auto"
-              max-width="300"
-              type="card"
-            ></v-skeleton-loader>
-          </v-sheet>
-          <line-chart
-            v-else
-            chartId="featureChart"
-            :chart-data="numberOfFeaturesData"
-            @hovered-element="onElementHover"
-          ></line-chart>
-        </div>
-        <v-expansion-panels v-else>
-          <v-expansion-panel>
-            <v-expansion-panel-title>
-              Number of Configurations
-            </v-expansion-panel-title>
-            <v-expansion-panel-text>
-              <v-sheet
-                v-if="loadingTable"
-                :color="`grey ${
+                        class="pa-3"
+                    >
+                        <v-skeleton-loader
+                            class="mx-auto"
+                            max-width="300"
+                            type="card"
+                        ></v-skeleton-loader>
+                    </v-sheet>
+                    <line-chart
+                        v-else
+                        chartId="featureChart"
+                        :chart-data="numberOfFeaturesData"
+                        @onHover="elem => onDatapointHover(elem)"
+                        @onUnHover="elem => onDatapointLeave(elem)"
+                    ></line-chart>
+                </div>
+                <v-expansion-panels v-else>
+                    <v-expansion-panel>
+                        <v-expansion-panel-text>
+                            <v-sheet
+                                v-if="loadingTable"
+                                :color="`grey ${
                                     theme.global.current.value.dark
                                         ? 'darken-2'
                                         : 'lighten-4'
                                 }`"
-                class="pa-3"
-              >
-                <v-skeleton-loader
-                  class="mx-auto"
-                  max-width="300"
-                  type="card"
-                ></v-skeleton-loader>
-              </v-sheet>
-              <line-chart
-                v-else
-                chartId="featureChart"
-                :chart-data="numberOfFeaturesData"
-                @hovered-element="onElementHover"
-              ></line-chart>
-            </v-expansion-panel-text>
-          </v-expansion-panel>
-        </v-expansion-panels>
-      </v-col>
-      <v-col cols="12" sm="6" md="3">
-        <div v-if="breakpoints.mdAndUp">
-          <v-sheet
-            v-if="loadingTable"
-            :color="`grey ${
+                                class="pa-3"
+                            >
+                                <v-skeleton-loader
+                                    class="mx-auto"
+                                    max-width="300"
+                                    type="card"
+                                ></v-skeleton-loader>
+                            </v-sheet>
+                            <line-chart
+                              v-else
+                              chartId="featureChart"
+                              :chart-data="numberOfFeaturesData"
+                              @on-hover ="elem => onDatapointHover(elem)"
+                              @onUnHover="elem => onDatapointLeave(elem)"
+                            ></line-chart>
+                        </v-expansion-panel-text>
+                    </v-expansion-panel>
+                </v-expansion-panels>
+            </v-col>
+            <v-col cols="12" sm="6" md="3">
+                <div v-if="breakpoints.mdAndUp">
+                    <v-sheet
+                        v-if="loadingTable"
+                        :color="`grey ${
                             theme.global.current.value.dark ? 'darken-2' : 'lighten-4'
                         }`"
-            class="pa-3"
-          >
-            <v-skeleton-loader
-              class="mx-auto"
-              max-width="300"
-              type="card"
-            ></v-skeleton-loader>
-          </v-sheet>
-          <line-chart
-            v-else
-            chartId="configurationsChart"
-            :chart-data="numberOfConstraintsData"
-            @hovered-element="onElementHover"
-          ></line-chart>
-        </div>
-        <v-expansion-panels v-else>
-          <v-expansion-panel>
-            <v-expansion-panel-title
-            >Number of Constraints
-            </v-expansion-panel-title
-            >
-            <v-expansion-panel-text>
-              <v-sheet
-                v-if="loadingTable"
-                :color="`grey ${
+                        class="pa-3"
+                    >
+                        <v-skeleton-loader
+                            class="mx-auto"
+                            max-width="300"
+                            type="card"
+                        ></v-skeleton-loader>
+                    </v-sheet>
+                    <line-chart
+                        v-else
+                        chartId="configurationsChart"
+                        :chart-data="numberOfConstraintsData"
+                        @on-hover ="elem => onDatapointHover(elem)"
+                        @onUnHover="elem => onDatapointLeave(elem)"
+                    ></line-chart>
+                </div>
+                <v-expansion-panels v-else>
+                    <v-expansion-panel>
+                        <v-expansion-panel-title
+                            >Number of Constraints</v-expansion-panel-title
+                        >
+                        <v-expansion-panel-text>
+                            <v-sheet
+                                v-if="loadingTable"
+                                :color="`grey ${
                                     theme.global.current.value.dark
                                         ? 'darken-2'
                                         : 'lighten-4'
                                 }`"
-                class="pa-3"
-              >Hallo
-                <v-skeleton-loader
-                  class="mx-auto"
-                  max-width="300"
-                  height="400"
-                  type="card"
-                ></v-skeleton-loader>
-              </v-sheet>
-              <line-chart
-                v-else
-                chartId="configurationsChart"
-                :chart-data="numberOfConstraintsData"
-                @hovered-element="onElementHover"
-              ></line-chart>
-            </v-expansion-panel-text>
-          </v-expansion-panel>
-        </v-expansion-panels>
-      </v-col>
-      <v-col cols="12" sm="6" md="3">
-        <div v-if="breakpoints.mdAndUp">
-          <v-sheet
-            v-if="loadingTable"
-            :color="`grey ${
+                                class="pa-3"
+                            >Hallo
+                                <v-skeleton-loader
+                                    class="mx-auto"
+                                    max-width="300"
+                                    height="400"
+                                    type="card"
+                                ></v-skeleton-loader>
+                            </v-sheet>
+                            <line-chart
+                                v-else
+                                chartId="configurationsChart"
+                                :chart-data="numberOfConstraintsData"
+                                @on-hover ="elem => onDatapointHover(elem)"
+                              @onUnHover="elem => onDatapointLeave(elem)"
+                            ></line-chart>
+                        </v-expansion-panel-text>
+                    </v-expansion-panel>
+                </v-expansion-panels>
+            </v-col>
+            <v-col cols="12" sm="6" md="3">
+                <div v-if="breakpoints.mdAndUp">
+                    <v-sheet
+                        v-if="loadingTable"
+                        :color="`grey ${
                             theme.global.current.value.dark ? 'darken-2' : 'lighten-4'
                         }`"
-            class="pa-3"
-          >
-            <v-skeleton-loader
-              class="mx-auto"
-              max-width="300"
-              type="card"
-            ></v-skeleton-loader>
-          </v-sheet>
-          <line-chart
-            v-else
-            chartid="constraintsChart"
-            :chart-data="numberOfConfigurationsData"
-            @hovered-element="onElementHover"
-          ></line-chart>
-        </div>
-        <v-expansion-panels v-else>
-          <v-expansion-panel>
-            <v-expansion-panel-title>
-              Number of Configurations
-            </v-expansion-panel-title>
-            <v-expansion-panel-text>
-              <v-sheet
-                v-if="loadingTable"
-                :color="`grey ${
+                        class="pa-3"
+                    >
+                        <v-skeleton-loader
+                            class="mx-auto"
+                            max-width="300"
+                            type="card"
+                        ></v-skeleton-loader>
+                    </v-sheet>
+                    <line-chart
+                        v-else
+                        chartid="constraintsChart"
+                        :chart-data="numberOfConfigurationsData"
+                        @on-hover ="elem => onDatapointHover(elem)"
+                        @onUnHover="elem => onDatapointLeave(elem)"
+                    ></line-chart>
+                </div>
+                <v-expansion-panels v-else>
+                    <v-expansion-panel>
+                        <v-expansion-panel-title>
+                            Number of Configurations
+                        </v-expansion-panel-title>
+                        <v-expansion-panel-text>
+                            <v-sheet
+                                v-if="loadingTable"
+                                :color="`grey ${
                                     theme.global.current.value.dark
                                         ? 'darken-2'
                                         : 'lighten-4'
                                 }`"
-                class="pa-3"
-              >
-                <v-skeleton-loader
-                  class="mx-auto"
-                  max-width="300"
-                  type="card"
-                ></v-skeleton-loader>
-              </v-sheet>
-              <line-chart
-                v-else
-                chartId="constraintsChart"
-                :chart-data="numberOfConfigurationsData"
-                @hovered-element="onElementHover"
-              ></line-chart>
-            </v-expansion-panel-text>
-          </v-expansion-panel>
-        </v-expansion-panels>
-      </v-col>
+                                class="pa-3"
+                            >
+                                <v-skeleton-loader
+                                    class="mx-auto"
+                                    max-width="300"
+                                    type="card"
+                                ></v-skeleton-loader>
+                            </v-sheet>
+                            <line-chart
+                                v-else
+                                chartId="constraintsChart"
+                                :chart-data="numberOfConfigurationsData"
+                                @on-hover ="elem => onDatapointHover(elem)"
+                                @onUnHover="elem => onDatapointLeave(elem)"
+                            ></line-chart>
+                        </v-expansion-panel-text>
+                    </v-expansion-panel>
+                </v-expansion-panels>
+            </v-col>
       <!--            <v-col cols="12" sm="6" md="3">
         <div v-if="breakpoints.mdAndUp">
           <v-sheet
@@ -295,14 +297,12 @@ const numberOfConfigurationsData = computed(() => {
     labels: labels.value,
     datasets: [
       {
-        label: 'Number of Configurations (log 10)',
-        borderColor: 'red',
-        fill: false,
-        data: dataConfigurations.value,
-        pointRadius: (() => {
-          return files.value.filter(file => visibleFiles.value.includes(file.id)).map(elem => elem.active ? 10 : 4)
-        })()
-      },
+                    label: 'Number of Configurations (log 10)',
+                    borderColor: 'red',
+                    fill: false,
+                    data: dataConfigurations.value,
+                    pointRadius: (() => {return files.value.map(elem => elem.active ? 6 : 4)})()
+                },
     ],
   };
 });
@@ -323,7 +323,8 @@ async function getFamily() {
 
 const data = ref([]);
 const dataConstraints = ref([]);
-const dataConfigurations = ref([])
+const dataConfigurations = ref([]);
+const shownIdList = ref([]);
 
 async function fetchFeatureModelOfFamily() {
   await api
@@ -370,6 +371,21 @@ async function getNumbersFromFile(path, label) {
     };
   } catch (error) {
     console.error(error);
+  }
+}
+
+function onDatapointHover(elem) {
+  if (elem !== undefined) {
+    files.value.find((file) => file.id === visibleFiles.value[elem]).active = true;
+  } else {
+    files.value.forEach((file) => (file.active = false));
+  }
+}
+function onDatapointLeave(elem) {
+  if (elem !== undefined) {
+    files.value[elem].active = false;
+  } else {
+    files.value.forEach((file) => (file.active = false));
   }
 }
 
