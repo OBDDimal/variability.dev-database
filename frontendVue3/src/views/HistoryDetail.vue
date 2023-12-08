@@ -12,6 +12,54 @@
     </h3>
     <h5 class="text-h5 mb-4">Details and more information</h5>
     <v-row justify="center">
+       <v-col cols="12" sm="6" md="3">
+        <div v-if="breakpoints.mdAndUp">
+          <v-sheet
+            v-if="loadingTable"
+            :color="`grey ${
+                            theme.global.current.value.dark ? 'darken-2' : 'lighten-4'
+                        }`"
+                        class="pa-3"
+                    >
+                        <v-skeleton-loader
+                            class="mx-auto"
+                            max-width="300"
+                            type="card"
+                        ></v-skeleton-loader>
+                    </v-sheet>
+                    <BoxPlot
+                        v-else
+                        :data="BoxplotData"
+                    ></BoxPlot>
+                </div>
+                <v-expansion-panels v-else>
+                    <v-expansion-panel>
+                        <v-expansion-panel-text>
+                            <v-sheet
+                                v-if="loadingTable"
+                                :color="`grey ${
+                                    theme.global.current.value.dark
+                                        ? 'darken-2'
+                                        : 'lighten-4'
+                                }`"
+                                class="pa-3"
+                            >
+                                <v-skeleton-loader
+                                    class="mx-auto"
+                                    max-width="300"
+                                    type="card"
+                                ></v-skeleton-loader>
+                            </v-sheet>
+                            <BoxPlot
+                              v-else
+                              :data="BoxplotData"
+                            ></BoxPlot>
+                        </v-expansion-panel-text>
+                    </v-expansion-panel>
+                </v-expansion-panels>
+            </v-col>
+    </v-row>
+      <v-row justify="center">
       <v-col cols="12" sm="6" md="3">
         <div v-if="breakpoints.mdAndUp">
           <v-sheet
@@ -230,7 +278,7 @@
 </template>
 
 <script setup>
-import {computed, onMounted, reactive, ref, watch} from 'vue';
+import {computed, onMounted, ref,} from 'vue';
 import {useRoute} from 'vue-router';
 import api from '@/services/api.service';
 import FeatureModelTable from "@/components/FeatureModelTable.vue";
@@ -240,6 +288,7 @@ import {VSkeletonLoader} from 'vuetify/labs/VSkeletonLoader'
 import LineChart from '@/components/Charts/LineChart.vue';
 import {useFileStore} from "@/store/file";
 import {storeToRefs} from "pinia";
+import BoxPlot from "@/components/Charts/BoxPlot.vue";
 
 const breakpoints = useDisplay();
 const theme = useTheme();
@@ -274,7 +323,28 @@ const numberOfFeaturesData = computed(() => {
     ],
   };
 });
-
+const BoxplotData = computed(()=>{
+  return{
+    labels: [family.value.label],
+    datasets: [
+      {
+        label: "NumberofFeatures",
+        backgroundColor: "rgba(242, 244, 255, 1)",
+        borderColor: "green",
+        borderWidth: 2,
+        outlierStyle: "circle",
+        outlierBackgroundColor: "#FFE2E2",
+        outlierBorderColor: "#6E1C1C",
+        outlierRadius: 2,
+        outlierBorderWidth: 2,
+        padding: 0,
+        itemRadius: 1,
+        itemBackgroundColor: "#FF8C3C",
+        data: [fullDataList.value.map(elem => elem.data)]
+      },
+    ],
+  };
+})
 const numberOfConstraintsData = computed(() => {
   return {
     labels: labels.value,
@@ -320,7 +390,6 @@ async function getFamily() {
       console.log(error);
     });
 }
-
 const data = ref([]);
 const dataConstraints = ref([]);
 const dataConfigurations = ref([]);
@@ -365,8 +434,8 @@ async function getNumbersFromFile(path, label) {
       amountFeatures: xmlDocument.getElementsByTagName('feature').length,
       amountConstraints: xmlDocument.getElementsByTagName('rule').length,
       //TODO: Add Correct Value
-      amountConfigurations: Math.log10(
-        busyBoxConfigs.find(({name}) => name === label)
+      amountConfigurations:(
+        busyBoxConfigs.find(({name}) => name === label) ? Math.log10(busyBoxConfigs.find(({name}) => name === label).mc) : 10
       ),
     };
   } catch (error) {
