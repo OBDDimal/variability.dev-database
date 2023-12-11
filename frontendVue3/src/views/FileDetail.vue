@@ -1,242 +1,242 @@
 <template>
-    <div class="mainView">
-        <h3 class="text-h3 mb-2 mt-8">
-            Feature Model:
-            <span v-if="loading">
+  <div class="mainView">
+    <h3 class="text-h3 mb-2 mt-8">
+      Feature Model:
+      <span v-if="loading">
                 <v-progress-circular
-                    indeterminate
-                    v-if="loading"
+                  indeterminate
+                  v-if="loading"
                 ></v-progress-circular>
             </span>
-            <span v-else>
+      <span v-else>
                 {{ file.label }}
             </span>
-        </h3>
-        <v-row justify="space-between">
-            <v-col cols="12" md="6" id="feature-model-details">
-                <h5 class="text-h5 mb-4">Details and more information</h5>
+    </h3>
+    <v-row justify="space-between">
+      <v-col cols="12" md="6" id="feature-model-details">
+        <h5 class="text-h5 mb-4">Details and more information</h5>
 
-                <v-list lines="two">
-                    <v-list-item>
-                        <template v-slot:prepend>
-                            <v-icon
-                                color="primary"
-                                icon="mdi-information"
-                            ></v-icon>
-                        </template>
+        <v-list lines="two">
+          <v-list-item>
+            <template v-slot:prepend>
+              <v-icon
+                color="primary"
+                icon="mdi-information"
+              ></v-icon>
+            </template>
 
-                        <v-list-item-title v-if="!isLabelEditing">
-                            {{ loading ? '...' : file.label }}
-                        </v-list-item-title>
-                      <!--
-                        <v-list-item-title v-else>
-                            <v-text-field v-model="editedItem.label" variant="outlined"
-                            density="comfortable" />
+            <v-list-item-title v-if="!isLabelEditing">
+              {{ loading ? '...' : file.label }}
+            </v-list-item-title>
+            <!--
+              <v-list-item-title v-else>
+                  <v-text-field v-model="editedItem.label" variant="outlined"
+                  density="comfortable" />
 
-                        </v-list-item-title>-->
-                        <v-list-item-subtitle>Label</v-list-item-subtitle>
-                        <!--
-                        <template v-slot:append>
-                            <v-list-item-action>
+              </v-list-item-title>-->
+            <v-list-item-subtitle>Label</v-list-item-subtitle>
+            <!--
+            <template v-slot:append>
+                <v-list-item-action>
 
-                                <v-btn
-                                    v-if="!isLabelEditing && file.owner"
-                                    icon="mdi-pencil"
-                                    variant="tonal"
-                                    color="primary"
-                                    size="small"
-                                    @click="isLabelEditing = true; editItem(file.label);"
-                                >
-                                </v-btn>
-                              <v-btn  v-else-if="!loading" variant="tonal"
-                                    color="primary"
-                                    size="small" icon="mdi-check" @click="updateItem(); isLabelEditing=false">
+                    <v-btn
+                        v-if="!isLabelEditing && file.owner"
+                        icon="mdi-pencil"
+                        variant="tonal"
+                        color="primary"
+                        size="small"
+                        @click="isLabelEditing = true; editItem(file.label);"
+                    >
+                    </v-btn>
+                  <v-btn  v-else-if="!loading" variant="tonal"
+                        color="primary"
+                        size="small" icon="mdi-check" @click="updateItem(); isLabelEditing=false">
 
-                            </v-btn>
-                              <v-progress-circular v-else indeterminate></v-progress-circular>
-                            </v-list-item-action>
+                </v-btn>
+                  <v-progress-circular v-else indeterminate></v-progress-circular>
+                </v-list-item-action>
 
-                        </template>-->
-                    </v-list-item>
+            </template>-->
+          </v-list-item>
 
-                    <v-list-item>
-                        <template v-slot:prepend>
-                            <v-icon></v-icon>
-                        </template>
-                        <v-list-item-title v-if="!isDescriptionEditing">
-                            {{ loading ? '...' : file.description }}
-                        </v-list-item-title>
-                      <!--
-                      <v-list-item-title v-else>
-                            <v-text-field v-model="editedItem.description" variant="outlined"
-                            density="comfortable" />
+          <v-list-item>
+            <template v-slot:prepend>
+              <v-icon></v-icon>
+            </template>
+            <v-list-item-title v-if="!isDescriptionEditing">
+              {{ loading ? '...' : file.description }}
+            </v-list-item-title>
+            <!--
+            <v-list-item-title v-else>
+                  <v-text-field v-model="editedItem.description" variant="outlined"
+                  density="comfortable" />
 
-                        </v-list-item-title>-->
-                        <v-list-item-subtitle>
-                            Description
-                        </v-list-item-subtitle>
-                        <!--
-                        <template v-slot:append>
-                            <v-list-item-action>
-                                <v-btn
-                                    v-if="!isDescriptionEditing && file.owner"
-                                    icon="mdi-pencil"
-                                    variant="tonal"
-                                    color="primary"
-                                    size="small"
-                                    @click="isDescriptionEditing = true; editItem(file.label);"
-                                >
-                                </v-btn>
-                              <v-btn  v-else-if="!loading" variant="tonal"
-                                    color="primary"
-                                    size="small" icon="mdi-check" @click="updateItem(); isDescriptionEditing=false">
+              </v-list-item-title>-->
+            <v-list-item-subtitle>
+              Description
+            </v-list-item-subtitle>
+            <!--
+            <template v-slot:append>
+                <v-list-item-action>
+                    <v-btn
+                        v-if="!isDescriptionEditing && file.owner"
+                        icon="mdi-pencil"
+                        variant="tonal"
+                        color="primary"
+                        size="small"
+                        @click="isDescriptionEditing = true; editItem(file.label);"
+                    >
+                    </v-btn>
+                  <v-btn  v-else-if="!loading" variant="tonal"
+                        color="primary"
+                        size="small" icon="mdi-check" @click="updateItem(); isDescriptionEditing=false">
 
-                            </v-btn>
-                              <v-progress-circular v-else indeterminate></v-progress-circular>
-                            </v-list-item-action>
-                        </template>-->
-                    </v-list-item>
+                </v-btn>
+                  <v-progress-circular v-else indeterminate></v-progress-circular>
+                </v-list-item-action>
+            </template>-->
+          </v-list-item>
 
-                    <v-divider inset></v-divider>
+          <v-divider inset></v-divider>
 
-                    <v-list-item>
-                        <template v-slot:prepend>
-                            <v-icon color="primary" icon="mdi-license"></v-icon>
-                        </template>
-                        <v-list-item-title>
-                            {{ loading ? '...' : file.license.label }}
-                        </v-list-item-title>
-                        <v-list-item-subtitle>License</v-list-item-subtitle>
+          <v-list-item>
+            <template v-slot:prepend>
+              <v-icon color="primary" icon="mdi-license"></v-icon>
+            </template>
+            <v-list-item-title>
+              {{ loading ? '...' : file.license.label }}
+            </v-list-item-title>
+            <v-list-item-subtitle>License</v-list-item-subtitle>
 
-                        <!--						<v-list-item-action>
-  <v-btn icon>
-    <v-icon>mdi-pencil</v-icon>
-  </v-btn>
+            <!--						<v-list-item-action>
+<v-btn icon>
+<v-icon>mdi-pencil</v-icon>
+</v-btn>
 </v-list-item-action>-->
-                    </v-list-item>
+          </v-list-item>
 
-                    <v-divider inset></v-divider>
+          <v-divider inset></v-divider>
 
-                    <v-list-item>
-                        <template v-slot:prepend>
-                            <v-icon color="primary" icon="mdi-tag"></v-icon>
-                        </template>
+          <v-list-item>
+            <template v-slot:prepend>
+              <v-icon color="primary" icon="mdi-tag"></v-icon>
+            </template>
 
-                        <v-list-item-title v-if="!isTagsEditing && !loading" style="white-space: normal">
-                            <v-chip
-                                class="mr-2"
-                                v-for="(tag) in visibleTags"
-                                :key="tag.id"
-                                size="small"
-                            >
-                                {{ tag.label }}
-                            </v-chip>
-                          <v-icon v-if="file.tags.length > 5" @click="toggleTags">
-                            {{ isTagsExpanded ? 'mdi-chevron-up' : 'mdi-chevron-down' }}
-                                </v-icon>
-                        </v-list-item-title>
-                      <!--
-                      <v-list-item-title v-else-if="isTagsEditing">
-                            <v-autocomplete
-                        v-model="editedItem.tags"
-                        :items="myOwnTags"
-                        item-value="id"
-                        item-title="label"
-                        chips
-                        variant="outlined"
-                        density="comfortable"
-                        hide-details
-                        hint="Choose or create tags for your feature model"
-                        label="Tags"
-                        multiple
-                    ></v-autocomplete>
+            <v-list-item-title v-if="!isTagsEditing && !loading" style="white-space: normal">
+              <v-chip
+                class="mr-2"
+                v-for="(tag) in visibleTags"
+                :key="tag.id"
+                size="small"
+              >
+                {{ tag.label }}
+              </v-chip>
+              <v-icon v-if="file.tags.length > 5" @click="toggleTags">
+                {{ isTagsExpanded ? 'mdi-chevron-up' : 'mdi-chevron-down' }}
+              </v-icon>
+            </v-list-item-title>
+            <!--
+            <v-list-item-title v-else-if="isTagsEditing">
+                  <v-autocomplete
+              v-model="editedItem.tags"
+              :items="myOwnTags"
+              item-value="id"
+              item-title="label"
+              chips
+              variant="outlined"
+              density="comfortable"
+              hide-details
+              hint="Choose or create tags for your feature model"
+              label="Tags"
+              multiple
+          ></v-autocomplete>
 
-                        </v-list-item-title>-->
-                      <v-list-item-title v-else>...</v-list-item-title>
+              </v-list-item-title>-->
+            <v-list-item-title v-else>...</v-list-item-title>
 
-                        <v-list-item-subtitle>Tags</v-list-item-subtitle>
-                        <!--
-                        <template v-slot:append>
-                            <v-list-item-action>
-                                <v-btn
-                                    v-if="!isTagsEditing && file.owner"
-                                    icon="mdi-pencil"
-                                    variant="tonal"
-                                    color="primary"
-                                    size="small"
-                                    @click="isTagsEditing = true; editItem(file.tags);"
-                                >
-                                </v-btn>
-                              <v-btn  v-else-if="!loading" variant="tonal"
-                                    color="primary"
-                                    size="small" icon="mdi-check" @click="updateItem(); isTagsEditing=false">
+            <v-list-item-subtitle>Tags</v-list-item-subtitle>
+            <!--
+            <template v-slot:append>
+                <v-list-item-action>
+                    <v-btn
+                        v-if="!isTagsEditing && file.owner"
+                        icon="mdi-pencil"
+                        variant="tonal"
+                        color="primary"
+                        size="small"
+                        @click="isTagsEditing = true; editItem(file.tags);"
+                    >
+                    </v-btn>
+                  <v-btn  v-else-if="!loading" variant="tonal"
+                        color="primary"
+                        size="small" icon="mdi-check" @click="updateItem(); isTagsEditing=false">
 
-                            </v-btn>
-                              <v-progress-circular v-else indeterminate></v-progress-circular>
-                            </v-list-item-action>
-                        </template>
-                        -->
-                    </v-list-item>
-                    <v-divider inset></v-divider>
-                    <v-list-item>
-                        <template v-slot:prepend>
-                            <v-icon
-                                color="primary"
-                                icon="mdi-calendar"
-                            ></v-icon>
-                        </template>
+                </v-btn>
+                  <v-progress-circular v-else indeterminate></v-progress-circular>
+                </v-list-item-action>
+            </template>
+            -->
+          </v-list-item>
+          <v-divider inset></v-divider>
+          <v-list-item>
+            <template v-slot:prepend>
+              <v-icon
+                color="primary"
+                icon="mdi-calendar"
+              ></v-icon>
+            </template>
 
-                        <v-list-item-title v-if="!loading">
-                            {{
-                                new Date(file.uploaded_at).toLocaleString(
-                                    'en-US'
-                                )
-                            }}
-                        </v-list-item-title>
-                        <v-list-item-title v-else>...</v-list-item-title>
-                        <v-list-item-subtitle>
-                            Uploaded on
-                        </v-list-item-subtitle>
-                    </v-list-item>
-                    <v-divider inset></v-divider>
-                    <v-list-item>
-                        <template v-slot:prepend>
-                            <v-icon
-                                color="primary"
-                                icon="mdi-human-male-female-child"
-                            ></v-icon>
-                        </template>
+            <v-list-item-title v-if="!loading">
+              {{
+                new Date(file.uploaded_at).toLocaleString(
+                  'en-US'
+                )
+              }}
+            </v-list-item-title>
+            <v-list-item-title v-else>...</v-list-item-title>
+            <v-list-item-subtitle>
+              Uploaded on
+            </v-list-item-subtitle>
+          </v-list-item>
+          <v-divider inset></v-divider>
+          <v-list-item>
+            <template v-slot:prepend>
+              <v-icon
+                color="primary"
+                icon="mdi-human-male-female-child"
+              ></v-icon>
+            </template>
 
-                            <v-list-item-title>
-                                {{ loading ? '...' : file.family.label }} ({{
-                                    loading ? '...' : file.version
-                                }})
-                            </v-list-item-title>
-                            <v-list-item-subtitle>
-                                Family and version
-                            </v-list-item-subtitle>
-                    </v-list-item>
-                </v-list>
-                <div
-                    class="mt-3 d-flex justify-space-between align-center"
+            <v-list-item-title>
+              {{ loading ? '...' : file.family.label }} ({{
+                loading ? '...' : file.version
+              }})
+            </v-list-item-title>
+            <v-list-item-subtitle>
+              Family and version
+            </v-list-item-subtitle>
+          </v-list-item>
+        </v-list>
+        <div
+          class="mt-3 d-flex justify-space-between align-center"
 
-                >
-                    <div  id="feature-model-actions">
-                        <div class="d-inline-block mr-2">
-                            <v-btn
-                                color="primary"
-                                variant="tonal"
-                                prepend-icon="mdi-eye"
-                                :to="'/feature-model/' + route.params.id"
-                            >
-                                View Model
-                            </v-btn>
-                        </div>
-                        <div class="d-inline-block">
-                            <v-btn
-                                variant="tonal"
-                                color="primary"
-                                @click="
+        >
+          <div id="feature-model-actions">
+            <div class="d-inline-block mr-2">
+              <v-btn
+                color="primary"
+                variant="tonal"
+                prepend-icon="mdi-eye"
+                :to="'/feature-model/' + route.params.id"
+              >
+                View Model
+              </v-btn>
+            </div>
+            <div class="d-inline-block">
+              <v-btn
+                variant="tonal"
+                color="primary"
+                @click="
                                     router.push({
                                         name: 'HistoryDetail',
                                         params: {
@@ -245,294 +245,290 @@
                                         },
                                     })
                                 "
-                                prepend-icon="mdi-human-male-female-child"
-                            >
-                                See Family
-                            </v-btn>
-                        </div>
-                    </div>
-                </div>
-            </v-col>
-            <v-col cols="12" md="6">
-                <div id="feature-model-artifacts">
-                    <h5 class="text-h5 mb-4">Artifacts (tbd)</h5>
-                    <div class="my-3">
-                        <v-list rounded>
-                            <v-list-subheader>REPORTS</v-list-subheader>
-                            <v-list-item
-                                v-for="(item, i) in artifacts"
-                                :key="i"
-                            >
-                                <template v-slot:prepend>
-                                    <v-icon
-                                        color="primary"
-                                        icon="mdi-file-document-outline"
-                                    ></v-icon>
-                                </template>
-                                <v-list-item-title>
-                                    {{ item.title }}
-                                </v-list-item-title>
-                                <v-list-item-subtitle>
-                                    {{ item.subtitle }}
-                                </v-list-item-subtitle>
-                                <template v-slot:append>
-                                    <v-list-item-action
-                                        style="flex-direction: row"
-                                    >
-                                        <v-btn
-                                            icon="mdi-download"
-                                            variant="tonal"
-                                            color="success"
-                                            size="small"
-                                            class="mr-2"
-                                        >
-                                        </v-btn>
-                                        <v-btn
-                                            icon="mdi-eye"
-                                            variant="tonal"
-                                            color="primary"
-                                            size="small"
-                                            @click.stop="
+                prepend-icon="mdi-human-male-female-child"
+              >
+                See Family
+              </v-btn>
+            </div>
+          </div>
+        </div>
+      </v-col>
+      <v-col cols="12" md="6">
+        <div id="feature-model-artifacts">
+          <h5 class="text-h5 mb-4">Artifacts (tbd)</h5>
+          <div class="my-3">
+            <v-list rounded>
+              <v-list-subheader>REPORTS</v-list-subheader>
+              <v-list-item
+                v-for="(item, i) in artifacts"
+                :key="i"
+              >
+                <template v-slot:prepend>
+                  <v-icon
+                    color="primary"
+                    icon="mdi-file-document-outline"
+                  ></v-icon>
+                </template>
+                <v-list-item-title>
+                  {{ item.title }}
+                </v-list-item-title>
+                <v-list-item-subtitle>
+                  {{ item.subtitle }}
+                </v-list-item-subtitle>
+                <template v-slot:append>
+                  <v-list-item-action
+                    style="flex-direction: row"
+                  >
+                    <v-btn
+                      icon="mdi-download"
+                      variant="tonal"
+                      color="success"
+                      size="small"
+                      class="mr-2"
+                    >
+                    </v-btn>
+                    <v-btn
+                      icon="mdi-eye"
+                      variant="tonal"
+                      color="primary"
+                      size="small"
+                      @click.stop="
                                                 showArtifactDialog(item)
                                             "
-                                        >
-                                        </v-btn>
-                                    </v-list-item-action>
-                                </template>
-                            </v-list-item>
-                        </v-list>
-                    </div>
-                </div>
-                <div class="my-3" id="feature-model-analysis-progress">
-                    <div
-                        class="d-flex justify-center flex-column align-center my-3"
                     >
-                        <span>Analyses Progress:</span>
-                        <div class="pa-0" style="width: 100%">
-                            <div
-                                :style="`width: ${getStati.success.percentage}%!important`"
-                                class="d-inline-block"
-                            >
-                                <v-tooltip location="bottom">
-                                    <template v-slot:activator="{ props }">
-                                        <v-progress-linear
-                                            height="15"
-                                            model-value="100"
-                                            color="success"
-                                            v-bind="props"
-                                        />
-                                    </template>
-                                    <span>
+                    </v-btn>
+                  </v-list-item-action>
+                </template>
+              </v-list-item>
+            </v-list>
+          </div>
+        </div>
+        <div class="my-3" id="feature-model-analysis-progress">
+          <div
+            class="d-flex justify-center flex-column align-center my-3"
+          >
+            <span>Analyses Progress:</span>
+            <div class="pa-0" style="width: 100%">
+              <div
+                :style="`width: ${getStati.success.percentage}%!important`"
+                class="d-inline-block"
+              >
+                <v-tooltip location="bottom">
+                  <template v-slot:activator="{ props }">
+                    <v-progress-linear
+                      height="15"
+                      model-value="100"
+                      color="success"
+                      v-bind="props"
+                    />
+                  </template>
+                  <span>
                                         Success:
                                         {{ getStati.success.absolute }} /
                                         {{ getStati.amount }}
                                     </span>
-                                </v-tooltip>
-                            </div>
-                            <div
-                                :style="`width: ${getStati.error.percentage}%!important`"
-                                class="d-inline-block"
-                            >
-                                <v-tooltip location="bottom">
-                                    <template v-slot:activator="{ props }">
-                                        <v-progress-linear
-                                            height="15"
-                                            model-value="100"
-                                            color="error"
-                                            v-bind="props"
-                                        />
-                                    </template>
-                                    <span>
+                </v-tooltip>
+              </div>
+              <div
+                :style="`width: ${getStati.error.percentage}%!important`"
+                class="d-inline-block"
+              >
+                <v-tooltip location="bottom">
+                  <template v-slot:activator="{ props }">
+                    <v-progress-linear
+                      height="15"
+                      model-value="100"
+                      color="error"
+                      v-bind="props"
+                    />
+                  </template>
+                  <span>
                                         Error:
                                         {{ getStati.error.absolute }} /
                                         {{ getStati.amount }}
                                     </span>
-                                </v-tooltip>
-                            </div>
-                            <div
-                                :style="`width: ${getStati.progress.percentage}%!important`"
-                                class="d-inline-block"
-                            >
-                                <v-tooltip location="bottom">
-                                    <template v-slot:activator="{ props }">
-                                        <v-progress-linear
-                                            height="15"
-                                            model-value="100"
-                                            color="primary"
-                                            v-bind="props"
-                                        />
-                                    </template>
-                                    <span>
-                                        In progress:
-                                        {{ getStati.progress.absolute }} /
-                                        {{ getStati.amount }}
-                                    </span>
-                                </v-tooltip>
-                            </div>
-                        </div>
-                    </div>
-                    <v-data-table
-                        :headers="headersAnalysis"
-                        :items="itemsAnalysis"
-                        :loading="loading"
-                        :search="searchAnalysis"
-                        items-per-page="5"
-                        class="elevation-1"
-                    >
-                        <template v-slot:top>
-                            <v-toolbar
-                                flat
-                                style="background-color: transparent"
-                            >
-                                <v-toolbar-title class="hidden-sm-and-down"
-                                    >Analyses
-                                </v-toolbar-title>
-                                <v-divider
-                                    class="mx-4 hidden-sm-and-down"
-                                    inset
-                                    vertical
-                                ></v-divider>
-                                <v-spacer class="hidden-sm-and-down"></v-spacer>
-                                <v-text-field
-                                    density="comfortable"
-                                    v-model="searchAnalysis"
-                                    append-inner-icon="mdi-magnify"
-                                    variant="filled"
-                                    clear-icon="mdi-download"
-                                    hide-details
-                                    label="Search"
-                                    single-line
-                                    class="mr-4"
-                                >
-                                </v-text-field>
-                            </v-toolbar>
-                        </template>
-                        <template v-slot:item.status="{ item }">
-                            <v-progress-circular
-                                v-if="item.raw.status === 0"
-                                size="24"
-                                width="3"
-                                indeterminate
-                                color="primary"
-                            ></v-progress-circular>
-                            <v-icon
-                                v-else-if="item.raw.status === 1"
-                                color="success"
-                            >
-                                mdi-check
-                            </v-icon>
-                            <v-icon v-else color="error"> mdi-cancel</v-icon>
-                        </template>
-                        <template v-slot:item.id="{ index }">
-                            {{ index + 1 }}
-                        </template>
-                    </v-data-table>
-                </div>
-            </v-col>
-        </v-row>
-        <v-dialog
-            v-model="dialogArtifact"
-            fullscreen
-            transition="dialog-bottom-transition"
-        >
-            <v-toolbar dark color="primary">
-                <!--                <v-icon icon="mdi-file-compare" class="mx-2"></v-icon>-->
-                <v-toolbar-title>
-                    View and compare Feature Model artifacts:
-                    <span class="font-weight-bold">
-                        {{ selectedArtifact.title }}
-                    </span>
+                </v-tooltip>
+              </div>
+              <div
+                :style="`width: ${getStati.progress.percentage}%!important`"
+                class="d-inline-block"
+              >
+                <v-tooltip location="bottom">
+                  <template v-slot:activator="{ props }">
+                    <v-progress-linear
+                      height="15"
+                      model-value="100"
+                      color="primary"
+                      v-bind="props"
+                    />
+                  </template>
+                  <span>
+                    In progress:
+                    {{ getStati.progress.absolute }} /
+                    {{ getStati.amount }}
+                  </span>
+                </v-tooltip>
+              </div>
+            </div>
+          </div>
+          <v-data-table
+            :headers="headersAnalysis"
+            :items="itemsAnalysis"
+            :loading="loading"
+            :search="searchAnalysis"
+            items-per-page="5"
+            class="elevation-1"
+          >
+            <template v-slot:top>
+              <v-toolbar
+                flat
+                style="background-color: transparent"
+              >
+                <v-toolbar-title class="hidden-sm-and-down"
+                >Analyses
                 </v-toolbar-title>
-                <v-spacer></v-spacer>
-                <v-toolbar-items>
-                    <v-btn
-                        icon="mdi-close"
-                        dark
-                        @click="dialogArtifact = false"
-                    >
-                    </v-btn>
-                </v-toolbar-items>
-            </v-toolbar>
-            <v-card>
-                <v-card-text>
-                    <v-row>
-                        <v-col cols="12" class="pb-0">
-                            <div class="text-subtitle-2">Toggle Headers</div>
-                        </v-col>
-                        <v-col cols="12" class="d-flex">
-                            <v-btn-toggle
-                                v-model="selectedCols"
-                                multiple
-                                density="compact"
-                                rounded="xl"
-                            >
-                                <v-btn
-                                    v-for="(
-                                        item, index
-                                    ) in headerCsvArtifactFull"
-                                    :key="index"
-                                    size="small"
-                                    variant="outlined"
-                                    :value="item.key"
-                                    :prepend-icon="
-                                        selectedCols.includes(item.key)
-                                            ? 'mdi-check'
-                                            : null
-                                    "
-                                >
-                                    {{ item.title }}
-                                </v-btn>
-                            </v-btn-toggle>
-                            <v-spacer></v-spacer>
-                            <v-btn
-                                :disabled="selectedCols.length === 0"
-                                variant="tonal"
-                                value="collapse"
-                                rounded="xl"
-                                @click="selectedCols = []"
-                            >
-                                Collapse all
-                            </v-btn>
-                            <v-btn
-                                :disabled="
+                <v-divider
+                  class="mx-4 hidden-sm-and-down"
+                  inset
+                  vertical
+                ></v-divider>
+                <v-spacer class="hidden-sm-and-down"></v-spacer>
+                <v-text-field
+                  density="comfortable"
+                  v-model="searchAnalysis"
+                  append-inner-icon="mdi-magnify"
+                  variant="filled"
+                  clear-icon="mdi-download"
+                  hide-details
+                  label="Search"
+                  single-line
+                  class="mr-4"
+                >
+                </v-text-field>
+              </v-toolbar>
+            </template>
+            <template v-slot:item.status="{ item }">
+              <v-progress-circular
+                v-if="item.raw.status === 0"
+                size="24"
+                width="3"
+                indeterminate
+                color="primary"
+              ></v-progress-circular>
+              <v-icon
+                v-else-if="item.raw.status === 1"
+                color="success"
+              >
+                mdi-check
+              </v-icon>
+              <v-icon v-else color="error"> mdi-cancel</v-icon>
+            </template>
+            <template v-slot:item.id="{ index }">
+              {{ index + 1 }}
+            </template>
+          </v-data-table>
+        </div>
+      </v-col>
+    </v-row>
+    <v-dialog
+      v-model="dialogArtifact"
+      fullscreen
+      transition="dialog-bottom-transition"
+    >
+      <v-toolbar dark color="primary">
+        <!--                <v-icon icon="mdi-file-compare" class="mx-2"></v-icon>-->
+        <v-toolbar-title>
+          View and compare Feature Model artifacts:
+          <span class="font-weight-bold">
+                        {{ selectedArtifact.value.title }}
+                    </span>
+        </v-toolbar-title>
+        <v-spacer></v-spacer>
+        <v-toolbar-items>
+          <v-btn
+            icon="mdi-close"
+            dark
+            @click="dialogArtifact = false"
+          >
+          </v-btn>
+        </v-toolbar-items>
+      </v-toolbar>
+      <v-card>
+        <v-card-text>
+          <v-row>
+            <v-col cols="12" class="pb-0">
+              <div class="text-subtitle-2">Toggle Headers</div>
+            </v-col>
+            <v-col cols="12" class="d-flex">
+              <v-btn-toggle
+                v-model="selectedCols"
+                multiple
+                density="compact"
+                rounded="xl"
+              >
+                <v-btn
+                  v-for="(item, index) in headerCsvArtifactFull"
+                  :key="index"
+                  size="small"
+                  variant="outlined"
+                  :value="item.key"
+                  :prepend-icon="selectedCols.includes(item.key)? 'mdi-check': null"
+                >
+                  {{ item.title }}
+                </v-btn>
+              </v-btn-toggle>
+              <v-spacer></v-spacer>
+              <v-btn
+                :disabled="selectedCols.length === 0"
+                variant="tonal"
+                value="collapse"
+                rounded="xl"
+                @click="selectedCols = []"
+              >
+                Collapse all
+              </v-btn>
+              <v-btn
+                :disabled="
                                     selectedCols.length ===
                                     headerCsvArtifactFull.length
                                 "
-                                variant="tonal"
-                                value="collapse"
-                                rounded="xl"
-                                class="ml-2"
-                                @click="
+                variant="tonal"
+                value="collapse"
+                rounded="xl"
+                class="ml-2"
+                @click="
                                     selectedCols = headerCsvArtifactFull.map(
                                         (el) => el.key
                                     )
                                 "
-                            >
-                                Expand all
-                            </v-btn>
-                        </v-col>
-                    </v-row>
-                    <v-divider class="mt-4"></v-divider>
-                    <v-row class="ma-1">
-                        <v-col
-                            cols="12"
-                            :md="isRightFmSelected ? 6 : 12"
-                            :lg="isRightFmSelected ? 6 : 12"
-                            class="pa-2"
-                        >
-                            <h6 class="text-h6">
-                                Feature Model: {{ file.label }}
-                            </h6>
-                            <v-data-table
-                                v-if="selectedArtifact.value.title === 'CSV'"
-                                :headers="headerCsvArtifact"
-                                :items="itemsCsvArtifact"
-                                :items-per-page="10"
-                            ></v-data-table>
-                            <div v-else>
+              >
+                Expand all
+              </v-btn>
+            </v-col>
+          </v-row>
+          <v-divider class="mt-4"></v-divider>
+          <v-row class="ma-1">
+
+            <v-col
+              cols="12"
+              :md="openCompare ? 6 : 12"
+              :lg="openCompare ? 6 : 12"
+              class="pa-2"
+            >
+              <v-container>
+                <h6 class="text-h6">
+                  Feature Model: {{ file.label }}
+                </h6>
+                <v-data-table
+                  v-if="selectedArtifact.value.title === 'CSV'"
+                  :headers="headerCsvArtifact"
+                  :items="itemsCsvArtifact"
+                  :items-per-page="10"
+                ></v-data-table>
+                <div v-else>
                                 <textarea
-                                    v-model="xmlFile"
-                                    style="
+                                  v-model="xmlFile"
+                                  style="
                                         border: none;
                                         width: 100%;
                                         height: 500px;
@@ -540,129 +536,112 @@
                                     "
                                 >
                                 </textarea>
-                            </div>
-                            <div
-                                class="d-flex justify-space-between"
-                                style="width: 100%"
-                            >
-                                <v-btn
-                                    color="success"
-                                    prepend-icon="mdi-download"
-                                >
-                                    Download Artifact
-                                </v-btn>
-                                <v-btn
-                                    color="primary"
-                                    prepend-icon="mdi-compare-horizontal"
-                                >
-                                    Compare
-                                </v-btn>
-                            </div>
-                        </v-col>
-                        <!--                        <v-col
-                            v-if="!isRightFmSelected"
-                            cols="12"
-                            md="4"
-                            lg="3"
-                            class="pa-2"
-                            style="border: 2px dashed grey"
-                        >
-                            <v-sheet
-                                v-if="!shouldCompare"
-                                height="300px"
-                                min-height="190px"
-                                width="100%"
-                                class="d-flex justify-center align-center pointer-on-hover"
-                                @click="compare"
-                            >
-                                <div class="text-h6 text-info text-center">
-                                    Click to compare with another feature model
-                                </div>
-                            </v-sheet>
-                            <div v-else>
-                                <v-btn
-                                    icon
-                                    @click="shouldCompare = false"
-                                    class="mr-2"
-                                >
-                                    <v-icon>mdi-arrow-left</v-icon>
-                                </v-btn>
-                                <span class="text-subtitle-1"
-                                    >My Feature Models</span
-                                >
-                                <v-progress-circular
-                                    style="display: block"
-                                    indeterminate
-                                    color="primary"
-                                    v-if="loadingComparableFM"
-                                ></v-progress-circular>
-                                <v-list
-                                    rounded
-                                    v-else
-                                    height="300px"
-                                    style="overflow-y: auto"
-                                >
-                                    <v-list-item-group
-                                        v-model="selectedRightFM"
-                                        color="primary"
-                                    >
-                                        <v-list-item
-                                            v-for="(item, i) in getMyFM"
-                                            :key="i"
-                                        >
-                                            <v-list-item-avatar>
-                                                <v-icon>
-                                                    mdi-family-tree
-                                                </v-icon>
-                                            </v-list-item-avatar>
-                                            <v-list-item-content>
-                                                <v-list-item-title>
-                                                    {{ item.label }}
-                                                </v-list-item-title>
-                                                <v-list-item-subtitle>
-                                                    {{
-                                                        new Date(
-                                                            item.uploaded_at
-                                                        ).toLocaleString(
-                                                            'en-US'
-                                                        )
-                                                    }}
-                                                </v-list-item-subtitle>
-                                            </v-list-item-content>
-                                        </v-list-item>
-                                    </v-list-item-group>
-                                </v-list>
-                            </div>
-                        </v-col>-->
-                        <v-col
-                            v-if="isRightFmSelected"
-                            cols="12"
-                            md="6"
-                            lg="6"
-                            class="pa-2"
-                            style="border-left: 2px solid white"
-                        >
-                            <h6 class="text-h6">
-                                <v-btn
-                                    color="inherit"
-                                    icon
-                                    @click="selectedRightFM = -1"
-                                    class="mr-2"
-                                >
-                                    <v-icon>mdi-arrow-left</v-icon>
-                                </v-btn>
-                                {{ getMyFM[selectedRightFM].label }}
-                            </h6>
-                            <v-data-table
-                                v-if="selectedArtifact.title === 'CSV'"
-                                :headers="headerCsvArtifact"
-                                :items="itemsCsvArtifact"
-                                :items-per-page="10"
-                            ></v-data-table>
-                            <div v-else>
+                </div>
+                <div
+                  class="d-flex justify-space-between"
+                  style="width: 100%"
+                >
+                  <v-btn
+                    color="success"
+                    prepend-icon="mdi-download"
+                  >
+                    Download Artifact
+                  </v-btn>
+                  <v-btn
+                    color="primary"
+                    prepend-icon="mdi-compare-horizontal"
+                    @click="toggleCompare"
+                  >
+                    Compare
+                  </v-btn>
+                </div>
+              </v-container>
+            </v-col>
+            <v-col
+              v-if="openCompare && !isRightFmSelected"
+              cols="12"
+              md="6"
+              lg="6"
+              class="pa-2"
+              style="border: 2px dashed grey"
+            >
+              <v-container>
+                <v-btn
+                  icon
+                  @click="toggleCompare"
+                  class="mr-2 mb-2"
+                >
+                  <v-icon>mdi-close</v-icon>
+                </v-btn>
+                <span class="text-subtitle-1"
+                >Select a model to compare with:</span
+                >
+                <v-progress-circular
+                  style="display: block"
+                  indeterminate
+                  color="primary"
+                  v-if="loadingComparableFM"
+                ></v-progress-circular>
+                <v-list
+                  rounded
+                  v-else
+                  height="300px"
+                  style="overflow-y: auto"
+                >
+                  <v-list-item
+                    v-for="(item, i) in getMyFM"
+                    :key="i"
+                    prepend-icon="mdi-family-tree"
+                    @click="selectedRightFM = i"
+                  >
+                    <v-icon>
+                      mdi-family-tree
+                    </v-icon>
+                    <v-list-item-title>
+                      {{ item.label }}
+                    </v-list-item-title>
+                    <v-list-item-subtitle>
+                      {{
+                        new Date(
+                          item.uploaded_at
+                        ).toLocaleString(
+                          'en-US'
+                        )
+                      }}
+                    </v-list-item-subtitle>
+                  </v-list-item>
+                </v-list>
+              </v-container>
+            </v-col>
+            <v-col
+              v-if="isRightFmSelected &&openCompare"
+              cols="12"
+              md="6"
+              lg="6"
+              class="pa-2"
+              style="border-left: 2px solid white"
+            >
+              <h6 class="text-h6">
+                <v-btn
+                  color="inherit"
+                  icon
+                  @click="selectedRightFM = -1"
+                  class="mr-2"
+                >
+                  <v-icon>mdi-arrow-left</v-icon>
+                </v-btn>
+                {{ getMyFM[selectedRightFM].label }}
+              </h6>
+              <v-data-table
+                v-if="selectedArtifact.value.title === 'CSV'"
+                :headers="headerCsvArtifact"
+                :items="itemsCsvArtifact"
+                :items-per-page="10"
+              ></v-data-table>
+              <div v-else>
                                 <textarea
-                                    v-model="xmlFile"
-                                    style="
+                                  v-model="xmlFile"
+                                  style="
                                         border: none;
                                         width: 100%;
                                         height: 500px;
@@ -670,28 +649,28 @@
                                     "
                                 >
                                 </textarea>
-                            </div>
-                        </v-col>
-                    </v-row>
-                </v-card-text>
-            </v-card>
-        </v-dialog>
-        <tutorial-mode
-            :show="showTutorial"
-            @close="showTutorial = false"
-            :next-steps="tutorialSteps"
-            local-storage-identifier="fileDetailTutorialCompleted"
-        ></tutorial-mode>
-        <v-btn
-            id="tutorial-mode"
-            position="fixed"
-            color="primary"
-            @click="showTutorial = true"
-            icon="mdi-school"
-            style="bottom: 70px; right: 20px"
-        >
-        </v-btn>
-    </div>
+              </div>
+            </v-col>
+          </v-row>
+        </v-card-text>
+      </v-card>
+    </v-dialog>
+    <tutorial-mode
+      :show="showTutorial"
+      @close="showTutorial = false"
+      :next-steps="tutorialSteps"
+      local-storage-identifier="fileDetailTutorialCompleted"
+    ></tutorial-mode>
+    <v-btn
+      id="tutorial-mode"
+      position="fixed"
+      color="primary"
+      @click="showTutorial = true"
+      icon="mdi-school"
+      style="bottom: 70px; right: 20px"
+    >
+    </v-btn>
+  </div>
 </template>
 
 <script setup>
@@ -704,7 +683,7 @@ import TutorialMode from '@/components/TutorialMode';
 const router = useRouter();
 const route = useRoute();
 const fileStore = useFileStore();
-
+const openCompare = ref(false);
 
 const API_URL = import.meta.env.VITE_APP_DOMAIN;
 const visibleTags = computed(() => {
@@ -720,7 +699,7 @@ const isTagsEditing = ref(false);
 let file = reactive({});
 const loading = ref(true);
 const dialogArtifact = ref(false);
-const shouldCompare = ref(false);
+const showComparable = ref(false);
 const loadingComparableFM = ref(false);
 const selectedRightFM = ref(-1);
 const selectedArtifact = {};
@@ -808,6 +787,7 @@ const isRightFmSelected = computed(() => {
     return selectedRightFM.value !== -1;
 });
 const getMyFM = computed(() => {
+  console.log(fileStore.myConfirmedFeatureModels)
     return fileStore.myConfirmedFeatureModels;
 });
 const getStati = computed(() => {
@@ -852,11 +832,12 @@ function showArtifactDialog(item) {
     selectedArtifact.value = item;
     dialogArtifact.value = true;
 }
-async function compare() {
-    shouldCompare.value = true;
-    loadingComparableFM.value = true;
-    fileStore.fetchConfirmedFeatureModels();
-    loadingComparableFM.value = false;
+
+async function toggleCompare(){
+  openCompare.value = !openCompare.value;
+  loadingComparableFM.value = true;
+  await fileStore.fetchMyConfirmedFeatureModels();
+  loadingComparableFM.value = false;
 }
 /*async fetchFeatureModelOfFamily(value) {
   await api
