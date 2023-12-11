@@ -219,7 +219,7 @@
                 </v-list>
                 <div
                     class="mt-3 d-flex justify-space-between align-center"
-                   
+
                 >
                     <div  id="feature-model-actions">
                         <div class="d-inline-block mr-2">
@@ -536,7 +536,7 @@
                                         border: none;
                                         width: 100%;
                                         height: 500px;
-                                        color: white;
+                                        color: #010101;
                                     "
                                 >
                                 </textarea>
@@ -666,7 +666,7 @@
                                         border: none;
                                         width: 100%;
                                         height: 500px;
-                                        color: white;
+                                        color: #010101;
                                     "
                                 >
                                 </textarea>
