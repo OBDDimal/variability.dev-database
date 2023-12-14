@@ -236,15 +236,13 @@
               <v-btn
                 variant="tonal"
                 color="primary"
-                @click="
-                                    router.push({
-                                        name: 'HistoryDetail',
-                                        params: {
-                                            id: file.family.id,
-                                            slug: file.family.slug,
-                                        },
-                                    })
-                                "
+                @click="router.push({
+                  name: 'HistoryDetail',
+                  params: {
+                  id: file.family.id,
+                  slug: file.family.slug,
+                  },
+                })"
                 prepend-icon="mdi-human-male-female-child"
               >
                 See Family
@@ -292,9 +290,7 @@
                       variant="tonal"
                       color="primary"
                       size="small"
-                      @click.stop="
-                                                showArtifactDialog(item)
-                                            "
+                      @click.stop="showArtifactDialog(item)"
                     >
                     </v-btn>
                   </v-list-item-action>
@@ -323,10 +319,10 @@
                     />
                   </template>
                   <span>
-                                        Success:
-                                        {{ getStati.success.absolute }} /
-                                        {{ getStati.amount }}
-                                    </span>
+                    Success:
+                    {{ getStati.success.absolute }} /
+                    {{ getStati.amount }}
+                  </span>
                 </v-tooltip>
               </div>
               <div
@@ -343,10 +339,10 @@
                     />
                   </template>
                   <span>
-                                        Error:
-                                        {{ getStati.error.absolute }} /
-                                        {{ getStati.amount }}
-                                    </span>
+                    Error:
+                    {{ getStati.error.absolute }} /
+                    {{ getStati.amount }}
+                  </span>
                 </v-tooltip>
               </div>
               <div
@@ -440,15 +436,15 @@
         <v-toolbar-title>
           View and compare Feature Model artifacts:
           <span class="font-weight-bold">
-                        {{ selectedArtifact.value.title }}
-                    </span>
+            {{ selectedArtifact.value.title }}
+          </span>
         </v-toolbar-title>
         <v-spacer></v-spacer>
         <v-toolbar-items>
           <v-btn
             icon="mdi-close"
             dark
-            @click="dialogArtifact = false"
+            @click="closeCompareView()"
           >
           </v-btn>
         </v-toolbar-items>
@@ -488,19 +484,12 @@
                 Collapse all
               </v-btn>
               <v-btn
-                :disabled="
-                                    selectedCols.length ===
-                                    headerCsvArtifactFull.length
-                                "
+                :disabled="selectedCols.length === headerCsvArtifactFull.length"
                 variant="tonal"
                 value="collapse"
                 rounded="xl"
                 class="ml-2"
-                @click="
-                                    selectedCols = headerCsvArtifactFull.map(
-                                        (el) => el.key
-                                    )
-                                "
+                @click="selectedCols = headerCsvArtifactFull.map((el) => el.key)"
               >
                 Expand all
               </v-btn>
@@ -838,6 +827,13 @@ async function toggleCompare(){
   loadingComparableFM.value = true;
   await fileStore.fetchMyConfirmedFeatureModels();
   loadingComparableFM.value = false;
+}
+
+function closeCompareView(){
+  dialogArtifact.value = false;
+  selectedRightFM.value = -1;
+  selectedArtifact.value={};
+  openCompare.value=false;
 }
 /*async fetchFeatureModelOfFamily(value) {
   await api
