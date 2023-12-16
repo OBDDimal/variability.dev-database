@@ -223,43 +223,6 @@
                     </v-expansion-panel>
                 </v-expansion-panels>
             </v-col>
-      <!--            <v-col cols="12" sm="6" md="3">
-        <div v-if="breakpoints.mdAndUp">
-          <v-sheet
-            :color="`grey ${
-              theme.global.current.value.dark ? 'darken-2' : 'lighten-4'
-            }`"
-            class="pa-3"
-          >
-            <v-skeleton-loader
-              class="mx-auto"
-              max-width="300"
-              type="card"
-            ></v-skeleton-loader>
-          </v-sheet>
-        </div>
-        <v-expansion-panels v-else>
-          <v-expansion-panel>
-            <v-expansion-panel-header>tba</v-expansion-panel-header>
-            <v-expansion-panel-content>
-              <v-sheet
-                :color="`grey ${
-                  theme.global.current.value.dark
-                    ? 'darken-2'
-                    : 'lighten-4'
-                }`"
-                class="pa-3"
-              >
-                <v-skeleton-loader
-                  class="mx-auto"
-                  max-width="300"
-                  type="card"
-                ></v-skeleton-loader>
-              </v-sheet>
-            </v-expansion-panel-content>
-          </v-expansion-panel>
-        </v-expansion-panels>
-      </v-col>-->
     </v-row>
     <div class="mt-5">
       <feature-model-table
@@ -268,6 +231,7 @@
         @onDelete="fetchFeatureModelOfFamily()"
         :no-data-text="`No feature models in ${family.label} yet`"
         :addable="false"
+        :is-selectable="true"
         headline="Feature Models of Family"
         @onHover="(id) => onElementHover(id)"
         @onMouseLeave="(id) => onMouseLeave(id)"
@@ -289,23 +253,8 @@ import LineChart from '@/components/Charts/LineChart.vue';
 import {useFileStore} from "@/store/file";
 import {storeToRefs} from "pinia";
 import BoxPlot from "@/components/Charts/BoxPlot.vue";
-
-const breakpoints = useDisplay();
-const theme = useTheme();
-const route = useRoute();
-const API_URL = import.meta.env.VITE_APP_DOMAIN;
-const fileStore = useFileStore();
-const {tags} = storeToRefs(useFileStore());
-
-const family = ref({});
-const files = ref([]);
-const loadingTable = ref(true);
-const labels = ref([])
-const visibleFiles = ref([]);
-const fullDataList = ref([]);
-const fullConstraintsList = ref([]);
-const fullConfigurationsList = ref([]);
-const FulllabelsList = ref([]);
+import DashbordTest from "@/views/DashbordTest.vue";
+import WidgetTest from "@/views/WidgetTest.vue";
 const numberOfFeaturesData = computed(() => {
   return {
     labels: labels.value,
@@ -323,6 +272,25 @@ const numberOfFeaturesData = computed(() => {
     ],
   };
 });
+
+
+const breakpoints = useDisplay();
+const theme = useTheme();
+const route = useRoute();
+const API_URL = import.meta.env.VITE_APP_DOMAIN;
+const fileStore = useFileStore();
+const {tags} = storeToRefs(useFileStore());
+
+const family = ref({});
+const files = ref([]);
+const loadingTable = ref(true);
+const labels = ref([])
+const visibleFiles = ref([]);
+const fullDataList = ref([]);
+const fullConstraintsList = ref([]);
+const fullConfigurationsList = ref([]);
+const FulllabelsList = ref([]);
+
 const BoxplotData = computed(()=>{
   return{
     labels: [family.value.label],
@@ -340,7 +308,7 @@ const BoxplotData = computed(()=>{
         padding: 0,
         itemRadius: 1,
         itemBackgroundColor: "#FF8C3C",
-        data: [fullDataList.value.map(elem => elem.data)]
+        data: [data.value]
       },
     ],
   };

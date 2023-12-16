@@ -12,7 +12,7 @@
         :page="currentPage"
         @update:itemsPerPage="updateItemsPerPage"
         @update:page="updateCurrentPage"
-
+        v-model="selectedItems"
       >
         <template v-slot:top>
           <v-toolbar flat style="background-color: transparent">
@@ -63,7 +63,7 @@
               inset
               vertical
             ></v-divider>
-            <v-switch v-model="showPrivateFiles" v-if="private" style="align-self: center;" label="Show Private Files"
+            <v-switch v-model="showPrivateFiles" v-if="props.private" style="align-self: center;" label="Show Private Files"
                       class='ml-4 mt-4' color="primary"></v-switch>
             <v-tooltip location='top'>
               <template v-slot:activator='{ props }'>
@@ -163,8 +163,8 @@
         <template #item="{item}">
           <tr @mouseenter="HandleMouseover(item.raw.id)"
               @mouseleave="HandleMouseleave(item.raw.id)"
-
           >
+
             <td class="text-xs-left color-corner"
               v-bind:class="{'purple': item.raw.active}">
               <v-btn
@@ -244,6 +244,13 @@
               >
               </v-btn>
             </td>
+            <td>
+              <v-checkbox
+                v-if="isSelectable"
+                v-model="selectedItems"
+                :value="item"
+              ></v-checkbox>
+        </td>
 
           </tr>
 
@@ -276,7 +283,7 @@ const sortDesc = ref(false);
 const selectedTags = ref([]); // Benutzer ausgewählte Tags
 const localUploadDialog = ref(false);
 const showPrivateFiles = ref(false);
-
+const selectedItems = ref([]);
 const props = defineProps({
   headline: {
     type: String,
@@ -311,6 +318,10 @@ const props = defineProps({
     required: false,
     default: false,
   },
+  isSelectable: {
+    type: Boolean,
+    default: false
+  }
 });
 const headers = [
   /*{
@@ -413,14 +424,18 @@ const updateItemsPerPage = (value) => {
 // Watch for changes in the currentPage and itemsPerPage
 // You can use these values to determine the currently displayed items
 watchEffect(() => {
-  const startIndex = (currentPage.value - 1) * itemsPerPage.value;
-  const endIndex = startIndex + itemsPerPage.value;
-  const displayedItems = filteredItems.value.slice(startIndex, endIndex);
+  if (selectedItems.value.length > 0){
+    const ids = selectedItems.value.map((elem) => elem.value)
+    emit('tableChange', ids);
+  }else {
+    const startIndex = (currentPage.value - 1) * itemsPerPage.value;
+    const endIndex = startIndex + itemsPerPage.value;
+    const displayedItems = filteredItems.value.slice(startIndex, endIndex);
 
-  // Log or return the currently displayed items
-  const ids = displayedItems.map((elem) => elem.id)
-  emit('tableChange', ids)
-
+    // Log or return the currently displayed items
+    const ids = displayedItems.map((elem) => elem.id)
+    emit('tableChange', ids)
+  }
   // or return/display the items as needed
 });
 </script>
