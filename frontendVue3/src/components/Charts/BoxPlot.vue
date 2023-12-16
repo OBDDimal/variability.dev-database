@@ -3,7 +3,7 @@
 </template>
 
 <script setup>
-import { onMounted, ref } from "vue";
+import {onMounted, ref, watch} from "vue";
 import { BoxPlotChart } from "@sgratzl/chartjs-chart-boxplot";
 import { Chart, registerables } from "chart.js";
 Chart.register(...registerables);
@@ -50,7 +50,20 @@ const boxplotData = {
   ],
 };*/
 onMounted(() => {
+  drawChart();
+});
+
+// Watch for changes in the 'data' prop and redraw the chart
+watch(() => props.data, () => {
+    if (chartCanvas.value) {
+    drawChart();
+  }
+});
+const drawChart = () => {
   const ctx = chartCanvas.value.getContext("2d");
+
+  // Clear existing chart (if any)
+  Chart.getChart(chartCanvas.value)?.destroy();
 
   new BoxPlotChart(ctx, {
     data: props.data,
@@ -78,5 +91,5 @@ onMounted(() => {
       },
     },
   });
-});
+};
 </script>
