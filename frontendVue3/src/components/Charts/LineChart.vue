@@ -1,5 +1,5 @@
 <template>
-  <Line :data="chartData" :options="options" ref="myChart"/>
+  <Line :data="props.chartdata" :options="options" ref="myChart"/>
 </template>
 
 <script setup>
@@ -14,7 +14,7 @@ import {
   Legend,
 } from 'chart.js'
 import {Line} from 'vue-chartjs'
-import {ref} from "vue";
+import {ref, onMounted} from "vue";
 
 ChartJS.register(
   CategoryScale,
@@ -25,7 +25,12 @@ ChartJS.register(
   Tooltip,
   Legend
 )
-const {chartData} = defineProps(['chartData']);
+const props = defineProps({
+  chartdata: {
+    type: Object,
+    required: false,
+  },
+});
 
 
 /*const chartData = ref({
