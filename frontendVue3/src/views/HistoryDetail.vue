@@ -11,6 +11,36 @@
       <span v-else>{{ family.label }}</span>
     </h3>
     <h5 class="text-h5 mb-4">Details and more information</h5>
+    <v-container>
+      <div class="p-8 bg-slate-900 min-h-screen">
+        <div class="grid-stack">
+          <div
+            v-for="widget in widgets" :key="widget.id"
+            :id="widget.id"
+            :gs-id="widget.id"
+            :gs-x="widget.x"
+            :gs-y="widget.y"
+            :gs-w="widget.w"
+            :gs-h="widget.h"
+
+          >
+            <div :style="{ backgroundColor: '#e0e0e0'}"
+                 class="grid-stack-item-content group relative p-4 bg-slate-800 highlight-white/5 rounded-md shadow-md flex items-center justify-center">
+              <line-chart v-if="widget.type=='LineChart'" :chartdata="widget.data"
+                          @on-hover="elem => onDatapointHover(elem)"
+                          @onUnHover="elem => onDatapointLeave(elem)"></line-chart>
+              <box-plot v-else :data="widget.data"></box-plot>
+            </div>
+            <!--<WidgetTest
+              v-for="widget in widgets"
+              :key="widget.id"
+              :data="widget"
+              :is-editing="true"
+            />-->
+          </div>
+        </div>
+      </div>
+    </v-container>
     <v-row justify="center">
        <v-col cols="12" sm="6" md="3">
         <div v-if="breakpoints.mdAndUp">
@@ -78,7 +108,7 @@
                     <line-chart
                         v-else
                         chartId="featureChart"
-                        :chart-data="numberOfFeaturesData"
+                        :chartdata="numberOfFeaturesData"
                         @onHover="elem => onDatapointHover(elem)"
                         @onUnHover="elem => onDatapointLeave(elem)"
                     ></line-chart>
@@ -104,7 +134,7 @@
                             <line-chart
                               v-else
                               chartId="featureChart"
-                              :chart-data="numberOfFeaturesData"
+                              :chartdata="numberOfFeaturesData"
                               @on-hover ="elem => onDatapointHover(elem)"
                               @onUnHover="elem => onDatapointLeave(elem)"
                             ></line-chart>
@@ -130,7 +160,7 @@
                     <line-chart
                         v-else
                         chartId="configurationsChart"
-                        :chart-data="numberOfConstraintsData"
+                        :chartdata="numberOfConstraintsData"
                         @on-hover ="elem => onDatapointHover(elem)"
                         @onUnHover="elem => onDatapointLeave(elem)"
                     ></line-chart>
@@ -160,7 +190,7 @@
                             <line-chart
                                 v-else
                                 chartId="configurationsChart"
-                                :chart-data="numberOfConstraintsData"
+                                :chartdata="numberOfConstraintsData"
                                 @on-hover ="elem => onDatapointHover(elem)"
                               @onUnHover="elem => onDatapointLeave(elem)"
                             ></line-chart>
@@ -186,7 +216,7 @@
                     <line-chart
                         v-else
                         chartid="constraintsChart"
-                        :chart-data="numberOfConfigurationsData"
+                        :chartdata="numberOfConfigurationsData"
                         @on-hover ="elem => onDatapointHover(elem)"
                         @onUnHover="elem => onDatapointLeave(elem)"
                     ></line-chart>
@@ -215,7 +245,7 @@
                             <line-chart
                                 v-else
                                 chartId="constraintsChart"
-                                :chart-data="numberOfConfigurationsData"
+                                :chartdata="numberOfConfigurationsData"
                                 @on-hover ="elem => onDatapointHover(elem)"
                                 @onUnHover="elem => onDatapointLeave(elem)"
                             ></line-chart>
@@ -253,26 +283,10 @@ import LineChart from '@/components/Charts/LineChart.vue';
 import {useFileStore} from "@/store/file";
 import {storeToRefs} from "pinia";
 import BoxPlot from "@/components/Charts/BoxPlot.vue";
-import DashbordTest from "@/views/DashbordTest.vue";
-import WidgetTest from "@/views/WidgetTest.vue";
-const numberOfFeaturesData = computed(() => {
-  return {
-    labels: labels.value,
-    datasets: [
-      {
-        label: 'Number of Features',
-        borderColor: 'green',
-        fill: false,
-        data: data.value,
-        pointRadius: (() => {
-          return files.value.filter(file => visibleFiles.value.includes(file.id)).map(elem => elem.active ? 10 : 4)
-        })()
 
-      },
-    ],
-  };
-});
-
+import {GridStack} from "gridstack";
+import "gridstack/dist/gridstack.min.css";
+import "gridstack/dist/gridstack-extra.min.css";
 
 const breakpoints = useDisplay();
 const theme = useTheme();
@@ -290,6 +304,7 @@ const fullDataList = ref([]);
 const fullConstraintsList = ref([]);
 const fullConfigurationsList = ref([]);
 const FulllabelsList = ref([]);
+
 
 const BoxplotData = computed(()=>{
   return{
@@ -313,6 +328,23 @@ const BoxplotData = computed(()=>{
     ],
   };
 })
+const numberOfFeaturesData = computed(() => {
+  return {
+    labels: labels.value,
+    datasets: [
+      {
+        label: 'Number of Features',
+        borderColor: 'green',
+        fill: false,
+        data: data.value,
+        pointRadius: (() => {
+          return files.value.filter(file => visibleFiles.value.includes(file.id)).map(elem => elem.active ? 10 : 4)
+        })()
+
+      },
+    ],
+  };
+});
 const numberOfConstraintsData = computed(() => {
   return {
     labels: labels.value,
@@ -361,7 +393,6 @@ async function getFamily() {
 const data = ref([]);
 const dataConstraints = ref([]);
 const dataConfigurations = ref([]);
-const shownIdList = ref([]);
 
 async function fetchFeatureModelOfFamily() {
   await api
@@ -450,10 +481,127 @@ function OnTableChange(idList){
   dataConfigurations.value = fullConfigurationsList.value.filter(file => idList.includes(file.id)).map(elem => elem.data)
   labels.value = FulllabelsList.value.filter(file => idList.includes(file.id)).map(elem => elem.version)
 }
+const grid = ref(null);
+function initGridStack() {
+  grid.value = GridStack.init({
+    column: 4,
+    cellHeight: 100,
+    maxRow: 6,
+    margin: 10,
+    disableResize: false,
+    disableDrag: false,
+  });
+  makeWidgets(widgets.value);
+}
 
+function makeWidgets(widgets) {
+  widgets.forEach((widget) => {
+    makeWidget(widget);
+  });
+}
+function makeWidget(item) {
+  const elSelector = `#${item.id}`;
+  return grid.value.makeWidget(elSelector);
+}
+const randomValues = (count, min, max) => {
+
+  const delta = max - min;
+  return Array.from({ length: count }).map(() => Math.random() * delta + min);
+};
+const boxplotData = {
+  labels: ["January", "February", "March", "April", "May", "June", "July"],
+  datasets: [
+    {
+      label: "Dataset 1",
+      backgroundColor: "rgba(242, 244, 255, 1)",
+      borderColor: "rgba(108, 123, 192, 1)",
+      borderWidth: 2,
+      outlierStyle: "circle",
+      outlierBackgroundColor: "#FFE2E2",
+      outlierBorderColor: "#6E1C1C",
+      outlierRadius: 2,
+      outlierBorderWidth: 2,
+      padding: 0,
+      itemRadius: 1,
+      itemBackgroundColor: "#FF8C3C",
+
+      data: [
+        [...randomValues(100, 400, 1000), 160, 140],
+        [...randomValues(100, 500, 200), 50, 55, 60, 65],
+        [...randomValues(100, 500, 700), 5, -5, 105],
+        randomValues(100, 600, 1000),
+        randomValues(40, 500, 1000),
+        randomValues(100, 600, 1200),
+        [...randomValues(100, 600, 1000), 50, 150],
+      ],
+    },
+  ],
+}
 onMounted(async () => {
   await getFamily();
   await fetchFeatureModelOfFamily();
   fileStore.fetchTags();
+  initGridStack();
 });
+const widgets = computed(()=>{
+  return([
+  {
+
+      x: 0,
+      y: 0,
+      w: 2,
+      h: 2,
+    type: "BoxPlot",
+    id: 1,
+    title: "SalesData",
+    data: boxplotData
+  },
+  {
+      x: 3,
+      y: 2,
+      w: 1,
+      h: 2,
+
+    type: "BoxPlot",
+    id: 2,
+    title: "NumberofFeatures",
+    data: BoxplotData.value
+  },
+  {
+
+      x: 0,
+      y: 2,
+      w: 2,
+      h: 1,
+    type: "LineChart",
+     id: 3,
+    title: "Number of Features",
+    data: numberOfFeaturesData.value
+  },
+  {
+
+      x: 2,
+      y: 2,
+      w: 1,
+      h: 2,
+    type: "LineChart",
+     id: 4,
+    title: "Number of Constraints",
+    data: numberOfConstraintsData.value
+  },
+  {
+    x: 2,
+    y: 0,
+    w: 2,
+    h: 1,
+
+    type: "LineChart",
+    id: 5,
+    title: "Number of Configs",
+    data: numberOfConfigurationsData.value
+  },
+])});
 </script>
+<style scoped>
+
+</style>
