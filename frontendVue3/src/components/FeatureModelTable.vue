@@ -3,7 +3,7 @@
     <v-card variant="elevated" rounded class="pa-2">
       <v-data-table
         :loading="props.loading"
-        :headers="headers"
+        :headers="tableHeaders"
         :items="filteredItems"
         :items-per-page="itemsPerPage"
         :search="search"
@@ -163,10 +163,19 @@
         <template #item="{item}">
           <tr @mouseenter="HandleMouseover(item.raw.id)"
               @mouseleave="HandleMouseleave(item.raw.id)"
-          >
 
-            <td class="text-xs-left color-corner"
-              v-bind:class="{'purple': item.raw.active}">
+          >
+             <td  class="text-xs-left color-corner"
+              v-bind:class="{'purple': item.raw.active}"
+              v-if="isSelectable">
+              <v-checkbox
+
+
+                v-model="selectedItems"
+                :value="item"
+              ></v-checkbox>
+        </td>
+            <td >
               <v-btn
                 variant="text"
                 color="primary"
@@ -244,13 +253,7 @@
               >
               </v-btn>
             </td>
-            <td>
-              <v-checkbox
-                v-if="isSelectable"
-                v-model="selectedItems"
-                :value="item"
-              ></v-checkbox>
-        </td>
+
 
           </tr>
 
@@ -344,6 +347,12 @@ const headers = [
     sortable: false,
   },
 ];
+const tableHeaders = props.isSelectable
+  ? [
+      { title: '', key: 'checkbox', sortable: false },
+      ...headers,
+    ]
+  : headers;
 const search = ref('');
 const createDialog = ref(false);
 const checkLocalStorage = computed(() => {
