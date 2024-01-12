@@ -43,7 +43,7 @@
     </v-container>
     <v-row justify="center">
        <v-col cols="12" sm="6" md="3">
-        <div v-if="breakpoints.mdAndUp">
+        <div v-if="mdAndUp">
           <v-sheet
             v-if="loadingTable"
             :color="`grey ${
@@ -64,6 +64,9 @@
                 </div>
                 <v-expansion-panels v-else>
                     <v-expansion-panel>
+                      <v-expansion-panel-title>
+                        Number of Features
+                      </v-expansion-panel-title>
                         <v-expansion-panel-text>
                             <v-sheet
                                 v-if="loadingTable"
@@ -91,7 +94,7 @@
     </v-row>
       <v-row justify="center">
       <v-col cols="12" sm="6" md="3">
-        <div v-if="breakpoints.mdAndUp">
+        <div v-if="mdAndUp">
           <v-sheet
             v-if="loadingTable"
             :color="`grey ${
@@ -115,6 +118,9 @@
                 </div>
                 <v-expansion-panels v-else>
                     <v-expansion-panel>
+                      <v-expansion-panel-title>
+                        Number of Features
+                      </v-expansion-panel-title>
                         <v-expansion-panel-text>
                             <v-sheet
                                 v-if="loadingTable"
@@ -143,7 +149,7 @@
                 </v-expansion-panels>
             </v-col>
             <v-col cols="12" sm="6" md="3">
-                <div v-if="breakpoints.mdAndUp">
+                <div v-if="mdAndUp">
                     <v-sheet
                         v-if="loadingTable"
                         :color="`grey ${
@@ -199,7 +205,7 @@
                 </v-expansion-panels>
             </v-col>
             <v-col cols="12" sm="6" md="3">
-                <div v-if="breakpoints.mdAndUp">
+                <div v-if="mdAndUp">
                     <v-sheet
                         v-if="loadingTable"
                         :color="`grey ${
@@ -305,7 +311,7 @@ const fullConstraintsList = ref([]);
 const fullConfigurationsList = ref([]);
 const FulllabelsList = ref([]);
 
-
+const { mdAndUp } = useDisplay()
 const BoxplotData = computed(()=>{
   return{
     labels: [family.value.label],
