@@ -14,7 +14,7 @@
     <v-container>
       <div class="p-8 bg-slate-900 min-h-screen">
         <div class="grid-stack">
-          <div
+          <v-container
             v-for="widget in widgets" :key="widget.id"
             :id="widget.id"
             :gs-id="widget.id"
@@ -22,22 +22,15 @@
             :gs-y="widget.y"
             :gs-w="widget.w"
             :gs-h="widget.h"
-
           >
-            <div :style="{ backgroundColor: '#e0e0e0'}"
+            <div :style="{ backgroundColor: '#ffffff'}"
                  class="grid-stack-item-content group relative p-4 bg-slate-800 highlight-white/5 rounded-md shadow-md flex items-center justify-center">
-              <line-chart v-if="widget.type=='LineChart'" :chartdata="widget.data"
+              <line-chart v-if="widget.type==='LineChart'" :chartdata="widget.data"
                           @on-hover="elem => onDatapointHover(elem)"
                           @onUnHover="elem => onDatapointLeave(elem)"></line-chart>
               <box-plot v-else :data="widget.data"></box-plot>
             </div>
-            <!--<WidgetTest
-              v-for="widget in widgets"
-              :key="widget.id"
-              :data="widget"
-              :is-editing="true"
-            />-->
-          </div>
+          </v-container>
         </div>
       </div>
     </v-container>
@@ -278,7 +271,7 @@
 </template>
 
 <script setup>
-import {computed, onMounted, ref,} from 'vue';
+import {computed, nextTick, onMounted, onUpdated, reactive, ref, watchEffect,} from 'vue';
 import {useRoute} from 'vue-router';
 import api from '@/services/api.service';
 import FeatureModelTable from "@/components/FeatureModelTable.vue";
@@ -549,64 +542,88 @@ onMounted(async () => {
   fileStore.fetchTags();
   initGridStack();
 });
-const widgets = computed(()=>{
-  return([
-  {
 
-      x: 0,
-      y: 0,
-      w: 2,
-      h: 2,
+async function addWidget(chartdata, type, title) {
+  const widget = {
+    w: 2,
+    h: 1,
+    title: title,
+    id: widgets.value.length+1,
+    type: type,
+    data: numberOfFeaturesData
+  };
+  console.log(widget)
+  console.log(widgets.value)
+  widgetList.value.push(widget)
+  console.log(widgets.value)
+  await nextTick();
+  makeWidget(widget);
+}
+function removeWidget(widget) {
+  const index = widgets.value.findIndex((w) => w.id === widget.id);
+  if (index === -1) {
+    return;
+  }
+  const selector = `#${CSS.escape(widget.id)}`;
+  grid.value.removeWidget(selector);
+  grid.value.compact();
+  widgets.value.splice(index, 1);
+}
+const widgetList = ref([
+  {
+    x: 0,
+    y: 0,
+    w: 2,
+    h: 2,
     type: "BoxPlot",
     id: 1,
     title: "SalesData",
-    data: boxplotData
+    data: boxplotData,
   },
   {
-      x: 3,
-      y: 2,
-      w: 1,
-      h: 2,
-
+    x: 3,
+    y: 2,
+    w: 1,
+    h: 2,
     type: "BoxPlot",
     id: 2,
     title: "NumberofFeatures",
-    data: BoxplotData.value
+    data: BoxplotData,
   },
   {
-
-      x: 0,
-      y: 2,
-      w: 2,
-      h: 1,
+    x: 0,
+    y: 2,
+    w: 2,
+    h: 1,
     type: "LineChart",
-     id: 3,
+    id: 3,
     title: "Number of Features",
-    data: numberOfFeaturesData.value
+    data: numberOfFeaturesData,
   },
   {
-
-      x: 2,
-      y: 2,
-      w: 1,
-      h: 2,
+    x: 2,
+    y: 2,
+    w: 1,
+    h: 2,
     type: "LineChart",
-     id: 4,
+    id: 4,
     title: "Number of Constraints",
-    data: numberOfConstraintsData.value
+    data: numberOfConstraintsData,
   },
   {
     x: 2,
     y: 0,
     w: 2,
     h: 1,
-
     type: "LineChart",
     id: 5,
     title: "Number of Configs",
-    data: numberOfConfigurationsData.value
+    data: numberOfConfigurationsData,
   },
-])});
+]);
+const widgets = computed(()=>{
+  return [...widgetList.value]
+})
 </script>
 <style scoped>
 
