@@ -1,5 +1,5 @@
 <template>
-  <Line :data="chartData" :options="options" />
+  <Line :data="chartData" :options="options" ref="myChart"/>
 </template>
 
 <script setup>
@@ -11,9 +11,9 @@ import {
   LineElement,
   Title,
   Tooltip,
-  Legend
+  Legend,
 } from 'chart.js'
-import { Line } from 'vue-chartjs'
+import {Line} from 'vue-chartjs'
 import {ref} from "vue";
 
 ChartJS.register(
@@ -25,22 +25,31 @@ ChartJS.register(
   Tooltip,
   Legend
 )
+const {chartData} = defineProps(['chartData']);
 
-const labels = ref(['January', 'February', 'March', 'April', 'May', 'June', 'July'])
-const datasets = ref([
-  {
-    label: 'Data One',
-    backgroundColor: '#f87979',
-    data: [40, 39, 10, 40, 39, 80, 40]
-  }
-])
-const { chartData } = defineProps(['chartData']);
+
 /*const chartData = ref({
   labels: labels.value,
   datasets: datasets.value
 })*/
-
+const emit = defineEmits(['onHover', 'onUnHover']);
 const options = ref({
   responsive: true,
+  pointHoverRadius: 10,
+  onHover: handleHover,
+  onLeave: handleMouseLeave(),
+  maintainAspectRatio: false,
 })
+function handleMouseLeave(event, elements){
+    emit("onUnHover")
+}
+function handleHover(event, elements){
+  if (elements.length > 0) {
+    const hoveredIndex = elements[0].index;
+    emit("onHover", hoveredIndex)
+  }
+  else {
+    emit("onUnHover")
+  }
+}
 </script>
