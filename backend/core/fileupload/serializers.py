@@ -8,6 +8,7 @@ from django.http import QueryDict
 from transpiler.g6_transpiler import xml_to_g6
 from core.fileupload.utils import generate_random_string
 
+
 class FamiliesSerializer(serializers.ModelSerializer):
     """
     A serializer for defining which Feature Model Family attributes should be converted to JSON
@@ -50,6 +51,7 @@ class FilesSerializer(serializers.ModelSerializer):
     tags = TagsSerializer(many=True)
     family = FamiliesSerializer()
     license = LicensesSerializer()
+
     # version = 'self'
 
     class Meta:
@@ -123,6 +125,7 @@ class FilesSerializer(serializers.ModelSerializer):
 
         return internal_rep.dict()
 
+
 class AnalysesSerializer(serializers.ModelSerializer):
     """
     A serializer for defining which Analysis attributes should be converted to JSON
@@ -131,6 +134,7 @@ class AnalysesSerializer(serializers.ModelSerializer):
     class Meta:
         model = Analysis
         fields = ['id', 'query', 'admin_only', 'disabled']
+
 
 class AnalysisResultsSerializer(serializers.ModelSerializer):
     """
