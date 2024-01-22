@@ -11,6 +11,8 @@ from django.contrib.admin.templatetags.admin_list import _boolean_icon
 from ddueruemweb.settings import PASSWORD_RESET_TIMEOUT_DAYS
 from django.contrib.admin.views.decorators import staff_member_required
 
+from core.analysis.models import AnalysisData
+
 
 @staff_member_required
 def send_activation_email(request, user_id):
@@ -159,3 +161,4 @@ admin.site.register(User, UserAdmin)
 admin.site.register(Family, FamilyAdmin)
 admin.site.register(Tag, TagAdmin)
 admin.site.register(File, FileAdmin)
+admin.site.register(AnalysisData)
