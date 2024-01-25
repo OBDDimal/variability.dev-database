@@ -305,10 +305,12 @@ const files = ref([]);
 const loadingTable = ref(true);
 const labels = ref([])
 const visibleFiles = ref([]);
-const fullDataList = ref([]);
+const fullFeatureList = ref([]);
 const fullConstraintsList = ref([]);
 const fullConfigurationsList = ref([]);
 const FulllabelsList = ref([]);
+const fullDataList = ref([]);
+const displayedDataList=ref({});
 
 const { mdAndUp } = useDisplay()
 const BoxplotData = computed(()=>{
@@ -328,7 +330,7 @@ const BoxplotData = computed(()=>{
         padding: 0,
         itemRadius: 1,
         itemBackgroundColor: "#FF8C3C",
-        data: [data.value]
+        data: [displayedDataList.value['fullFeatureList']]
       },
     ],
   };
@@ -341,7 +343,7 @@ const numberOfFeaturesData = computed(() => {
         label: 'Number of Features',
         borderColor: 'green',
         fill: false,
-        data: data.value,
+        data: displayedDataList.value['fullFeatureList'],
         pointRadius: (() => {
           return files.value.filter(file => visibleFiles.value.includes(file.id)).map(elem => elem.active ? 10 : 4)
         })()
@@ -358,7 +360,7 @@ const numberOfConstraintsData = computed(() => {
         label: 'Number of Constraints',
         borderColor: 'blue',
         fill: false,
-        data: dataConstraints.value,
+        data: displayedDataList.value['fullConstraintsList'],
         pointRadius: (() => {
           return files.value.filter(file => visibleFiles.value.includes(file.id)).map(elem => elem.active ? 8 : 4)
         })()
@@ -375,7 +377,7 @@ const numberOfConfigurationsData = computed(() => {
                     label: 'Number of Configurations (log 10)',
                     borderColor: 'red',
                     fill: false,
-                    data: dataConfigurations.value,
+                    data: displayedDataList.value['fullConfigurationsList'],
                     pointRadius: (() => {return files.value.map(elem => elem.active ? 8 : 4)})()
                 },
     ],
@@ -395,9 +397,6 @@ async function getFamily() {
       console.log(error);
     });
 }
-const data = ref([]);
-const dataConstraints = ref([]);
-const dataConfigurations = ref([]);
 
 async function fetchFeatureModelOfFamily() {
   await api
@@ -417,20 +416,44 @@ async function fetchFeatureModelOfFamily() {
       FulllabelsList.value = sorted.map((elem) => ({id: elem.id, version: elem.version}));
       for (let i = 0; i < sorted.length; i++) {
         const elem = sorted[i];
+        //TODO: Fetch right data
         const res = await getNumbersFromFile(
           elem.local_file,
           sorted[i].label
         );
-        fullDataList.value.push({id: elem.id, data: res.amountFeatures});
+        fullFeatureList.value.push({id: elem.id, data: res.amountFeatures});
         fullConstraintsList.value.push({ id: elem.id, data:res.amountConstraints});
         fullConfigurationsList.value.push({id: elem.id, data:res.amountConfigurations});
+        fullDataList.value.push({name: "fullFeatureList", list: fullFeatureList}, {name: "fullConstraintsList", list: fullConstraintsList}, {name: "fullConfigurationsList", list: fullConfigurationsList})
       }
       loadingTable.value = false;
     });
 }
+async function getDatafromBackend(fileIDs, dataKey){
+  //TODO: Insert right url
+  const requests = fileIDs.map((fileId) =>
+    api.get(`${API_URL}analyses/data/?model_id=${fileId}&key=${dataKey}`)
+  );
+  try {
+    // Use Promise.all to execute all requests in parallel
+    const responses = await Promise.all(requests);
+    const dataList = ref([]);
+    // Process responses as needed
+    responses.forEach((response) => {
+      dataList.value.push({id: response.fileID, data: response.data});
+    });
 
+    // Return processed data if needed
+    return dataList
+  } catch (error) {
+    // Handle errors
+    console.error('Error fetching data:', error);
+    throw error;
+  }
+}
 async function getNumbersFromFile(path, label) {
   try {
+    console.log(path)
     const response = await api.get(`${API_URL.slice(0, -1)}${path}`);
     const parser = new DOMParser();
     const xmlDocument = parser.parseFromString(response.data, 'text/xml');
@@ -481,9 +504,9 @@ function OnTableChange(idList){
   visibleFiles.value = files.value
   .filter((file) => idList.includes(file.id))
   .map((file) => file.id);
-  data.value = fullDataList.value.filter(file => idList.includes(file.id)).map(elem => elem.data)
-  dataConstraints.value = fullConstraintsList.value.filter(file => idList.includes(file.id)).map(elem => elem.data)
-  dataConfigurations.value = fullConfigurationsList.value.filter(file => idList.includes(file.id)).map(elem => elem.data)
+  for (const elem of fullDataList.value){
+    displayedDataList.value[elem.name] = elem.list.filter(file => idList.includes(file.id)).map(elem => elem.data)
+  }
   labels.value = FulllabelsList.value.filter(file => idList.includes(file.id)).map(elem => elem.version)
 }
 const grid = ref(null);
@@ -551,8 +574,8 @@ onMounted(async () => {
 
 async function addWidget(chartdata, type, title) {
   const widget = {
-    w: 2,
-    h: 1,
+    w: 1,
+    h: 2,
     title: title,
     id: widgets.value.length+1,
     type: type,
@@ -572,7 +595,7 @@ function removeWidget(widget) {
   grid.value.compact();
   widgets.value.splice(index, 1);
 }
-function generateChartData(data, customLabel = 'Custom Label') {
+function generateChartData(datakey, customLabel = 'Custom Label') {
   return computed(() => {
     return {
       labels: labels.value,
@@ -581,7 +604,7 @@ function generateChartData(data, customLabel = 'Custom Label') {
           label: customLabel,
           borderColor: 'red',
           fill: false,
-          data: data,
+          data: displayedDataList.value[datakey],
           pointRadius: (() => {
             return files.value.filter(file => visibleFiles.value.includes(file.id)).map(elem => elem.active ? 8 : 4);
           })(),
