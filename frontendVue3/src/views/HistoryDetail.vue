@@ -287,6 +287,12 @@ import {GridStack} from "gridstack";
 import "gridstack/dist/gridstack.min.css";
 import "gridstack/dist/gridstack-extra.min.css";
 
+const open = ref(true);
+
+const setOpen = () => {
+  open.value = false;
+  //emit('close');
+};
 const breakpoints = useDisplay();
 const theme = useTheme();
 const route = useRoute();
@@ -354,7 +360,7 @@ const numberOfConstraintsData = computed(() => {
         fill: false,
         data: dataConstraints.value,
         pointRadius: (() => {
-          return files.value.filter(file => visibleFiles.value.includes(file.id)).map(elem => elem.active ? 10 : 4)
+          return files.value.filter(file => visibleFiles.value.includes(file.id)).map(elem => elem.active ? 8 : 4)
         })()
       },
     ],
@@ -370,7 +376,7 @@ const numberOfConfigurationsData = computed(() => {
                     borderColor: 'red',
                     fill: false,
                     data: dataConfigurations.value,
-                    pointRadius: (() => {return files.value.map(elem => elem.active ? 6 : 4)})()
+                    pointRadius: (() => {return files.value.map(elem => elem.active ? 8 : 4)})()
                 },
     ],
   };
@@ -550,12 +556,9 @@ async function addWidget(chartdata, type, title) {
     title: title,
     id: widgets.value.length+1,
     type: type,
-    data: numberOfFeaturesData
+    data: generateChartData(chartdata, title)
   };
-  console.log(widget)
-  console.log(widgets.value)
   widgetList.value.push(widget)
-  console.log(widgets.value)
   await nextTick();
   makeWidget(widget);
 }
@@ -568,6 +571,24 @@ function removeWidget(widget) {
   grid.value.removeWidget(selector);
   grid.value.compact();
   widgets.value.splice(index, 1);
+}
+function generateChartData(data, customLabel = 'Custom Label') {
+  return computed(() => {
+    return {
+      labels: labels.value,
+      datasets: [
+        {
+          label: customLabel,
+          borderColor: 'red',
+          fill: false,
+          data: data,
+          pointRadius: (() => {
+            return files.value.filter(file => visibleFiles.value.includes(file.id)).map(elem => elem.active ? 8 : 4);
+          })(),
+        },
+      ],
+    };
+  });
 }
 const widgetList = ref([
   {
