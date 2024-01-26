@@ -583,7 +583,7 @@ async function addWidget(chartdata, type, title) {
     title: title,
     id: widgets.value.length+1,
     type: type,
-    data: generateChartData(chartdata, title)
+    data: generateChartData(chartdata,type, title)
   };
   widgetList.value.push(widget)
   await nextTick();
@@ -599,8 +599,9 @@ function removeWidget(widget) {
   grid.value.compact();
   widgets.value.splice(index, 1);
 }
-function generateChartData(datakey, customLabel = 'Custom Label') {
-  return computed(() => {
+function generateChartData(datakey, type, customLabel = 'Custom Label') {
+  if (type === "LineChart"){
+    return computed(() => {
     return {
       labels: labels.value,
       datasets: [
@@ -616,6 +617,34 @@ function generateChartData(datakey, customLabel = 'Custom Label') {
       ],
     };
   });
+  }
+  else{
+    return computed(() => {
+      return {
+        labels: [family.value.label],
+        datasets: [
+          {
+            label: "NumberofFeatures",
+            backgroundColor: "rgba(242, 244, 255, 1)",
+            borderColor: "green",
+            borderWidth: 2,
+            outlierStyle: "circle",
+            outlierBackgroundColor: "#FFE2E2",
+            outlierBorderColor: "#6E1C1C",
+            outlierRadius: 2,
+            outlierBorderWidth: 2,
+            padding: 0,
+            itemRadius: 1,
+            itemBackgroundColor: "#FF8C3C",
+            data: [displayedDataList.value[datakey]]
+          },
+        ],
+      };
+    })
+
+  }
+
+
 }
 const widgetList = ref([
   {

@@ -113,6 +113,7 @@ const emit = defineEmits(['createChart'])
 function generateChart(name){
   emit('createChart', name);
 }
+
 const showMetrics = computed(() => {
     if (hideMissing.value) {
         return updateMetrics().filter((entry) => checkEntryIfValueSet(entry));
@@ -146,7 +147,6 @@ const updateAnalysis = () => {
     return analysis.value.map((entry) => {
         var obj = {};
         obj["name"] = entry.name;
-        obj["value"] = getDisplayValue(entry);
         return obj;
     });
 };
