@@ -11,6 +11,9 @@
       <span v-else>{{ family.label }}</span>
     </h3>
     <h5 class="text-h5 mb-4">Details and more information</h5>
+    <v-navigation-drawer v-model="open">
+      <ChartsSideMenu @createChart="datakey => addWidget(datakey, 'LineChart', datakey)"></ChartsSideMenu>
+    </v-navigation-drawer>
     <v-container>
       <div class="p-8 bg-slate-900 min-h-screen">
         <div class="grid-stack">
@@ -286,6 +289,7 @@ import BoxPlot from "@/components/Charts/BoxPlot.vue";
 import {GridStack} from "gridstack";
 import "gridstack/dist/gridstack.min.css";
 import "gridstack/dist/gridstack-extra.min.css";
+import ChartsSideMenu from "@/components/ChartsSideMenu.vue";
 
 const open = ref(true);
 
