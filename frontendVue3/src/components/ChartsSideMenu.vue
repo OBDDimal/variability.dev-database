@@ -21,7 +21,7 @@
                 </template>
                 </td>
                 <td>
-                  <v-btn v-if="!item.raw.childs || !item.raw.childs.length > 0" @click="generateChart(item.value)" icon>
+                  <v-btn v-if="!item.raw.childs || !item.raw.childs.length > 0" @click="generateChart(item.raw.datakey, item.raw.name)" icon>
                     <v-icon>mdi-chart-bar</v-icon>
                   </v-btn>
                 </td>
@@ -38,7 +38,7 @@
                         </template>
                         <template v-slot:item="{ item }">
                           <tr>
-                          <v-btn @click="generateChart(item.value)" icon>
+                          <v-btn @click="generateChart(item.raw.datakey, item.raw.name)" icon>
                           <v-icon>mdi-chart-bar</v-icon>
                             </v-btn>
                           <td>
