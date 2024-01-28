@@ -12,7 +12,7 @@
     </h3>
     <h5 class="text-h5 mb-4">Details and more information</h5>
     <v-navigation-drawer v-model="open">
-      <ChartsSideMenu @createChart="datakey => addWidget(datakey, 'LineChart', datakey)"></ChartsSideMenu>
+      <ChartsSideMenu @createChart="(datakey, title) => addWidget(datakey, 'LineChart', title)"></ChartsSideMenu>
     </v-navigation-drawer>
     <v-container>
       <div class="p-8 bg-slate-900 min-h-screen">
@@ -334,7 +334,7 @@ const BoxplotData = computed(()=>{
         padding: 0,
         itemRadius: 1,
         itemBackgroundColor: "#FF8C3C",
-        data: [displayedDataList.value['fullFeatureList']]
+        data: [displayedDataList.value['NumberofFeatures']]
       },
     ],
   };
@@ -347,7 +347,7 @@ const numberOfFeaturesData = computed(() => {
         label: 'Number of Features',
         borderColor: 'green',
         fill: false,
-        data: displayedDataList.value['fullFeatureList'],
+        data: displayedDataList.value['NumberofFeatures'],
         pointRadius: (() => {
           return files.value.filter(file => visibleFiles.value.includes(file.id)).map(elem => elem.active ? 10 : 4)
         })()
@@ -401,63 +401,72 @@ async function getFamily() {
       console.log(error);
     });
 }
-
+const sorted=ref([]);
 async function fetchFeatureModelOfFamily() {
   await api
     .get(`${API_URL}files/uploaded/confirmed/?family=${family.value.id}`)
     .then(async (response) => {
-      const sorted = response.data.sort((a, b) =>
+      sorted.value = response.data.sort((a, b) =>
         parseInt(a.version, 10) > parseInt(b.version, 10)
           ? 1
           : parseInt(b.version, 10) > parseInt(a.version, 10)
             ? -1
             : 0
       );
-      files.value = sorted.map((elem) => ({
+      files.value = sorted.value.map((elem) => ({
         ...elem,
         active: false,
       }));
-      FulllabelsList.value = sorted.map((elem) => ({id: elem.id, version: elem.version}));
-      for (let i = 0; i < sorted.length; i++) {
-        const elem = sorted[i];
+      FulllabelsList.value = sorted.value.map((elem) => ({id: elem.id, version: elem.version}));
+      for (let i = 0; i < sorted.value.length; i++) {
+        const elem = sorted.value[i];
         //TODO: Fetch right data
         const res = await getNumbersFromFile(
           elem.local_file,
-          sorted[i].label
+          sorted.value[i].label
         );
         fullFeatureList.value.push({id: elem.id, data: res.amountFeatures});
         fullConstraintsList.value.push({ id: elem.id, data:res.amountConstraints});
         fullConfigurationsList.value.push({id: elem.id, data:res.amountConfigurations});
-        fullDataList.value.push({name: "fullFeatureList", list: fullFeatureList}, {name: "fullConstraintsList", list: fullConstraintsList}, {name: "fullConfigurationsList", list: fullConfigurationsList})
+
       }
+      fullDataList.value.push({name: "NumberofFeatures", list: fullFeatureList}, {name: "fullConstraintsList", list: fullConstraintsList}, {name: "fullConfigurationsList", list: fullConfigurationsList})
       loadingTable.value = false;
     });
 }
 async function getDatafromBackend(fileIDs, dataKey){
   //TODO: Insert right url
-  const requests = fileIDs.map((fileId) =>
-    api.get(`${API_URL}analyses/data/?model_id=${fileId}&key=${dataKey}`)
-  );
-  try {
+  const dataList = ref([]);
+  const request = await api.get(`${API_URL}analysis-data/?model_id=${fileIDs}&key=${dataKey}`)
+  .then((response) => {
+                    if (response.data.length === 0) {
+                        return null;
+                    } else {
+                      console.log(response.data)
+                        for (const entry of response.data){
+                          dataList.value.push({id: entry.file, data: entry.value.value});
+                        }
+
+                    }
+                });
+  fullDataList.value.push({name: dataKey, list: dataList})
+  return dataList
+  // const requests = fileIDs.map((fileId) =>
+  //   api.get(`${API_URL}analysis-data/?model_id=${fileId}&key=${dataKey}`)
+  // );
     // Use Promise.all to execute all requests in parallel
-    const responses = await Promise.all(requests);
-    const dataList = ref([]);
+    // const responses = await Promise.all(requests);
+
     // Process responses as needed
-    responses.forEach((response) => {
+    /*responses.forEach((response) => {
+      console.log(response)
       dataList.value.push({id: response.fileID, data: response.data});
-    });
+    });*/
 
     // Return processed data if needed
-    return dataList
-  } catch (error) {
-    // Handle errors
-    console.error('Error fetching data:', error);
-    throw error;
-  }
 }
 async function getNumbersFromFile(path, label) {
   try {
-    console.log(path)
     const response = await api.get(`${API_URL.slice(0, -1)}${path}`);
     const parser = new DOMParser();
     const xmlDocument = parser.parseFromString(response.data, 'text/xml');
@@ -509,6 +518,7 @@ function OnTableChange(idList){
   .filter((file) => idList.includes(file.id))
   .map((file) => file.id);
   for (const elem of fullDataList.value){
+
     displayedDataList.value[elem.name] = elem.list.filter(file => idList.includes(file.id)).map(elem => elem.data)
   }
   labels.value = FulllabelsList.value.filter(file => idList.includes(file.id)).map(elem => elem.version)
@@ -576,14 +586,14 @@ onMounted(async () => {
   initGridStack();
 });
 
-async function addWidget(chartdata, type, title) {
-  const widget = {
+async function addWidget(datakey, type, title) {
+   const widget = {
     w: 1,
     h: 2,
     title: title,
     id: widgets.value.length+1,
     type: type,
-    data: generateChartData(chartdata,type, title)
+    data: await generateChartData(datakey,type, title)
   };
   widgetList.value.push(widget)
   await nextTick();
@@ -599,7 +609,9 @@ function removeWidget(widget) {
   grid.value.compact();
   widgets.value.splice(index, 1);
 }
-function generateChartData(datakey, type, customLabel = 'Custom Label') {
+async function  generateChartData(datakey, type, customLabel = 'Custom Label') {
+  const idList = ref(files.value.map((elem)=> (elem.id)));
+  await getDatafromBackend(idList.value, datakey);
   if (type === "LineChart"){
     return computed(() => {
     return {
@@ -624,7 +636,7 @@ function generateChartData(datakey, type, customLabel = 'Custom Label') {
         labels: [family.value.label],
         datasets: [
           {
-            label: "NumberofFeatures",
+            label: customLabel,
             backgroundColor: "rgba(242, 244, 255, 1)",
             borderColor: "green",
             borderWidth: 2,

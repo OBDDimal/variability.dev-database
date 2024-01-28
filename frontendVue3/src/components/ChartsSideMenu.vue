@@ -72,9 +72,16 @@
 
     <v-divider class="border-opacity-100" thickness="10"></v-divider>
     <!--  Data Table for Analysis: -->
-    <v-data-table :headers="factHeaders" :items="showAnalysis" item-value="name">
+    <v-data-table :headers="factHeaders" :items="showAnalysis">
       <template v-slot:headers>
         Core Metrics
+      </template>
+      <template #item="{item}">
+        <tr>
+          <td @click="generateChart(item.raw.datakey, item.raw.name)">
+            {{item.raw.name}}
+          </td>
+        </tr>
       </template>
       <template v-slot:no-data>
         No Analysis available
@@ -106,12 +113,13 @@ const desc = ref("");
 const expandedRoot = ref([]);
 const expandedSubs = ref([]);
 const expandedSubSubs = ref([]);
-const factHeaders = ref([{ key: "name", sortable: false }, { key: "value", sortable: false }]);
+const factHeaders = ref([ { key: "name", sortable: false }]);
 const expandableHeaders = ref([{ key: 'data-table-expand' }, { key: "name", sortable: false }, ]);
 const hideMissing = ref(false);
 const emit = defineEmits(['createChart'])
-function generateChart(name){
-  emit('createChart', name);
+function generateChart(datakey, name){
+  console.log(name)
+  emit('createChart', datakey, name);
 }
 
 const showMetrics = computed(() => {
@@ -147,6 +155,7 @@ const updateAnalysis = () => {
     return analysis.value.map((entry) => {
         var obj = {};
         obj["name"] = entry.name;
+        console.log(obj)
         return obj;
     });
 };
@@ -182,6 +191,7 @@ const getEntriesOnLevel = (arr, level) => {
         obj["name"] = entry.name;
         obj["value"] = getDisplayValue(entry);
         obj["parent"] = entry.parent;
+        obj["datakey"] = entry.datakey;
         obj["childs"] = [];
         return obj;
     });
