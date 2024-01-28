@@ -355,7 +355,7 @@ function initGridStack() {
   grid.value = GridStack.init({
     column: 4,
     cellHeight: 100,
-    maxRow: 6,
+    maxRow: 10,
     margin: 10,
     disableResize: false,
     disableDrag: false,
