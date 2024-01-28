@@ -19,6 +19,8 @@ from core.user.viewsets import ActivateUserViewSet, UserInfoApiView
 from core.auth.viewsets import LoginViewSet, RegistrationViewSet, RefreshViewSet
 from ddueruemweb.settings import STATIC_ROOT, STATIC_URL, MEDIA_URL, MEDIA_ROOT
 
+from core.analysis.viewsets import AnalysisDataViewSet
+
 # Register new routes for backend here
 router = routers.DefaultRouter()
 
@@ -49,6 +51,7 @@ router.register(r"tags", TagsViewSet, basename="tags")
 router.register(r"licenses", LicensesViewSet, basename="licenses")
 router.register(r"families", FamiliesViewSet, basename="families")
 router.register(r"analyses", AnalysesViewSet, basename="analyses")
+router.register(r'analysis-data', AnalysisDataViewSet, basename='analysis-data')
 router.register(r"analysisresults", AnalysisResultsViewSet, basename="analysisresults")
 
 
