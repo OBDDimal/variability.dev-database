@@ -1,6 +1,6 @@
 <template>
   <v-card variant="outlined">
-
+    <v-card-title>Select Chart to Create</v-card-title>
     <v-divider class="border-opacity-100"></v-divider>
     <v-divider class="border-opacity-100" thickness="10"></v-divider>
     <!--  Data Table for Metrics: -->
@@ -21,9 +21,26 @@
                 </template>
                 </td>
                 <td>
-                  <v-btn v-if="!item.raw.childs || !item.raw.childs.length > 0" @click="generateChart(item.raw.datakey, item.raw.name)" icon>
-                    <v-icon>mdi-chart-bar</v-icon>
-                  </v-btn>
+                  <v-menu>
+                    <template v-slot:activator="{ props }">
+                      <v-btn
+                        color="primary"
+                        v-bind="props"
+                      >
+                        Select
+                      </v-btn>
+                    </template>
+
+                    <v-list>
+                      <v-list-item
+                        v-for="(listitem, index) in items"
+                        :key="index"
+                        @click="generateChart(item.raw.datakey, item.raw.name, listitem.value)"
+                      >
+                        <v-list-item-title>{{ listitem.title }}</v-list-item-title>
+                      </v-list-item>
+                    </v-list>
+                  </v-menu>
                 </td>
               </template>
               <template v-slot:expanded-row="{ item, columns }">
@@ -38,9 +55,28 @@
                         </template>
                         <template v-slot:item="{ item }">
                           <tr>
-                          <v-btn @click="generateChart(item.raw.datakey, item.raw.name)" icon>
-                          <v-icon>mdi-chart-bar</v-icon>
-                            </v-btn>
+                            <td>
+                              <v-menu>
+                                <template v-slot:activator="{ props }">
+                                  <v-btn
+                                    color="primary"
+                                    v-bind="props"
+                                  >
+                                    Select
+                                  </v-btn>
+                                </template>
+
+                                <v-list>
+                                  <v-list-item
+                                    v-for="(listitem, index) in items"
+                                    :key="index"
+                                    @click="generateChart(item.raw.datakey, item.raw.name, listitem.value)"
+                                  >
+                                    <v-list-item-title>{{ listitem.title }}</v-list-item-title>
+                                  </v-list-item>
+                                </v-list>
+                              </v-menu>
+                            </td>
                           <td>
                             {{item.value}}
                           </td>
@@ -78,7 +114,29 @@
       </template>
       <template #item="{item}">
         <tr>
-          <td @click="generateChart(item.raw.datakey, item.raw.name)">
+          <td>
+            <v-menu>
+                    <template v-slot:activator="{ props }">
+                      <v-btn
+                        color="primary"
+                        v-bind="props"
+                      >
+                        Select
+                      </v-btn>
+                    </template>
+
+                    <v-list>
+                      <v-list-item
+                        v-for="(listitem, index) in items"
+                        :key="index"
+                        @click="generateChart(item.raw.datakey, item.raw.name, listitem.value)"
+                      >
+                        <v-list-item-title>{{ listitem.title }}</v-list-item-title>
+                      </v-list-item>
+                    </v-list>
+                  </v-menu>
+          </td>
+          <td>
             {{item.raw.name}}
           </td>
         </tr>
@@ -90,8 +148,6 @@
       </template>
     </v-data-table>
     <v-divider class="border-opacity-100" thickness="10"></v-divider>
-    <v-checkbox-btn v-model="hideMissing" label="Hide Missing">
-    </v-checkbox-btn>
   </v-card>
 </template>
 
@@ -117,9 +173,14 @@ const factHeaders = ref([ { key: "name", sortable: false }]);
 const expandableHeaders = ref([{ key: 'data-table-expand' }, { key: "name", sortable: false }, ]);
 const hideMissing = ref(false);
 const emit = defineEmits(['createChart'])
-function generateChart(datakey, name){
+const items = ref([
+  { title: 'LineChart', value: 'LineChart' },
+  { title: 'BoxPlot', value: 'BoxPlot' },
+]);
+function generateChart(datakey, name, type){
+  console.log(datakey)
   console.log(name)
-  emit('createChart', datakey, name);
+  emit('createChart', datakey, name, type);
 }
 
 const showMetrics = computed(() => {
@@ -155,6 +216,7 @@ const updateAnalysis = () => {
     return analysis.value.map((entry) => {
         var obj = {};
         obj["name"] = entry.name;
+        obj["datakey"] = entry.datakey;
         console.log(obj)
         return obj;
     });
