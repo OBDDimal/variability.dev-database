@@ -254,6 +254,7 @@ async function getFamily() {
     });
 }
 const sorted=ref([]);
+const sortedIds = ref([]);
 async function fetchFeatureModelOfFamily() {
   await api
     .get(`${API_URL}files/uploaded/confirmed/?family=${family.value.id}`)
@@ -265,6 +266,7 @@ async function fetchFeatureModelOfFamily() {
             ? -1
             : 0
       );
+      sortedIds.value = sorted.value.map((elem) => elem.id)
       files.value = sorted.value.map((elem) => ({
         ...elem,
         active: false,
@@ -275,7 +277,6 @@ async function fetchFeatureModelOfFamily() {
       await generateChartData('Number_CORE', 'LineChart', 'Number Of Core Features')
       await generateChartData('NumberOfValidConfigurationsLog', 'LineChart', 'Number Of Valid Configurations (Log)')
       await generateChartData('NumberOfValidConfigurationsLog', 'BoxPlot', 'Number Of Valid Configurations (Log)')
-      console.log(fullDataList.value)
       loadingTable.value = false;
     });
 }
@@ -286,11 +287,10 @@ async function getDatafromBackend(fileIDs, dataKey){
                     if (response.data.length === 0) {
                         return null;
                     } else {
-                      console.log(response.data)
                         for (const entry of response.data){
                           dataList.value.push({id: entry.file, data: entry.value.value});
                         }
-
+                        dataList.value = sortByOrder(sortedIds.value, dataList.value)
                     }
                 });
   fullDataList.value.push({name: dataKey, list: dataList})
@@ -309,7 +309,19 @@ async function getDatafromBackend(fileIDs, dataKey){
 
     // Return processed data if needed
 }
+function sortByOrder(originalOrder, listToSort) {
+  // Create a copy of the listToSort to avoid modifying the original array
+  const sortedList = [...listToSort];
+  // Sort the list based on the order of elements in the originalOrder array
+  sortedList.sort((a, b) => {
+    const indexA = originalOrder.indexOf(a.id);
+    const indexB = originalOrder.indexOf(b.id);
 
+    // Compare the indices to determine the order
+    return indexA - indexB;
+  });
+  return sortedList;
+}
 function onDatapointHover(elem) {
   if (elem !== undefined) {
     files.value.find((file) => file.id === visibleFiles.value[elem]).active = true;
@@ -345,7 +357,6 @@ function OnTableChange(idList){
   .filter((file) => idList.includes(file.id))
   .map((file) => file.id);
   for (const elem of fullDataList.value){
-
     displayedDataList.value[elem.name] = elem.list.filter(file => idList.includes(file.id)).map(elem => elem.data)
   }
   labels.value = FulllabelsList.value.filter(file => idList.includes(file.id)).map(elem => elem.version)
