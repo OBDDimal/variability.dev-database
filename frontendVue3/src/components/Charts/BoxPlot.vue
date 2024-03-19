@@ -1,8 +1,15 @@
 <template>
-  <canvas ref="chartCanvas"></canvas>
+  <!--<canvas ref="chartCanvas" @click.right="onContextMenu($event)"></canvas>-->
+  <canvas ref="chartCanvas" @contextmenu="onContextMenu($event)"></canvas>
+  <!--<canvas ref="chartCanvas" @contextmenu="onButtonClick($event)"></canvas>-->
+  <context-menu></context-menu>
 </template>
 
 <script setup>
+import '@imengyu/vue3-context-menu/lib/vue3-context-menu.css'
+//import ContextMenu, { ContextMenuItem, ContextMenuGroup, ContextMenuSeparator } from '@imengyu/vue3-context-menu'
+import ContextMenu from '@imengyu/vue3-context-menu'
+
 import {onMounted, ref, watch} from "vue";
 import { BoxPlotChart } from "@sgratzl/chartjs-chart-boxplot";
 import { Chart, registerables } from "chart.js";
@@ -92,4 +99,109 @@ const drawChart = () => {
     },
   });
 };
+
+
+
+const saveStorage = function(key, data) {
+    localStorage.setItem(key, JSON.stringify(data));
+};
+
+
+function multipleYAxis() {
+  //console.log(Chart.getChart(chartCanvas.value));
+  
+
+  if (localStorage.getItem("dataBox") == null){
+    console.log("IF")
+    console.log(props.data.datasets[0].data[0]);
+    saveStorage("dataBox", props.data.datasets[0].data[0]);
+    saveStorage("colorBox", props.data.datasets[0].borderColor);
+    saveStorage("labelBox", props.data.datasets[0].label);
+  }
+
+  else{
+    console.log("ELSE");
+    let olddata = JSON.parse(localStorage.getItem("dataBox"));
+    let color = JSON.parse(localStorage.getItem("colorBox"));
+    let label = JSON.parse(localStorage.getItem("labelBox"));
+    localStorage.clear();
+    
+    let arr = [];
+    for(let i=0; i<Chart.getChart(chartCanvas.value)["data"]["datasets"].length; i++){ 
+      console.log("HIER");
+      //console.log(Chart.getChart(chartCanvas.value)["config"]["data"]["datasets"][i].label);
+      arr.push(Chart.getChart(chartCanvas.value)["data"]["datasets"][i].label);
+    }
+
+    console.log(arr);
+
+    if(!arr.includes(label)){
+      Chart.getChart(chartCanvas.value)["data"]["datasets"].push({
+        //label: 'Dataset 2',
+        label: label,
+        //data: [28, 48, 40, 19, 86, 27, 90],
+        data: olddata,
+        //borderColor: 'rgb(54, 162, 235)',
+        borderColor: color,
+        tension: 0.1
+      });
+      console.log(Chart.getChart(chartCanvas.value));
+      Chart.getChart(chartCanvas.value).update();
+      //drawChart();
+    } 
+  }
+}
+
+
+
+
+/*
+const changeToLog = () =>{
+  console.log("Ausgewählt");
+  Chart.getChart(chartCanvas.value).scales.x.type = "exponential"
+  console.log(Chart.getChart(chartCanvas.value).scales.x.type);
+  console.log(Chart.getChart(chartCanvas.value));
+};*/
+
+function onContextMenu(e) {
+  //prevent the browser's default menu
+  e.preventDefault();
+  //show your menu
+  console.log(ContextMenu);
+  ContextMenu.showContextMenu({
+    x: e.x,
+    y: e.y,
+    items: [
+      { 
+        label: "Multiple Y Axis", 
+        onClick: () => {
+          //alert("You click a menu item");
+          multipleYAxis();
+        }
+      },
+      { 
+        label: "Change Labels", 
+        children: [
+          { label: "X-Axis",
+            onClick: () => {
+              //alert("You click a menu item");
+              changeXLabels();
+            }
+          },
+          { label: "Y-Axis",
+            onClick: () => {
+              //alert("You click a menu item");
+              changeYLabels();
+            }
+          },
+        ]
+      },
+    ]
+  }); 
+}
+
+
+
+
+
 </script>

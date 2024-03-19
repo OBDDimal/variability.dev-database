@@ -4,13 +4,18 @@ import { createVuetify } from 'vuetify';
 import { VDataTable } from 'vuetify/labs/VDataTable';
 import { VBottomSheet} from 'vuetify/labs/VBottomSheet';
 
+import '@imengyu/vue3-context-menu/lib/vue3-context-menu.css'
+import ContextMenu from '@imengyu/vue3-context-menu'
+
+
 export default createVuetify({
     theme: {
         defaultTheme: 'light',
     },
     components: {
         VDataTable,
-        VBottomSheet
+        VBottomSheet,
+        ContextMenu
     },
 });
 /*{
