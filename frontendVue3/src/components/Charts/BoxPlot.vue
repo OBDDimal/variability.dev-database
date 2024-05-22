@@ -67,6 +67,8 @@ watch(() => props.data, () => {
   }
 });
 const drawChart = () => {
+
+  
   const ctx = chartCanvas.value.getContext("2d");
 
   // Clear existing chart (if any)
@@ -108,33 +110,21 @@ const saveStorage = function(key, data) {
 
 
 function multipleYAxis() {
-  //console.log(Chart.getChart(chartCanvas.value));
-  
-
   if (localStorage.getItem("dataBox") == null){
-    console.log("IF")
-    console.log(props.data.datasets[0].data[0]);
     saveStorage("dataBox", props.data.datasets[0].data[0]);
     saveStorage("colorBox", props.data.datasets[0].borderColor);
     saveStorage("labelBox", props.data.datasets[0].label);
   }
 
   else{
-    console.log("ELSE");
     let olddata = JSON.parse(localStorage.getItem("dataBox"));
     let color = JSON.parse(localStorage.getItem("colorBox"));
     let label = JSON.parse(localStorage.getItem("labelBox"));
     localStorage.clear();
-    
     let arr = [];
     for(let i=0; i<Chart.getChart(chartCanvas.value)["data"]["datasets"].length; i++){ 
-      console.log("HIER");
-      //console.log(Chart.getChart(chartCanvas.value)["config"]["data"]["datasets"][i].label);
       arr.push(Chart.getChart(chartCanvas.value)["data"]["datasets"][i].label);
     }
-
-    console.log(arr);
-
     if(!arr.includes(label)){
       Chart.getChart(chartCanvas.value)["data"]["datasets"].push({
         //label: 'Dataset 2',
@@ -145,29 +135,14 @@ function multipleYAxis() {
         borderColor: color,
         tension: 0.1
       });
-      console.log(Chart.getChart(chartCanvas.value));
       Chart.getChart(chartCanvas.value).update();
-      //drawChart();
     } 
   }
 }
 
-
-
-
-/*
-const changeToLog = () =>{
-  console.log("Ausgewählt");
-  Chart.getChart(chartCanvas.value).scales.x.type = "exponential"
-  console.log(Chart.getChart(chartCanvas.value).scales.x.type);
-  console.log(Chart.getChart(chartCanvas.value));
-};*/
-
 function onContextMenu(e) {
-  //prevent the browser's default menu
   e.preventDefault();
   //show your menu
-  console.log(ContextMenu);
   ContextMenu.showContextMenu({
     x: e.x,
     y: e.y,
@@ -175,7 +150,6 @@ function onContextMenu(e) {
       { 
         label: "Multiple Y Axis", 
         onClick: () => {
-          //alert("You click a menu item");
           multipleYAxis();
         }
       },
@@ -184,13 +158,11 @@ function onContextMenu(e) {
         children: [
           { label: "X-Axis",
             onClick: () => {
-              //alert("You click a menu item");
               changeXLabels();
             }
           },
           { label: "Y-Axis",
             onClick: () => {
-              //alert("You click a menu item");
               changeYLabels();
             }
           },
@@ -199,9 +171,5 @@ function onContextMenu(e) {
     ]
   }); 
 }
-
-
-
-
 
 </script>
